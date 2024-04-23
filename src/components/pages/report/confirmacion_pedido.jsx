@@ -240,7 +240,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 fontFamily: CONFIG.BOLD,
               }}
             >
-              Prueba
+              {title}
             </Text>
           </View>
 
