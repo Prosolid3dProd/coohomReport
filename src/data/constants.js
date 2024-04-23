@@ -30,8 +30,8 @@ export const CONFIG = {
     COMPLEMENTO: "500",
     HANDLER: "11",
     BALDAS_DECORATIVAS:"4545",
-    FRENTE_FIJO: "7070"
-    // ACCESORIOS:"8080",
+    FRENTE_FIJO: "7070",
+    ZOCALOS:"2222",
   },
   MODELNAME: {
     ACCESORIOS: {

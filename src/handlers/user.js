@@ -77,7 +77,6 @@ export const login = async (params) => {
       ...params,
       token: Settings.TOKEN,
     });
-
     if (data.data) {
       if (data.data.ok) {
         if (data.data.user.role === "admin") {

@@ -5,141 +5,142 @@ import { createOrder } from "../handlers/order";
 import { CONFIG } from "../data/constants";
 import { FormItemInputContext } from "antd/es/form/context";
 
-const zocalosw = [
-  {
-    ref: ["ESTM", "ESTF"], //estrato
-    pMediaTira: 49,
-    pTira: 77,
-    anchoMaximo: 3000,
-    descripcion: "Zócalo estratificado para h:",
-    referencia: {
-      M65: "ZE6.150B4",
-      T65: "ZE6.300B4",
-      M105: "ZE6.150B8",
-      T105: "ZE6.300B8",
-      M60: "ZE6.150",
-      T60: "ZE6.300",
-      M100: "ZE10.150",
-      T100: "ZE10.300",
-      M150: "ZE15.150",
-      T150: "ZE15.300",
-    },
-  },
-  {
-    ref: ["PLAM"], //Melamina
-    pMediaTira: 32,
-    pTira: 59,
-    anchoMaximo: 2750,
-    descripcion: "Zócalo melamina para h:",
-    referencia: {
-      M65: "ZM6.140B4",
-      T65: "ZM6.280B4",
-      M105: "ZM10.140B8",
-      T105: "ZM10.280B8",
-      M60: "ZM6.140",
-      T60: "ZM6.280",
-      M100: "ZM10.140",
-      T100: "ZM10.280",
-      M150: "ZM15.140",
-      T150: "ZM15.280",
-    },
-  },
-  {
-    ref: ["LACAM", "LACAB"], //Lacado
-    pMediaTira: 59,
-    pTira: 99,
-    anchoMaximo: 2440,
-    descripcion: "Zócalo dm lacado para h:",
-    referencia: {
-      M65: "ZL6.122B4",
-      T65: "ZL6.244B4",
-      M105: "ZL10.122B8",
-      T105: "ZL10.244B8",
-      M60: "ZL6.122",
-      T60: "ZL6.244",
-      M100: "ZL10.122",
-      T100: "ZL10.244",
-      M150: "ZL15.122",
-      T150: "ZL15.244",
-    },
-  },
-  {
-    ref: ["NP200", "NP300", "NP200L"], //barnizado
-    pMediaTira: 59,
-    pTira: 99,
-    anchoMaximo: 2440,
-    descripcion: "Zócalo barnizado para h:",
-    referencia: {
-      M65: "ZB6.122B4",
-      T65: "ZB6.244B4",
-      M105: "ZB10.122B8",
-      T105: "ZB10.244B8",
-      M60: "ZB6.122",
-      T60: "ZB6.244",
-      M100: "ZB10.122",
-      T100: "ZB10.244",
-      M150: "ZB15.122",
-      T150: "ZB15.244",
-    },
-  },
-  {
-    ref: ["ALU"], //aluminio
-    pMediaTira: {
-      M60: 38,
-      M100: 38,
-      M120: 47,
-      M150: 47,
-    },
-    pTira: {
-      T60: 70,
-      T100: 70,
-      T120: 85,
-      T150: 85,
-    },
-    anchoMaximo: 4000,
-    descripcion: "Zócalo aluminio mate para h:",
-    referencia: {
-      M60: "ZAM6.200",
-      T60: "ZAM6.400",
-      M100: "ZB10.ZAM10.200",
-      T100: "ZAM10.400",
-      M120: "ZAM12.200",
-      T120: "ZAM12.400",
-      M150: "ZAM15.200",
-      T150: "ZAM15.400",
-    },
-  },
+// const zocalosw = [
+//   {
+//     ref: ["ESTM", "ESTF"], //estrato
+//     pMediaTira: 49,
+//     pTira: 77,
+//     anchoMaximo: 3000,
+//     descripcion: "Zócalo estratificado para h:",
+//     referencia: {
+//       M65: "ZE6.150B4",
+//       T65: "ZE6.300B4",
+//       M105: "ZE6.150B8",
+//       T105: "ZE6.300B8",
+//       M60: "ZE6.150",
+//       T60: "ZE6.300",
+//       M100: "ZE10.150",
+//       T100: "ZE10.300",
+//       M150: "ZE15.150",
+//       T150: "ZE15.300",
+//     },
+//   },
+//   {
+//     ref: ["PLAM"], //Melamina
+//     pMediaTira: 32,
+//     pTira: 59,
+//     anchoMaximo: 2750,
+//     descripcion: "Zócalo melamina para h:",
+//     referencia: {
+//       M65: "ZM6.140B4",
+//       T65: "ZM6.280B4",
+//       M105: "ZM10.140B8",
+//       T105: "ZM10.280B8",
+//       M60: "ZM6.140",
+//       T60: "ZM6.280",
+//       M100: "ZM10.140",
+//       T100: "ZM10.280",
+//       M150: "ZM15.140",
+//       T150: "ZM15.280",
+//     },
+//   },
+//   {
+//     ref: ["LACAM", "LACAB"], //Lacado
+//     pMediaTira: 59,
+//     pTira: 99,
+//     anchoMaximo: 2440,
+//     descripcion: "Zócalo dm lacado para h:",
+//     referencia: {
+//       M65: "ZL6.122B4",
+//       T65: "ZL6.244B4",
+//       M105: "ZL10.122B8",
+//       T105: "ZL10.244B8",
+//       M60: "ZL6.122",
+//       T60: "ZL6.244",
+//       M100: "ZL10.122",
+//       T100: "ZL10.244",
+//       M150: "ZL15.122",
+//       T150: "ZL15.244",
+//     },
+//   },
+//   {
+//     ref: ["NP200", "NP300", "NP200L"], //barnizado
+//     pMediaTira: 59,
+//     pTira: 99,
+//     anchoMaximo: 2440,
+//     descripcion: "Zócalo barnizado para h:",
+//     referencia: {
+//       M65: "ZB6.122B4",
+//       T65: "ZB6.244B4",
+//       M105: "ZB10.122B8",
+//       T105: "ZB10.244B8",
+//       M60: "ZB6.122",
+//       T60: "ZB6.244",
+//       M100: "ZB10.122",
+//       T100: "ZB10.244",
+//       M150: "ZB15.122",
+//       T150: "ZB15.244",
+//     },
+//   },
+//   {
+//     ref: ["ALU"], //aluminio
+//     pMediaTira: {
+//       M60: 38,
+//       M100: 38,
+//       M120: 47,
+//       M150: 47,
+//     },
+//     pTira: {
+//       T60: 70,
+//       T100: 70,
+//       T120: 85,
+//       T150: 85,
+//     },
+//     anchoMaximo: 4000,
+//     descripcion: "Zócalo aluminio mate para h:",
+//     referencia: {
+//       M60: "ZAM6.200",
+//       T60: "ZAM6.400",
+//       M100: "ZB10.ZAM10.200",
+//       T100: "ZAM10.400",
+//       M120: "ZAM12.200",
+//       T120: "ZAM12.400",
+//       M150: "ZAM15.200",
+//       T150: "ZAM15.400",
+//     },
+//   },
 
-  {
-    ref: ["ALUL"], //aluminio lacado
-    pMediaTira: {
-      M60: 58,
-      M100: 58,
-      M120: 66,
-      M150: 66,
-    },
-    pTira: {
-      T60: 94,
-      T100: 94,
-      T120: 110,
-      T150: 110,
-    },
-    anchoMaximo: 4000,
-    descripcion: "Zócalo aluminio lacado para h:",
-    referencia: {
-      M60: "ZAL6.200",
-      T60: "ZAL6.400",
-      M100: "ZAL10.200",
-      T100: "ZAL10.400",
-      M120: "ZAL12.200",
-      T120: "ZAL12.400",
-      M150: "ZAL15.200",
-      T150: "ZAL15.400",
-    },
-  },
-];
+//   {
+//     ref: ["ALUL"], //aluminio lacado
+//     pMediaTira: {
+//       M60: 58,
+//       M100: 58,
+//       M120: 66,
+//       M150: 66,
+//     },
+//     pTira: {
+//       T60: 94,
+//       T100: 94,
+//       T120: 110,
+//       T150: 110,
+//     },
+//     anchoMaximo: 4000,
+//     descripcion: "Zócalo aluminio lacado para h:",
+//     referencia: {
+//       M60: "ZAL6.200",
+//       T60: "ZAL6.400",
+//       M100: "ZAL10.200",
+//       T100: "ZAL10.400",
+//       M120: "ZAL12.200",
+//       T120: "ZAL12.400",
+//       M150: "ZAL15.200",
+//       T150: "ZAL15.400",
+//     },
+//   },
+// ];
 
-// const zocalos = (item) => {
+// const zocalos = (ite) => {
+//   // if (item.lineales !== undefined) {
 //   let footline = [];
 //   let calculo = 0;
 //   let division = "";
@@ -147,52 +148,94 @@ const zocalosw = [
 //   let mediatiraFootline = 0;
 //   let newFootline = [];
 
-//   if (item.length > 0) {
+//   if (ite !== undefined) {
 //     try {
-//       item.forEach((ite) => {
-//         //recorremos los diferentes zocalos es decir vienen como un param model diferente
-//         const zoc = zocalosw.find((x) =>
-//           x.ref.includes(
-//             ite.code === "1000" && ite.customCode != "ALU"
-//               ? "ALUL"
-//               : ite.customCode
-//           )
-//         );
-//         tiraFootline = 0;
-//         mediatiraFootline = 0;
-//         ite.lineales.forEach((lineal) => {
-//           // recorremos los puntos de un zocalo
-//           calculo = lineal.lengthWithAllowance / zoc.anchoMaximo;
-//           division = calculo.toString().split(".");
-//           tiraFootline = tiraFootline + parseInt(division[0]);
-//           //const zoc = zocalosw.find(x => x.ref === "Z36");
+//       //recorremos los diferentes zocalos es decir vienen como un param model diferente
+//       const zoc = zocalosw.find((x) =>
+//         x.ref.includes(
+//           ite.code === "1000" && ite.customCode != "ALU"
+//             ? "ALUL"
+//             : ite.customCode
+//         )
+//       );
+//       tiraFootline = 0;
+//       mediatiraFootline = 0;
+//       ite.lineales.forEach((lineal) => {
+//         // recorremos los puntos de un zocalo
+//         calculo = lineal.lengthWithAllowance / zoc.anchoMaximo;
+//         division = calculo.toString().split(".");
+//         tiraFootline = tiraFootline + parseInt(division[0]);
+//         // const zoc = zocalosw.find(x => x.ref === "Z36");
 
-//           if (parseInt(String(division[1])[0]) < 5) {
-//             mediatiraFootline++;
-//           } else {
-//             tiraFootline++;
-//           }
-//         });
+//         if (parseInt(String(division[1])[0]) < 5) {
+//           mediatiraFootline++;
+//         } else {
+//           tiraFootline++;
+//         }
+//       });
 
+//       if (tiraFootline > 0) {
 //         footline.push({
+//           tipo: "T",
+//           typeZocalo: "5",
 //           material: ite.material || null,
-//           tira: tiraFootline || null,
-//           mediaTira: mediatiraFootline,
-//           precioTira:
+//           customCode: ite.customCode,
+//           quantity: tiraFootline || null,
+//           priceCabinet:
 //             ite.code === "1000"
-//               ? zoc.pTira["T" + ite.height.toString()]
-//               : zoc.pTira, //*tiraFootline
-//           precioMediaTira:
+//               ? zoc.pMediaTira["M" + ite.height.toString()]
+//               : zoc.pMediaTira,
+//           // mediaTira: mediatiraFootline,
+//           // precioTira:
+//           //   ite.code === "1000"
+//           //     ? zoc.pTira["T" + ite.height.toString()]
+//           //     : zoc.pTira, //*tiraFootline
+//           total:
 //             ite.code === "1000"
 //               ? zoc.pMediaTira["M" + ite.height.toString()]
 //               : zoc.pMediaTira, //*mediatiraFootline
-//           altura: ite.height,
-//           referenciaMedia: zoc.referencia["M" + ite.height.toString()] || null,
-//           referenciaTira: zoc.referencia["T" + ite.height.toString()] || null,
+//           // referenciaMedia:
+//           //   zoc.referencia["M" + ite.height.toString()] || null,
+//           reference: zoc.referencia["T" + ite.height.toString()] || null,
+//           obsBrandGoodId: ite.obsBrandGoodId,
 //           name: zoc.descripcion + ite.height.toString(),
-//           anchoMaximo: zoc.anchoMaximo,
+//           size: {
+//             x: zoc.anchoMaximo,
+//             z: ite.height,
+//             y: ite.y,
+//           },
 //         });
-//       });
+//       } else if (mediatiraFootline > 0) {
+//         footline.push({
+//           tipo: "T",
+//           typeZocalo: "5",
+//           material: ite.material || null,
+//           customCode: ite.customCode,
+//           // tira: tiraFootline || null,
+//           quantity: mediatiraFootline,
+//           priceCabinet:
+//             ite.code === "1000"
+//               ? zoc.pMediaTira["M" + ite.height.toString()]
+//               : zoc.pMediaTira,
+//           // precioTira:
+//           //   ite.code === "1000"
+//           //     ? zoc.pTira["T" + ite.height.toString()]
+//           //     : zoc.pTira, //*tiraFootline
+//           total:
+//             ite.code === "1000"
+//               ? zoc.pMediaTira["M" + ite.height.toString()]
+//               : zoc.pMediaTira, //*mediatiraFootline
+//           reference: zoc.referencia["M" + ite.height.toString()] || null,
+//           obsBrandGoodId: ite.obsBrandGoodId,
+//           // referenciaTira: zoc.referencia["T" + ite.height.toString()] || null,
+//           name: zoc.descripcion + ite.height.toString(),
+//           size: {
+//             x: zoc.anchoMaximo,
+//             z: ite.height,
+//             y: it.y,
+//           },
+//         });
+//       }
 
 //       //sumar los zocalos que son del mismo material(combinarlo)
 //       newFootline = [].concat(footline); //duplicamos el array de los zocalos a otro nuevo
@@ -204,7 +247,8 @@ const zocalosw = [
 //             newFootline[tamano] != undefined &&
 //             newFootline[tamano].material === lineal.material &&
 //             tamano !== indice &&
-//             newFootline[tamano].altura === lineal.altura
+//             newFootline[tamano].altura === lineal.altura &&
+//             newFootline[tamano].reference === lineal.reference
 //           ) {
 //             newFootline[tamano].mediaTira += lineal.mediaTira;
 //             newFootline[tamano].tira += lineal.tira;
@@ -219,7 +263,6 @@ const zocalosw = [
 //     }
 //     newFootline = newFootline.filter((x) => x != Empty);
 //   }
-
 //   return newFootline;
 // };
 
@@ -290,13 +333,12 @@ const getRef = (parametros, reference) => {
     if (item.name === CONFIG.REF) {
       reference.ref = String(item.value);
       reference.type = String(item.value).trim().substring(0, 1);
-
       if (
         String(item.value)
           .toLocaleUpperCase()
           .indexOf(CONFIG.MODELNAME.SOBREENCIMERAS.CODE) > -1
       ) {
-        reference.type = CONFIG.MODELNAME.SOBREENCIMERAS.CODE;
+        reference.type = CONFIG.MODELNAME.MURALES.CODE;
       }
 
       if (
@@ -330,6 +372,10 @@ const getRef = (parametros, reference) => {
         reference.ref = String(item.value);
         reference.type = "B";
       }
+      if (String(item.value).trim().substring(0, 2) === "BH") {
+        reference.ref = String(item.value);
+        reference.type = "B";
+      }
     }
   });
 
@@ -343,7 +389,7 @@ const getRef = (parametros, reference) => {
           .toLocaleUpperCase()
           .indexOf(CONFIG.MODELNAME.SOBREENCIMERAS.CODE) > -1
       ) {
-        reference.type = CONFIG.MODELNAME.SOBREENCIMERAS.CODE;
+        reference.type = CONFIG.MODELNAME.MURALES.CODE;
       }
 
       if (
@@ -397,6 +443,10 @@ const getRef = (parametros, reference) => {
       reference.ref = String(item.value);
       reference.type = "B";
     }
+    if (String(item.value).trim().substring(0, 2) === "BH") {
+      reference.ref = String(item.value);
+      reference.type = "B";
+    }
   });
   if (
     String(parametros.modelName).toLocaleUpperCase().indexOf("FORRADO") > -1
@@ -425,7 +475,6 @@ const getRef = (parametros, reference) => {
   ) {
     reference.type = CONFIG.MODELNAME.REGLETAS.CODE;
   }
-
   if (
     String(parametros.modelProductNumber).toUpperCase() ===
     CONFIG.MODELNAME.ACCESORIOS.NAME
@@ -452,6 +501,10 @@ const getRef = (parametros, reference) => {
     CONFIG.MODELNAME.COSTADOS.NAME
   ) {
     reference.type = CONFIG.MODELNAME.COSTADOS.CODE;
+  }
+
+  if (String(parametros.modelProductNumber) === "脚线") {
+    reference.type = "T";
   }
 
   if (String(parametros.modelName).toLocaleUpperCase()?.indexOf("PLACA") > -1) {
@@ -548,11 +601,12 @@ const getInfoCabinet = (submodels) => {
     materialCabinet: null,
     modelCabinet: null,
   };
+
   //nuevo
 
-  values = {
-    materialCabinet: submodels.textureName,
-  };
+  // values = {
+  //   materialCabinet: submodels.textureName,
+  // };
   //nuevo
 
   submodels.forEach((item) => {
@@ -574,27 +628,26 @@ const getInfoCabinet = (submodels) => {
       };
     }
   });
-  // console.log(values.materialCabinet)
   return values;
 };
 
-const getInfoArmazon = (submodels) => {
-  let values = {
-    materialCabinet: null,
-    modelCabinet: null,
-  };
+// const getInfoArmazon = (submodels) => {
+//   let values = {
+//     materialCabinet: null,
+//     modelCabinet: null,
+//   };
 
-  submodels.forEach((item) => {
-    if (String(item.customCode).substring(0, 4) === CONFIG.CUSTOMCODE.CASCO) {
-      values = {
-        material: item.textureName,
-        modelo: item.modelName,
-      };
-    }
-  });
-  // console.log(values.materialCabinet)
-  return values;
-};
+//   submodels.forEach((item) => {
+//     if (String(item.customCode).substring(0, 4) === CONFIG.CUSTOMCODE.CASCO) {
+//       values = {
+//         material: item.textureName,
+//         modelo: item.modelName,
+//       };
+//     }
+//   });
+//   // console.log(values.materialCabinet)
+//   return values;
+// };
 
 const getInfoDrawer = (submodels) => {
   let modelDrawer = null;
@@ -619,12 +672,14 @@ const getPerfil = (perf) => {
   let price = 0;
   let priceTapa = 0;
   let acabado = undefined;
+
   const perfil = perf.find((x) =>
     String(x.modelBrandGoodName).toLocaleUpperCase().includes("PERFIL")
   );
   const tapa = perf.find((x) =>
     String(x.modelBrandGoodName).toLocaleUpperCase().includes("TAPA")
   );
+
   if (perfil != undefined) {
     perfil.parameters?.forEach((item) => {
       if (String(item.name).toUpperCase() === CONFIG.PRICE) {
@@ -688,8 +743,28 @@ const getTotalDoors = (submodels) => {
 
 const getParameters = (param, tipoMueble) => {
   let op = [];
-  param.forEach((item) => {
+
+  const casco = param.subModels.find((x) =>
+    x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
+  );
+
+  if (casco !== undefined) {
+    const cv = casco.parameters.find((x) =>
+      x.name == "CV" && x.value > 0 ? x.value : undefined
+    );
+
+    if (cv !== undefined) {
+      op.push({
+        name: cv.displayName,
+        value: parseFloat(cv.value),
+        description: cv.description,
+        nameValue: cv.optionValues[cv.options?.indexOf(cv.value)].name,
+      });
+    }
+  }
+  param.parameters.forEach((item) => {
     //para quitar las variante que vienen activas por defecto
+
     let bool = true;
     if (
       String(item.name) === "CIZ" ||
@@ -729,7 +804,6 @@ const getParameters = (param, tipoMueble) => {
     ) {
       bool = false;
     }
-
     if (item.name == "FSK" && item.value < 0) {
       op.push({
         name: item.displayName,
@@ -825,19 +899,21 @@ const getCalculoFondo = (item) => {
     z: 0,
   };
 
-  if (
-    String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
-    item.boxSize.y >= 150 &&
-    item.boxSize.y < 700
-  ) {
-    size.y = item.boxSize.y + 2;
-  } else if (
-    String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
-    item.boxSize.y >= 700
-  ) {
-    size.y = item.boxSize.y + 4;
-  } else {
-    size.y = item.boxSize.y;
+  // if (
+  //   String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
+  //   item.boxSize.y >= 150 &&
+  //   item.boxSize.y < 700
+  // ) {
+  //   size.y = item.boxSize.y + 2;
+  // } else if (
+  //   String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
+  //   item.boxSize.y >= 700
+  // ) {
+  //   size.y = item.boxSize.y + 4;
+  // } else
+
+  if (String(item.modelProductNumber).toUpperCase() !== "ACCESORIOS") {
+    size.y = item.boxSize.y + fondoPuerta;
   }
 
   size.x = item.boxSize.x;
@@ -874,10 +950,11 @@ const quitarDuplicados = (array) => {
 // main
 export const parseJson3D = async (json) => {
   try {
+    let referenceTemp;
     let contador = 0;
     let contador2 = 0;
     var cabinets = [];
-    let tiradores = [];
+    // let tiradores = [];
     let door;
     let cabinet;
     let armazonInfo;
@@ -911,9 +988,10 @@ export const parseJson3D = async (json) => {
     const drawerGlobal = [];
 
     let opening;
-    // let zocalo = 0;
+    let zocalo = 0;
     let arrZocalos = [];
     let arrEncimeras = [];
+    let tiradoresCabecera = [];
 
     json.paramModel?.forEach((item) => {
       let materialCostado = "";
@@ -952,18 +1030,71 @@ export const parseJson3D = async (json) => {
         };
       }
 
-      if (item["@type"] == 5) {
+      const precioZocalo = (item) => {
+        for (const precio of item.ignoreParameters) {
+          if (precio.name === "PRICE") {
+            return parseFloat(precio.value);
+          }
+        }
+      };
+      const referenceZocalo = (item) => {
+        for (const reference of item.ignoreParameters) {
+          if (reference.name === "REF") {
+            return String(reference.value);
+          }
+        }
+      };
+
+      if (item.customCode === CONFIG.CUSTOMCODE.ZOCALOS) {
         arrZocalos.push({
+          tipo: "T",
+          typeZocalo: "library",
           material: item.textureName,
-          lineales: item.profileSegments,
+          reference: referenceZocalo(item),
           customCode: item.textureCustomCode,
-          height: item.size.z,
-          code:
-            "brandGoodCode" in item.profiles[0]
-              ? item.profiles[0].brandGoodCode
-              : null,
+          size: {
+            x: item.size.x,
+            y: item.size.y,
+            z: item.size.z,
+          },
+          total: precioZocalo(item),
+          priceCabinet: precioZocalo(item),
+          name: item.modelName,
+          obsBrandGoodId: item.obsBrandGoodId,
+          quantity: parseInt(item.modelCostInfo.quantity),
         });
-      } else if (item["@type"] == 3) {
+      } else if (item["@type"] == "5") {
+        // arrZocalos.push(
+        //   zocalos(
+        //     {
+        //       material: item.textureName,
+        //       lineales: item.profileSegments,
+        //       customCode: item.textureCustomCode,
+        //       y: item.profileSegments[0].width,
+        //       height: item.size.z,
+        //       code:
+        //         "brandGoodCode" in item.profiles[0]
+        //           ? item.profiles[0].brandGoodCode
+        //           : null,
+        //     },
+        //   )
+        // );
+        // let pushTipo = zocalos({
+        //   tipo: "T",
+        //   tipo: "T",
+        //   material: item.textureName,
+        //   lineales: item.profileSegments,
+        //   customCode: item.textureCustomCode,
+        //   y: item.profileSegments[0].width,
+        //   height: item.size.z,
+        //   code:
+        //     "brandGoodCode" in item.profiles[0]
+        //       ? item.profiles[0].brandGoodCode
+        //       : null,
+        //   obsBrandGoodId: item.obsBrandGoodId,
+        //   customCode: item.textureCustomCode,
+        // });
+      } else if (item["@type"] == "3") {
         item.subModels?.forEach((submodel) => {
           if (submodel.modelName == "Countertop Block") {
             arrEncimeras.push({
@@ -972,25 +1103,25 @@ export const parseJson3D = async (json) => {
             });
           }
         });
-      // }else if(item["@type"] == 1){
-      //   item.subModels
-      //   .filter((element) => String(element.modelTypeId) === "1")
-      //   .map((element) => {
-      //     if (
-      //       String(element.customCode).trim().substring(0, 2) ===
-      //       CONFIG.CUSTOMCODE.DOOR
-      //     ) {
-      //       element.subModels.map((el) => {
-      //         if (String(el.modelTypeId) === "2") {
-      //           tiradores.push({
-      //             name: el.modelBrandGoodName,
-      //             material: el.textureName,
-      //             price: 0
-      //           });
-      //         }
-      //       });
-      //     }
-      //   });
+        // } else if (item["@type"] == 1) {
+        //   item.subModels
+        //     .filter((element) => String(element.modelTypeId) === "1")
+        //     .map((element) => {
+        //       if (
+        //         String(element.customCode).trim().substring(0, 2) ===
+        //         CONFIG.CUSTOMCODE.DOOR
+        //       ) {
+        //         element.subModels.map((el) => {
+        //           if (String(el.modelTypeId) === "2") {
+        //             tiradores.push({
+        //               name: el.modelBrandGoodName,
+        //               material: el.textureName,
+        //               price: el.modelCostInfo.unitCost,
+        //             });
+        //           }
+        //         });
+        //       }
+        //     });
       } else {
         referenceType = getRef(item, referenceType);
         opening = "";
@@ -1080,7 +1211,9 @@ export const parseJson3D = async (json) => {
           materialRegleta = item.textureName;
 
           String(item.modelName).toLocaleUpperCase().indexOf("INGLETADA") !== -1
-            ? (materialRegletaF = item.subModels[0].subModels[0].textureName)
+            ? (materialRegletaF =
+                item.subModels[0]
+                  .textureName) /*(materialRegletaF = item.subModels[0].subModels[0].textureName)*/
             : (materialRegletaF = item.subModels[0].textureName);
         }
 
@@ -1104,9 +1237,9 @@ export const parseJson3D = async (json) => {
               }
             }
             // if (
-            //   /*item3.simpleName === "LD" &&
+            //   item3.simpleName === "LD" &&
             //   (referenceType.type === CONFIG.MODELNAME.BAJOS.CODE ||
-            //     referenceType.type === CONFIG.MODELNAME.MURALES.CODE)*/
+            //     referenceType.type === CONFIG.MODELNAME.MURALES.CODE) ||
             //   arrZocalos.length > 0
             // ) {
             //   if (zocalo === 0) {
@@ -1123,10 +1256,9 @@ export const parseJson3D = async (json) => {
           } else {
             armazonInfo = getInfoCabinet(item.subModels);
           }
-
           cajonesInfo = getInfoDrawer(item.subModels);
           cabinet = armazonInfo;
-
+          // -------------------------------------------------------
           item.subModels.forEach((submodel) => {
             if (
               String(submodel.customCode).substring(0, 2) ===
@@ -1142,24 +1274,19 @@ export const parseJson3D = async (json) => {
             }
           });
 
-          // item.subModels?.forEach((item3) => {
-          //   if (item3.customCode === "1001") {
-          //     item3.subModels?.forEach((item4) => {
-          //       if (item4.customCode === "0301") {
-          //         puertasInfo = {
-          //           modelDoor: item4.modelName,
-          //           materialDoor: item4.textureName,
-          //         };
-          //       }
-          //     });
-          //   }
-          // })
-
-          /*if (puertasInfo.materialDoor) {
-          } else {
-            puertasInfo = null;
-          }*/
-
+          item.subModels?.forEach((item3) => {
+            if (item3.customCode === "1001") {
+              item3.subModels?.forEach((item4) => {
+                if (item4.customCode === "0301") {
+                  puertasInfo = {
+                    modelDoor: item4.modelName,
+                    materialDoor: item4.textureName,
+                  };
+                }
+              });
+            }
+          });
+          // ----------------------------------------------------
           if (cajonesInfo.modelDrawer) {
             if (referenceType.ref?.indexOf(".BC") !== -1) {
               cajonesInfo = {
@@ -1207,7 +1334,6 @@ export const parseJson3D = async (json) => {
             cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
             materialDrawerArray.push(cajonesInfo?.materialDrawer);
 
-          // console.log(puertasInfo.modelDoor)
           puertasInfo?.modelDoor &&
             puertasInfo?.modelDoor !== "undefined" &&
             puertasInfo?.modelDoor?.indexOf("Cajon") === -1 &&
@@ -1236,16 +1362,24 @@ export const parseJson3D = async (json) => {
             armazonInfo?.modelCabinet?.indexOf("Corte") === -1 &&
             modelCabinetArray.push(armazonInfo?.modelCabinet);
 
-          armazonInfo?.materialCabinet &&
-            armazonInfo?.materialCabinet !== "undefined" &&
-            armazonInfo?.materialCabinet?.indexOf("Cajon") === -1 &&
-            armazonInfo?.materialCabinet?.indexOf("Gaveta") === -1 &&
-            armazonInfo?.materialCabinet?.indexOf("Sola") === -1 &&
-            armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
-            armazonInfo?.materialCabinet?.indexOf("Corte") === -1 &&
-            materialCabinetArray.push(armazonInfo?.materialCabinet);
+          item.subModels.map((filtroArmazon) => {
+            if (
+              String(filtroArmazon.modelBrandGoodName)
+                .toLocaleUpperCase()
+                .indexOf("CASCO") !== -1
+            ) {
+              armazonInfo?.materialCabinet &&
+                armazonInfo?.materialCabinet !== "undefined" &&
+                armazonInfo?.materialCabinet?.indexOf("Cajon") === -1 &&
+                armazonInfo?.materialCabinet?.indexOf("Gaveta") === -1 &&
+                armazonInfo?.materialCabinet?.indexOf("Sola") === -1 &&
+                armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
+                armazonInfo?.materialCabinet?.indexOf("Corte") === -1;
+              materialCabinetArray.push(armazonInfo?.materialCabinet);
 
-          drawerGlobal.push(modeloDrawer);
+              drawerGlobal.push(modeloDrawer);
+            }
+          });
 
           const accesories = item.subModels
             .filter((element) => String(element.modelTypeId) === "4")
@@ -1398,7 +1532,7 @@ export const parseJson3D = async (json) => {
               });
 
               //A las esterillas se le agrega el ancho de la cajonera
-              let referenceTemp = itemx.reference;
+              referenceTemp = itemx.reference;
 
               const sizeX = parseFloat(item.size?.x);
 
@@ -1434,7 +1568,7 @@ export const parseJson3D = async (json) => {
                     parseFloat(itemx.price).toFixed(2) *
                     parseFloat(itemx.quantity || 1),
                   size: item.boxSize, // { width: 0, height: 0, depth: 0 },
-                  variants: getParameters(item.parameters),
+                  variants: getParameters(item),
                   priceVariants: 0,
                   priceDrawers: 0,
                   drawerPriceDetails,
@@ -1492,11 +1626,11 @@ export const parseJson3D = async (json) => {
               doors: getDoors(item.subModels),
               opening,
               modelDrawer: modeloDrawer,
-              // zocalo: zocalo,
+              zocalo: zocalo,
               priceDoor: parseInt(getTotalDoors(item.subModels)),
-              total: parseFloat(totalPrice).toFixed(0),
+              total: parseFloat(Math.ceil(totalPrice)).toFixed(0),
               size: getCalculoFondo(item), // { width: 0, height: 0, depth: 0 },
-              variants: getParameters(item.parameters, referenceType.type),
+              variants: getParameters(item, referenceType.type),
               priceVariants: getPriceParameters(
                 item.parameters,
                 referenceType.type
@@ -1534,7 +1668,7 @@ export const parseJson3D = async (json) => {
           parseFloat(getTotalDoors(item.subModels)) +
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
       }
-      
+
       item.subModels
         .filter((element) => String(element.modelTypeId) === "1")
         .map((element) => {
@@ -1543,32 +1677,41 @@ export const parseJson3D = async (json) => {
             CONFIG.CUSTOMCODE.DOOR
           ) {
             element.subModels.map((el) => {
-              if (String(el.modelTypeId) === "2") {
-                tiradores.push({
+              if (String(el.customCode).trim() === "1101") {
+                modelHandlerArray.push({
                   name: el.modelBrandGoodName,
                   material: el.textureName,
-                  price: 0
+                  price: el.modelCostInfo.unitCost,
                 });
               }
             });
           }
         });
+      modelHandlerArray.forEach((handler) => {
+        tiradoresCabecera.push(handler.name);
+      });
+    });
+
+    contador = contador + 1;
+    arrZocalos.filter((zoc) => {
+      zoc.typeZocalo = "library";
+      zoc.id = `id_${contador++}`;
+      cabinets.push(zoc);
     });
 
     if (modelDrawer) {
       drawerTemp = modelDrawer[0].modelDrawer;
       drawerTexture = modelDrawer[0].textureDrawer;
     }
-    console.log(tiradores)
     const orderJson = {
       ...(json.partnerOrder || null),
       projectName: json.designData.designName || "",
-      infoTiradores: tiradores|| null,
+      infoTiradores: modelHandlerArray || null,
       extra,
       cabinets,
       doors,
       total,
-      // infoZocalos: zocalos(arrZocalos) || null,
+      infoZocalos: arrZocalos || null,
       ...door,
       ...cabinet,
       modelDrawer: quitarDuplicados(modelDrawerArray)
@@ -1589,19 +1732,19 @@ export const parseJson3D = async (json) => {
       materialCabinet: quitarDuplicados(materialCabinetArray)
         .toString()
         .replace(/,/g, " / "),
-      modelHandler: quitarDuplicados(modelHandlerArray)
+      modelHandler: quitarDuplicados(tiradoresCabecera)
         .toString()
         .replace(/,/g, " / "),
       location: json.partnerOrder?.detailAddress || "",
-      // zocalo,
+      zocalo,
       designerName: json.partnerOrder?.designerName || "",
       storeName: json.partnerOrder?.storeName || "",
     };
+
+    console.log(orderJson)
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
-
-     console.log(orderJson)
-    //  return;
+    return;
 
     if (result && result._id) {
       message.success(messageResult);

@@ -144,20 +144,85 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
       });
   }, [data]);
 
-  const items = data.cabinets;
-  let sumaTotal = 0;
-  items.forEach((precio) => {
-    sumaTotal += precio.priceTotal;
-  });
+  // Función para calcular la suma total de los precios
+  const calcularSumaTotal = (productos) => {
+    return productos.reduce(
+      (total, producto) => total + producto.priceTotal,
+      0
+    );
+  };
+
+  let totalZocalo = data.infoZocalos.reduce(
+    (total, zocalo) => total + (zocalo.precio ? zocalo.precio : 0),
+    0
+  );
+  const calcularTotalDescuentos = (data) => {
+    let totalDescuentos = 0;
+    const descuentos = [
+      { key: "discountCabinets", value: "discountCabinetsPorcentaje" },
+      {
+        key: "discountElectrodomesticos",
+        value: "discountElectrodomesticosPorcentaje",
+      },
+      { key: "discountEncimeras", value: "discountEncimerasPorcentaje" },
+      {
+        key: "discountEquipamientos",
+        value: "discountEquipamientosPorcentaje",
+      },
+    ];
+
+    descuentos.forEach((descuento) => {
+      if (data[descuento.key] > 0) {
+        totalDescuentos += parseFloat(data[descuento.value]);
+      }
+    });
+
+    return totalDescuentos;
+  };
+
+  const calcularTotalConDescuento = (
+    sumaTotal,
+    totalZocalo,
+    totalDescuentos
+  ) => {
+    return parseFloat(sumaTotal + totalZocalo - totalDescuentos).toFixed(2);
+  };
+
+  const calcularTotalConDescuentoEIVA = (
+    sumaTotal,
+    totalZocalo,
+    totalDescuentos
+  ) => {
+    const total = (sumaTotal + totalZocalo) * 1.21;
+    const totalConDescuento = total - totalDescuentos;
+    console.log(parseFloat(totalConDescuento).toFixed(2));
+    return parseFloat(totalConDescuento).toFixed(2);
+  };
+
+  const calcularIva = (sumaTotalSinDescuento) => {
+    return parseFloat(sumaTotalSinDescuento * 0.21).toFixed(2);
+  };
+
+  const calcularTotal = (sumaTotalSinDescuento) => {
+    return parseFloat(sumaTotalSinDescuento * 1.21).toFixed(2);
+  };
+
+  const sumaTotal = calcularSumaTotal(data.cabinets);
+
+  totalDescuentos = calcularTotalDescuentos(data);
+
+  const sumaTotalSinDescuento = sumaTotal + totalZocalo;
+
+  const complementos = data.infoZocalos.length > 0 || cabinets.complementos.length > 0 ? true : false
 
   return (
     <Document title="Presupuesto COOHOM">
       <Page
-        style={{ paddingHorizontal: "65", paddingVertical: "45" }}
+        style={{ paddingHorizontal: "55", paddingVertical: "45" }}
         size={"A4"}
         wrap
       >
-        <View fixed style={{ display: "flex", flexDirection: "column" }}>
+        <View style={{ display: "flex", flexDirection: "column" }}>
           <View
             style={{
               display: "flex",
@@ -175,7 +240,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 fontFamily: CONFIG.BOLD,
               }}
             >
-              {title}
+              Prueba
             </Text>
           </View>
 
@@ -209,6 +274,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 <Text style={{ fontFamily: CONFIG.BOLD }}>
                   Envío mercancía:
                 </Text>
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Referencia:</Text>{" "}
                 <Text style={{ fontFamily: CONFIG.BOLD }}>Cliente:</Text>{" "}
               </View>
               <View
@@ -224,6 +290,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   {data.semanaEntrega || "."}
                 </Text>
                 <Text>{data?.customerName}</Text>
+                <Text>{data?.storeName}</Text>
               </View>
             </View>
 
@@ -244,7 +311,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 <Text style={{ fontFamily: CONFIG.BOLD }}>Modelo:</Text>{" "}
                 <Text style={{ fontFamily: CONFIG.BOLD }}>Acabado:</Text>{" "}
                 <Text style={{ fontFamily: CONFIG.BOLD }}>Armazón:</Text>
-                {/* <Text style={{ fontFamily: CONFIG.BOLD }}>Zócalo:</Text>{" "} */}
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Zócalo:</Text>{" "}
                 <Text style={{ fontFamily: CONFIG.BOLD }}>Tirador:</Text>{" "}
                 <Text style={{ fontFamily: CONFIG.BOLD }}>Cajón:</Text>{" "}
               </View>
@@ -257,11 +324,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 <Text>{data?.modelDoor || "."}</Text>
                 <Text>{String(data?.materialDoor).toLowerCase() || "."}</Text>
                 <Text>{data?.materialCabinet || "."}</Text>
-                {/* <Text>{parseFloat(data?.zocalo) || "."}</Text> */}
-                <Text>{data?.handle || "."}</Text>
+                <Text>
+                  {/* {data.infoZocalos !== null ? data.infoZocalos.map((zocalo) => {
+                    return zocalo.height - 10 + "/"
+                  }) : "." } */}
+.
+                  {data?.infoZocalos[0]?.size?.z || "."}
+                </Text>
+                <Text>{data?.modelHandler || "."}</Text>
                 <Text>
                   {String(
-                    data?.drawer + "/" + data?.materialDrawer
+                    data?.modelDrawer + "/" + data?.materialDrawer
                   ).toLowerCase() || "."}
                   {/* {String(data?.materialDrawer).toLowerCase() || ""} */}
                 </Text>
@@ -507,7 +580,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.total * data.coefficient).toFixed(2)}
+                        {parseFloat(item.priceTotal * data.coefficient).toFixed(2)}
                         {/* {parseFloat(item.priceDoor + item.priceDrawers + item.priceVariants + parseFloat(item.priceCabinet)).toFixed(0)} */}
                       </Text>
                     </View>
@@ -653,29 +726,22 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         </Text>
                       )}
                       {formatNumber(item.priceDoor) > 0 && (
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                          }}
-                        >
-                          <Text>- Puertas: </Text>
+                        <Text>
+                          - Puertas:{" "}
                           <Text
                             style={{
+                              fontFamily: CONFIG.BOLD,
                               fontSize: "8",
                             }}
                           >
-                            {formatNumber(item.priceDoor) + " "}
+                            {/* {formatNumber(item.priceDoor)} */}
                           </Text>
-                          <Text
-                            style={{
-                              fontSize: "8",
-                            }}
-                          >
-                            {item.modelDoor || ""} {item.modelDoor ? "/" : " "}{" "}
-                            {item.materialDoor || ""}
-                          </Text>
-                        </View>
+                          {`[${formatNumber(item.doors.price)}] ${
+                            item.doors.name.toLocaleUpperCase() +
+                            "-" +
+                            item.doors.material
+                          } / `}
+                        </Text>
                       )}
                       {item.doors !== undefined &&
                         item.doors.acabadoTirador !== undefined &&
@@ -716,7 +782,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             )}
                           </View>
                         )}
-                      {formatNumber(item.priceCabinet) > 0 && (
+                      {formatNumber(item.priceCabinet) > -1 && (
                         <Text>
                           - Armazón:{" "}
                           <Text style={{ fontSize: "8" }}>
@@ -738,7 +804,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           {item.variants.map((item) => (
                             <Text>
                               {" "}
-                              {item.name}: {item.description} / [{item.value}]
+                              {item.name}: {item.description} / [
+                              {item.nameValue}]
                             </Text>
                           ))}
                         </View>
@@ -1616,12 +1683,16 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
             ))}
           </View>
         )}
-        {cabinets?.complementos?.length > 0 && (
-          <View style={{ margintop: 40 }}>
+        <View style={{ margintop: 40 }}>
+          {complementos && (
             <View wrap={false}>
               <View>
                 <Text
-                  style={{ fontSize: "14", marginLeft: "32", marginTop: 20 }}
+                  style={{
+                    fontSize: "14",
+                    marginLeft: "32",
+                    marginTop: 20,
+                  }}
                 >
                   COMPLEMENTOS
                 </Text>
@@ -1657,204 +1728,320 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 )}
               </View>
             </View>
-            {cabinets?.complementos?.map((item, key) => (
-              <View
-                key={key}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  marginTop: "1",
-                }}
-                wrap={false}
-              >
-                <View style={{ width: "50", fontSize: "8" }}>
-                  <Text>{contador++}</Text>{" "}
-                </View>
-                <View style={{ height: "100", width: "100", fontSize: "8" }}>
-                  <Text>
-                    <Image
-                      style={{
-                        width: "80",
-                        height: "80",
-                      }}
-                      filter={grayscaleFilter("#fff")}
-                      src={loadImage(
-                        item.obsBrandGoodId || item.obsBrandGoodId2
-                      )}
-                    />
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    width: "40",
-                    fontSize: "11",
-                  }}
-                >
-                  <Text style={{ fontSize: "8" }}>{item.quantity || 1}</Text>
-                </View>
-                <View style={{ width: "300", fontSize: "8" }}>
-                  <View>
-                    <Text style={{ fontFamily: CONFIG.BOLD }}>
-                      {item.reference}
-                    </Text>
-                    <Text style={{ fontFamily: CONFIG.BOLD }}>{item.name}</Text>
-                    <Text style={{ fontSize: "8" }}>
-                      L: {item.size?.x} F: {item.size?.y} A: {item.size?.z}
-                    </Text>
-                    {item.opening && (
-                      <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
-                    )}
-                    {formatNumber(item.priceCabinet) > 0 && (
-                      <Text>
-                        - Acabado:{" "}
-                        <Text style={{ fontSize: "8" }}>
-                          {verificarVariable(item.material)} / [{" "}
-                          {formatNumber(item.priceCabinet)} ]
-                        </Text>
-                      </Text>
-                    )}
-                  </View>
-                  {item?.observation !== undefined &&
-                    item?.observation.length > 0 && (
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontFamily: CONFIG.BOLD,
-                            fontSize: 8, // Asegúrate de que el valor sea numérico y no una cadena
-                          }}
-                        >
-                          Observaciones: {item.observation}
-                        </Text>
-                      </View>
-                    )}
-                </View>
+          )}
 
-                {price && (
-                  <View style={{ width: "70" }}>
-                    <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.priceTotal).toFixed(2)}
+          {cabinets.complementos.length > 0 && (
+            <View>
+              {cabinets?.complementos?.map((item, key) => (
+                <View
+                  key={key}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginTop: "1",
+                  }}
+                  wrap={false}
+                >
+                  <View style={{ width: "50", fontSize: "8" }}>
+                    <Text>{contador++}</Text>{" "}
+                  </View>
+                  <View style={{ height: "100", width: "100", fontSize: "8" }}>
+                    <Text>
+                      <Image
+                        style={{
+                          width: "80",
+                          height: "80",
+                        }}
+                        filter={grayscaleFilter("#fff")}
+                        src={loadImage(
+                          item.obsBrandGoodId || item.obsBrandGoodId2
+                        )}
+                      />
                     </Text>
                   </View>
-                )}
-              </View>
-            ))}
-            {/* {data && data.infoZocalos.length > 0 && (
-              <View>
-                {data.infoZocalos.map((zoc, index) => (
-                  <View style={{ fontSize: 8 }} key={index}>
-                    {zoc.mediaTira && (
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          marginTop: "10",
-                        }}
-                      >
-                        <View style={{ width: "50", fontSize: "8" }}>
-                          <Text>{contador++}</Text>{" "}
-                        </View>
-                        <View
-                          style={{
-                            height: "100",
-                            width: "100",
-                            fontSize: "8",
-                          }}
-                        >
-                          <Text>
-                            <Image
-                              style={{
-                                width: "80",
-                                height: "80",
-                              }}
-                              filter={grayscaleFilter("#fff")}
-                              src={loadImage(zoc.obsBrandGoodId)}
-                            />
-                          </Text>
-                        </View>
-                        <Text style={{ width: "40" }}>{zoc.mediaTira}</Text>
-                        <View style={{ width: "300" }}>
-                          <Text style={{ fontFamily: CONFIG.BOLD }}>
-                            {zoc.referenciaMedia
-                              ? zoc.referenciaMedia
-                              : "Sin referencia"}
-                          </Text>
-                          <Text style={{ fontFamily: CONFIG.BOLD }}>
-                            {zoc.name}
-                          </Text>
-                          <Text style={{ fontSize: "8" }}>
-                            L: {zoc.anchoMaximo} A: {zoc.material}
-                          </Text>
-                          <Text> Ancho Max: {zoc.anchoMaximo / 2}</Text>
-                        </View>
-                        <Text style={{ textAlign: "right", width: "70" }}>
-                          {parseFloat(
-                            zoc.precioMediaTira * zoc.mediaTira
-                          ).toFixed(2)}
-                        </Text>
-                      </View>
-                    )}
-                    {zoc.tira && (
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          marginTop: "10",
-                        }}
-                      >
-                        <View style={{ width: "50", fontSize: "8" }}>
-                          <Text>{contador++}</Text>{" "}
-                        </View>
-                        <View
-                          style={{
-                            height: "100",
-                            width: "100",
-                            fontSize: "8",
-                          }}
-                        >
-                          <Text>
-                            <Image
-                              style={{
-                                width: "80",
-                                height: "80",
-                              }}
-                              filter={grayscaleFilter("#fff")}
-                              src={loadImage(zoc.obsBrandGoodId)}
-                            />
-                          </Text>
-                        </View>
-                        <Text style={{ width: "40" }}>{zoc.tira}</Text>
-                        <View style={{ width: "300" }}>
-                          <Text style={{ fontFamily: CONFIG.BOLD }}>
-                            {zoc.referenciaTira
-                              ? zoc.referenciaTira
-                              : "Sin referencia"}
-                          </Text>
-                          <Text style={{ fontFamily: CONFIG.BOLD }}>
-                            {zoc.name}
-                          </Text>
-                          <Text style={{ fontSize: "8" }}>
-                            L: {zoc.anchoMaximo} A: {zoc.material}
-                          </Text>
-                          <Text>Ancho Max: {zoc.anchoMaximo}</Text>
-                        </View>
-                        {price && (
-                          <Text style={{ textAlign: "right", width: "70" }}>
-                            {parseFloat(zoc.precioTira * zoc.tira).toFixed(2)}
-                          </Text>
-                        )}
-                      </View>
-                    )}
+                  <View
+                    style={{
+                      width: "40",
+                      fontSize: "11",
+                    }}
+                  >
+                    <Text style={{ fontSize: "8" }}>{item.quantity || 1}</Text>
                   </View>
-                ))}
-              </View>
-            )} */}
-          </View>
-        )}
+                  <View style={{ width: "300", fontSize: "8" }}>
+                    <View>
+                      <Text style={{ fontFamily: CONFIG.BOLD }}>
+                        {item.reference}
+                      </Text>
+                      <Text style={{ fontFamily: CONFIG.BOLD }}>
+                        {item.name}
+                      </Text>
+                      <Text style={{ fontSize: "8" }}>
+                        L: {item.size?.x} F: {item.size?.y} A: {item.size?.z}
+                      </Text>
+                      {item.opening && (
+                        <Text style={{ fontSize: "8" }}>
+                          M: {item?.opening}
+                        </Text>
+                      )}
+                      {
+                        <Text>
+                          - Acabado:{" "}
+                          <Text style={{ fontSize: "8" }}>
+                            {verificarVariable(item.material)} / [{" "}
+                            {formatNumber(item.priceCabinet)} ]
+                          </Text>
+                        </Text>
+                      }
+                    </View>
+                    {item?.observation !== undefined &&
+                      item?.observation.length > 0 && (
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: CONFIG.BOLD,
+                              fontSize: 8, // Asegúrate de que el valor sea numérico y no una cadena
+                            }}
+                          >
+                            Observaciones: {item.observation}
+                          </Text>
+                        </View>
+                      )}
+                  </View>
+
+                  {price && (
+                    <View style={{ width: "70" }}>
+                      <Text style={{ fontSize: "8", textAlign: "right" }}>
+                        {parseFloat(formatNumber(item.priceTotal)).toFixed(2)}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* {price && item.typeZocalo === "" ? (
+                    <View style={{ width: "70" }}>
+                      <Text style={{ fontSize: "8", textAlign: "right" }}>
+                        {parseFloat(item.priceTotal).toFixed(2)}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={{ width: "70" }}>
+                      <Text style={{ fontSize: "8", textAlign: "right" }}>
+                        {parseFloat(item.priceCabinet).toFixed(2)}
+                      </Text>
+                    </View>
+                  )} */}
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* {data && data.infoZocalos.length > 0 && (
+            <View>
+              {data.infoZocalos.map((zoc, key) => (
+                <View
+                  key={key}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginTop: "1",
+                  }}
+                  wrap={false}
+                >
+                  <View style={{ width: "50", fontSize: "8" }}>
+                    <Text>{contador++}</Text>{" "}
+                  </View>
+                  <View style={{ height: "100", width: "100", fontSize: "8" }}>
+                    <Text>
+                      <Image
+                        style={{
+                          width: "80",
+                          height: "80",
+                        }}
+                        filter={grayscaleFilter("#fff")}
+                        src={loadImage(zoc.obsBrandGoodId)}
+                      />
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: "40",
+                      fontSize: "11",
+                    }}
+                  >
+                    <Text style={{ fontSize: "8" }}>{zoc.quantity || 1}</Text>
+                  </View>
+                  <View style={{ width: "300", fontSize: "8" }}>
+                    <View>
+                      <Text style={{ fontFamily: CONFIG.BOLD }}>
+                        {zoc.reference}
+                      </Text>
+                      <Text style={{ fontFamily: CONFIG.BOLD }}>
+                        {zoc.name}
+                      </Text>
+
+                      <Text style={{ fontSize: "8" }}>
+                        {" L: " +
+                          zoc?.size?.x +
+                          " F: " +
+                          zoc?.size?.y +
+                          " A: " +
+                          zoc?.size?.z}
+                      </Text>
+
+                      {data.infoZocalos.length > 0 && (
+                        <Text>
+                          - Acabado:{" "}
+                          <Text style={{ fontSize: "8" }}>
+                            {zoc.material} / [ {formatNumber(zoc.priceCabinet)} ]
+                          </Text>
+                        </Text>
+                      )}
+                    </View>
+                    {zoc?.observation !== undefined &&
+                      zoc?.observation.length > 0 && (
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: CONFIG.BOLD,
+                              fontSize: 8, // Asegúrate de que el valor sea numérico y no una cadena
+                            }}
+                          >
+                            Observaciones: {zoc.observation}
+                          </Text>
+                        </View>
+                      )}
+                  </View>
+
+                  {price && (
+                    <View style={{ width: "70" }}>
+                      <Text style={{ fontSize: "8", textAlign: "right" }}>
+                        {zoc.material}
+                        {parseFloat(formatNumber(zoc.priceCabinet)).toFixed(2)}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+          )} */}
+
+          {/* <View style={{ fontSize: 8 }} key={index}>
+                      {zoc.mediaTira && (
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            marginTop: "10",
+                          }}
+                        >
+                          <View style={{ width: "50", fontSize: "8" }}>
+                            <Text>{contador++}</Text>{" "}
+                          </View>
+                          <View
+                            style={{
+                              height: "100",
+                              width: "100",
+                              fontSize: "8",
+                            }}
+                          >
+                            <Text>
+                              <Image
+                                style={{
+                                  width: "80",
+                                  height: "80",
+                                }}
+                                filter={grayscaleFilter("#fff")}
+                                src={loadImage(zoc.obsBrandGoodId)}
+                              />
+                            </Text>
+                          </View>
+                          <Text style={{ width: "40" }}>{zoc.mediaTira}</Text>
+                          <View style={{ width: "300" }}>
+                            <Text style={{ fontFamily: CONFIG.BOLD }}>
+                              {zoc.referenciaMedia
+                                ? zoc.referenciaMedia
+                                : "Sin referencia"}
+                            </Text>
+                            <Text style={{ fontFamily: CONFIG.BOLD }}>
+                              {zoc.name}
+                            </Text>
+                            <Text style={{ fontSize: "8" }}>
+                              L: {zoc.anchoMaximo} A: {zoc.material}
+                            </Text>
+                            <Text> Ancho Max: {zoc.anchoMaximo / 2}</Text>
+                          </View>
+                          <Text style={{ textAlign: "right", width: "70" }}>
+                            {parseFloat(
+                              zoc.precioMediaTira * zoc.mediaTira
+                            ).toFixed(2)}
+                          </Text>
+                        </View>
+                      )}
+                      {zoc.tira && (
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            marginTop: "10",
+                          }}
+                        >
+                          <View style={{ width: "50", fontSize: "8" }}>
+                            <Text>{contador++}</Text>{" "}
+                          </View>
+                          <View
+                            style={{
+                              height: "100",
+                              width: "100",
+                              fontSize: "8",
+                            }}
+                          >
+                            <Text>
+                              <Image
+                                style={{
+                                  width: "80",
+                                  height: "80",
+                                }}
+                                filter={grayscaleFilter("#fff")}
+                                src={loadImage(zoc.obsBrandGoodId)}
+                              />
+                            </Text>
+                          </View>
+                          <Text style={{ width: "40" }}>{zoc.tira}</Text>
+                          <View style={{ width: "300" }}>
+                            <Text style={{ fontFamily: CONFIG.BOLD }}>
+                              {zoc.referenciaTira
+                                ? zoc.referenciaTira
+                                : "Sin referencia"}
+                            </Text>
+                            <Text style={{ fontFamily: CONFIG.BOLD }}>
+                              {zoc.name}
+                            </Text>
+                            <Text style={{ fontSize: "8" }}>
+                              L: {zoc.anchoMaximo} A: {zoc.material}
+                            </Text>
+                            <Text>Ancho Max: {zoc.anchoMaximo}</Text>
+                          </View>
+                          {price && (
+                            <Text style={{ textAlign: "right", width: "70" }}>
+                              {parseFloat(zoc.precioTira * zoc.tira).toFixed(2)}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              )} */}
+        </View>
 
         {cabinets && cabinets?.accesorios.length > 0 && (
           <View style={{ marginTop: 10 }}>
@@ -2077,7 +2264,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
               <View
                 style={{
-                  width: "80",
+                  width: 80,
                   textAlign: "right",
                   display: "flex",
                   flexDirection: "column",
@@ -2086,12 +2273,12 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               >
                 <View
                   style={{
-                    borderTop: "1 solid #000000",
-                    marginBottom: "1",
+                    borderTopWidth: 1,
+                    marginBottom: 1,
                     textAlign: "right",
                   }}
                 >
-                  <Text>{parseFloat(sumaTotal).toFixed(2)}</Text>
+                  <Text>{parseFloat(sumaTotal + totalZocalo).toFixed(2)}</Text>
                 </View>
 
                 <View>
@@ -2100,11 +2287,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text>
                         {parseFloat(data.discountCabinetsPorcentaje).toFixed(2)}
                       </Text>
-                      {
-                        (totalDescuentos += parseFloat(
-                          data.discountCabinetsPorcentaje
-                        ))
-                      }
                     </View>
                   )}
                   {data?.discountElectrodomesticos > 0 && (
@@ -2114,11 +2296,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           data.discountElectrodomesticosPorcentaje
                         ).toFixed(2)}
                       </Text>
-                      {
-                        (totalDescuentos += parseFloat(
-                          data.discountElectrodomesticosPorcentaje
-                        ))
-                      }
                     </View>
                   )}
                   {data?.discountEncimeras > 0 && (
@@ -2128,11 +2305,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           2
                         )}
                       </Text>
-                      {
-                        (totalDescuentos += parseFloat(
-                          data.discountEncimerasPorcentaje
-                        ))
-                      }
                     </View>
                   )}
                   {data?.discountEquipamientos > 0 && (
@@ -2142,74 +2314,62 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           data.discountEquipamientosPorcentaje
                         ).toFixed(2)}
                       </Text>
-                      {
-                        (totalDescuentos += parseFloat(
-                          data.discountEquipamientosPorcentaje
-                        ))
-                      }
                     </View>
                   )}
                 </View>
 
-                {/* Importe si hay descuento */}
                 {(data?.discountCabinets > 0 ||
                   data?.discountElectrodomesticos > 0 ||
                   data?.discountEncimeras > 0 ||
                   data?.discountEquipamientos > 0) && (
                   <View>
                     <Text>
-                      {parseFloat(sumaTotal - totalDescuentos.toFixed(2))}
-                    </Text>
-                  </View>
-                )}
-
-                {/* Iva con descuento */}
-                {(data?.discountCabinets > 0 ||
-                  data?.discountElectrodomesticos > 0 ||
-                  data?.discountEncimeras > 0 ||
-                  data?.discountEquipamientos > 0) && (
-                  <View>
-                    <Text>
-                      {parseFloat((sumaTotal - totalDescuentos) * 0.21).toFixed(
-                        2
+                      {calcularTotalConDescuento(
+                        sumaTotal,
+                        totalZocalo,
+                        totalDescuentos
                       )}
                     </Text>
                   </View>
                 )}
-                {/* Iva sin descuento */}
-                {totalDescuentos == 0 && (
+
+                {(data?.discountCabinets > 0 ||
+                  data?.discountElectrodomesticos > 0 ||
+                  data?.discountEncimeras > 0 ||
+                  data?.discountEquipamientos > 0) && (
                   <View>
-                    <Text>{parseFloat(sumaTotal * 0.21).toFixed(2)}</Text>
+                    <Text>{calcularIva(sumaTotal, totalDescuentos)}</Text>
+                  </View>
+                )}
+
+                {totalDescuentos === 0 && (
+                  <View>
+                    <Text>{calcularIva(sumaTotal, totalDescuentos)}</Text>
                   </View>
                 )}
 
                 <View
                   style={{
-                    borderTop: "1 solid #000000",
-                    paddingLeft: "8",
-                    marginTop: "1",
+                    borderTopWidth: 1,
+                    paddingLeft: 8,
+                    marginTop: 1,
                   }}
                 >
-                  {/* Total con descuento */}
                   {totalDescuentos > 0 && (
                     <View>
                       <Text>
-                        {parseFloat(
-                          sumaTotal -
-                            totalDescuentos +
-                            (sumaTotal - totalDescuentos) * 0.21
-                        ).toFixed(2)}
+                        {calcularTotalConDescuentoEIVA(
+                          sumaTotal,
+                          totalZocalo,
+                          totalDescuentos
+                        )}
                       </Text>
                     </View>
                   )}
 
-                  {/* Total sin descuento */}
-
-                  {totalDescuentos == 0 && (
+                  {totalDescuentos === 0 && (
                     <View>
-                      <Text>
-                        {parseFloat(sumaTotal + sumaTotal * 0.21).toFixed(2)}
-                      </Text>
+                      <Text>{calcularTotal(sumaTotalSinDescuento)}</Text>
                     </View>
                   )}
                 </View>

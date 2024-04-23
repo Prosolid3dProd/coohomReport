@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../../index.css";
+import {} from "antd";
+import "./admin.css";
 
 import {
   Button,
@@ -14,6 +16,8 @@ import {
   Modal,
   Typography,
   Empty,
+  Table,
+  Checkbox,
 } from "antd";
 
 import { Header } from "../../content";
@@ -33,6 +37,7 @@ const MENSAJES = {
   ERROR: (problema) => error(`Error: ${problema}`),
   DELETE: (nombreTienda) => info(`Se ha eliminado la Tienda: ${nombreTienda}`),
 };
+
 
 const Datos = () => {
   const [form] = Form.useForm();
@@ -141,10 +146,11 @@ const Datos = () => {
           </Col>
         </Row>
       );
+      console.log(f)
 
     return f.map((obj, key) => {
       return (
-        <Row className="grid grid-cols-[1fr_1fr_1fr_.75fr] gap-1 border-b border-border py-4">
+        <Row key={key} className="grid grid-cols-[1fr_1fr_1fr_.75fr] gap-1 border-b border-border py-4">
           {obj &&
             Object.entries(obj)
               .filter((val) => ["email", "name", "phone"].includes(val[0]))
@@ -158,7 +164,7 @@ const Datos = () => {
               })}
           <div div className="flex flex-row justify-end mr-4">
             <Button
-              onClick={(ev) => {
+              onClick={() => {
                 setModal(true);
                 setRowActual(key);
               }}
@@ -433,8 +439,367 @@ const Datos = () => {
   );
 };
 
+// const Datos = () => {
+
+// const onFinish = async (values) => {
+//       try {
+//         const nuevaTienda = await createUser({
+//           phone: `${values.prefix}${values.phone}`,
+//           tienda: values.tienda,
+//           name: values.propietario,
+//           email: values.email,
+//           observation: values.intro,
+//           gender: values.gender,
+//           password: values.password,
+//         });
+  
+//         if (!nuevaTienda) {
+//           return MENSAJES.ERROR("Conexión Base de Datos");
+//         }
+  
+//         // const tiendasTemporal = await getUsers();
+
+//         // console.log(tiendasTemporal)
+  
+//         // if (!tiendasTemporal) {
+//         //   return MENSAJES.ERROR("Conexión Base de Datos");
+//         // }
+  
+//         // setListaTiendas(tiendasTemporal);
+//         // console.log(tiendasTemporal);
+  
+//         // console.log(values);
+//         // MENSAJES.INFO(nuevaTienda.name);
+  
+//         setTimeout(() => window.location.reload(), 500);
+//       } catch (error) {
+//         console.error("Error en onFinish:", error);
+//       }
+//     };
+
+// const onFinishFailed = (errorInfo) => {
+//   console.log("Failed:", errorInfo);
+// };
+
+
+// // -------------------------------------------------------------------------
+// const EditableContext = React.createContext(null);
+// const EditableRow = ({ index, ...props }) => {
+//   const [form] = Form.useForm();
+//   return (
+//     <Form form={form} component={false}>
+//       <EditableContext.Provider value={form}>
+//         <tr {...props} />
+//       </EditableContext.Provider>
+//     </Form>
+//   );
+// };
+// const EditableCell = ({
+//   title,
+//   editable,
+//   children,
+//   dataIndex,
+//   record,
+//   handleSave,
+//   ...restProps
+// }) => {
+//   const [editing, setEditing] = useState(false);
+//   const inputRef = useRef(null);
+//   const form = useContext(EditableContext);
+//   useEffect(() => {
+//     if (editing) {
+//       inputRef.current?.focus();
+//     }
+//   }, [editing]);
+//   const toggleEdit = () => {
+//     setEditing(!editing);
+//     form.setFieldsValue({
+//       [dataIndex]: record[dataIndex],
+//     });
+//   };
+//   const save = async () => {
+//     try {
+//       const values = await form.validateFields();
+//       toggleEdit();
+//       handleSave({
+//         ...record,
+//         ...values,
+//       });
+//     } catch (errInfo) {
+//       console.log("Save failed:", errInfo);
+//     }
+//   };
+//   let childNode = children;
+//   if (editable) {
+//     childNode = editing ? (
+//       <Form.Item
+//         style={{
+//           margin: 0,
+//         }}
+//         name={dataIndex}
+//         rules={[
+//           {
+//             required: true,
+//             message: `${title} is required.`,
+//           },
+//         ]}
+//       >
+//         <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+//       </Form.Item>
+//     ) : (
+//       <div
+//         className="editable-cell-value-wrap"
+//         style={{
+//           paddingRight: 24,
+//         }}
+//         onClick={toggleEdit}
+//       >
+//         {children}
+//       </div>
+//     );
+//   }
+//   return <td {...restProps}>{childNode}</td>;
+// };
+// const RegistratedShops = () => {
+//   const [dataSource, setDataSource] = useState([
+//     {
+//       key: "0",
+//       Propietario: "Edward King 0",
+//       Numero: "123456789",
+//       Tienda: "32",
+//       Correo: "London, Park Lane no. 0",
+//     },
+//   ]);
+//   const [count, setCount] = useState(2);
+//   const handleDelete = (key) => {
+//     const newData = dataSource.filter((item) => item.key !== key);
+//     setDataSource(newData);
+//   };
+//   const defaultColumns = [
+//     {
+//       title: "Propietario",
+//       dataIndex: "Propietario",
+//       editable: true,
+//     },
+//     {
+//       title: "Numero",
+//       dataIndex: "Numero",
+//       editable: true,
+//     },
+//     {
+//       title: "Tienda",
+//       dataIndex: "Tienda",
+//       editable: true,
+//     },
+//     {
+//       title: "Correo",
+//       dataIndex: "Correo",
+//       editable: true,
+//     },
+//     {
+//       title: "operation",
+//       dataIndex: "operation",
+//       render: (_, record) =>
+//         dataSource.length >= 1 ? (
+//           <Popconfirm
+//             title="Sure to delete?"
+//             onConfirm={() => handleDelete(record.key)}
+//           >
+//             <Button type="default">Delete</Button>
+//           </Popconfirm>
+//         ) : null,
+//     },
+//   ];
+//   const handleAdd = () => {
+//     const newData = {
+//       key: count,
+//       Propietario: `Edward King ${count}`,
+//       Numero: "123456789",
+//       Tienda: "32",
+//       Correo: `London, Park Lane no. ${count}`,
+//     };
+//     setDataSource([...dataSource, newData]);
+//     setCount(count + 1);
+//   };
+//   const handleSave = (row) => {
+//     const newData = [...dataSource];
+//     const index = newData.findIndex((item) => row.key === item.key);
+//     const item = newData[index];
+//     newData.splice(index, 1, {
+//       ...item,
+//       ...row,
+//     });
+//     setDataSource(newData);
+//   };
+//   const components = {
+//     body: {
+//       row: EditableRow,
+//       cell: EditableCell,
+//     },
+//   };
+//   const columns = defaultColumns.map((col) => {
+//     if (!col.editable) {
+//       return col;
+//     }
+//     return {
+//       ...col,
+//       onCell: (record) => ({
+//         record,
+//         editable: col.editable,
+//         dataIndex: col.dataIndex,
+//         title: col.title,
+//         handleSave,
+//       }),
+//     };
+//   });
+//   return (
+//     <div>
+//       <Button
+//         onClick={handleAdd}
+//         type="default"
+//         style={{
+//           marginBottom: 16,
+//         }}
+//       >
+//         Add a row
+//       </Button>
+//       <Table
+//         components={components}
+//         rowClassName={() => "editable-row"}
+//         bordered
+//         dataSource={dataSource}
+//         columns={columns}
+//       />
+//     </div>
+//   );
+// };
+
+// // -----------------------------------------------------------------------
+
+// const ShopsForm = () => (
+//   <Form
+//     name="basic"
+//     labelCol={{
+//       span: 8,
+//     }}
+//     wrapperCol={{
+//       span: 16,
+//     }}
+//     style={{
+//       maxWidth: 600,
+//     }}
+//     initialValues={{
+//       remember: true,
+//     }}
+//     onFinish={onFinish}
+//     onFinishFailed={onFinishFailed}
+//     autoComplete="off"
+//   >
+//     <Form.Item
+//       name="propietario"
+//       label={<span className="">Propietario</span>}
+//       className="w-full  p-4 flex items-center  m-0"
+//       rules={[
+//         {
+//           required: true,
+//           message: "Porfavor introduce tu Propietario",
+//           whitespace: true,
+//         },
+//       ]}
+//     >
+//       <Input_ant className="" id="firstInputForm" />
+//     </Form.Item>
+//     <Form.Item
+//       name="tienda"
+//       label={<span className="">Tienda</span>}
+//       className="w-full  p-4 flex items-center  m-0"
+//       onChange={(e) => e.target.value}
+//       rules={[
+//         {
+//           required: true,
+//           message: "Porfavor introduce tu Tienda",
+//           whitespace: true,
+//         },
+//       ]}
+//     >
+//       <Input_ant className="" />
+//     </Form.Item>
+//     <Form.Item
+//       name="email"
+//       label={<span className="">E-mail</span>}
+//       className="w-full p-4 flex items-center  m-0"
+//       rules={[
+//         {
+//           type: "email",
+//           message: "El email no es valido",
+//         },
+//         {
+//           required: true,
+//           message: "Porfavor introduce un email",
+//         },
+//       ]}
+//     >
+//       <Input_ant />
+//     </Form.Item>
+
+//     <Form.Item
+//       name="phone"
+//       className="w-full  p-4 flex items-center  m-0"
+//       label={<span className="">Teléfono</span>}
+//       rules={[
+//         {
+//           max: 9,
+//           min: 9,
+//           required: true,
+//           message: "Introduce un número de teléfono correcto",
+//         },
+//       ]}
+//     >
+//       <Input_ant className="rounded-none w-full" addonBefore={prefixSelector} />
+//     </Form.Item>
+//     <Form.Item
+//       name="password"
+//       className="w-full p-4 flex items-center  m-0"
+//       label={<span className="">Contraseña</span>}
+//       rules={[
+//         {
+//           required: true,
+//           whitespace: true,
+//           type: "password",
+//         },
+//       ]}
+//     >
+//       <Input_ant className="" />
+//     </Form.Item>
+//     <Form.Item
+//       name="comentario"
+//       className="pl-4"
+//       label={<span className="italic">Comentario</span>}
+//     >
+//       <Input_ant.TextArea
+//         showCount
+//         maxLength={100}
+//         className="lg:w-[200px] h-[100px]"
+//         placeholder="Añada información más allá de los campos requeridos."
+//       />
+//     </Form.Item>
+
+//     <Form.Item
+//       wrapperCol={{
+//         offset: 8,
+//         span: 16,
+//       }}
+//     >
+//       <Button className="bg-blue text-white" type="default" htmlType="submit">
+//         Submit
+//       </Button>
+//     </Form.Item>
+//   </Form>
+// );
+// }
+
 const Admin = () => (
-  <main className="overflow-y-scroll px-4 flex gap-4 flex-col">
+  <main className="overflow-y-scroll px-4 flex gap-4 flex-row">
     <Datos />
   </main>
 );

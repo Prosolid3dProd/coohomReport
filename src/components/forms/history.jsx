@@ -202,6 +202,7 @@ const History = ({ getData, data }) => {
                                     replace: true,
                                   });
                                 });
+                                console.log(result)
                               } catch (e) {
                                 console.log(e);
                               }

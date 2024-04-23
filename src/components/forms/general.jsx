@@ -41,8 +41,8 @@ const General = ({ getData, data }) => {
     drawer: data?.drawer,
     // drawer: data?.drawer + "/" + data?.materialDrawer,
     materialCabinet: data?.materialCabinet,
-    // observation: data?.observation, Trae Null
-    observation: "",
+    observation: data?.observation, 
+    // observation: "fwefwf",
     fecha: String(data?.fecha).split(" ")[0],
     discountEncimeras: data?.discountEncimeras,
     discountCabinets: data?.discountCabinets,
@@ -53,14 +53,11 @@ const General = ({ getData, data }) => {
   });
 
   const onFinish = async (values) => {
-    console.log(values)
-    console.log(coefficient)
     if (data._id) {
       const result = await updateOrder({
         ...values,
         _id: data._id,
       });
-      console.log(result)
       if (result) {
         getData(result);
         setLocalOrder(result);
