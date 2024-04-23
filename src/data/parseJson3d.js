@@ -1703,6 +1703,41 @@ export const parseJson3D = async (json) => {
       drawerTemp = modelDrawer[0].modelDrawer;
       drawerTexture = modelDrawer[0].textureDrawer;
     }
+
+    const newCabinets = [];
+
+    cabinets.forEach((cab) => {
+      if (cab.tipo !== "C" && cab.tipo !== "T") {
+        newCabinets.push(cab);
+        return;
+      }
+
+      if (cab.tipo === "C" || cab.tipo === "T") {
+        const repeatedIds = cabinets.filter(
+          (otherCab) => cab.obsBrandGoodId === otherCab.obsBrandGoodId
+        );
+
+        if (repeatedIds.length > 1) {
+          const quantity = repeatedIds.length;
+          const price =
+            typeof cab.total === "string" ? parseFloat(cab.total) : cab.total;
+          const total = price * quantity;
+          const alreadyAdded = newCabinets.some(
+            (item) => item.obsBrandGoodId === cab.obsBrandGoodId
+          );
+
+          if (!alreadyAdded) {
+            const newObj = { ...cab, quantity, total };
+            newCabinets.push(newObj);
+          }
+        } else {
+          newCabinets.push(cab);
+        }
+      }
+    });
+    cabinets.length = 0;
+    cabinets.push(...newCabinets);
+
     const orderJson = {
       ...(json.partnerOrder || null),
       projectName: json.designData.designName || "",
@@ -1741,10 +1776,10 @@ export const parseJson3D = async (json) => {
       storeName: json.partnerOrder?.storeName || "",
     };
 
-    console.log(orderJson)
+    // console.log(orderJson);
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
-    return;
+    // return;
 
     if (result && result._id) {
       message.success(messageResult);
