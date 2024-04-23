@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*:focus-visible {
+  outline: 1px solid #1a7af8;
+}
+
+.bg-form {
+  box-shadow: hsla(214, 94%, 54%, 25%) 0px 20px 25px -5px,
+    hsla(214, 94%, 54%, 25%) 0px 10px 10px -5px,
+    hsla(214, 94%, 54%, 75%) 0px 0px 0px 3px;
+  background-color: hsla(214, 100%, 75%, 15%);
+}
+
+.rootLayout {
+  grid-template-columns: 56px 1fr !important;
+}
+
+.active {
+  color: #1a7af8 !important;
+}
+
+.activeTab:focus {
+  border-bottom: 1px solid #1a7af8 !important;
+  color: #1a7af8;
+  transition: all 500ms ease-in;
+}
+
+.inputAble {
+  border: 1px solid #1a7af8 !important;
+  color: #1a7af8;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+}
+
+:where(.css-dev-only-do-not-override-pr0fja).ant-card .ant-card-body{
+  padding-top: 0px;
+}
+
+#pantalla {
+  background: rgb(189, 189, 189);
+  background: linear-gradient(
+    90deg,
+    hsla(214, 100%, 75%, 100%) 0%,
+    hsla(214, 94%, 54%, 100%) 100%
+  );
+  background-size: 300% 100%;
+  animation: gradient 6s ease-in-out infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* @layer utilities {
+  .colorbotonDark {
+    background-color: #1151a6;
+  }
+
+  .bordesbotonDark {
+    border: 1px solid #1151a6;
+    color: white;
+    font-weight: bold;
+  }
+
+  .bordesbotonDark:hover {
+    background-color: #1151a6;
+  }
+
+  .bordes {
+    border-color: slategrey;
+  }
+} */

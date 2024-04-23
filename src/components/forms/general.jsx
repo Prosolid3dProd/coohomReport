@@ -1,0 +1,376 @@
+import React, { useState, useEffect } from "react";
+
+import {
+  Button,
+  Input,
+  Form,
+  Card,
+  Row,
+  Col,
+  message,
+  Divider,
+  Space,
+  Checkbox,
+} from "antd";
+
+import { updateOrder, setLocalOrder } from "../../handlers/order";
+import {
+  existePrecio,
+  getPrecio,
+  setPrecio,
+  getTotales,
+  existeTotales,
+  setTotales,
+} from "../../data/localStorage";
+import { Select } from "antd";
+import { ButtonAction } from "../utils/btnAction";
+
+const General = ({ getData, data }) => {
+  const [form] = Form.useForm();
+  const [initialValues, setInitialValues] = useState({
+    reference: data?.reference,
+    date: data?.date,
+    customerName: data?.customerName,
+    location: data?.location,
+    phone: data?.phone,
+    total: data?.total,
+    coefficient: data?.coefficient,
+    modelDoor: data?.modelDoor,
+    materialDoor: data?.materialDoor,
+    handle: data?.handle,
+    drawer: data?.drawer,
+    // drawer: data?.drawer + "/" + data?.materialDrawer,
+    materialCabinet: data?.materialCabinet,
+    // observation: data?.observation, Trae Null
+    observation: "",
+    fecha: String(data?.fecha).split(" ")[0],
+    discountEncimeras: data?.discountEncimeras,
+    discountCabinets: data?.discountCabinets,
+    discountElectrodomesticos: data?.discountElectrodomesticos,
+    discountEquipamientos: data?.discountEquipamientos,
+    semanaEntrega: data?.semanaEntrega,
+    fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
+  });
+
+  const onFinish = async (values) => {
+    console.log(values)
+    console.log(coefficient)
+    if (data._id) {
+      const result = await updateOrder({
+        ...values,
+        _id: data._id,
+      });
+      console.log(result)
+      if (result) {
+        getData(result);
+        setLocalOrder(result);
+        message.success("Se ha actualizado correctamente");
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      }
+    }
+  };
+
+  const [checkC, setCheckC] = useState(existePrecio(getPrecio("C")));
+  const [total_Enci, setEnci] = useState(
+    existeTotales(getTotales("Encimeras"))
+  );
+  const [total_Equi, setEqui] = useState(
+    existeTotales(getTotales("Equipamiento"))
+  );
+  const [total_Elec, setElec] = useState(
+    existeTotales(getTotales("Electrodomesticos"))
+  );
+  const [checkF, setCheckF] = useState(existePrecio(getPrecio("F")));
+  const [checkP, setCheckP] = useState(existePrecio(getPrecio("P")));
+
+  return (
+    <Card className="rounded-nonel bg-gray rounded-none border border-border ">
+      <Form
+        layout="vertical"
+        form={form}
+        initialValues={initialValues}
+        onFinish={onFinish}
+      >
+        <Row gutter={16}>
+          <Col xs={24} sm={24} md={24}>
+            <Divider orientation="left">
+              <p className="uppercase">
+                <b>Acerca del Cliente</b>
+              </p>
+            </Divider>
+          </Col>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Fecha Confirmación" name="fecha">
+              <Input placeholder="" type="date" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Envio Mercancia" name="fechaEntrega">
+              <Input placeholder="" type="date" />
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Semana de Entrega" name="semanaEntrega">
+              <Input placeholder="" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={5}>
+            <Form.Item label="Nombre Cliente" name="customerName">
+              <Input placeholder="" maxLength="100" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={3}>
+            <Form.Item label="Teléfono" name="phone">
+              <Input placeholder="" maxLength="15" />
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Localización" name="location">
+              <Input placeholder="" maxLength="100" />
+            </Form.Item>
+          </Col>
+          <Divider orientation="left">
+            {" "}
+            <p className="uppercase">
+              <b>Acerca del Mueble</b>
+            </p>
+          </Divider>
+
+          <Col xs={24} sm={24} md={5}>
+            <Form.Item label="Modelo" name="modelDoor">
+              <Input placeholder="" maxLength="50" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={5}>
+            <Form.Item label="Acabado" name="materialDoor">
+              <Input placeholder="" maxLength="200" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={5}>
+            <Form.Item label="Tirador" name="handle">
+              <Input placeholder="" maxLength="200" />
+            </Form.Item>
+          </Col>
+          
+          <Col xs={24} sm={24} md={5}>
+            <Form.Item label="Cajon" name="drawer">
+              <Input placeholder="" maxLength="200" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Armazón" name="materialCabinet">
+              <Input placeholder="" maxLength="200" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={24}>
+            <Form.Item label="Observaciones" name="observation">
+              <Input.TextArea placeholder="" cols={4} />
+            </Form.Item>
+          </Col>
+          <Divider orientation="left">
+            <p className="uppercase">
+              {" "}
+              <b>Acerca de los Precios</b>
+            </p>
+          </Divider>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Coeficiente Tiendas" name="coefficient">
+              <Input placeholder="" maxLength="5" max={10} min={0} />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={2}>
+            <Form.Item label="IVA" name="iva">
+              <Input placeholder="" maxLength="5" defaultValue="21%" disabled />
+            </Form.Item>
+          </Col>
+          <Divider orientation="left" className="px-10">
+            <b className="uppercase">Descuento</b>{" "}
+            <span className="italic text-slate-400">(%)</span>
+          </Divider>
+          <Row className="w-full px-10 gap-4">
+            <Col xs={12} sm={12} md={3}>
+              <Form.Item label="Encimeras" name="discountEncimeras">
+                <Input
+                  maxLength="3"
+                  max={100}
+                  min={0}
+                  onBlur={(e) => {
+                    const newDiscount = e.target.value.trim();
+                    setInitialValues((prevValues) => ({
+                      ...prevValues,
+                      discountEncimeras: newDiscount,
+                    }));
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={12} sm={12} md={3}>
+              <Form.Item label="Muebles" name="discountCabinets">
+                <Input
+                  defaultValue={0}
+                  maxLength="3"
+                  max={100}
+                  min={0}
+                  onBlur={(e) => {
+                    const newDiscount = e.target.value.trim();
+                    setInitialValues((prevValues) => ({
+                      ...prevValues,
+                      discountCabinets: newDiscount,
+                    }));
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={12} sm={12} md={3}>
+              <Form.Item label="Equipamientos" name="discountEquipamientos">
+                <Input
+                  defaultValue={0}
+                  maxLength="3"
+                  max={100}
+                  min={0}
+                  onBlur={(e) => {
+                    const newDiscount = e.target.value.trim();
+                    setInitialValues((prevValues) => ({
+                      ...prevValues,
+                      discountEquipamientos: newDiscount,
+                    }));
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={12} sm={12} md={3}>
+              <Form.Item
+                label="Electrodomesticos"
+                name="discountElectrodomesticos"
+              >
+                <Input
+                  defaultValue={0}
+                  maxLength="3"
+                  max={100}
+                  min={0}
+                  onBlur={(e) => {
+                    const newDiscount = e.target.value.trim();
+                    setInitialValues((prevValues) => ({
+                      ...prevValues,
+                      discountElectrodomesticos: newDiscount,
+                    }));
+                  }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Col xs={24} sm={24} md={24}>
+            <Row>
+              <Divider orientation="left">
+                <p className="uppercase">
+                  {" "}
+                  <b>Mostrar Precios</b>
+                </p>
+              </Divider>
+              <div className="flex flex-col">
+                <Checkbox
+                  checked={checkC}
+                  onChange={(e) =>
+                    setCheckC(
+                      (check) => (check = setPrecio("C", e.target.checked))
+                    )
+                  }
+                >
+                  Mostrar Precios Clientes
+                </Checkbox>
+                <Checkbox
+                  checked={checkF}
+                  onChange={(e) =>
+                    setCheckF(
+                      (check) => (check = setPrecio("F", e.target.checked))
+                    )
+                  }
+                >
+                  Mostrar Precios Fabrica
+                </Checkbox>
+                <Checkbox
+                  checked={checkP}
+                  onChange={(e) =>
+                    setCheckP(
+                      (check) => (check = setPrecio("P", e.target.checked))
+                    )
+                  }
+                >
+                  Mostrar Precios Confirmación Pedido
+                </Checkbox>
+              </div>
+            </Row>
+            <Row>
+              <Divider orientation="left">
+                <p className="uppercase">
+                  {" "}
+                  <b>Mostrar Totales</b>
+                </p>
+              </Divider>
+              <div className="flex flex-col">
+                <Checkbox
+                  checked={total_Enci}
+                  onChange={(e) =>
+                    setEnci(
+                      (check) =>
+                        (check = setTotales("Encimeras", e.target.checked))
+                    )
+                  }
+                >
+                  Mostrar Totales Encimeras
+                </Checkbox>
+                <Checkbox
+                  checked={total_Equi}
+                  onChange={(e) =>
+                    setEqui(
+                      (check) =>
+                        (check = setTotales("Equipamiento", e.target.checked))
+                    )
+                  }
+                >
+                  Mostrar Totales Equipamiento
+                </Checkbox>
+                <Checkbox
+                  checked={total_Elec}
+                  onChange={(e) =>
+                    setElec(
+                      (check) =>
+                        (check = setTotales(
+                          "Electrodomesticos",
+                          e.target.checked
+                        ))
+                    )
+                  }
+                >
+                  Mostrar Totales Electrodomesticos
+                </Checkbox>
+              </div>
+            </Row>
+            <Space>
+              <Button
+                htmlType="submit"
+                type="primary"
+                className="flex justify-center items-center"
+                style={{
+                  height: 50,
+                  width: 150,
+                  marginTop: 30,
+                  padding: "5px 20px",
+                  background: "#1a7af8",
+                  color: "#fff",
+                }}
+              >
+                Guardar
+              </Button>
+            </Space>
+          </Col>
+        </Row>
+      </Form>
+    </Card>
+  );
+};
+export default General;

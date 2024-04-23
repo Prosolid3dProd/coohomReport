@@ -1,0 +1,13 @@
+.alturaPreview {
+    height: calc(100vh - 235px);
+}
+
+@media screen and (max-width: 900px) {
+    #tdNoFlex {
+        flex: 0 !important;
+    }
+
+    #tdFlex {
+        flex: 1 !important;
+    }
+}
