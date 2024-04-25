@@ -489,20 +489,18 @@ const ShopsForm = () => (
     wrapperCol={{
       span: 16,
     }}
-    style={{
-      maxWidth: 600,
-    }}
     initialValues={{
       remember: true,
     }}
     onFinish={onFinish}
     onFinishFailed={onFinishFailed}
     autoComplete="off"
+    className="w-full"
   >
     <Form.Item
       name="propietario"
       label={<span className="">Propietario</span>}
-      className="w-full p-4 flex items-center m-0"
+      className="p-4 flex items-center m-0"
       rules={[
         {
           required: true,
@@ -577,22 +575,21 @@ const ShopsForm = () => (
     </Form.Item>
     <Form.Item
       name="comentario"
-      className="pl-4"
       label={<span className="italic">Comentario</span>}
     >
       <Input_ant.TextArea
         showCount
         maxLength={100}
-        className="lg:w-[200px] h-[100px]"
+        className="lg:w-[200px] h-[70px]"
         placeholder="Añada información más allá de los campos requeridos."
       />
     </Form.Item>
 
     <Form.Item
       wrapperCol={{
-        offset: 8,
-        span: 16,
+        offset: 14,
       }}
+
     >
       <Button className="bg-blue text-white" type="default" htmlType="submit">
         Crear
@@ -657,20 +654,9 @@ const Admin = () => {
       message.error(`Error al eliminar el pedido ${item.orderCode}`);
     }
   };
+
   const onUpdate = async (item) => {
-    const handleOk = () => {
-      setIsModalOpen(false);
-    };
-    const handleCancel = () => {
-      setIsModalOpen(false);
-    };
-    return (
-        <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-        </Modal>
-    );
+    
   };
 
   columns = [
@@ -690,6 +676,7 @@ const Admin = () => {
 
     {
       title: "Telefono",
+      width: 60,
       dataIndex: "phone",
       key: "phone",
       key: "1",
@@ -700,12 +687,11 @@ const Admin = () => {
       fixed: "right",
       width: 100,
       render: (text, record) => (
-        <div className="flex flex-row">
+        <div className="flex flex-row justify-around">
           <Space>
             <Typography.Link>
               <Button type="default" onClick={() => {
                 onUpdate(record) 
-                setIsModalOpen(true)
                 }}>
                 Editar
               </Button>
@@ -730,13 +716,11 @@ const Admin = () => {
       ),
     },
   ];
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
     
   return (
     <main className="overflow-y-scroll px-4 flex gap-4 flex-col">
       <Header actions={false} name={"Tiendas"} />
-      <section className="flex flex-row justify-around">
+      <section className="grid grid-cols-2">
         <ShopsForm />
         <Table
           columns={columns}

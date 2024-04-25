@@ -1268,9 +1268,9 @@ export const parseJson3D = async (json) => {
               String(submodel.customCode) === "1001"
                 ? (puertasInfo = getInfoDoor(submodel.subModels))
                 : (puertasInfo = getInfoDoor(item.subModels));
-              if (puertasInfo.handler) {
-                modelHandlerArray.push(puertasInfo.handler);
-              }
+              // if (puertasInfo.handler) {
+              //   modelHandlerArray.push(puertasInfo.handler);
+              // }
             }
           });
 
@@ -1669,6 +1669,14 @@ export const parseJson3D = async (json) => {
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
       }
 
+      const referenceTiradores = (item) => {
+        for (const reference of item.ignoreParameters) {
+          if (reference.name === "REF") {
+            return String(reference.value);
+          }
+        }
+      };
+
       item.subModels
         .filter((element) => String(element.modelTypeId) === "1")
         .map((element) => {
@@ -1679,9 +1687,20 @@ export const parseJson3D = async (json) => {
             element.subModels.map((el) => {
               if (String(el.customCode).trim() === "1101") {
                 modelHandlerArray.push({
-                  name: el.modelBrandGoodName,
                   material: el.textureName,
-                  price: el.modelCostInfo.unitCost,
+                  total: parseFloat(el.modelCostInfo.unitCost),
+                  priceCabinet: parseFloat(el.modelCostInfo.unitCost),
+                  tipo: "C",
+                  material: el.textureName,
+                  reference: referenceTiradores(el) || null,
+                  customCode: null,
+                  size: {
+                    x: el.size.x,
+                    y: el.size.y,
+                    z: el.size.z,
+                  },
+                  name: el.modelName,
+                  obsBrandGoodId: el.obsBrandGoodId,
                 });
               }
             });
@@ -1697,6 +1716,11 @@ export const parseJson3D = async (json) => {
       zoc.typeZocalo = "library";
       zoc.id = `id_${contador++}`;
       cabinets.push(zoc);
+    });
+
+    modelHandlerArray.map((tirador) => {
+      tirador.id = `id_${contador++}`;
+      cabinets.push(tirador);
     });
 
     if (modelDrawer) {

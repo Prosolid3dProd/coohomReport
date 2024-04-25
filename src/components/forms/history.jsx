@@ -354,6 +354,7 @@ const History = () => {
       const result = await getOrderById({
         _id: item._id,
       });
+      console.log(result)
       fixOrder(result, () => {
         navigate("/Dashboard/Report/", {
           replace: true,
@@ -383,7 +384,7 @@ const History = () => {
   useEffect(() => {
     const handleResize = () => {
       const windowHeight = window.innerHeight;
-      const newRowHeight = 90;
+      const newRowHeight = 108;
       const newPageSize = Math.floor((windowHeight - 200) / newRowHeight);
       setPageSize(newPageSize);
     };
