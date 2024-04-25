@@ -195,7 +195,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
   ) => {
     const total = (sumaTotal + totalZocalo) * 1.21;
     const totalConDescuento = total - totalDescuentos;
-    console.log(parseFloat(totalConDescuento).toFixed(2));
     return parseFloat(totalConDescuento).toFixed(2);
   };
 

@@ -73,10 +73,9 @@ const Report = () => {
       ),
     },
     {
-      Presupuesto: (
+      "Presupuesto": (
         <div className="alturaPreview">
           <PDFViewer className="h-full w-full">
-            {/* <Presupuesto_Fabrica price={priceF} data={data} /> */}
             <Confirmacion_Pedido
               price={priceP}
               data={data}

@@ -84,7 +84,6 @@ const ModalEditar = ({ editar, filaCambiar }) => {
     console.log(filaEditada);
     // Agregar conexión BD --> obj
   }
-  
 
   return (
     <Modal
@@ -137,6 +136,48 @@ const Encimeras = () => {
   const [data, setData] = useState([]);
   const [modalEditarOpen, setModalEditar] = useState(false)
   const [datosModal, setDatosModal] = useState({})
+  let columns = [
+    {
+      title: "Codigo",
+      dataIndex: "code",
+      key: "code",
+    },
+    {
+      title: "Nombre",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Tipo",
+      dataIndex: "type",
+      key: "type",
+    },
+    {
+      title: "Ancho",
+      dataIndex: "width",
+      key: "width",
+    },
+    {
+      title: "Alto",
+      dataIndex: "height",
+      key: "height",
+    },
+    {
+      title: "Profundidad",
+      dataIndex: "depth",
+      key: "depth",
+    },
+    {
+      title: "Precio",
+      dataIndex: "price",
+      key: "price",
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      key: "action",
+    },
+  ];
 
   const getDataComplements = async () => {
     await getComplements()
@@ -200,55 +241,14 @@ const Encimeras = () => {
 
   return (
     <main className="flex flex-col overflow-y-scroll px-4">
-      <Header name={'Complementos'} input={true} getFilter={getFilterComplements} downloadFile={(e) => exportarArchivo(e)} addFile={(e) => importarArchivo(e)} />
+      <Header name={'Biblioteca'} input={true} getFilter={getFilterComplements} downloadFile={(e) => exportarArchivo(e)} addFile={(e) => importarArchivo(e)} />
       <Table
         className="border border-t-0 border-border mx-3 relative overflow-x-hidden"
         loading={editado}
         dataSource={data}
         scroll={{ x:true }}
         searchable
-        columns={[
-          {
-            title: "Codigo",
-            dataIndex: "code",
-            key: "code",
-          },
-          {
-            title: "Nombre",
-            dataIndex: "name",
-            key: "name",
-          },
-          {
-            title: "Tipo",
-            dataIndex: "type",
-            key: "type",
-          },
-          {
-            title: "Ancho",
-            dataIndex: "width",
-            key: "width",
-          },
-          {
-            title: "Alto",
-            dataIndex: "height",
-            key: "height",
-          },
-          {
-            title: "Profundidad",
-            dataIndex: "depth",
-            key: "depth",
-          },
-          {
-            title: "Precio",
-            dataIndex: "price",
-            key: "price",
-          },
-          {
-            title: "Action",
-            dataIndex: "action",
-            key: "action",
-          },
-        ]}
+        columns={columns}
       />
       {modalEditarOpen && <ModalEditar editar={setModalEditar} filaCambiar={datosModal} />}
     </main>

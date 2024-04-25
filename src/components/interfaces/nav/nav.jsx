@@ -18,7 +18,7 @@ const Header = () => (
       <b> {JSON.parse(localStorage.getItem("token")).user?.name}</b>
     </h1>{" "}
     &nbsp; &nbsp; &nbsp;
-    <Typography.Link href="https://coohom-reportes-git-atomicchanges-skycode87.vercel.app//Login">
+    <Typography.Link href="https://coohom-report.vercel.app/Login">
       Cerrar Sesión
     </Typography.Link>
   </header>
