@@ -585,7 +585,7 @@ const getInfoDoor = (submodels) => {
 const getInfoHandler = (submodels) => {
   let handler = "";
 
-  submodels.forEach((item) => {
+  submodels?.forEach((item) => {
     if (
       String(item.customCode).trim().substring(0, 2) ===
       CONFIG.CUSTOMCODE.HANDLER
@@ -749,16 +749,29 @@ const getParameters = (param, tipoMueble) => {
   );
 
   if (casco !== undefined) {
+    const mcv = casco.subModels.find((x) => {
+      const upperCaseModelName = x.modelName?.toLocaleUpperCase();
+
+      if (upperCaseModelName) {
+        if (
+          upperCaseModelName.includes("VISTO IZQ") ||
+          upperCaseModelName.includes("VISTO DER") ||
+          upperCaseModelName.includes("AMBOS")
+        ) {
+          return x.textureName;
+        }
+      }
+    });
     const cv = casco.parameters.find((x) =>
       x.name == "CV" && x.value > 0 ? x.value : undefined
     );
-
     if (cv !== undefined) {
       op.push({
         name: cv.displayName,
         value: parseFloat(cv.value),
         description: cv.description,
         nameValue: cv.optionValues[cv.options?.indexOf(cv.value)].name,
+        mcv: mcv.textureName,
       });
     }
   }
@@ -992,15 +1005,16 @@ export const parseJson3D = async (json) => {
     let arrZocalos = [];
     let arrEncimeras = [];
     let tiradoresCabecera = [];
+    let quantityCT;
 
     json.paramModel?.forEach((item) => {
+      // console.log(item)
       let materialCostado = "";
       let materialRegleta = "";
       let materialRegletaF = "";
       let materialAccesorios = "";
       let campana;
       let modelProductNumber = item.modelProductNumber;
-
       //Si es campana integrada tenemos que sacar unas variables del mueble
       if (item.customCode == "8000") {
         let wCampana = 0;
@@ -1451,7 +1465,7 @@ export const parseJson3D = async (json) => {
             const customCodeSubstring = String(item.customCode).substring(0, 2);
 
             if (customCodeSubstring === CONFIG.CUSTOMCODE.DOOR) {
-              item.subModels.forEach((it) => {
+              item.subModels?.forEach((it) => {
                 if (it.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO) {
                   frente = traerFrente(item);
                   const perfil = getPerfil(frente.datos.subModels);
@@ -1677,6 +1691,40 @@ export const parseJson3D = async (json) => {
         }
       };
 
+      // const idCT = cabinets.map(id=>{
+      //   return id.obsBrandGoodId
+      // })
+
+      //   if (
+      //     String(item.modelProductNumber).toLocaleUpperCase() ===
+      //       "COMPLEMENTOS" ||
+      //     String(item.modelProductNumber).toLocaleUpperCase() === "ACCESORIOS"
+      //   ) {
+      //     for (const reference of item.parameters) {
+      //       if (reference.name === "Cantidad") {
+      //         if (item.obsBrandGoodId === idCT) {
+      //           console.log(item)
+      //         }
+      //         // console.log(reference.value)
+      //         //  quantityCT = parseFloat(reference.value);
+      //       }
+      //     }
+      //   }
+
+      for (const cabinet of cabinets) {
+        const cabinetObsBrandGoodId = cabinet.obsBrandGoodId;
+        if (cabinetObsBrandGoodId === item.obsBrandGoodId) {
+          console.log(item);
+          for (const reference of item.parameters) {
+            if (reference.name === "Cantidad") {
+              cabinet.quantity = parseFloat(reference.value);
+              cabinet.total = cabinet.total * cabinet.quantity;
+              break;
+            }
+          }
+        }
+      }
+
       item.subModels
         .filter((element) => String(element.modelTypeId) === "1")
         .map((element) => {
@@ -1684,7 +1732,7 @@ export const parseJson3D = async (json) => {
             String(element.customCode).trim().substring(0, 2) ===
             CONFIG.CUSTOMCODE.DOOR
           ) {
-            element.subModels.map((el) => {
+            element.subModels?.map((el) => {
               if (String(el.customCode).trim() === "1101") {
                 modelHandlerArray.push({
                   material: el.textureName,
@@ -1706,6 +1754,7 @@ export const parseJson3D = async (json) => {
             });
           }
         });
+
       modelHandlerArray.forEach((handler) => {
         tiradoresCabecera.push(handler.name);
       });
@@ -1727,40 +1776,68 @@ export const parseJson3D = async (json) => {
       drawerTemp = modelDrawer[0].modelDrawer;
       drawerTexture = modelDrawer[0].textureDrawer;
     }
+    // ---------------------------------------------------------------------------------------------------
+    // json.paramModel.forEach((item) => {
+    //   const CT = cabinets.filter(
+    //     (cab) =>
+    //       cab.tipo.toLocaleUpperCase() === "T" ||
+    //       cab.tipo.toLocaleUpperCase() === "C"
+    //   );
 
-    const newCabinets = [];
+    //   item.parameters.forEach( i => {
 
-    cabinets.forEach((cab) => {
-      if (cab.tipo !== "C" && cab.tipo !== "T") {
-        newCabinets.push(cab);
-        return;
-      }
+    //   })
 
-      if (cab.tipo === "C" || cab.tipo === "T") {
-        const repeatedIds = cabinets.filter(
-          (otherCab) => cab.obsBrandGoodId === otherCab.obsBrandGoodId
-        );
+    //   // if (
+    //   //   String(item.modelProductNumber).toLocaleUpperCase() ===
+    //   //     "COMPLEMENTOS" ||
+    //   //   String(item.modelProductNumber).toLocaleUpperCase() === "ACCESORIOS"
+    //   // ) {
+    //   //   console.log(item)
+    //   //   item.parameters.filter((ref) => {
+    //   //     ref.name === "Cantidad";
+    //   //     cabinets.map((cab) => {
+    //   //       cab.quantity = ref.value;
+    //   //       cab.total = parseInt(cab.quantity) * parseFloat(cab.total);
+    //   //     });
+    //   //   });
+    //   // }
+    // });
 
-        if (repeatedIds.length > 1) {
-          const quantity = repeatedIds.length;
-          const price =
-            typeof cab.total === "string" ? parseFloat(cab.total) : cab.total;
-          const total = price * quantity;
-          const alreadyAdded = newCabinets.some(
-            (item) => item.obsBrandGoodId === cab.obsBrandGoodId
-          );
+    // ----------------------------------------------------------------------------------------------------
+    // const newCabinets = [];
 
-          if (!alreadyAdded) {
-            const newObj = { ...cab, quantity, total };
-            newCabinets.push(newObj);
-          }
-        } else {
-          newCabinets.push(cab);
-        }
-      }
-    });
-    cabinets.length = 0;
-    cabinets.push(...newCabinets);
+    // cabinets.forEach((cab) => {
+    //   if (cab.tipo !== "C" && cab.tipo !== "T") {
+    //     newCabinets.push(cab);
+    //     return;
+    //   }
+
+    //   if (cab.tipo === "C" || cab.tipo === "T") {
+    //     const repeatedIds = cabinets.filter(
+    //       (otherCab) => cab.obsBrandGoodId === otherCab.obsBrandGoodId
+    //     );
+
+    //     if (repeatedIds.length > 1) {
+    //       const quantity = repeatedIds.length;
+    //       // const price =
+    //       //   typeof cab.total === "string" ? parseFloat(cab.total) : cab.total;
+    //       // const total = price * quantity;
+    //       const alreadyAdded = newCabinets.some(
+    //         (item) => item.obsBrandGoodId === cab.obsBrandGoodId
+    //       );
+
+    //       if (!alreadyAdded) {
+    //         const newObj = { ...cab, quantity, total };
+    //         newCabinets.push(newObj);
+    //       }
+    //     } else {
+    //       newCabinets.push(cab);
+    //     }
+    //   }
+    // });
+    // cabinets.length = 0;
+    // cabinets.push(...newCabinets);
 
     const orderJson = {
       ...(json.partnerOrder || null),

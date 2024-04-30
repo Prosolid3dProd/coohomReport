@@ -66,8 +66,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
       const mes = fechaPartes[1];
       const dia = fechaPartes[2];
 
-      const fechaFormateada = `${dia}/${mes}/${año}`;
-      return fechaFormateada;
+      if (año !== undefined && mes !== undefined && dia !== undefined) {
+        const fechaFormateada = `${dia}/${mes}/${año}`;
+        return fechaFormateada;
+      }
     } catch (e) {
       return fecha;
     }
@@ -212,7 +214,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
   const sumaTotalSinDescuento = sumaTotal + totalZocalo;
 
-  const complementos = data.infoZocalos.length > 0 || cabinets.complementos.length > 0 ? true : false
+  const complementos =
+    data.infoZocalos.length > 0 || cabinets.complementos.length > 0
+      ? true
+      : false;
 
   return (
     <Document title="Presupuesto COOHOM">
@@ -327,8 +332,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   {/* {data.infoZocalos !== null ? data.infoZocalos.map((zocalo) => {
                     return zocalo.height - 10 + "/"
                   }) : "." } */}
-.
-                  {data?.infoZocalos[0]?.size?.z || "."}
+                  .{data?.infoZocalos[0]?.size?.z || "."}
                 </Text>
                 <Text>{data?.modelHandler || "."}</Text>
                 <Text>
@@ -579,7 +583,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.priceTotal * data.coefficient).toFixed(2)}
+                        {parseFloat(item.priceTotal).toFixed(
+                          2
+                        )}
                         {/* {parseFloat(item.priceDoor + item.priceDrawers + item.priceVariants + parseFloat(item.priceCabinet)).toFixed(0)} */}
                       </Text>
                     </View>
@@ -1815,7 +1821,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(formatNumber(item.priceTotal)).toFixed(2)}
+                        {parseFloat(item.priceTotal).toFixed(2)}
                       </Text>
                     </View>
                   )}
