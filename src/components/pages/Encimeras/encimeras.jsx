@@ -1,17 +1,29 @@
-import { Table, message, Modal, Button } from "antd";
+import {
+  Table,
+  message,
+  Modal,
+  Button,
+  Space,
+  Popconfirm,
+  Typography,
+} from "antd";
 import React, { useEffect, useState } from "react";
-
-import { getComplements, getComplementsByText } from "../../../handlers/order";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import {
+  archivedOrder,
+  getComplements,
+  getComplementsByText,
+} from "../../../handlers/order";
 import { Header, Input } from "../../content";
 import { Label, Input as InputModal } from "../../content";
-import { exportarArchivo, importarArchivo } from "../../content/logic/obtenerArchivoJson";
-
-const columnas = ['Código', 'Nombre', 'Tipo', 'Ancho', 'Alto', 'Profundidad', 'Precio']
+import {
+  exportarArchivo,
+  importarArchivo,
+} from "../../content/logic/obtenerArchivoJson";
 
 // export const AgregarComplemento = () => {
 
 //   const [showModal, setModal] = useState(false)
-
 
 //   const recogerDatos = () => {
 //     const inputs = document.getElementsByTagName('input')
@@ -21,8 +33,6 @@ const columnas = ['Código', 'Nombre', 'Tipo', 'Ancho', 'Alto', 'Profundidad', '
 //     //Agregar conexión BD
 //     setModal(open => open = false)
 //   }
-
-  
 
 //   return (
 //     <>
@@ -64,36 +74,48 @@ const columnas = ['Código', 'Nombre', 'Tipo', 'Ancho', 'Alto', 'Profundidad', '
  *
  * @param {Function} editar --> editar = abrir/cerrar modal
  * @param {object} filaCambiar --> elemento tabla Complementos editar
- * @return {Component} 
+ * @return {Component}
  */
 const ModalEditar = ({ editar, filaCambiar }) => {
-  const columnasOrden = ['code', 'name', 'type', 'width', 'height', 'depth', 'price']
+  const columnasOrden = [
+    "code",
+    "name",
+    "type",
+    "width",
+    "height",
+    "depth",
+    "price",
+  ];
 
   const editarFila = () => {
-    const inputs = Array.from(document.getElementsByTagName('input')).slice(2); 
+    const inputs = Array.from(document.getElementsByTagName("input")).slice(2);
     console.log(inputs);
-  
+
     let filaEditada = {};
-  
+
     inputs.forEach((input, i) => {
       const columna = columnasOrden[i];
-      console.log(columna)
+      console.log(columna);
       filaEditada = { ...filaEditada, [columna]: input.value };
     });
 
     console.log(filaEditada);
     // Agregar conexión BD --> obj
-  }
+  };
 
   return (
     <Modal
-      title='Editar Complemento'
+      title="Editar Complemento"
       open={() => true}
       onOk={editarFila}
       destroyOnClose
-      onCancel={() => editar(editar => editar = false)}
+      onCancel={() => editar((editar) => (editar = false))}
       footer={[
-        <Button key="back" onClick={() => editar(editar => editar = false)} target="_self">
+        <Button
+          key="back"
+          onClick={() => editar((editar) => (editar = false))}
+          target="_self"
+        >
           Cancel
         </Button>,
         <Button target="_self" key="submit" type="default" onClick={editarFila}>
@@ -101,41 +123,47 @@ const ModalEditar = ({ editar, filaCambiar }) => {
         </Button>,
       ]}
     >
-      {
-  columnas.map((columna, i) => {
+      {columnas.map((columna, i) => {
+        const filterFila = Object.entries(filaCambiar).filter((dato) =>
+          [
+            "code",
+            "name",
+            "type",
+            "depth",
+            "height",
+            "width",
+            "price",
+          ].includes(dato[0])
+        ); //filtramos las columnas que nos interesen
 
-    const filterFila = Object.entries(filaCambiar).filter(dato => ['code', 'name', 'type', 'depth', 'height', 'width', 'price'].includes(dato[0]))//filtramos las columnas que nos interesen
+        const [columnasFiltradas, valores] = [
+          [...filterFila].map((dato) => dato[0]), //key
+          [...filterFila].map((dato) => dato[1]), //values
+        ];
 
-    const [columnasFiltradas, valores] = [
-      [...filterFila].map((dato) => dato[0]),//key
-      [...filterFila].map((dato) => dato[1])//values
-    ]
-
-    const vc = []
-    for (const index in columnasOrden) {
-      const columna = columnasOrden[index]
-      const indexVal = columnasFiltradas.findIndex(col => col === columna)
-      vc.push(valores[indexVal])//Values en orden
-    }
-
-    return (
-      <Label
-        key={columna} // Asigna la clave única (key) a cada elemento
-        texto={columna}
-        input={
-          <Input dfValue={vc[i]} />
+        const vc = [];
+        for (const index in columnasOrden) {
+          const columna = columnasOrden[index];
+          const indexVal = columnasFiltradas.findIndex(
+            (col) => col === columna
+          );
+          vc.push(valores[indexVal]); //Values en orden
         }
-      />
-    );
-  })
-}
+
+        return (
+          <Label
+            key={columna} // Asigna la clave única (key) a cada elemento
+            texto={columna}
+            input={<Input dfValue={vc[i]} />}
+          />
+        );
+      })}
     </Modal>
-  )
-}
+  );
+};
 const Encimeras = () => {
   const [data, setData] = useState([]);
-  const [modalEditarOpen, setModalEditar] = useState(false)
-  const [datosModal, setDatosModal] = useState({})
+
   let columns = [
     {
       title: "Codigo",
@@ -173,84 +201,134 @@ const Encimeras = () => {
       key: "price",
     },
     {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
+      title: "Acciones",
+      key: "actions",
+      fixed: "right",
+      width: 110,
+      render: (text, record) => (
+        <Space>
+          <Popconfirm
+            title="¿Estás seguro de que deseas eliminar este reporte?"
+            icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+            onConfirm={() => onDelete(record)}
+            onCancel={() => {}}
+            okType="default"
+            okText="Si"
+            cancelText="No"
+          >
+            <Typography.Link>
+              <Button danger>Eliminar</Button>
+            </Typography.Link>
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
-  const getDataComplements = async () => {
-    await getComplements()
-      .then((res) => {
-        let temp = [];
+  // const getDataComplements = async () => {
+  //   await getComplements()
+  //     .then((res) => {
+  //       let temp = [];
 
-        res.forEach((element) => {
-          if (
-            String(element.name) !== "undefined" &&
-            element.name !== "" &&
-            element.name !== undefined
-          ) {
-            element = {
-              ...element, ['action']: <Button
-                className="w-[65px] text-blue border-blue cursor-pointer transition-all ease-out duration-350 hover:text-blue/75"
-                onClick={() => {
-                  setDatosModal(fila => fila = element)
-                  setModalEditar(open => open = true)
-                }}
-              >
-                Edit
-              </Button>
-            }
-            temp.push(element);
-          }
-        });
+  //       res.forEach((element) => {
+  //         if (
+  //           String(element.name) !== "undefined" &&
+  //           element.name !== "" &&
+  //           element.name !== undefined
+  //         ) {
+  //           element = {
+  //             ...element,
+  //             ["action"]: (
+  //               <Button
+  //                 className="text-red border-red cursor-pointer transition-all ease-out duration-350 hover:text-red/75"
+  //                 onClick={() => {
+  //                   setDatosModal((fila) => (fila = element));
+  //                   setModalEditar((open) => (open = true));
+  //                 }}
+  //               >
+  //                 Eliminar
+  //               </Button>
+  //             ),
+  //           };
+  //           temp.push(element);
+  //         }
+  //       });
 
-        setData(temp);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  //       setData(temp);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setEditado(true);
+        const result = await getComplements();
+        const newData = structuredClone(result);
+        const flattenedData = newData.flat();
+        const filteredData = flattenedData.filter(el => el.name !== null);
+        setData(filteredData);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setEditado(false);
+      }
+      
+    };
+    fetchData();
+    
+  }, []);
 
   const getFilterComplements = async (params) => {
     const result = await getComplementsByText(params);
-    console.log(result)
+    console.log(result);
     if (result && result.length > 0) setData(result);
     else {
       message.error("No se encontraron resultados");
-      getDataComplements();
+      fetchData();
     }
   };
 
-  useEffect(() => {
-    getDataComplements();
-  }, []);
+  const onDelete = async (item) => {
+    setEditado(true);
+    try {
+      const result = await archivedOrder(item);
+      if (result) {
+        setInitialValues((prevValues) =>
+          prevValues.filter((value) => value._id !== item._id)
+        );
+        message.success(`${item.orderCode} eliminado correctamente`);
+        setEditado(false);
+      } else {
+        message.error(`Error al eliminar ${item.orderCode}`);
+      }
+    } catch (e) {
+      console.log(e);
+      message.error(`Error al eliminar ${item.orderCode}`);
+    }
+  };
 
   const [editado, setEditado] = useState(false);
-  const [bool, setbool] = useState(false);
-
-  useEffect(() => {
-    if (!bool) {
-      setEditado(editado => editado = true)
-      setTimeout(() => {
-        setEditado(editado => editado = false)
-      }, 500)
-    }
-  }, [bool])
-
 
   return (
     <main className="flex flex-col overflow-y-scroll px-4">
-      <Header name={'Biblioteca'} input={true} getFilter={getFilterComplements} downloadFile={(e) => exportarArchivo(e)} addFile={(e) => importarArchivo(e)} />
+      <Header
+        name={"Biblioteca"}
+        input={true}
+        getFilter={getFilterComplements}
+        downloadFile={(e) => exportarArchivo(e)}
+        addFile={(e) => importarArchivo(e)}
+      />
       <Table
         className="border border-t-0 border-border mx-3 relative overflow-x-hidden"
         loading={editado}
         dataSource={data}
-        scroll={{ x:true }}
+        scroll={{ x: true }}
         searchable
         columns={columns}
       />
-      {modalEditarOpen && <ModalEditar editar={setModalEditar} filaCambiar={datosModal} />}
     </main>
   );
 };

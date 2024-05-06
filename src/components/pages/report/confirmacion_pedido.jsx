@@ -552,10 +552,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         >
                           {" "}
                           <Text>Variantes: </Text>
-                          {item.variants.map((item) => (
+                          {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {item.name}: {item.description} / [{item.value}]
+                              {it.name}: {it.nameValue} / [{it.mcv}]
                             </Text>
                           ))}
                         </View>
