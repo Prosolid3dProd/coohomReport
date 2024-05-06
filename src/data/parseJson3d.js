@@ -767,11 +767,11 @@ const getParameters = (param, tipoMueble) => {
     );
     if (cv !== undefined) {
       op.push({
-        name: cv.displayName,
-        value: parseFloat(cv.value),
-        description: cv.description,
-        nameValue: cv.optionValues[cv.options?.indexOf(cv.value)].name,
-        mcv: mcv.textureName,
+        name: cv.displayName || null,
+        value: parseFloat(cv.value) || null,
+        description: cv.description || null,
+        nameValue: cv.optionValues[cv.options?.indexOf(cv.value)].name || null,
+        mcv: mcv.textureName || null,
       });
     }
   }
