@@ -268,7 +268,7 @@ const Encimeras = () => {
         const result = await getComplements();
         const newData = structuredClone(result);
         const flattenedData = newData.flat();
-        const filteredData = flattenedData.filter(el => el.name !== null);
+        const filteredData = flattenedData.filter(el => el.name);
         setData(filteredData);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -283,7 +283,6 @@ const Encimeras = () => {
 
   const getFilterComplements = async (params) => {
     const result = await getComplementsByText(params);
-    console.log(result);
     if (result && result.length > 0) setData(result);
     else {
       message.error("No se encontraron resultados");
