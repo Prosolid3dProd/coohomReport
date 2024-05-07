@@ -1712,13 +1712,21 @@ export const parseJson3D = async (json) => {
       //   }
 
       for (const cabinet of cabinets) {
-        const cabinetObsBrandGoodId = cabinet.obsBrandGoodId;
-        if (cabinetObsBrandGoodId === item.obsBrandGoodId) {
+        if (
+          String(cabinet.modelProductNumber).toLocaleUpperCase() ===
+            "COMPLEMENTOS" ||
+          String(cabinet.modelProductNumber).toLocaleUpperCase() ===
+            "ACCESORIOS"
+        ) {
           console.log(item);
           for (const reference of item.parameters) {
             if (reference.name === "Cantidad") {
               cabinet.quantity = parseFloat(reference.value);
-              cabinet.total = cabinet.total * cabinet.quantity;
+
+              break;
+            }
+            if (reference.name === "price") {
+              cabinet.total = parseFloat(reference.value);
               break;
             }
           }

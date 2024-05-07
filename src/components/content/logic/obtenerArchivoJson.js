@@ -27,7 +27,7 @@ const procesarArchivoXLSX = (readerXlsx, fileUpload) => {
   readerXlsx.onload = function (e) {
     try {
       const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" })
+      const workbook = XLSX.read(data, { type: "array" });
 
       const serialLabel = "Product serial number";
       const nameLabel = "Product name (editable)";
@@ -58,7 +58,6 @@ const procesarArchivoXLSX = (readerXlsx, fileUpload) => {
   readerXlsx.readAsArrayBuffer(fileUpload);
 };
 
-
 const procesarArchivo = (fileUpload) => {
   const nombreArchivo = fileUpload.name;
 
@@ -80,41 +79,76 @@ const obtenerArchivo = (evento, _cambios) => {
   procesarArchivo(fileUpload);
 };
 
-const importarArchivo = (evento, _cambios) => {
-  const files = evento.target.files;
-  const fileUpload = files[0];
+const importarArchivo = (evento) => {
+  return new Promise((resolve, reject) => {
+    const files = evento.target.files;
+    const fileUpload = files[0];
 
-  const readerImports = new FileReader();
-  readerImports.onload = function (e) {
-    try {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheetData = XLSX.utils.sheet_to_json(
-        workbook.Sheets[workbook.SheetNames[0]],
-        { header: 1 }
-      );
+    const readerImports = new FileReader();
+    readerImports.onload = function (e) {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetData = XLSX.utils.sheet_to_json(
+          workbook.Sheets[workbook.SheetNames[0]],
+          { header: 1 }
+        );
 
-      sheetData.shift();
-      const resultArray = sheetData.map((row) => ({
-        nombre: row[0],
-        codigo: row[1],
-        tipo: row[2],
-        ancho: row[3],
-        altura: row[4],
-        profundidad: row[5],
-        precio: row[6],
-        imagen: row[7]
-      }));
-      console.log(resultArray);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  readerImports.readAsArrayBuffer(fileUpload);
+        sheetData.shift();
+        const resultArray = sheetData.map((row) => ({
+          Referencia: row[0],
+          Nombre: row[1],
+          Tipo: row[2],
+          Ancho: row[3],
+          Altura: row[4],
+          Profundidad: row[5],
+          Precio: row[6],
+          archived: row[7],
+          id: row[8],
+          fecha1: row[9],
+          fecha2: row[10],
+          v: row[11],
+        }));
+        resolve(resultArray);
+      } catch (error) {
+        console.error(error);
+        reject(error);
+      }
+    };
+
+    readerImports.readAsArrayBuffer(fileUpload);
+  });
 };
 
-const exportarArchivo = (evento, _cambios) => {
-  
-}; 
+const exportarArchivo = (data) => {
+  const modifiedData = data
+    .map((obj) => {
+      const referencia = typeof obj.code === "string" ? obj.code : "";
+      let nombre = typeof obj.name === "string" ? obj.name : "";
+      nombre = nombre.replace("\n", " ");
+
+      return {
+        Referencia: referencia,
+        Nombre: nombre,
+        Tipo: obj.type,
+        Ancho: obj.width,
+        Altura: obj.height,
+        Profundidad: obj.depth,
+        Precio: parseFloat(obj.price).toFixed(2),
+        archived: obj.archived,
+        id: obj._id,
+        fecha1: obj.createdAt,
+        fecha2: obj.updatedAt,
+        v: obj.__v,
+      };
+    })
+    .filter((obj) => obj !== null);
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.json_to_sheet(modifiedData);
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Datos");
+  const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([wbout], { type: "application/octet-stream" });
+  saveAs(blob, "libreria_Sola.xlsx");
+};
 
 export { obtenerArchivo, importarArchivo, exportarArchivo };

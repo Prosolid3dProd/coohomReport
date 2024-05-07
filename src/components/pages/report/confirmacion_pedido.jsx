@@ -583,10 +583,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(
-                          2
-                        )}
-                        {/* {parseFloat(item.priceDoor + item.priceDrawers + item.priceVariants + parseFloat(item.priceCabinet)).toFixed(0)} */}
+                        {parseFloat(item.priceTotal).toFixed(2)}
                       </Text>
                     </View>
                   )}
@@ -806,11 +803,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         >
                           {" "}
                           <Text>Variantes: </Text>
-                          {item.variants.map((item) => (
+                          {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {item.name}: {item.description} / [
-                              {item.nameValue}]
+                              {it.name}: {it.nameValue} / [{it.mcv}]
                             </Text>
                           ))}
                         </View>
@@ -840,7 +836,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
                         {parseFloat(item.priceTotal).toFixed(2)}
-                        {/* {parseFloat(item.priceDoor + item.priceDrawers + item.priceVariants + parseFloat(item.priceCabinet)).toFixed(0)} */}
                       </Text>
                     </View>
                   )}
@@ -1792,8 +1787,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         <Text>
                           - Acabado:{" "}
                           <Text style={{ fontSize: "8" }}>
-                            {verificarVariable(item.material)} / [{" "}
-                            {formatNumber(item.priceCabinet)} ]
+                            {verificarVariable(item.material)}
                           </Text>
                         </Text>
                       }
@@ -2132,10 +2126,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
                         - Acabado:{" "}
-                        <Text style={{ fontSize: "8" }}>
-                          {item.material} / [ {formatNumber(item.priceCabinet)}{" "}
-                          ]
-                        </Text>
+                        <Text style={{ fontSize: "8" }}>{item.material}</Text>
                       </Text>
                     )}
                     {item.opening && (

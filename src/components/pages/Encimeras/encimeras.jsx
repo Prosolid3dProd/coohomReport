@@ -161,8 +161,157 @@ const ModalEditar = ({ editar, filaCambiar }) => {
     </Modal>
   );
 };
+
 const Encimeras = () => {
   const [data, setData] = useState([]);
+  const [editado, setEditado] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // const getDataComplements = async () => {
+  //   await getComplements()
+  //     .then((res) => {
+  //       let temp = [];
+
+  //       res.forEach((element) => {
+  //         if (
+  //           String(element.name) !== "undefined" &&
+  //           element.name !== "" &&
+  //           element.name !== undefined
+  //         ) {
+  //           element = {
+  //             ...element,
+  //             ["action"]: (
+  //               <Button
+  //                 className="text-red border-red cursor-pointer transition-all ease-out duration-350 hover:text-red/75"
+  //                 onClick={() => {
+  //                   setDatosModal((fila) => (fila = element));
+  //                   setModalEditar((open) => (open = true));
+  //                 }}
+  //               >
+  //                 Eliminar
+  //               </Button>
+  //             ),
+  //           };
+  //           temp.push(element);
+  //         }
+  //       });
+
+  //       setData(temp);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
+
+  const fetchData = async () => {
+    try {
+      setEditado(true);
+      const result = await getComplements();
+      const newData = structuredClone(result);
+      const filteredData = newData.filter((el) => el.name);
+      setData(filteredData);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setEditado(false);
+    }
+  };
+
+  const getFilterComplements = async (params) => {
+    try {
+      const result = await getComplementsByText(params);
+      if (result && result.length > 0) setData(result);
+      else {
+        message.error("No se encontraron resultados");
+        fetchData();
+      }
+    } catch (error) {
+      console.error("Error filtering orders:", error);
+    }
+  };
+
+  const onDelete = async (item) => {
+    setEditado(true);
+    try {
+      const result = await archivedOrder(item);
+      if (result) {
+        setInitialValues((prevValues) =>
+          prevValues.filter((value) => value._id !== item._id)
+        );
+        message.success(`${item.orderCode} eliminado correctamente`);
+        setEditado(false);
+      } else {
+        message.error(`Error al eliminar ${item.orderCode}`);
+      }
+    } catch (e) {
+      console.log(e);
+      message.error(`Error al eliminar ${item.orderCode}`);
+    }
+  };
+
+  // let columns = [
+  //   {
+  //     title: "Codigo",
+  //     dataIndex: "Referencia",
+  //     key: "Referencia",
+  //   },
+  //   {
+  //     title: "Nombre",
+  //     dataIndex: "Nombre",
+  //     key: "Nombre",
+  //   },
+  //   {
+  //     title: "Tipo",
+  //     dataIndex: "Tipo",
+  //     key: "Tipo",
+  //   },
+  //   {
+  //     title: "Ancho",
+  //     dataIndex: "Ancho",
+  //     key: "Ancho",
+  //   },
+  //   {
+  //     title: "Alto",
+  //     dataIndex: "Altura",
+  //     key: "Altura",
+  //   },
+  //   {
+  //     title: "Profundidad",
+  //     dataIndex: "Profundidad",
+  //     key: "Profundidad",
+  //   },
+  //   {
+  //     title: "Precio",
+  //     dataIndex: "Precio",
+  //     key: "Precio",
+  //   },
+  //   {
+  //     title: "Acciones",
+  //     key: "actions",
+  //     fixed: "right",
+  //     width: 110,
+  //     render: (text, record) => (
+  //       <Space>
+  //         <Popconfirm
+  //           title="¿Estás seguro de que deseas eliminar este reporte?"
+  //           icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+  //           onConfirm={() => onDelete(record)}
+  //           onCancel={() => {}}
+  //           okType="default"
+  //           okText="Si"
+  //           cancelText="No"
+  //         >
+  //           <Typography.Link>
+  //             <Button danger>Eliminar</Button>
+  //           </Typography.Link>
+  //         </Popconfirm>
+  //       </Space>
+  //     ),
+  //   },
+  // ];
 
   let columns = [
     {
@@ -225,91 +374,19 @@ const Encimeras = () => {
     },
   ];
 
-  // const getDataComplements = async () => {
-  //   await getComplements()
-  //     .then((res) => {
-  //       let temp = [];
-
-  //       res.forEach((element) => {
-  //         if (
-  //           String(element.name) !== "undefined" &&
-  //           element.name !== "" &&
-  //           element.name !== undefined
-  //         ) {
-  //           element = {
-  //             ...element,
-  //             ["action"]: (
-  //               <Button
-  //                 className="text-red border-red cursor-pointer transition-all ease-out duration-350 hover:text-red/75"
-  //                 onClick={() => {
-  //                   setDatosModal((fila) => (fila = element));
-  //                   setModalEditar((open) => (open = true));
-  //                 }}
-  //               >
-  //                 Eliminar
-  //               </Button>
-  //             ),
-  //           };
-  //           temp.push(element);
-  //         }
-  //       });
-
-  //       setData(temp);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setEditado(true);
-        const result = await getComplements();
-        const newData = structuredClone(result);
-        const flattenedData = newData.flat();
-        const filteredData = flattenedData.filter(el => el.name);
-        setData(filteredData);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setEditado(false);
-      }
-      
-    };
-    fetchData();
-    
-  }, []);
-
-  const getFilterComplements = async (params) => {
-    const result = await getComplementsByText(params);
-    if (result && result.length > 0) setData(result);
-    else {
-      message.error("No se encontraron resultados");
-      fetchData();
-    }
-  };
-
-  const onDelete = async (item) => {
-    setEditado(true);
+  const importData = async (evento) => {
     try {
-      const result = await archivedOrder(item);
-      if (result) {
-        setInitialValues((prevValues) =>
-          prevValues.filter((value) => value._id !== item._id)
-        );
-        message.success(`${item.orderCode} eliminado correctamente`);
-        setEditado(false);
+      const resultArray = await importarArchivo(evento);
+      if (resultArray && resultArray.length > 0) {
+        setData(resultArray);
       } else {
-        message.error(`Error al eliminar ${item.orderCode}`);
+        message.warning("No se encontraron datos en el archivo importado.");
       }
-    } catch (e) {
-      console.log(e);
-      message.error(`Error al eliminar ${item.orderCode}`);
+    } catch (error) {
+      console.error("Error importing data:", error);
+      message.error("Error al importar datos. Por favor, inténtalo de nuevo.");
     }
   };
-
-  const [editado, setEditado] = useState(false);
 
   return (
     <main className="flex flex-col overflow-y-scroll px-4">
@@ -317,8 +394,8 @@ const Encimeras = () => {
         name={"Biblioteca"}
         input={true}
         getFilter={getFilterComplements}
-        downloadFile={(e) => exportarArchivo(e)}
-        addFile={(e) => importarArchivo(e)}
+        downloadFile={() => exportarArchivo(data)}
+        addFile={importData}
       />
       <Table
         className="border border-t-0 border-border mx-3 relative overflow-x-hidden"

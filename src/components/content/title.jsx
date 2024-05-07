@@ -5,6 +5,7 @@ import { LabelAction } from "../utils";
 import { ButtonAction } from "../utils/btnAction";
 import { FiDownload } from "../icons";
 import { breakPointMD, breakpoint, typeOfText as type } from "./logic/btnLogic";
+import { exportarArchivo } from "./logic/obtenerArchivoJson";
 // import { AgregarComplemento } from "../pages/Encimeras/encimeras";
 
 /**
@@ -16,6 +17,7 @@ import { breakPointMD, breakpoint, typeOfText as type } from "./logic/btnLogic";
  */
 const Actions = ({ file, addRow }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
   window.onresize = () =>
     setScreenWidth((width) => (width = window.innerWidth));
 
@@ -28,7 +30,6 @@ const Actions = ({ file, addRow }) => {
               <input
                 placeholder="Introduce a file"
                 type="file"
-                //accept=".json"
                 className="hidden z-10"
                 onChange={file}
               />
@@ -50,6 +51,7 @@ const Actions = ({ file, addRow }) => {
 };
 const Exportar = ({ file }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
   window.onresize = () =>
     setScreenWidth((width) => (width = window.innerWidth));
 
@@ -60,10 +62,9 @@ const Exportar = ({ file }) => {
           text={
             <>
               <input
-                placeholder="Introduce a file"
                 //accept=".json"
                 className="hidden z-10"
-                onChange={file}
+                onClick={file} // Cambiar "onclick" a "onClick"
               />
               {type(
                 breakpoint(screenWidth, breakPointMD),
@@ -78,7 +79,6 @@ const Exportar = ({ file }) => {
     </div>
   );
 };
-
 const AgregarMueble = ({ funcion }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   window.onresize = () =>
@@ -124,7 +124,6 @@ const Title = ({ name }) => {
     </div>
   );
 };
-
 const InputSearch = ({ getFilter }) => {
   return (
     <Input.Search

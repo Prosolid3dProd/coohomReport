@@ -18,6 +18,7 @@ import LogoCERAPAL from "../../../assets/CERAPAL.jpeg";
 import LogoJ10 from "../../../assets/J10.jpeg";
 import LogoDecor from "../../../assets/DECORMOBILIARIO.jpeg";
 import LogoSola from "../../../assets/sola.png";
+import { data } from "autoprefixer";
 
 Font.register({
   family: "Helvetica-Bold",
@@ -454,6 +455,7 @@ const Presupuesto_Cliente = ({
                         fontSize: "8",
                       }}
                     >
+                      {console.log(data)}
                       Cajón:
                     </Text>
                     <Text
