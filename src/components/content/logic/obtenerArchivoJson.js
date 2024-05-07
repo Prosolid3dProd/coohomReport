@@ -120,6 +120,37 @@ const importarArchivo = (evento) => {
   });
 };
 
+// const exportarArchivo = (data) => {
+//   const modifiedData = data
+//     .map((obj) => {
+//       const referencia = typeof obj.code === "string" ? obj.code : "";
+//       let nombre = typeof obj.name === "string" ? obj.name : "";
+//       nombre = nombre.replace("\n", " ");
+
+//       return {
+//         Referencia: referencia,
+//         Nombre: nombre,
+//         Tipo: obj.type,
+//         Ancho: obj.width,
+//         Altura: obj.height,
+//         Profundidad: obj.depth,
+//         Precio: parseFloat(obj.price).toFixed(2),
+//         archived: obj.archived,
+//         id: obj._id,
+//         fecha1: obj.createdAt,
+//         fecha2: obj.updatedAt,
+//         v: obj.__v,
+//       };
+//     })
+//     .filter((obj) => obj !== null);
+//   const workbook = XLSX.utils.book_new();
+//   const worksheet = XLSX.utils.json_to_sheet(modifiedData);
+//   XLSX.utils.book_append_sheet(workbook, worksheet, "Datos");
+//   const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+//   const blob = new Blob([wbout], { type: "application/octet-stream" });
+//   saveAs(blob, "libreria_Sola.xlsx");
+// };
+
 const exportarArchivo = (data) => {
   const modifiedData = data
     .map((obj) => {
@@ -143,12 +174,13 @@ const exportarArchivo = (data) => {
       };
     })
     .filter((obj) => obj !== null);
-  const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.json_to_sheet(modifiedData);
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Datos");
-  const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  const blob = new Blob([wbout], { type: "application/octet-stream" });
-  saveAs(blob, "libreria_Sola.xlsx");
+  
+  const jsonData = JSON.stringify(modifiedData, null, 2);
+  
+  const blob = new Blob([jsonData], { type: "application/json" });
+  
+  saveAs(blob, "libreria_Sola.json");
 };
+
 
 export { obtenerArchivo, importarArchivo, exportarArchivo };

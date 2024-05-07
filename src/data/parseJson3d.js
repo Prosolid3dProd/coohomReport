@@ -940,7 +940,6 @@ const getCalculoFondo = (item) => {
               String(item.customCode).substring(0, 2) === config.customCode.door
             ) {
               fondoPuerta = item.boxSize.y;
-              
             }
           }
         });
@@ -1691,26 +1690,6 @@ export const parseJson3D = async (json) => {
         }
       };
 
-      // const idCT = cabinets.map(id=>{
-      //   return id.obsBrandGoodId
-      // })
-
-      //   if (
-      //     String(item.modelProductNumber).toLocaleUpperCase() ===
-      //       "COMPLEMENTOS" ||
-      //     String(item.modelProductNumber).toLocaleUpperCase() === "ACCESORIOS"
-      //   ) {
-      //     for (const reference of item.parameters) {
-      //       if (reference.name === "Cantidad") {
-      //         if (item.obsBrandGoodId === idCT) {
-      //           console.log(item)
-      //         }
-      //         // console.log(reference.value)
-      //         //  quantityCT = parseFloat(reference.value);
-      //       }
-      //     }
-      //   }
-
       for (const cabinet of cabinets) {
         if (
           String(cabinet.modelProductNumber).toLocaleUpperCase() ===
@@ -1780,68 +1759,6 @@ export const parseJson3D = async (json) => {
       drawerTemp = modelDrawer[0].modelDrawer;
       drawerTexture = modelDrawer[0].textureDrawer;
     }
-    // ---------------------------------------------------------------------------------------------------
-    // json.paramModel.forEach((item) => {
-    //   const CT = cabinets.filter(
-    //     (cab) =>
-    //       cab.tipo.toLocaleUpperCase() === "T" ||
-    //       cab.tipo.toLocaleUpperCase() === "C"
-    //   );
-
-    //   item.parameters.forEach( i => {
-
-    //   })
-
-    //   // if (
-    //   //   String(item.modelProductNumber).toLocaleUpperCase() ===
-    //   //     "COMPLEMENTOS" ||
-    //   //   String(item.modelProductNumber).toLocaleUpperCase() === "ACCESORIOS"
-    //   // ) {
-    //   //   console.log(item)
-    //   //   item.parameters.filter((ref) => {
-    //   //     ref.name === "Cantidad";
-    //   //     cabinets.map((cab) => {
-    //   //       cab.quantity = ref.value;
-    //   //       cab.total = parseInt(cab.quantity) * parseFloat(cab.total);
-    //   //     });
-    //   //   });
-    //   // }
-    // });
-
-    // ----------------------------------------------------------------------------------------------------
-    // const newCabinets = [];
-
-    // cabinets.forEach((cab) => {
-    //   if (cab.tipo !== "C" && cab.tipo !== "T") {
-    //     newCabinets.push(cab);
-    //     return;
-    //   }
-
-    //   if (cab.tipo === "C" || cab.tipo === "T") {
-    //     const repeatedIds = cabinets.filter(
-    //       (otherCab) => cab.obsBrandGoodId === otherCab.obsBrandGoodId
-    //     );
-
-    //     if (repeatedIds.length > 1) {
-    //       const quantity = repeatedIds.length;
-    //       // const price =
-    //       //   typeof cab.total === "string" ? parseFloat(cab.total) : cab.total;
-    //       // const total = price * quantity;
-    //       const alreadyAdded = newCabinets.some(
-    //         (item) => item.obsBrandGoodId === cab.obsBrandGoodId
-    //       );
-
-    //       if (!alreadyAdded) {
-    //         const newObj = { ...cab, quantity, total };
-    //         newCabinets.push(newObj);
-    //       }
-    //     } else {
-    //       newCabinets.push(cab);
-    //     }
-    //   }
-    // });
-    // cabinets.length = 0;
-    // cabinets.push(...newCabinets);
 
     const orderJson = {
       ...(json.partnerOrder || null),
@@ -1881,7 +1798,6 @@ export const parseJson3D = async (json) => {
       storeName: json.partnerOrder?.storeName || "",
     };
 
-    // console.log(orderJson);
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
     return;
