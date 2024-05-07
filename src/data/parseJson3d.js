@@ -1718,16 +1718,12 @@ export const parseJson3D = async (json) => {
           String(cabinet.modelProductNumber).toLocaleUpperCase() ===
             "ACCESORIOS"
         ) {
-          console.log(item);
           for (const reference of item.parameters) {
             if (reference.name === "Cantidad") {
               cabinet.quantity = parseFloat(reference.value);
-
-              break;
             }
             if (reference.name === "price") {
               cabinet.total = parseFloat(reference.value);
-              break;
             }
           }
         }
@@ -1888,7 +1884,7 @@ export const parseJson3D = async (json) => {
     // console.log(orderJson);
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
-    // return;
+    return;
 
     if (result && result._id) {
       message.success(messageResult);
