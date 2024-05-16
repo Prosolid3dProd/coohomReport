@@ -537,7 +537,7 @@ const getDoors = (submodels) => {
         price: parseFloat(getPrice(item)) + parseFloat(perfil?.price || 0),
         // price: parseFloat(getPrice(item)) + perfil?.price !== undefined ? parseFloat(perfil?.price) : 0,
         material: item.textureName,
-        name: item.modelBrandGoodName,
+        name: item.modelProductNumber,
         acabadoTirador: perfil?.acabado || "",
       };
     }
@@ -601,13 +601,6 @@ const getInfoCabinet = (submodels) => {
     materialCabinet: null,
     modelCabinet: null,
   };
-
-  //nuevo
-
-  // values = {
-  //   materialCabinet: submodels.textureName,
-  // };
-  //nuevo
 
   submodels.forEach((item) => {
     if (
@@ -954,10 +947,13 @@ const getCalculoFondo = (item) => {
 };
 
 const quitarDuplicados = (array) => {
-  return array.filter((element, index, self) => {
-    return self.indexOf(element) === index;
-  });
+  return array
+    .map(element => element.toUpperCase())
+    .filter((element, index, self) => {
+      return self.indexOf(element) === index;
+    });
 };
+
 
 // main
 export const parseJson3D = async (json) => {
@@ -1295,6 +1291,9 @@ export const parseJson3D = async (json) => {
                     modelDoor: item4.modelName,
                     materialDoor: item4.textureName,
                   };
+                  // console.log(puertasInfo)
+                  const tapasTiradores = item4.subModels.filter(ti => ti.customCode == "202" || ti.customCode == "203")
+                  // console.log(tapasTiradores)
                 }
               });
             }
@@ -1381,6 +1380,7 @@ export const parseJson3D = async (json) => {
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
+              console.log(filtroArmazon)
               armazonInfo?.materialCabinet &&
                 armazonInfo?.materialCabinet !== "undefined" &&
                 armazonInfo?.materialCabinet?.indexOf("Cajon") === -1 &&
@@ -1389,7 +1389,6 @@ export const parseJson3D = async (json) => {
                 armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Corte") === -1;
               materialCabinetArray.push(armazonInfo?.materialCabinet);
-
               drawerGlobal.push(modeloDrawer);
             }
           });
@@ -1415,50 +1414,6 @@ export const parseJson3D = async (json) => {
           let drawerPriceDetails = [];
           let drawerMaterialDetails = [];
           let frente;
-
-          // item.subModels?.forEach((item) => {
-          //   if (
-          //     String(item.customCode).substring(0, 2) ===
-          //       CONFIG.CUSTOMCODE.DRAWER ||
-          //     String(item.customCode) === CONFIG.CUSTOMCODE.FRENTE_FIJO
-          //   ) {
-          //     frente = traerFrente(item);
-          //     let perfil = 0;
-          //     if (
-          //       String(frente.datos.modelBrandGoodName)
-          //         .toLocaleUpperCase()
-          //         .indexOf("PURA") !== -1 ||
-          //       String(frente.datos.modelBrandGoodName)
-          //         .toLocaleUpperCase()
-          //         .indexOf("GP") !== -1 ||
-          //       String(frente.datos.modelBrandGoodName)
-          //         .toLocaleUpperCase()
-          //         .indexOf("MONTEA") !== -1
-          //     ) {
-          //       perfil = getPerfil(frente.datos.subModels);
-          //     }
-          //     drawerMaterialDetails.push({
-          //       tipo: frente.tipo,
-          //       Acabado: frente.datos.textureName,
-          //       modelo: frente.datos.modelProductNumber,
-          //     });
-          //     drawerPrice =
-          //       parseFloat(getPrice(frente.datos, frente.datos.boxSize.z)) +
-          //       parseFloat(drawerPrice) +
-          //       parseFloat(perfil);
-          //     drawerPriceDetails.push(
-          //       parseFloat(
-          //         getPrice(
-          //           frente.datos,
-          //           frente.tipo === "cajon" ? frente.datos.boxSize.z : undefined
-          //         )
-          //       ) + parseFloat(perfil)
-          //     );
-          //     isCajonExist = true;
-          //   }
-          // });
-
-          //  -------------------------------------------------------------------------------
 
           item.subModels?.forEach((item) => {
             const customCodeSubstring = String(item.customCode).substring(0, 2);
@@ -1759,7 +1714,6 @@ export const parseJson3D = async (json) => {
       drawerTemp = modelDrawer[0].modelDrawer;
       drawerTexture = modelDrawer[0].textureDrawer;
     }
-
     const orderJson = {
       ...(json.partnerOrder || null),
       projectName: json.designData.designName || "",
@@ -1800,13 +1754,12 @@ export const parseJson3D = async (json) => {
 
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
-    return;
+    // return;
 
     if (result && result._id) {
       message.success(messageResult);
 
       setTimeout(() => {
-        // recarcamos la pagina
         window.location.reload();
       }, 2000);
 

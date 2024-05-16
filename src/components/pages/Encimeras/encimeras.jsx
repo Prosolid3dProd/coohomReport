@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import {
   archivedOrder,
+  deleteComplements,
   getComplements,
   getComplementsByText,
 } from "../../../handlers/order";
@@ -76,91 +77,91 @@ import {
  * @param {object} filaCambiar --> elemento tabla Complementos editar
  * @return {Component}
  */
-const ModalEditar = ({ editar, filaCambiar }) => {
-  const columnasOrden = [
-    "code",
-    "name",
-    "type",
-    "width",
-    "height",
-    "depth",
-    "price",
-  ];
+// const ModalEditar = ({ editar, filaCambiar }) => {
+//   const columnasOrden = [
+//     "code",
+//     "name",
+//     "type",
+//     "width",
+//     "height",
+//     "depth",
+//     "price",
+//   ];
 
-  const editarFila = () => {
-    const inputs = Array.from(document.getElementsByTagName("input")).slice(2);
-    console.log(inputs);
+//   const editarFila = () => {
+//     const inputs = Array.from(document.getElementsByTagName("input")).slice(2);
+//     console.log(inputs);
 
-    let filaEditada = {};
+//     let filaEditada = {};
 
-    inputs.forEach((input, i) => {
-      const columna = columnasOrden[i];
-      console.log(columna);
-      filaEditada = { ...filaEditada, [columna]: input.value };
-    });
+//     inputs.forEach((input, i) => {
+//       const columna = columnasOrden[i];
+//       console.log(columna);
+//       filaEditada = { ...filaEditada, [columna]: input.value };
+//     });
 
-    console.log(filaEditada);
-    // Agregar conexión BD --> obj
-  };
+//     console.log(filaEditada);
+//     // Agregar conexión BD --> obj
+//   };
 
-  return (
-    <Modal
-      title="Editar Complemento"
-      open={() => true}
-      onOk={editarFila}
-      destroyOnClose
-      onCancel={() => editar((editar) => (editar = false))}
-      footer={[
-        <Button
-          key="back"
-          onClick={() => editar((editar) => (editar = false))}
-          target="_self"
-        >
-          Cancel
-        </Button>,
-        <Button target="_self" key="submit" type="default" onClick={editarFila}>
-          Okey
-        </Button>,
-      ]}
-    >
-      {columnas.map((columna, i) => {
-        const filterFila = Object.entries(filaCambiar).filter((dato) =>
-          [
-            "code",
-            "name",
-            "type",
-            "depth",
-            "height",
-            "width",
-            "price",
-          ].includes(dato[0])
-        ); //filtramos las columnas que nos interesen
+//   return (
+//     <Modal
+//       title="Editar Complemento"
+//       open={() => true}
+//       onOk={editarFila}
+//       destroyOnClose
+//       onCancel={() => editar((editar) => (editar = false))}
+//       footer={[
+//         <Button
+//           key="back"
+//           onClick={() => editar((editar) => (editar = false))}
+//           target="_self"
+//         >
+//           Cancel
+//         </Button>,
+//         <Button target="_self" key="submit" type="default" onClick={editarFila}>
+//           Okey
+//         </Button>,
+//       ]}
+//     >
+//       {columnas.map((columna, i) => {
+//         const filterFila = Object.entries(filaCambiar).filter((dato) =>
+//           [
+//             "code",
+//             "name",
+//             "type",
+//             "depth",
+//             "height",
+//             "width",
+//             "price",
+//           ].includes(dato[0])
+//         ); //filtramos las columnas que nos interesen
 
-        const [columnasFiltradas, valores] = [
-          [...filterFila].map((dato) => dato[0]), //key
-          [...filterFila].map((dato) => dato[1]), //values
-        ];
+//         const [columnasFiltradas, valores] = [
+//           [...filterFila].map((dato) => dato[0]), //key
+//           [...filterFila].map((dato) => dato[1]), //values
+//         ];
 
-        const vc = [];
-        for (const index in columnasOrden) {
-          const columna = columnasOrden[index];
-          const indexVal = columnasFiltradas.findIndex(
-            (col) => col === columna
-          );
-          vc.push(valores[indexVal]); //Values en orden
-        }
+//         const vc = [];
+//         for (const index in columnasOrden) {
+//           const columna = columnasOrden[index];
+//           const indexVal = columnasFiltradas.findIndex(
+//             (col) => col === columna
+//           );
+//           vc.push(valores[indexVal]); //Values en orden
+//         }
 
-        return (
-          <Label
-            key={columna} // Asigna la clave única (key) a cada elemento
-            texto={columna}
-            input={<Input dfValue={vc[i]} />}
-          />
-        );
-      })}
-    </Modal>
-  );
-};
+//         return (
+//           <Label
+//             key={columna} // Asigna la clave única (key) a cada elemento
+//             texto={columna}
+//             input={<Input dfValue={vc[i]} />}
+//           />
+//         );
+//       })}
+//     </Modal>
+//   );
+// };
 
 const Encimeras = () => {
   const [data, setData] = useState([]);
@@ -210,6 +211,7 @@ const Encimeras = () => {
     try {
       setEditado(true);
       const result = await getComplements();
+      console.log(result)
       const newData = structuredClone(result);
       const filteredData = newData.filter((el) => el.name);
       setData(filteredData);
@@ -236,19 +238,19 @@ const Encimeras = () => {
   const onDelete = async (item) => {
     setEditado(true);
     try {
-      const result = await archivedOrder(item);
+      const result = await deleteComplements(item);
       if (result) {
         setInitialValues((prevValues) =>
           prevValues.filter((value) => value._id !== item._id)
         );
-        message.success(`${item.orderCode} eliminado correctamente`);
+        message.success(`${item.code} eliminado correctamente`);
         setEditado(false);
       } else {
-        message.error(`Error al eliminar ${item.orderCode}`);
+        message.error(`Error al eliminar ${item.code}`);
       }
     } catch (e) {
       console.log(e);
-      message.error(`Error al eliminar ${item.orderCode}`);
+      message.error(`Error al eliminar ${item.code}`);
     }
   };
 
@@ -376,17 +378,21 @@ const Encimeras = () => {
 
   const importData = async (evento) => {
     try {
-      const resultArray = await importarArchivo(evento);
-      if (resultArray && resultArray.length > 0) {
-        setData(resultArray);
-      } else {
-        message.warning("No se encontraron datos en el archivo importado.");
-      }
+        setEditado(true);
+        const resultArray = await importarArchivo(evento);
+        console.log(resultArray);
+        if (resultArray && resultArray.length > 0) {
+            setData((prevData) => [...resultArray, ...prevData]);
+            setEditado(false);
+        } else {
+            message.warning("No se encontraron datos en el archivo importado.");
+        }
     } catch (error) {
-      console.error("Error importing data:", error);
-      message.error("Error al importar datos. Por favor, inténtalo de nuevo.");
+        console.error("Error importing data:", error);
+        message.error("Error al importar datos. Por favor, inténtalo de nuevo.");
     }
-  };
+};
+
 
   return (
     <main className="flex flex-col overflow-y-scroll px-4">

@@ -101,7 +101,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     } else {
       return "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMV97UpeAbbPPiPpJz8iFsmgeusjg_pVfTscc75Hm18KTA6np6O7Tro2YAaooQDdqq_zk&usqp=CAU";
     }
-
     // return SolaImagenes().find((item) => item.serial === serial)?.link || null;
   };
 
@@ -2157,7 +2156,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
                       {parseFloat(item.priceTotal).toFixed(2)}
-                      {/* {getRangePrice(item.name, item.size.x)} */}
                     </Text>
                   </View>
                 )}

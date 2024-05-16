@@ -38,7 +38,7 @@ export const createOrder = async (params) => {
       }
     );
     // setLocalOrder(data.data.result)
-    console.log(data.data.result, "createOrder")
+    console.log(data.data.result, "createOrder");
     return data.data;
   } catch (error) {
     console.log(error);
@@ -71,7 +71,7 @@ export const updateOrder = async (params) => {
         token: Settings.TOKEN,
       }
     );
-    console.log(data.data, "updateOrder")
+    console.log(data.data, "updateOrder");
     return data.data;
   } catch (error) {
     console.log(error);
@@ -278,13 +278,64 @@ export const archivedOrder = async (params) => {
   }
 };
 
+// export const deleteComplements = async (params) => {
+//   const formData = new URLSearchParams();
+//   formData.append('code', params.code);
+//   formData.append('token', Settings.TOKEN);
+
+//   try {
+//     const response = await axios.put(
+//       `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`,
+//       formData.toString(),
+//       {
+//         headers: {
+//           'Content-Type': 'application/x-www-form-urlencoded'
+//         }
+//       }
+//     );
+
+//     return response.data;
+//   } catch (error) {
+//     console.error(error);
+//     return false;
+//   }
+// };
+
+export const deleteComplements = async (params) => {
+  try {
+    const data = await axios.put(
+      `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`,
+      {
+        ...params,
+        token: Settings.TOKEN,
+      }
+    );
+    return data.data;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+export const importLibrary = async (formData) => {
+  try {
+    const response = await axios.post(`${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log(response.data);
+  } catch (error) {
+    console.error("Error uploading file:", error);
+  }
+};
+
 export const fixOrder = (order, onSuccess = () => {}) => {
   let total = 0;
   let priceTotal = 0;
   let cabinetsArray = [];
 
   if (order) {
-    
     order.cabinets.forEach((item) => {
       let totalVariants = 0;
 
@@ -304,40 +355,50 @@ export const fixOrder = (order, onSuccess = () => {}) => {
       });
     });
 
-    let discountEncimerasPorcentaje  = 0;
+    let discountEncimerasPorcentaje = 0;
     let discountCabinetsPorcentaje = 0;
     let discountElectrodomesticosPorcentaje = 0;
     let discountEquipamientosPorcentaje = 0;
 
-
-    if(parseFloat(order.discountEncimeras) > 0){
-      discountEncimerasPorcentaje  = parseFloat(total)*(parseFloat(order.discountEncimeras)/100) ;
+    if (parseFloat(order.discountEncimeras) > 0) {
+      discountEncimerasPorcentaje =
+        parseFloat(total) * (parseFloat(order.discountEncimeras) / 100);
     }
 
-    if(parseFloat(order.discountCabinets) > 0){
-      discountCabinetsPorcentaje  = parseFloat(total)*(parseFloat(order.discountCabinets)/100) ;
+    if (parseFloat(order.discountCabinets) > 0) {
+      discountCabinetsPorcentaje =
+        parseFloat(total) * (parseFloat(order.discountCabinets) / 100);
     }
 
-    if(parseFloat(order.discountElectrodomesticos) > 0){
-      discountElectrodomesticosPorcentaje  = parseFloat(total)*(parseFloat(order.discountElectrodomesticos)/100) ;
+    if (parseFloat(order.discountElectrodomesticos) > 0) {
+      discountElectrodomesticosPorcentaje =
+        parseFloat(total) * (parseFloat(order.discountElectrodomesticos) / 100);
     }
 
-    if(parseFloat(order.discountEquipamientos) > 0){
-      discountEquipamientosPorcentaje  = parseFloat(total)*(parseFloat(order.discountEquipamientos)/100) ;
+    if (parseFloat(order.discountEquipamientos) > 0) {
+      discountEquipamientosPorcentaje =
+        parseFloat(total) * (parseFloat(order.discountEquipamientos) / 100);
     }
-
 
     const iva = parseFloat((total.toFixed(2) * 21) / 100);
     const orderJson = {
       ...order,
       importe: parseFloat(total).toFixed(2),
       iva: parseFloat(iva).toFixed(2),
-      total: (parseFloat(total) - discountEncimerasPorcentaje - discountCabinetsPorcentaje - discountElectrodomesticosPorcentaje - discountEquipamientosPorcentaje + parseFloat(iva)).toFixed(2)|| 0,
+      total:
+        (
+          parseFloat(total) -
+          discountEncimerasPorcentaje -
+          discountCabinetsPorcentaje -
+          discountElectrodomesticosPorcentaje -
+          discountEquipamientosPorcentaje +
+          parseFloat(iva)
+        ).toFixed(2) || 0,
       cabinets: cabinetsArray,
       discountEncimerasPorcentaje,
       discountCabinetsPorcentaje,
       discountElectrodomesticosPorcentaje,
-      discountEquipamientosPorcentaje
+      discountEquipamientosPorcentaje,
     };
 
     setLocalOrder(orderJson);
