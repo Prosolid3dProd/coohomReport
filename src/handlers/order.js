@@ -319,12 +319,16 @@ export const deleteComplements = async (params) => {
 
 export const importLibrary = async (formData) => {
   try {
-    const response = await axios.post(`${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`, formData, {
+    const response = await axios.post(`${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`,
+    {
       headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    console.log(response.data);
+            "Content-Type": "multipart/form-data",
+          },
+      formData, 
+      token: Settings.TOKEN
+    },
+  );
+    console.log("RESULT: ", response.data);
   } catch (error) {
     console.error("Error uploading file:", error);
   }

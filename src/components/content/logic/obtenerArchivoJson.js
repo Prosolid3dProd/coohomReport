@@ -118,10 +118,13 @@ const importarArchivo = (evento) => {
           bookType: "xlsx",
           type: "array",
         });
+
+        console.log("XSL", wbout);
         const blob = new Blob([wbout], { type: "application/octet-stream" });
-        const formData = new FormData();
-        formData.append("sampleFile", blob, "bibliotecaSola.xlsx");
-        // await importLibrary(formData)
+        let formData = new FormData();
+        formData.append("sampleFile", blob, 'bibliotecaSola.xlsx');
+        console.log("TEST", formData);
+        await importLibrary(formData);
         resolve(resultArray);
       } catch (error) {
         console.error(error);
