@@ -904,10 +904,7 @@ const getCalculoFondo = (item) => {
     y: 0,
     z: 0,
   };
-  console.log(item);
-  size.y = item.boxSize.y;
-  size.x = item.boxSize.x;
-  size.z = item.boxSize.z;
+
   // if (
   //   String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
   //   item.boxSize.y >= 150 &&
@@ -920,6 +917,13 @@ const getCalculoFondo = (item) => {
   // ) {
   //   size.y = item.boxSize.y + 4;
   // } else
+
+  if (String(item.modelProductNumber).toUpperCase() !== "ACCESORIOS") {
+    size.y = item.boxSize.y + fondoPuerta;
+  }
+
+  size.x = item.boxSize.x;
+  size.z = item.boxSize.z;
 
   /* item.subModels.forEach((item) => {
       if (String(item.customCode).substring(0, 2) === config.customCode.drawer) {
