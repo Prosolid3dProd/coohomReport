@@ -121,7 +121,7 @@ const importarArchivo = (evento) => {
         console.log("XSL", wbout);
         const blob = new Blob([wbout], { type: "application/octet-stream" });
         let formData = new FormData();
-        formData.append("sampleFile", blob, 'bibliotecaSola.xlsx');
+        formData.append("file", blob, 'bibliotecaSola.xlsx');
         console.log("TEST", formData);
         await importLibrary(formData);
         resolve(resultArray);
