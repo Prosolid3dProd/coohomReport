@@ -118,7 +118,6 @@ const importarArchivo = (evento) => {
           bookType: "xlsx",
           type: "array",
         });
-
         console.log("XSL", wbout);
         const blob = new Blob([wbout], { type: "application/octet-stream" });
         let formData = new FormData();
@@ -136,6 +135,8 @@ const importarArchivo = (evento) => {
   });
 };
 
+
+
 const exportarArchivo = (data) => {
   const modifiedData = data
     .map((obj) => {
@@ -144,13 +145,13 @@ const exportarArchivo = (data) => {
       nombre = nombre.replace("\n", " ");
 
       return {
-        Referencia: referencia,
-        Nombre: nombre,
-        Tipo: obj.type,
-        Ancho: obj.width,
-        Altura: obj.height,
-        Profundidad: obj.depth,
-        Precio: parseFloat(obj.price).toFixed(2),
+        code: referencia,
+        name: nombre,
+        type: obj.type,
+        width: obj.width,
+        height: obj.height,
+        depth: obj.depth,
+        price: parseFloat(obj.price).toFixed(2),
         archived: obj.archived,
         // id: obj._id,
         // fecha1: obj.createdAt,

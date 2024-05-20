@@ -38,7 +38,7 @@ export const createOrder = async (params) => {
       }
     );
     // setLocalOrder(data.data.result)
-    console.log(data.data.result, "createOrder");
+    // console.log(data.data.result, "createOrder");
     return data.data;
   } catch (error) {
     console.log(error);
@@ -303,11 +303,11 @@ export const archivedOrder = async (params) => {
 
 export const deleteComplements = async (params) => {
   try {
-    const data = await axios.put(
-      `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`,
+    const data = await axios.post(
+      `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`, params,
       {
-        ...params,
         token: Settings.TOKEN,
+        params,
       }
     );
     return data.data;
@@ -319,12 +319,12 @@ export const deleteComplements = async (params) => {
 
 export const importLibrary = async (formData) => {
   try {
-    const response = await axios.post(`${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`,
+    const response = await axios.post(`${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`, formData,
     {
       headers: {
             "Content-Type": "multipart/form-data",
           },
-      formData, 
+      ...formData,
       token: Settings.TOKEN
     },
   );

@@ -918,9 +918,9 @@ const getCalculoFondo = (item) => {
   //   size.y = item.boxSize.y + 4;
   // } else
 
-  if (String(item.modelProductNumber).toUpperCase() !== "ACCESORIOS") {
-    size.y = item.boxSize.y + fondoPuerta;
-  }
+  // if (String(item.modelProductNumber).toUpperCase() !== "ACCESORIOS") {
+  //   size.y = item.boxSize.y + fondoPuerta;
+  // }
 
   size.x = item.boxSize.x;
   size.z = item.boxSize.z;
@@ -948,12 +948,11 @@ const getCalculoFondo = (item) => {
 
 const quitarDuplicados = (array) => {
   return array
-    .map(element => element.toUpperCase())
+    .map((element) => element.toUpperCase())
     .filter((element, index, self) => {
       return self.indexOf(element) === index;
     });
 };
-
 
 // main
 export const parseJson3D = async (json) => {
@@ -1292,7 +1291,9 @@ export const parseJson3D = async (json) => {
                     materialDoor: item4.textureName,
                   };
                   // console.log(puertasInfo)
-                  const tapasTiradores = item4.subModels.filter(ti => ti.customCode == "202" || ti.customCode == "203")
+                  const tapasTiradores = item4.subModels.filter(
+                    (ti) => ti.customCode == "202" || ti.customCode == "203"
+                  );
                   // console.log(tapasTiradores)
                 }
               });
@@ -1380,7 +1381,7 @@ export const parseJson3D = async (json) => {
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
-              console.log(filtroArmazon)
+              console.log(filtroArmazon);
               armazonInfo?.materialCabinet &&
                 armazonInfo?.materialCabinet !== "undefined" &&
                 armazonInfo?.materialCabinet?.indexOf("Cajon") === -1 &&
@@ -1597,7 +1598,7 @@ export const parseJson3D = async (json) => {
               zocalo: zocalo,
               priceDoor: parseInt(getTotalDoors(item.subModels)),
               total: parseFloat(Math.ceil(totalPrice)).toFixed(0),
-              size: item, // { width: 0, height: 0, depth: 0 },
+              size: getCalculoFondo(item), // { width: 0, height: 0, depth: 0 },
               variants: getParameters(item, referenceType.type),
               priceVariants: getPriceParameters(
                 item.parameters,
@@ -1752,8 +1753,10 @@ export const parseJson3D = async (json) => {
       storeName: json.partnerOrder?.storeName || "",
     };
 
+    // console.log(orderJson, "orderJSon");
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
+    // console.log(res, "res");
     // return;
 
     if (result && result._id) {
