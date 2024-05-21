@@ -10,17 +10,12 @@ import {
 import React, { useEffect, useState } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import {
-  archivedOrder,
   deleteComplements,
   getComplements,
   getComplementsByText,
 } from "../../../handlers/order";
-import { Header, Input } from "../../content";
-import { Label, Input as InputModal } from "../../content";
-import {
-  exportarArchivo,
-  importarArchivo,
-} from "../../content/logic/obtenerArchivoJson";
+import { Header } from "../../content";
+import { exportarArchivo } from "../../content/logic/obtenerArchivoJson";
 
 // export const AgregarComplemento = () => {
 
@@ -211,7 +206,6 @@ const Encimeras = () => {
     try {
       setEditado(true);
       const result = await getComplements();
-      console.log(result)
       const newData = structuredClone(result);
       const filteredData = newData.filter((el) => el.name);
       setData(filteredData);
@@ -240,7 +234,7 @@ const Encimeras = () => {
     try {
       const result = await deleteComplements(item);
       if (result) {
-        setInitialValues((prevValues) =>
+        setData((prevValues) =>
           prevValues.filter((value) => value._id !== item._id)
         );
         message.success(`${item.code} eliminado correctamente`);
@@ -253,67 +247,6 @@ const Encimeras = () => {
       message.error(`Error al eliminar ${item.code}`);
     }
   };
-
-  // let columns = [
-  //   {
-  //     title: "Codigo",
-  //     dataIndex: "Referencia",
-  //     key: "Referencia",
-  //   },
-  //   {
-  //     title: "Nombre",
-  //     dataIndex: "Nombre",
-  //     key: "Nombre",
-  //   },
-  //   {
-  //     title: "Tipo",
-  //     dataIndex: "Tipo",
-  //     key: "Tipo",
-  //   },
-  //   {
-  //     title: "Ancho",
-  //     dataIndex: "Ancho",
-  //     key: "Ancho",
-  //   },
-  //   {
-  //     title: "Alto",
-  //     dataIndex: "Altura",
-  //     key: "Altura",
-  //   },
-  //   {
-  //     title: "Profundidad",
-  //     dataIndex: "Profundidad",
-  //     key: "Profundidad",
-  //   },
-  //   {
-  //     title: "Precio",
-  //     dataIndex: "Precio",
-  //     key: "Precio",
-  //   },
-  //   {
-  //     title: "Acciones",
-  //     key: "actions",
-  //     fixed: "right",
-  //     width: 110,
-  //     render: (text, record) => (
-  //       <Space>
-  //         <Popconfirm
-  //           title="¿Estás seguro de que deseas eliminar este reporte?"
-  //           icon={<QuestionCircleOutlined style={{ color: "red" }} />}
-  //           onConfirm={() => onDelete(record)}
-  //           onCancel={() => {}}
-  //           okType="default"
-  //           okText="Si"
-  //           cancelText="No"
-  //         >
-  //           <Typography.Link>
-  //             <Button danger>Eliminar</Button>
-  //           </Typography.Link>
-  //         </Popconfirm>
-  //       </Space>
-  //     ),
-  //   },
-  // ];
 
   let columns = [
     {
@@ -378,21 +311,20 @@ const Encimeras = () => {
 
   const importData = async (evento) => {
     try {
-        setEditado(true);
-        const resultArray = await importarArchivo(evento);
-        console.log(resultArray);
-        if (resultArray && resultArray.length > 0) {
-            setData((prevData) => [...resultArray, ...prevData]);
-            setEditado(false);
-        } else {
-            message.warning("No se encontraron datos en el archivo importado.");
-        }
+      setEditado(true);
+      const resultArray = await importarArchivo(evento);
+      console.log(resultArray);
+      if (resultArray && resultArray.length > 0) {
+        setData((prevData) => [...resultArray, ...prevData]);
+        setEditado(false);
+      } else {
+        message.warning("No se encontraron datos en el archivo importado.");
+      }
     } catch (error) {
-        console.error("Error importing data:", error);
-        message.error("Error al importar datos. Por favor, inténtalo de nuevo.");
+      console.error("Error importing data:", error);
+      message.error("Error al importar datos. Por favor, inténtalo de nuevo.");
     }
-};
-
+  };
 
   return (
     <main className="flex flex-col overflow-y-scroll px-4">

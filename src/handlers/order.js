@@ -304,13 +304,10 @@ export const archivedOrder = async (params) => {
 export const deleteComplements = async (params) => {
   try {
     const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`, params,
-      {
-        token: Settings.TOKEN,
-        params,
-      }
+      `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`,
+      params
     );
-    return data.data;
+    return data;
   } catch (error) {
     console.log(error);
     return false;
@@ -319,16 +316,18 @@ export const deleteComplements = async (params) => {
 
 export const importLibrary = async (formData) => {
   try {
-    // const response = await axios.post(`${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`, formData,
-    const response = await axios.post(`http://localhost:3000/upload`, formData,
-    {
-      headers: {
-            "Content-Type": "multipart/form-data",
-          },
-      ...formData,
-      token: Settings.TOKEN
-    },
-  );
+    const response = await axios.post(
+      `${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`,
+      formData,
+      // const response = await axios.post(`http://localhost:3000/upload`, formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        ...formData,
+        token: Settings.TOKEN,
+      }
+    );
     console.log("RESULT: ", response.data);
   } catch (error) {
     console.error("Error uploading file:", error);

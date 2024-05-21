@@ -1,12 +1,11 @@
-import { Input } from "antd";
 import { useState } from "react";
+import { Button, message, Upload, Input, Tooltip } from "antd";
 import { File } from "../icons";
 import { LabelAction } from "../utils";
 import { ButtonAction } from "../utils/btnAction";
 import { FiDownload } from "../icons";
 import { breakPointMD, breakpoint, typeOfText as type } from "./logic/btnLogic";
-import { exportarArchivo } from "./logic/obtenerArchivoJson";
-// import { AgregarComplemento } from "../pages/Encimeras/encimeras";
+import { UploadOutlined } from "@ant-design/icons";
 
 /**
  *
@@ -15,6 +14,44 @@ import { exportarArchivo } from "./logic/obtenerArchivoJson";
  * @param {Function}  clear
  * @return {Component}
  */
+
+const props1 = {
+  name: "sampleFile",
+  action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
+  method: "POST",
+  headers: {
+    authorization: "authorization-text",
+  },
+  onChange(info) {
+    if (info.file.status !== "uploading") {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === "done") {
+      message.success(`${info.file.name} file uploaded successfully`);
+    } else if (info.file.status === "error") {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  },
+};
+const props2 = {
+  name: "sampleFile",
+  action:
+    "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
+  method: "POST",
+  headers: {
+    authorization: "authorization-text",
+  },
+  onChange(info) {
+    if (info.file.status !== "uploading") {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === "done") {
+      message.success(`${info.file.name} file uploaded successfully`);
+    } else if (info.file.status === "error") {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  },
+};
 const Actions = ({ file, addRow }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
@@ -24,24 +61,23 @@ const Actions = ({ file, addRow }) => {
   return (
     <div className="flex flex-row items-center mr-4 gap-2">
       {file && (
-        <LabelAction
-          text={
-            <>
-              <input
-                placeholder="Introduce a file"
-                type="file"
-                className="hidden z-10"
-                onChange={file}
-              />
-              {type(
-                breakpoint(screenWidth, breakPointMD),
-                "Importar",
-                <File className="text-sv" />
-              )}
-            </>
-          }
-          color={"#1a7af8"}
-        ></LabelAction>
+        <>
+          <Tooltip title="Cargar un excel con esta estructura de cabecera [Referencia/Nombre/Tipo/Ancho/Altura/Profundidad/Precio]">
+            <Upload {...props1}>
+              <Button icon={<UploadOutlined />}>Añadir Complementos</Button>
+            </Upload>
+          </Tooltip>
+          <Tooltip title="Cargar un excel con una columna llamada 'Referencia' que tenga los codigos de los elementos que quieras eliminar.">
+            <Upload {...props2}>
+              <Button
+                style={{ border: "1px solid red", color: "red" }}
+                icon={<UploadOutlined />}
+              >
+                Eliminar Complementos
+              </Button>
+            </Upload>
+          </Tooltip>
+        </>
       )}
       {addRow && (
         <ButtonAction text={"Agregar Mueble"} color="#1a7af8" action={addRow} />

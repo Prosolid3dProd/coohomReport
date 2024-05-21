@@ -281,6 +281,7 @@ const traerFrente = (block) => {
         ) {
           frente = item;
           tipo = "cajon";
+          console.log(item, "FRENTE")
         }
       }
     });
@@ -1381,7 +1382,6 @@ export const parseJson3D = async (json) => {
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
-              console.log(filtroArmazon);
               armazonInfo?.materialCabinet &&
                 armazonInfo?.materialCabinet !== "undefined" &&
                 armazonInfo?.materialCabinet?.indexOf("Cajon") === -1 &&
@@ -1416,9 +1416,9 @@ export const parseJson3D = async (json) => {
           let drawerMaterialDetails = [];
           let frente;
 
+          console.log(item, "ITEM");
           item.subModels?.forEach((item) => {
             const customCodeSubstring = String(item.customCode).substring(0, 2);
-
             if (customCodeSubstring === CONFIG.CUSTOMCODE.DOOR) {
               item.subModels?.forEach((it) => {
                 if (it.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO) {
@@ -1452,6 +1452,7 @@ export const parseJson3D = async (json) => {
               item.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO
             ) {
               frente = traerFrente(item);
+             
               const perfil = getPerfil(frente.datos.subModels);
 
               drawerMaterialDetails.push({
@@ -1553,6 +1554,10 @@ export const parseJson3D = async (json) => {
               }
             });
 
+          const casco = item.subModels.find((x) =>
+            x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
+          );
+          console.log(casco, "CASCO");
           let nameFinal = item.modelName;
           if (String(item.modelName).indexOf("L") > -1) {
             //quitar los ultimoss 4 digitos y eliminar los guiones
@@ -1586,6 +1591,7 @@ export const parseJson3D = async (json) => {
               "COMPLEMENTOS"
             )
               isComplement = true;
+            // console.log(item);
             cabinets.push({
               ...items,
               obsBrandGoodId: item.obsBrandGoodId,
@@ -1715,6 +1721,11 @@ export const parseJson3D = async (json) => {
       drawerTemp = modelDrawer[0].modelDrawer;
       drawerTexture = modelDrawer[0].textureDrawer;
     }
+    cabinets.map((costados) => {
+      if (costados.tipo === "O") {
+        costados.size.y = costados.size.y - 20;
+      }
+    });
     const orderJson = {
       ...(json.partnerOrder || null),
       projectName: json.designData.designName || "",
@@ -1756,8 +1767,8 @@ export const parseJson3D = async (json) => {
     // console.log(orderJson, "orderJSon");
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
-    // console.log(res, "res");
-    // return;
+    console.log(result, "res");
+    return;
 
     if (result && result._id) {
       message.success(messageResult);
