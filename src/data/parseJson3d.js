@@ -1773,8 +1773,8 @@ export const parseJson3D = async (json) => {
     // console.log(orderJson, "orderJSon");
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
-    // console.log(result, "res");
-    // return;
+    console.log(result, "res");
+    return;
 
     if (result && result._id) {
       message.success(messageResult);

@@ -163,8 +163,10 @@ export const fetchData = async (setEditado, setData) => {
     setEditado(true);
     const result = await getComplements();
     const newData = structuredClone(result);
-    const filteredData = newData.filter((el) => el.name);
-    setData(filteredData);
+    if (Array.isArray(result)) {
+      const filteredData = newData.filter((el) => el.name);
+      setData(filteredData);
+    }
   } catch (error) {
     console.error("Error fetching orders:", error);
   } finally {

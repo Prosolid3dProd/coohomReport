@@ -121,7 +121,7 @@ const Exportar = ({ file }) => {
     setScreenWidth((width) => (width = window.innerWidth));
 
   return (
-    <div className="flex flex-row items-center mr-4 gap-2">
+    <div className="flex flex-row items-center gap-2">
       {file && (
         <LabelAction
           text={
@@ -129,7 +129,7 @@ const Exportar = ({ file }) => {
               <input
                 //accept=".json"
                 className="hidden z-10"
-                onClick={file} // Cambiar "onclick" a "onClick"
+                onClick={file}
               />
               {type(
                 breakpoint(screenWidth, breakPointMD),
