@@ -75,7 +75,6 @@ const procesarArchivo = (fileUpload) => {
 const obtenerArchivo = (evento, _cambios) => {
   const files = evento.target.files;
   const fileUpload = files[0];
-  console.log(fileUpload)
 
   procesarArchivo(fileUpload);
 };

@@ -512,7 +512,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             )}
                           </View>
                         )}
-
                       {formatNumber(item.priceDoor) > 0 && (
                         <Text>
                           - Puertas:{" "}
@@ -525,7 +524,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             {/* {formatNumber(item.priceDoor)} */}
                           </Text>
                           {`[${formatNumber(item.doors.price)}] ${
-                            item.doors.name.toLocaleUpperCase() +
+                            item.doors.name?.toLocaleUpperCase() +
                             "-" +
                             item.doors.material
                           } / `}

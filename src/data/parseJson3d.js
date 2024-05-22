@@ -269,9 +269,11 @@ import { FormItemInputContext } from "antd/es/form/context";
 const traerFrente = (block) => {
   let frente;
   let tipo;
+
   if (String(block.customCode) === CONFIG.CUSTOMCODE.FRENTE_FIJO) {
     frente = block;
     tipo = "frente";
+    console.log(block, "FRENTE");
   } else {
     block.subModels?.forEach((item) => {
       if (item && item.subModels && item.subModels.length > 0) {
@@ -281,13 +283,16 @@ const traerFrente = (block) => {
         ) {
           frente = item;
           tipo = "cajon";
-          console.log(item, "FRENTE")
         }
       }
     });
   }
+  if (frente === undefined) {
+    return { datos: {}, tipo: "" };
+  }
   return { datos: frente, tipo };
 };
+
 const getPrice = (parametros, tipo, materialCasco) => {
   //el tipo traera cuando es casco con "cabinet" y cuando es un cajón la altura de este para calcular el precio con su altura y el resto undefined
   let price = 0;
@@ -667,42 +672,43 @@ const getPerfil = (perf) => {
   let priceTapa = 0;
   let acabado = undefined;
 
-  const perfil = perf.find((x) =>
-    String(x.modelBrandGoodName).toLocaleUpperCase().includes("PERFIL")
-  );
-  const tapa = perf.find((x) =>
-    String(x.modelBrandGoodName).toLocaleUpperCase().includes("TAPA")
-  );
+  if (perf !== undefined) {
+    const perfil = perf.find((x) =>
+      String(x.modelBrandGoodName).toLocaleUpperCase().includes("PERFIL")
+    );
+    const tapa = perf.find((x) =>
+      String(x.modelBrandGoodName).toLocaleUpperCase().includes("TAPA")
+    );
 
-  if (perfil != undefined) {
-    perfil.parameters?.forEach((item) => {
-      if (String(item.name).toUpperCase() === CONFIG.PRICE) {
-        price = parseFloat(item.value);
-      }
-    });
+    if (perfil != undefined) {
+      perfil.parameters?.forEach((item) => {
+        if (String(item.name).toUpperCase() === CONFIG.PRICE) {
+          price = parseFloat(item.value);
+        }
+      });
 
-    perfil.ignoreParameters?.forEach((item) => {
-      if (String(item.name).toUpperCase() === CONFIG.PRICE) {
-        price = parseFloat(item.value);
-      }
-    });
-    acabado = perfil.textureName;
+      perfil.ignoreParameters?.forEach((item) => {
+        if (String(item.name).toUpperCase() === CONFIG.PRICE) {
+          price = parseFloat(item.value);
+        }
+      });
+      acabado = perfil.textureName;
+    }
+
+    if (tapa !== undefined) {
+      tapa.parameters?.forEach((item) => {
+        if (String(item.name).toUpperCase() === CONFIG.PRICE) {
+          priceTapa = parseFloat(item.value);
+        }
+      });
+
+      tapa.ignoreParameters?.forEach((item) => {
+        if (String(item.name).toUpperCase() === CONFIG.PRICE) {
+          priceTapa = parseFloat(item.value);
+        }
+      });
+    }
   }
-
-  if (tapa != undefined) {
-    tapa.parameters?.forEach((item) => {
-      if (String(item.name).toUpperCase() === CONFIG.PRICE) {
-        priceTapa = parseFloat(item.value);
-      }
-    });
-
-    tapa.ignoreParameters?.forEach((item) => {
-      if (String(item.name).toUpperCase() === CONFIG.PRICE) {
-        priceTapa = parseFloat(item.value);
-      }
-    });
-  }
-
   return {
     price: parseFloat(price) + parseFloat(priceTapa),
     acabado: acabado,
@@ -1452,7 +1458,7 @@ export const parseJson3D = async (json) => {
               item.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO
             ) {
               frente = traerFrente(item);
-             
+
               const perfil = getPerfil(frente.datos.subModels);
 
               drawerMaterialDetails.push({
@@ -1767,8 +1773,8 @@ export const parseJson3D = async (json) => {
     // console.log(orderJson, "orderJSon");
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
-    console.log(result, "res");
-    return;
+    // console.log(result, "res");
+    // return;
 
     if (result && result._id) {
       message.success(messageResult);

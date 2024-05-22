@@ -6,6 +6,7 @@ import { ButtonAction } from "../utils/btnAction";
 import { FiDownload } from "../icons";
 import { breakPointMD, breakpoint, typeOfText as type } from "./logic/btnLogic";
 import { UploadOutlined } from "@ant-design/icons";
+import { fetchData } from "../pages/Encimeras/encimeras";
 
 /**
  *
@@ -15,65 +16,93 @@ import { UploadOutlined } from "@ant-design/icons";
  * @return {Component}
  */
 
-const props1 = {
-  name: "sampleFile",
-  action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
-  method: "POST",
-  headers: {
-    authorization: "authorization-text",
-  },
-  onChange(info) {
-    if (info.file.status !== "uploading") {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
-const props2 = {
-  name: "sampleFile",
-  action:
-    "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
-  method: "POST",
-  headers: {
-    authorization: "authorization-text",
-  },
-  onChange(info) {
-    if (info.file.status !== "uploading") {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
-const Actions = ({ file, addRow }) => {
+const Actions = ({ file, addRow, showUploadButtons, setLoading, setData }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
+  const handleChange = async (info) => {
+    setLoading(true);
+    if (info.file.status === "done") {
+      message.success(`${info.file.name} biblioteca actualizada con exito`);
+      await fetchData(setLoading, setData);
+    } else if (info.file.status === "error") {
+      message.error(`${info.file.name} error al actualizar la biblioteca.`);
+    }
+    setLoading(false);
+  };
+
+  const props1 = {
+    name: "sampleFile",
+    action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
+    method: "POST",
+    headers: {
+      authorization: "authorization-text",
+    },
+    onChange: handleChange,
+  };
+
+  const props2 = {
+    name: "sampleFile",
+    action:
+      "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
+    method: "POST",
+    headers: {
+      authorization: "authorization-text",
+    },
+    onChange: handleChange,
+  };
   window.onresize = () =>
     setScreenWidth((width) => (width = window.innerWidth));
 
   return (
     <div className="flex flex-row items-center mr-4 gap-2">
       {file && (
+        <LabelAction
+          text={
+            <>
+              <input
+                placeholder="Introduce a file"
+                type="file"
+                className="hidden z-10"
+                onChange={file}
+              />
+              {type(
+                breakpoint(screenWidth, breakPointMD),
+                "Importar",
+                <File className="text-sv" />
+              )}
+            </>
+          }
+          color={"#1a7af8"}
+        ></LabelAction>
+      )}
+      {showUploadButtons && (
         <>
           <Tooltip title="Cargar un excel con esta estructura de cabecera [Referencia/Nombre/Tipo/Ancho/Altura/Profundidad/Precio]">
-            <Upload {...props1}>
-              <Button icon={<UploadOutlined />}>Añadir Complementos</Button>
+            <Upload showUploadList={false} multiple={false} {...props1}>
+              <Button
+                style={{
+                  height: "60px",
+                  border: "1px solid blue",
+                  color: "blue",
+                  width: "100px",
+                }}
+                icon={<UploadOutlined />}
+              >
+                Añadir
+              </Button>
             </Upload>
           </Tooltip>
           <Tooltip title="Cargar un excel con una columna llamada 'Referencia' que tenga los codigos de los elementos que quieras eliminar.">
-            <Upload {...props2}>
+            <Upload showUploadList={false} multiple={false} {...props2}>
               <Button
-                style={{ border: "1px solid red", color: "red" }}
+                style={{
+                  height: "60px",
+                  border: "1px solid red",
+                  color: "red",
+                }}
                 icon={<UploadOutlined />}
               >
-                Eliminar Complementos
+                Eliminar
               </Button>
             </Upload>
           </Tooltip>
@@ -104,12 +133,12 @@ const Exportar = ({ file }) => {
               />
               {type(
                 breakpoint(screenWidth, breakPointMD),
-                "Exportar",
+                "Descargar",
                 <FiDownload className="text-sv" />
               )}
             </>
           }
-          color={"#1a7af8"}
+          color={"green"}
         ></LabelAction>
       )}
     </div>
@@ -171,7 +200,6 @@ const InputSearch = ({ getFilter }) => {
     />
   );
 };
-
 /**
  *
  *
@@ -187,6 +215,9 @@ const Header = ({
   actions = true,
   getFilter,
   input = false,
+  showUploadButtons = false,
+  setLoading,
+  setData,
   // complementos = false,
 }) => {
   return (
@@ -194,7 +225,15 @@ const Header = ({
       <Title name={name} />
       {input && <InputSearch getFilter={getFilter} />}
       <div className="h-full flex flex-row">
-        {actions && <Actions file={addFile} addRow={addRow} />}
+        {actions && (
+          <Actions
+            showUploadButtons={showUploadButtons}
+            file={addFile}
+            addRow={addRow}
+            setLoading={setLoading}
+            setData={setData}
+          />
+        )}
         {downloadFile && <Exportar file={downloadFile} />}
       </div>
       {funcion && <AgregarMueble funcion={funcion} />}

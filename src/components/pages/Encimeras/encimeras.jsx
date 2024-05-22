@@ -158,63 +158,26 @@ import { exportarArchivo } from "../../content/logic/obtenerArchivoJson";
 //   );
 // };
 
+export const fetchData = async (setEditado, setData) => {
+  try {
+    setEditado(true);
+    const result = await getComplements();
+    const newData = structuredClone(result);
+    const filteredData = newData.filter((el) => el.name);
+    setData(filteredData);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+  } finally {
+    setEditado(false);
+  }
+};
 const Encimeras = () => {
   const [data, setData] = useState([]);
   const [editado, setEditado] = useState(false);
 
   useEffect(() => {
-    fetchData();
+    fetchData(setEditado, setData);
   }, []);
-
-  // const getDataComplements = async () => {
-  //   await getComplements()
-  //     .then((res) => {
-  //       let temp = [];
-
-  //       res.forEach((element) => {
-  //         if (
-  //           String(element.name) !== "undefined" &&
-  //           element.name !== "" &&
-  //           element.name !== undefined
-  //         ) {
-  //           element = {
-  //             ...element,
-  //             ["action"]: (
-  //               <Button
-  //                 className="text-red border-red cursor-pointer transition-all ease-out duration-350 hover:text-red/75"
-  //                 onClick={() => {
-  //                   setDatosModal((fila) => (fila = element));
-  //                   setModalEditar((open) => (open = true));
-  //                 }}
-  //               >
-  //                 Eliminar
-  //               </Button>
-  //             ),
-  //           };
-  //           temp.push(element);
-  //         }
-  //       });
-
-  //       setData(temp);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
-  const fetchData = async () => {
-    try {
-      setEditado(true);
-      const result = await getComplements();
-      const newData = structuredClone(result);
-      const filteredData = newData.filter((el) => el.name);
-      setData(filteredData);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setEditado(false);
-    }
-  };
 
   const getFilterComplements = async (params) => {
     try {
@@ -309,23 +272,6 @@ const Encimeras = () => {
     },
   ];
 
-  const importData = async (evento) => {
-    try {
-      setEditado(true);
-      const resultArray = await importarArchivo(evento);
-      console.log(resultArray);
-      if (resultArray && resultArray.length > 0) {
-        setData((prevData) => [...resultArray, ...prevData]);
-        setEditado(false);
-      } else {
-        message.warning("No se encontraron datos en el archivo importado.");
-      }
-    } catch (error) {
-      console.error("Error importing data:", error);
-      message.error("Error al importar datos. Por favor, inténtalo de nuevo.");
-    }
-  };
-
   return (
     <main className="flex flex-col overflow-y-scroll px-4">
       <Header
@@ -333,7 +279,9 @@ const Encimeras = () => {
         input={true}
         getFilter={getFilterComplements}
         downloadFile={() => exportarArchivo(data)}
-        addFile={importData}
+        showUploadButtons={true}
+        setLoading={setEditado}
+        setData={setData}
       />
       <Table
         className="border border-t-0 border-border mx-3 relative overflow-x-hidden"
