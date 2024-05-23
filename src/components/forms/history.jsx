@@ -15,8 +15,6 @@ import {
 } from "antd";
 
 import {
-  updateOrder,
-  setLocalOrder,
   getOrders,
   getOrderById,
   fixOrder,
@@ -354,7 +352,7 @@ const History = () => {
       const result = await getOrderById({
         _id: item._id,
       });
-      console.log(result)
+      // console.log(result)
       fixOrder(result, () => {
         navigate("/Dashboard/Report/", {
           replace: true,
@@ -502,6 +500,8 @@ const History = () => {
           actions={true}
           addFile={(e) => obtenerArchivo(e)}
           name={"Listado"}
+          setLoading={setLoad}
+          setData={setInitialValues}
         />
       </div>
       <article className="border-none rounded-none relative overflow-x-hidden">

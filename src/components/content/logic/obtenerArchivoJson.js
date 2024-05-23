@@ -9,11 +9,13 @@ const esArchivoXLSX = (nombreArchivo) =>
 // const esArchivoCSV = (nombreArchivo) =>
 //   nombreArchivo.toLowerCase().endsWith(".csv");
 
+
 const procesarArchivoJSON = (fileRead, fileUpload) => {
   fileRead.onload = () => {
     const fileContent = fileRead.result;
     try {
       const fileToJSON = JSON.parse(fileContent);
+      console.log(fileToJSON)
       parseJson3D(fileToJSON);
     } catch (e) {
       console.error(e);
@@ -22,7 +24,6 @@ const procesarArchivoJSON = (fileRead, fileUpload) => {
   };
   fileRead.readAsText(fileUpload);
 };
-
 const procesarArchivoXLSX = (readerXlsx, fileUpload) => {
   readerXlsx.onload = function (e) {
     try {

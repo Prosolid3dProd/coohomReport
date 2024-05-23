@@ -1422,7 +1422,7 @@ export const parseJson3D = async (json) => {
           let drawerMaterialDetails = [];
           let frente;
 
-          console.log(item, "ITEM");
+          // console.log(item, "ITEM");
           item.subModels?.forEach((item) => {
             const customCodeSubstring = String(item.customCode).substring(0, 2);
             if (customCodeSubstring === CONFIG.CUSTOMCODE.DOOR) {
@@ -1560,10 +1560,10 @@ export const parseJson3D = async (json) => {
               }
             });
 
-          const casco = item.subModels.find((x) =>
-            x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
-          );
-          console.log(casco, "CASCO");
+          // const casco = item.subModels.find((x) =>
+          //   x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
+          // );
+          // console.log(casco, "CASCO");
           let nameFinal = item.modelName;
           if (String(item.modelName).indexOf("L") > -1) {
             //quitar los ultimoss 4 digitos y eliminar los guiones
@@ -1771,6 +1771,7 @@ export const parseJson3D = async (json) => {
     };
 
     // console.log(orderJson, "orderJSon");
+
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
     console.log(result, "res");

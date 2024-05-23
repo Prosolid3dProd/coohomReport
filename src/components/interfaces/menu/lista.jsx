@@ -24,26 +24,27 @@ const Lista = ({ change, textShown }) => {
   if (localStorage.getItem("campaign") === CONFIG.ROLE.ADMIN) {
     return items?.map(({ id, name, icon }) => (
       <Item
-    key={id}
-    id={id}
-    name={name}
-    Icon={icon}
-    textShown={change ? false : textShown}
-  />
+        key={id}
+        id={id}
+        name={name}
+        Icon={icon}
+        textShown={change ? false : textShown}
+      />
     ));
   }
   if (localStorage.getItem("campaign") === CONFIG.ROLE.CLIENT) {
     return itemsCliente?.map(({ id, name, icon }) => (
       <Item
-      key={id}
-      id={id}
-      name={name}
-      Icon={icon}
-      textShown={change ? false : textShown}
-    />
+        key={id}
+        id={id}
+        name={name}
+        Icon={icon}
+        textShown={change ? false : textShown}
+      />
     ));
   }
 };
+
 
 
 export default Lista;

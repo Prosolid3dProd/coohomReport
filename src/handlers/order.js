@@ -164,7 +164,6 @@ export const getOrderById = async (params) => {
     });
     localStorage.setItem("orderErp", JSON.stringify(data.data));
 
-    // console.log("getOrderById")
     return data.data;
   } catch (error) {
     console.log(error);
@@ -316,10 +315,9 @@ export const deleteComplements = async (params) => {
 
 export const importLibrary = async (formData) => {
   try {
-    const response = await axios.post(
+    await axios.post(
       `${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`,
       formData,
-      // const response = await axios.post(`http://localhost:3000/upload`, formData,
       {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -328,7 +326,6 @@ export const importLibrary = async (formData) => {
         token: Settings.TOKEN,
       }
     );
-    console.log("RESULT: ", response.data);
   } catch (error) {
     console.error("Error uploading file:", error);
   }
