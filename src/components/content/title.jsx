@@ -19,32 +19,6 @@ import { parseJson3D } from "../../data";
 
 const Actions = ({ file, addRow, showUploadButtons, setLoading, setData }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  
-  const JSONFile = (file) => {
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const json = JSON.parse(reader.result);
-          resolve(json);
-          handleChangeJSON(json);
-        } catch (error) {
-          reject(new Error("Error parsing JSON"));
-        }
-      };
-      reader.onerror = () => {
-        reject(new Error("Error reading file"));
-      };
-      reader.readAsText(file);
-    });
-  };
-
-  const handleChangeJSON = async (info) => {
-    setLoading(true);
-    await parseJson3D(info)
-    setLoading(false);
-  
-  };
 
   const handleChange = async (info) => {
     setLoading(true);
@@ -83,43 +57,24 @@ const Actions = ({ file, addRow, showUploadButtons, setLoading, setData }) => {
   return (
     <div className="flex flex-row items-center mr-4 gap-2">
       {file && (
-        <>
-          <LabelAction
-            text={
-              <>
-                <input
-                  placeholder="Introduce a file"
-                  type="file"
-                  className="hidden z-10"
-                  onChange={file}
-                />
-                {type(
-                  breakpoint(screenWidth, breakPointMD),
-                  "Importar",
-                  <File className="text-sv" />
-                )}
-              </>
-            }
-            color={"#1a7af8"}
-          ></LabelAction>
-          <Upload
-            beforeUpload={JSONFile}
-            showUploadList={false}
-            multiple={false}
-          >
-            <Button
-              style={{
-                height: "60px",
-                border: "1px solid blue",
-                color: "blue",
-                width: "100px",
-              }}
-              icon={<UploadOutlined />}
-            >
-              Añadir
-            </Button>
-          </Upload>
-        </>
+        <LabelAction
+          text={
+            <>
+              <input
+                placeholder="Introduce a file"
+                type="file"
+                className="hidden z-10"
+                onChange={file}
+              />
+              {type(
+                breakpoint(screenWidth, breakPointMD),
+                "Importar",
+                <File className="text-sv" />
+              )}
+            </>
+          }
+          color={"#1a7af8"}
+        ></LabelAction>
       )}
       {showUploadButtons && (
         <>
