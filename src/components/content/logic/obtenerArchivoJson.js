@@ -15,7 +15,6 @@ const procesarArchivoJSON = (fileRead, fileUpload) => {
     const fileContent = fileRead.result;
     try {
       const fileToJSON = JSON.parse(fileContent);
-      console.log(fileToJSON)
       parseJson3D(fileToJSON);
     } catch (e) {
       console.error(e);

@@ -1775,7 +1775,7 @@ export const parseJson3D = async (json) => {
     const res = await createOrder(orderJson);
     const { result, message: messageResult } = res;
     console.log(result, "res");
-    return;
+    // return;
 
     if (result && result._id) {
       message.success(messageResult);
