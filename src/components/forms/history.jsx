@@ -21,7 +21,6 @@ import {
   archivedOrder,
 } from "../../handlers/order";
 import { Header } from "../content";
-import { obtenerArchivo } from "../content/logic";
 
 const getDiferenciaDias = (creacionPresupuesto) => {
   const creationalDate = new Date(creacionPresupuesto);
@@ -368,6 +367,7 @@ const History = () => {
       try {
         setLoad(true);
         const result = await getOrders({});
+        result.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
         setInitialValues(result);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -498,10 +498,11 @@ const History = () => {
       <div className="px-4">
         <Header
           actions={true}
-          addFile={(e) => obtenerArchivo(e)}
+          addFile={(e) => {return e}}
           name={"Listado"}
           setLoading={setLoad}
           setData={setInitialValues}
+          data={initialValues}
         />
       </div>
       <article className="border-none rounded-none relative overflow-x-hidden">
