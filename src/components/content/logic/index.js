@@ -19,10 +19,6 @@ import {
 } from './muebles'
 
 import {
-        obtenerArchivo
-} from './obtenerArchivoJson'
-
-import {
         obtenerMuebleIndex,
 } from './btnLogic'
 
@@ -33,7 +29,6 @@ export {
         getCabinets,
         getVariants,
         handleUpdateCabinet,
-        obtenerArchivo,
         omitirColumnas,
         tablaExpansible,
         obtenerMuebleIndex,

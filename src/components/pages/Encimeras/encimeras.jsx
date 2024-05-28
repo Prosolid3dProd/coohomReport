@@ -182,16 +182,19 @@ const Encimeras = () => {
   }, []);
 
   const getFilterComplements = async (params) => {
+   setEditado(true)
     try {
       const result = await getComplementsByText(params);
       if (result && result.length > 0) setData(result);
+      
       else {
         message.error("No se encontraron resultados");
-        fetchData();
+        fetchData(setEditado, setData);
       }
     } catch (error) {
       console.error("Error filtering orders:", error);
     }
+    setEditado(false)
   };
 
   const onDelete = async (item) => {

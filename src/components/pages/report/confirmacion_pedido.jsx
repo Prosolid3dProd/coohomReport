@@ -391,6 +391,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     display: "flex",
                     flexDirection: "row",
                     marginTop: "1",
+                    marginBottom: "5",
                   }}
                   wrap={false}
                 >
@@ -454,14 +455,19 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                               <View>
                                 <Text style={{ fontSize: 7 }}>
                                   {item.drawerPriceDetails.map((it, index) => {
-                                    const modelo =
-                                      item.drawerMaterialDetails[index]?.modelo;
-                                    const acabado =
-                                      item.drawerMaterialDetails[index]
-                                        ?.Acabado;
+                                    const materialDetail =
+                                      item.drawerMaterialDetails[index];
+                                    if (!materialDetail || it === 0) {
+                                      return null;
+                                    }
 
-                                    const modeloInfo =
-                                      modelo !== undefined ? `${modelo}-` : "";
+                                    const modelo = materialDetail.modelo || "";
+                                    const acabado =
+                                      materialDetail.Acabado || "";
+
+                                    const modeloInfo = modelo
+                                      ? `${modelo}-`
+                                      : "";
 
                                     return `[${formatNumber(
                                       it
@@ -553,7 +559,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {it.name}: {it.nameValue} / [{it.mcv}]
+                              {it.name}: {it.nameValue || it.description} / [
+                              {it.value}] {it.mcv}
                             </Text>
                           ))}
                         </View>
@@ -636,6 +643,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   style={{
                     display: "flex",
                     flexDirection: "row",
+                    marginBottom: "10",
                     marginTop: "1",
                   }}
                   wrap={false}
@@ -804,7 +812,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {it.name}: {it.nameValue} / [{it.mcv}]
+                              {it.name}: {it.nameValue || it.description} / [
+                              {it.value}] {it.mcv}
                             </Text>
                           ))}
                         </View>
@@ -889,6 +898,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   display: "flex",
                   flexDirection: "row",
                   marginTop: "1",
+                  marginBottom: "5",
                 }}
                 wrap={false}
               >
@@ -1018,7 +1028,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         {item.variants.map((item) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.description} / [{item.value}]
+                            {item.name}: {item.nameValue || item.description} /
+                            [{item.value}] {item.mcv}
                           </Text>
                         ))}
                       </View>
@@ -1218,7 +1229,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         {item.variants.map((item) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.description} / [{item.value}]
+                            {item.name}: {item.nameValue || item.description} /
+                            [{itemvalue}] {item.mcv}
                           </Text>
                         ))}
                       </View>
@@ -1441,7 +1453,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         {item.variants.map((item) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.description} / [{item.value}]
+                            {item.name}: {item.nameValue || item.description} /
+                            [{item.value}] {item.mcv}
                           </Text>
                         ))}
                       </View>
@@ -1644,7 +1657,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         {item.variants.map((item) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.description} / [{item.value}]
+                            {item.name}: {item.nameValue || item.description} /
+                            [{item.value}] {item.mcv}
                           </Text>
                         ))}
                       </View>

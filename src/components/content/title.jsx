@@ -8,6 +8,8 @@ import { breakPointMD, breakpoint, typeOfText as type } from "./logic/btnLogic";
 import { UploadOutlined } from "@ant-design/icons";
 import { fetchData } from "../pages/Encimeras/encimeras";
 import { parseJson3D } from "../../data";
+import { createOrder } from "../../handlers/order";
+import { procesarArchivoXLSX } from "../content/logic/obtenerArchivoJson";
 
 /**
  *
@@ -16,36 +18,65 @@ import { parseJson3D } from "../../data";
  * @param {Function}  clear
  * @return {Component}
  */
-
-const Actions = ({ file, addRow, showUploadButtons, setLoading, setData }) => {
+const Actions = ({
+  file,
+  addRow,
+  showUploadButtons,
+  setLoading,
+  setData,
+  data,
+}) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  
+
   const JSONFile = (file) => {
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const json = JSON.parse(reader.result);
-          resolve(json);
-          handleChangeJSON(json);
-        } catch (error) {
-          reject(new Error("Error parsing JSON"));
-        }
-      };
-      reader.onerror = () => {
-        reject(new Error("Error reading file"));
-      };
-      reader.readAsText(file);
-    });
+    if (file.name.endsWith(".xlsx")) {
+      const readerXlsx = new FileReader();
+      procesarArchivoXLSX(readerXlsx, file);
+      return;
+    } else {
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const json = JSON.parse(reader.result);
+            resolve(json);
+            handleChangeJSON(json);
+          } catch (error) {
+            reject(new Error("Error parsing JSON"));
+          }
+        };
+        reader.onerror = () => {
+          reject(new Error("Error reading file"));
+        };
+        reader.readAsText(file);
+      });
+    }
   };
 
   const handleChangeJSON = async (info) => {
     setLoading(true);
-    await parseJson3D(info)
-    setLoading(false);
-  
-  };
 
+    const newData = await parseJson3D(info);
+    const existingIndex = data.findIndex(
+      (item) => item.orderCode === newData.orderCode
+    );
+    if (existingIndex !== -1) {
+      let dataS = [...data];
+      dataS.splice(existingIndex, 1);
+      const upData = await createOrder(newData);
+      const updatedData = [upData.result, ...dataS];
+      message.success(upData.result.projectName + " actualizado correctamente");
+      setData(updatedData);
+    } else {
+      const order = await createOrder(newData);
+      message.success(order.result.projectName + " agregado correctamente");
+      setData((prevData) => {
+        const updatedData = [order.result, ...prevData];
+        return updatedData;
+      });
+    }
+    setLoading(false);
+  };
   const handleChange = async (info) => {
     setLoading(true);
     if (info.file.status === "done") {
@@ -83,43 +114,19 @@ const Actions = ({ file, addRow, showUploadButtons, setLoading, setData }) => {
   return (
     <div className="flex flex-row items-center mr-4 gap-2">
       {file && (
-        <>
-          <LabelAction
-            text={
-              <>
-                <input
-                  placeholder="Introduce a file"
-                  type="file"
-                  className="hidden z-10"
-                  onChange={file}
-                />
-                {type(
-                  breakpoint(screenWidth, breakPointMD),
-                  "Importar",
-                  <File className="text-sv" />
-                )}
-              </>
-            }
-            color={"#1a7af8"}
-          ></LabelAction>
-          <Upload
-            beforeUpload={JSONFile}
-            showUploadList={false}
-            multiple={false}
+        <Upload beforeUpload={JSONFile} showUploadList={false} multiple={false}>
+          <Button
+            style={{
+              height: "60px",
+              border: "1px solid blue",
+              color: "blue",
+              width: "100px",
+            }}
+            icon={<UploadOutlined />}
           >
-            <Button
-              style={{
-                height: "60px",
-                border: "1px solid blue",
-                color: "blue",
-                width: "100px",
-              }}
-              icon={<UploadOutlined />}
-            >
-              Añadir
-            </Button>
-          </Upload>
-        </>
+            Añadir
+          </Button>
+        </Upload>
       )}
       {showUploadButtons && (
         <>
@@ -169,23 +176,25 @@ const Exportar = ({ file }) => {
   return (
     <div className="flex flex-row items-center gap-2">
       {file && (
-        <LabelAction
-          text={
-            <>
-              <input
-                //accept=".json"
-                className="hidden z-10"
-                onClick={file}
-              />
-              {type(
-                breakpoint(screenWidth, breakPointMD),
-                "Descargar",
-                <FiDownload className="text-sv" />
-              )}
-            </>
-          }
-          color={"green"}
-        ></LabelAction>
+        <>
+          <LabelAction
+            text={
+              <>
+                <input
+                  //accept=".json"
+                  className="hidden z-10"
+                  onClick={file}
+                />
+                {type(
+                  breakpoint(screenWidth, breakPointMD),
+                  "Descargar",
+                  <FiDownload className="text-sv" />
+                )}
+              </>
+            }
+            color={"green"}
+          ></LabelAction>
+        </>
       )}
     </div>
   );
@@ -264,6 +273,7 @@ const Header = ({
   showUploadButtons = false,
   setLoading,
   setData,
+  data,
   // complementos = false,
 }) => {
   return (
@@ -278,6 +288,7 @@ const Header = ({
             addRow={addRow}
             setLoading={setLoading}
             setData={setData}
+            data={data}
           />
         )}
         {downloadFile && <Exportar file={downloadFile} />}

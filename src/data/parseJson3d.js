@@ -386,71 +386,76 @@ const getRef = (parametros, reference) => {
   });
 
   parametros.ignoreParameters?.forEach((item) => {
+    const newItemValue = item.value.replace(/['"]/g, "");
     if (item.name === CONFIG.REF) {
       reference.ref = String(item.value);
       reference.type = String(item.value).trim().substring(0, 1);
 
       if (
-        String(item.value)
+        String(newItemValue)
           .toLocaleUpperCase()
           .indexOf(CONFIG.MODELNAME.SOBREENCIMERAS.CODE) > -1
       ) {
         reference.type = CONFIG.MODELNAME.MURALES.CODE;
       }
-
-      if (
-        String(item.value)
-          .toLocaleUpperCase()
-          .indexOf(CONFIG.MODELNAME.FORRADO.CODE) > -1
-      ) {
-        reference.type = CONFIG.MODELNAME.FORRADO.CODE;
-      }
+      // console.log(parametros.modelName + "----" + item.value)
+      // if (
+      //   String(item.value)
+      //     .toLocaleUpperCase()
+      //     .indexOf(CONFIG.MODELNAME.FORRADO.CODE) > -1
+      // ) {
+      //   console.log(parametros.modelName + "----" + item.value)
+      //   reference.type = CONFIG.MODELNAME.FORRADO.CODE;
+      // }
     }
 
     if (
-      String(item.value).trim().substring(0, 2) === "RA" ||
-      String(item.value).trim().substring(0, 2) === "RB" ||
-      String(item.value).trim().substring(0, 2) === "RM"
+      String(newItemValue).trim().substring(0, 2) === "RA" ||
+      String(newItemValue).trim().substring(0, 2) === "RB" ||
+      String(newItemValue).trim().substring(0, 2) === "RM"
     ) {
-      reference.ref = String(item.value);
-      reference.type = String(item.value).trim().substring(1, 2);
+      reference.ref = String(newItemValue);
+      reference.type = String(newItemValue).trim().substring(1, 2);
     }
 
     if (reference.type === "L") {
       reference.type = "C";
     }
 
-    if (String(item.value).trim().substring(0, 4) === "BD25") {
-      reference.ref = String(item.value);
+    if (String(newItemValue).trim().substring(0, 4) === "BD25") {
+      reference.ref = String(newItemValue);
       reference.type = "T";
     }
 
-    if (String(item.value).trim().substring(0, 2) === "BF") {
-      reference.ref = String(item.value);
-      reference.type = "M";
-    }
-
-    if (String(item.value).trim().substring(0, 2) === "BP") {
-      reference.ref = String(item.value);
+    if (String(newItemValue).trim().substring(0, 2) === "BF") {
+      reference.ref = String(newItemValue);
       reference.type = "B";
     }
 
-    if (String(item.value).trim().substring(0, 2) === "MF") {
-      reference.ref = String(item.value);
+    if (String(newItemValue).trim().substring(0, 2) === "BP") {
+      reference.ref = String(newItemValue);
+      reference.type = "B";
+    }
+
+    if (String(newItemValue).trim().substring(0, 2) === "MF") {
+      reference.ref = String(newItemValue);
       reference.type = "M";
     }
 
-    if (String(item.value).trim().substring(0, 2) === "AF") {
-      reference.ref = String(item.value);
+    if (String(newItemValue).trim().substring(0, 2) === "AF") {
+      reference.ref = String(newItemValue);
       reference.type = "A";
     }
-
-    if (String(item.value).trim().substring(0, 2) === "BF") {
-      reference.ref = String(item.value);
+    if (String(newItemValue).trim().substring(0, 2) === "BF") {
+      reference.ref = String(newItemValue);
       reference.type = "B";
     }
-    if (String(item.value).trim().substring(0, 2) === "BH") {
-      reference.ref = String(item.value);
+    if (String(newItemValue).trim().substring(0, 2) === "BH") {
+      reference.ref = String(newItemValue);
+      reference.type = "B";
+    }
+    if (String(newItemValue).trim().substring(0, 1) === "B") {
+      reference.ref = String(newItemValue);
       reference.type = "B";
     }
   });
@@ -1006,7 +1011,7 @@ export const parseJson3D = async (json) => {
     let arrZocalos = [];
     let arrEncimeras = [];
     let tiradoresCabecera = [];
-    let quantityCT;
+    // let quantityCT;
 
     json.paramModel?.forEach((item) => {
       // console.log(item)
@@ -1078,7 +1083,7 @@ export const parseJson3D = async (json) => {
           obsBrandGoodId: item.obsBrandGoodId,
           quantity: parseInt(item.modelCostInfo.quantity),
         });
-      } else if (item["@type"] == "5") {
+        // } else if (item["@type"] == "5") {
         // arrZocalos.push(
         //   zocalos(
         //     {
@@ -1323,14 +1328,7 @@ export const parseJson3D = async (json) => {
             cajonesInfo = null;
           }
 
-          /*console.log("=====================================");
-          console.log(item.modelName, item.obsBrandGoodId);
-          console.log("cabinet", armazonInfo);
-          console.log("puerta", puertasInfo);
-          console.log("cajones", cajonesInfo);
-          */
-
-          extra = {
+                extra = {
             ...armazonInfo,
             ...puertasInfo,
             ...cajonesInfo,
@@ -1354,24 +1352,39 @@ export const parseJson3D = async (json) => {
             cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
             materialDrawerArray.push(cajonesInfo?.materialDrawer);
 
-          puertasInfo?.modelDoor &&
-            puertasInfo?.modelDoor !== "undefined" &&
-            puertasInfo?.modelDoor?.indexOf("Cajon") === -1 &&
-            puertasInfo?.modelDoor?.indexOf("Gaveta") === -1 &&
-            puertasInfo?.modelDoor?.indexOf("Mural") === -1 &&
-            puertasInfo?.modelDoor?.indexOf("Sola") === -1 &&
-            puertasInfo?.modelDoor?.indexOf("Corte") === -1 &&
-            modelDoorArray.push(puertasInfo?.modelDoor);
+          item.subModels.map((filtroModelDoor) => {
+            if (
+              String(filtroModelDoor.customCode).trim().substring(0, 2) ===
+              CONFIG.CUSTOMCODE.DOOR
+            ) {
+              puertasInfo?.modelDoor &&
+                puertasInfo?.modelDoor !== "undefined" &&
+                puertasInfo?.modelDoor?.indexOf("Cajon") === -1 &&
+                puertasInfo?.modelDoor?.indexOf("Gaveta") === -1 &&
+                puertasInfo?.modelDoor?.indexOf("Mural") === -1 &&
+                puertasInfo?.modelDoor?.indexOf("Sola") === -1 &&
+                puertasInfo?.modelDoor?.indexOf("Corte") === -1 &&
+                modelDoorArray.push(puertasInfo?.modelDoor);
+              // console.log(modelDoorArray);
+            }
+          });
 
-          puertasInfo?.materialDoor &&
-            puertasInfo?.materialDoor !== "undefined" &&
-            puertasInfo?.materialDoor !== "undefined" &&
-            puertasInfo?.materialDoor?.indexOf("Cajon") === -1 &&
-            puertasInfo?.materialDoor?.indexOf("Gaveta") === -1 &&
-            puertasInfo?.materialDoor?.indexOf("Sola") === -1 &&
-            puertasInfo?.materialDoor?.indexOf("Mural") === -1 &&
-            puertasInfo?.materialDoor?.indexOf("Corte") === -1 &&
-            materialDoorArray.push(puertasInfo?.materialDoor);
+          item.subModels.map((filtroMaterialDoor) => {
+            if (
+              String(filtroMaterialDoor.customCode).trim().substring(0, 2) ===
+              CONFIG.CUSTOMCODE.DOOR
+            ) {
+              puertasInfo?.materialDoor &&
+                puertasInfo?.materialDoor !== "undefined" &&
+                puertasInfo?.materialDoor?.indexOf("Cajon") === -1 &&
+                puertasInfo?.materialDoor?.indexOf("Gaveta") === -1 &&
+                puertasInfo?.materialDoor?.indexOf("Sola") === -1 &&
+                puertasInfo?.materialDoor?.indexOf("Mural") === -1 &&
+                puertasInfo?.materialDoor?.indexOf("Corte") === -1 &&
+                materialDoorArray.push(puertasInfo?.materialDoor);
+              // console.log(materialDoorArray);
+            }
+          });
 
           armazonInfo?.modelCabinet &&
             armazonInfo?.modelCabinet !== "undefined" &&
@@ -1384,7 +1397,7 @@ export const parseJson3D = async (json) => {
 
           item.subModels.map((filtroArmazon) => {
             if (
-              String(filtroArmazon.modelBrandGoodName)
+              String(filtroArmazon.modelName)
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
@@ -1397,6 +1410,7 @@ export const parseJson3D = async (json) => {
                 armazonInfo?.materialCabinet?.indexOf("Corte") === -1;
               materialCabinetArray.push(armazonInfo?.materialCabinet);
               drawerGlobal.push(modeloDrawer);
+              // console.log(materialCabinetArray);
             }
           });
 
@@ -1558,6 +1572,7 @@ export const parseJson3D = async (json) => {
                   ...extra,
                 });
               }
+              console.log(item);
             });
 
           // const casco = item.subModels.find((x) =>
@@ -1749,10 +1764,14 @@ export const parseJson3D = async (json) => {
       materialDrawer: quitarDuplicados(materialDrawerArray)
         .toString()
         .replace(/,/g, " / "),
-      modelDoor: quitarDuplicados(modelDoorArray)
+      modelDoor: quitarDuplicados(
+        modelDoorArray
+      ) /**-------------------------- */
         .toString()
         .replace(/,/g, " / "),
-      materialDoor: quitarDuplicados(materialDoorArray)
+      materialDoor: quitarDuplicados(
+        materialDoorArray
+      ) /**-------------------------- */
         .toString()
         .replace(/,/g, " / "),
       modelCabinet: quitarDuplicados(modelCabinetArray)
@@ -1770,24 +1789,25 @@ export const parseJson3D = async (json) => {
       storeName: json.partnerOrder?.storeName || "",
     };
 
+    return orderJson;
+
     // console.log(orderJson, "orderJSon");
 
-    const res = await createOrder(orderJson);
-    const { result, message: messageResult } = res;
-    console.log(result, "res");
-    return;
+    // const res = await createOrder(orderJson);
+    // const { result, message: messageResult } = res;
+    // console.log(result, "res");
 
-    if (result && result._id) {
-      message.success(messageResult);
+    // if (result && result._id) {
+    //   message.success(messageResult);
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+    //   setTimeout(() => {
+    //     window.location.reload();
+    //   }, 2000);
 
-      return result;
-    } else {
-      return null;
-    }
+    //   return result;
+    // } else {
+    //   return null;
+    // }
   } catch (error) {
     console.log(error);
   }

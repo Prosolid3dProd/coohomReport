@@ -1,29 +1,3 @@
-import { message } from "antd";
-import { parseJson3D } from "../../../data";
-
-const esArchivoJSON = (nombreArchivo) =>
-  nombreArchivo.toLowerCase().endsWith(".json");
-const esArchivoXLSX = (nombreArchivo) =>
-  nombreArchivo.toLowerCase().endsWith(".xlsx") ||
-  nombreArchivo.toLowerCase().endsWith(".xls");
-// const esArchivoCSV = (nombreArchivo) =>
-//   nombreArchivo.toLowerCase().endsWith(".csv");
-
-
-const procesarArchivoJSON = (fileRead, fileUpload) => {
-  fileRead.onload = () => {
-    const fileContent = fileRead.result;
-    try {
-      const fileToJSON = JSON.parse(fileContent);
-      console.log(fileToJSON)
-      parseJson3D(fileToJSON);
-    } catch (e) {
-      console.error(e);
-      message.error("Error al cargar el archivo JSON");
-    }
-  };
-  fileRead.readAsText(fileUpload);
-};
 const procesarArchivoXLSX = (readerXlsx, fileUpload) => {
   readerXlsx.onload = function (e) {
     try {
@@ -59,28 +33,6 @@ const procesarArchivoXLSX = (readerXlsx, fileUpload) => {
   readerXlsx.readAsArrayBuffer(fileUpload);
 };
 
-const procesarArchivo = (fileUpload) => {
-  const nombreArchivo = fileUpload.name;
-
-  if (esArchivoJSON(nombreArchivo)) {
-    const fileRead = new FileReader();
-    procesarArchivoJSON(fileRead, fileUpload);
-  } else if (esArchivoXLSX(nombreArchivo)) {
-    const readerXlsx = new FileReader();
-    procesarArchivoXLSX(readerXlsx, fileUpload);
-  } else {
-    message.error("Formato de archivo no compatible");
-  }
-};
-
-const obtenerArchivo = (evento, _cambios) => {
-  const files = evento.target.files;
-  const fileUpload = files[0];
-
-  procesarArchivo(fileUpload);
-};
-
-
 const exportarArchivo = (data) => {
   const modifiedData = data
     .map((obj) => {
@@ -96,7 +48,7 @@ const exportarArchivo = (data) => {
         height: obj.height,
         depth: obj.depth,
         price: parseFloat(obj.price).toFixed(2),
-        archived: obj.archived,
+        // archived: obj.archived,
         // id: obj._id,
         // fecha1: obj.createdAt,
         // fecha2: obj.updatedAt,
@@ -112,4 +64,4 @@ const exportarArchivo = (data) => {
   saveAs(blob, "libreria_Sola.xlsx");
 };
 
-export { obtenerArchivo, exportarArchivo };
+export { procesarArchivoXLSX, exportarArchivo };
