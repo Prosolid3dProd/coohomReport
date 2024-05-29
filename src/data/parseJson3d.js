@@ -1004,8 +1004,6 @@ export const parseJson3D = async (json) => {
     const modelCabinetArray = [];
     const materialCabinetArray = [];
 
-    const drawerGlobal = [];
-
     let opening;
     let zocalo = 0;
     let arrZocalos = [];
@@ -1303,9 +1301,9 @@ export const parseJson3D = async (json) => {
                     materialDoor: item4.textureName,
                   };
                   // console.log(puertasInfo)
-                  const tapasTiradores = item4.subModels.filter(
-                    (ti) => ti.customCode == "202" || ti.customCode == "203"
-                  );
+                  // const tapasTiradores = item4.subModels.filter(
+                  //   (ti) => ti.customCode == "202" || ti.customCode == "203"
+                  // );
                   // console.log(tapasTiradores)
                 }
               });
@@ -1328,7 +1326,7 @@ export const parseJson3D = async (json) => {
             cajonesInfo = null;
           }
 
-                extra = {
+          extra = {
             ...armazonInfo,
             ...puertasInfo,
             ...cajonesInfo,
@@ -1352,20 +1350,64 @@ export const parseJson3D = async (json) => {
             cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
             materialDrawerArray.push(cajonesInfo?.materialDrawer);
 
+          // item.subModels.map((filtroModelDoor) => {
+          //   if (String(filtroModelDoor.customCode).trim() === "1001") {
+          //     filtroModelDoor.subModels.map((puertaGav) => {
+          //       if (
+          //         String(puertaGav.customCode).trim().substring(0, 2) ===
+          //         CONFIG.CUSTOMCODE.DOOR
+          //       ) {
+          //         console.log(puertaGav);
+          //         puertasInfo?.modelDoor &&
+          //           puertasInfo?.modelDoor !== "undefined" &&
+          //           puertasInfo?.modelDoor?.indexOf("Cajon") === -1 &&
+          //           puertasInfo?.modelDoor?.indexOf("Gaveta") === -1 &&
+          //           puertasInfo?.modelDoor?.indexOf("Mural") === -1 &&
+          //           puertasInfo?.modelDoor?.indexOf("Sola") === -1 &&
+          //           puertasInfo?.modelDoor?.indexOf("Corte") === -1 &&
+          //           modelDoorArray.push(puertasInfo?.modelDoor);
+          //         // console.log(modelDoorArray);
+          //       }
+          //     });
+          //   }
+          //   if (
+          //     String(filtroModelDoor.customCode).trim().substring(0, 2) ===
+          //     CONFIG.CUSTOMCODE.DOOR
+          //   ) {
+          //     console.log(filtroModelDoor);
+          //     puertasInfo?.modelDoor &&
+          //       puertasInfo?.modelDoor !== "undefined" &&
+          //       puertasInfo?.modelDoor?.indexOf("Cajon") === -1 &&
+          //       puertasInfo?.modelDoor?.indexOf("Gaveta") === -1 &&
+          //       puertasInfo?.modelDoor?.indexOf("Mural") === -1 &&
+          //       puertasInfo?.modelDoor?.indexOf("Sola") === -1 &&
+          //       puertasInfo?.modelDoor?.indexOf("Corte") === -1 &&
+          //       modelDoorArray.push(puertasInfo?.modelDoor);
+          //     console.log(modelDoorArray);
+          //   }
+          // });
+
+          //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
-            if (
+            const isCustomCode1001 =
+              String(filtroModelDoor.customCode).trim() === "1001";
+            const isDoorCustomCode =
               String(filtroModelDoor.customCode).trim().substring(0, 2) ===
-              CONFIG.CUSTOMCODE.DOOR
-            ) {
-              puertasInfo?.modelDoor &&
+              CONFIG.CUSTOMCODE.DOOR;
+
+            if (isCustomCode1001 || isDoorCustomCode) {
+              if (
+                puertasInfo?.modelDoor &&
                 puertasInfo?.modelDoor !== "undefined" &&
-                puertasInfo?.modelDoor?.indexOf("Cajon") === -1 &&
-                puertasInfo?.modelDoor?.indexOf("Gaveta") === -1 &&
-                puertasInfo?.modelDoor?.indexOf("Mural") === -1 &&
-                puertasInfo?.modelDoor?.indexOf("Sola") === -1 &&
-                puertasInfo?.modelDoor?.indexOf("Corte") === -1 &&
+                !puertasInfo?.modelDoor.includes("Cajon") &&
+                !puertasInfo?.modelDoor.includes("Gaveta") &&
+                !puertasInfo?.modelDoor.includes("Mural") &&
+                !puertasInfo?.modelDoor.includes("Sola") &&
+                !puertasInfo?.modelDoor.includes("Corte")
+              ) {
                 modelDoorArray.push(puertasInfo?.modelDoor);
-              // console.log(modelDoorArray);
+                // console.log(modelDoorArray);
+              }
             }
           });
 
@@ -1409,7 +1451,6 @@ export const parseJson3D = async (json) => {
                 armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Corte") === -1;
               materialCabinetArray.push(armazonInfo?.materialCabinet);
-              drawerGlobal.push(modeloDrawer);
               // console.log(materialCabinetArray);
             }
           });
@@ -1466,15 +1507,14 @@ export const parseJson3D = async (json) => {
                 }
               });
             }
-
             if (
-              customCodeSubstring === CONFIG.CUSTOMCODE.DRAWER ||
+              (item.customCode !== "1002" &&
+                customCodeSubstring === CONFIG.CUSTOMCODE.DRAWER) ||
               item.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO
             ) {
               frente = traerFrente(item);
 
               const perfil = getPerfil(frente.datos.subModels);
-
               drawerMaterialDetails.push({
                 tipo: frente.tipo,
                 Acabado: frente.datos.textureName,
@@ -1680,13 +1720,13 @@ export const parseJson3D = async (json) => {
           String(cabinet.modelProductNumber).toLocaleUpperCase() ===
             "ACCESORIOS"
         ) {
-          for (const reference of item.parameters) {
-            if (reference.name === "Cantidad") {
-              cabinet.quantity = parseFloat(reference.value);
-            }
-            if (reference.name === "price") {
-              cabinet.total = parseFloat(reference.value);
-            }
+          const cantidad = item.parameters.find((c) => c.name === "Cantidad");
+          const precio = item.parameters.find((p) => p.name === "price");
+          if (cantidad && cabinet.quantity === undefined) {
+            cabinet.quantity = parseFloat(cantidad.value);
+          }
+          if (precio && cabinet.total === undefined) {
+            cabinet.total = parseFloat(precio.value);
           }
         }
       }
@@ -1764,14 +1804,10 @@ export const parseJson3D = async (json) => {
       materialDrawer: quitarDuplicados(materialDrawerArray)
         .toString()
         .replace(/,/g, " / "),
-      modelDoor: quitarDuplicados(
-        modelDoorArray
-      ) /**-------------------------- */
+      modelDoor: quitarDuplicados(modelDoorArray)
         .toString()
         .replace(/,/g, " / "),
-      materialDoor: quitarDuplicados(
-        materialDoorArray
-      ) /**-------------------------- */
+      materialDoor: quitarDuplicados(materialDoorArray)
         .toString()
         .replace(/,/g, " / "),
       modelCabinet: quitarDuplicados(modelCabinetArray)
