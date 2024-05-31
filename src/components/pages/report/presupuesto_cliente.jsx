@@ -455,7 +455,6 @@ const Presupuesto_Cliente = ({
                         fontSize: "8",
                       }}
                     >
-                      {console.log(data)}
                       Cajón:
                     </Text>
                     <Text

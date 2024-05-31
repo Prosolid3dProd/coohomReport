@@ -53,31 +53,6 @@ const Actions = ({
     }
   };
 
-  // const handleChangeJSON = async (info) => {
-  //   setLoading(true);
-
-  //   const newData = await parseJson3D(info);
-  //   const existingIndex = data.findIndex(
-  //     (item) => item.orderCode === newData.orderCode
-  //   );
-  //   if (existingIndex !== -1) {
-  //     let dataS = [...data];
-  //     dataS.splice(existingIndex, 1);
-  //     const upData = await createOrder(newData);
-  //     const updatedData = [upData.result, ...dataS];
-  //     message.success(upData.result.projectName + " actualizado correctamente");
-  //     setData(updatedData);
-  //   } else {
-  //     const order = await createOrder(newData);
-  //     message.success(order.result.projectName + " agregado correctamente");
-  //     setData((prevData) => {
-  //       const updatedData = [order.result, ...prevData];
-  //       return updatedData;
-  //     });
-  //   }
-  //   setLoading(false);
-  // };
-
   const handleChangeJSON = async (info) => {
     setLoading(true);
 
@@ -135,6 +110,7 @@ const Actions = ({
     },
     onChange: handleChange,
   };
+
   window.onresize = () =>
     setScreenWidth((width) => (width = window.innerWidth));
 
@@ -208,7 +184,6 @@ const Exportar = ({ file }) => {
             text={
               <>
                 <input
-                  //accept=".json"
                   className="hidden z-10"
                   onClick={file}
                 />

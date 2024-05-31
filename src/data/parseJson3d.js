@@ -273,7 +273,6 @@ const traerFrente = (block) => {
   if (String(block.customCode) === CONFIG.CUSTOMCODE.FRENTE_FIJO) {
     frente = block;
     tipo = "frente";
-    console.log(block, "FRENTE");
   } else {
     block.subModels?.forEach((item) => {
       if (item && item.subModels && item.subModels.length > 0) {
@@ -398,15 +397,14 @@ const getRef = (parametros, reference) => {
       ) {
         reference.type = CONFIG.MODELNAME.MURALES.CODE;
       }
-      // console.log(parametros.modelName + "----" + item.value)
-      // if (
-      //   String(item.value)
-      //     .toLocaleUpperCase()
-      //     .indexOf(CONFIG.MODELNAME.FORRADO.CODE) > -1
-      // ) {
-      //   console.log(parametros.modelName + "----" + item.value)
-      //   reference.type = CONFIG.MODELNAME.FORRADO.CODE;
-      // }
+
+      if (
+        String(newItemValue)
+          .toLocaleUpperCase()
+          .indexOf(CONFIG.MODELNAME.FORRADO.CODE) > -1
+      ) {
+        reference.type = CONFIG.MODELNAME.FORRADO.CODE;
+      }
     }
 
     if (
@@ -634,24 +632,6 @@ const getInfoCabinet = (submodels) => {
   });
   return values;
 };
-
-// const getInfoArmazon = (submodels) => {
-//   let values = {
-//     materialCabinet: null,
-//     modelCabinet: null,
-//   };
-
-//   submodels.forEach((item) => {
-//     if (String(item.customCode).substring(0, 4) === CONFIG.CUSTOMCODE.CASCO) {
-//       values = {
-//         material: item.textureName,
-//         modelo: item.modelName,
-//       };
-//     }
-//   });
-//   // console.log(values.materialCabinet)
-//   return values;
-// };
 
 const getInfoDrawer = (submodels) => {
   let modelDrawer = null;
@@ -973,19 +953,14 @@ export const parseJson3D = async (json) => {
     let contador = 0;
     let contador2 = 0;
     var cabinets = [];
-    // let tiradores = [];
     let door;
     let cabinet;
     let armazonInfo;
     let extra;
-    //  let extraArray = [];
     let puertasInfo;
     let cajonesInfo;
     let validarDoor = false;
-    // let validarCabinet = false;
     let drawer;
-    //let doorDrawer;
-    // let validarDrawer = false;
     let total = 0;
     let modelDrawer = null;
     let modeloDrawer = null;
@@ -1009,10 +984,8 @@ export const parseJson3D = async (json) => {
     let arrZocalos = [];
     let arrEncimeras = [];
     let tiradoresCabecera = [];
-    // let quantityCT;
 
     json.paramModel?.forEach((item) => {
-      // console.log(item)
       let materialCostado = "";
       let materialRegleta = "";
       let materialRegletaF = "";
@@ -1350,43 +1323,6 @@ export const parseJson3D = async (json) => {
             cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
             materialDrawerArray.push(cajonesInfo?.materialDrawer);
 
-          // item.subModels.map((filtroModelDoor) => {
-          //   if (String(filtroModelDoor.customCode).trim() === "1001") {
-          //     filtroModelDoor.subModels.map((puertaGav) => {
-          //       if (
-          //         String(puertaGav.customCode).trim().substring(0, 2) ===
-          //         CONFIG.CUSTOMCODE.DOOR
-          //       ) {
-          //         console.log(puertaGav);
-          //         puertasInfo?.modelDoor &&
-          //           puertasInfo?.modelDoor !== "undefined" &&
-          //           puertasInfo?.modelDoor?.indexOf("Cajon") === -1 &&
-          //           puertasInfo?.modelDoor?.indexOf("Gaveta") === -1 &&
-          //           puertasInfo?.modelDoor?.indexOf("Mural") === -1 &&
-          //           puertasInfo?.modelDoor?.indexOf("Sola") === -1 &&
-          //           puertasInfo?.modelDoor?.indexOf("Corte") === -1 &&
-          //           modelDoorArray.push(puertasInfo?.modelDoor);
-          //         // console.log(modelDoorArray);
-          //       }
-          //     });
-          //   }
-          //   if (
-          //     String(filtroModelDoor.customCode).trim().substring(0, 2) ===
-          //     CONFIG.CUSTOMCODE.DOOR
-          //   ) {
-          //     console.log(filtroModelDoor);
-          //     puertasInfo?.modelDoor &&
-          //       puertasInfo?.modelDoor !== "undefined" &&
-          //       puertasInfo?.modelDoor?.indexOf("Cajon") === -1 &&
-          //       puertasInfo?.modelDoor?.indexOf("Gaveta") === -1 &&
-          //       puertasInfo?.modelDoor?.indexOf("Mural") === -1 &&
-          //       puertasInfo?.modelDoor?.indexOf("Sola") === -1 &&
-          //       puertasInfo?.modelDoor?.indexOf("Corte") === -1 &&
-          //       modelDoorArray.push(puertasInfo?.modelDoor);
-          //     console.log(modelDoorArray);
-          //   }
-          // });
-
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
             const isCustomCode1001 =
@@ -1406,7 +1342,6 @@ export const parseJson3D = async (json) => {
                 !puertasInfo?.modelDoor.includes("Corte")
               ) {
                 modelDoorArray.push(puertasInfo?.modelDoor);
-                // console.log(modelDoorArray);
               }
             }
           });
@@ -1424,7 +1359,6 @@ export const parseJson3D = async (json) => {
                 puertasInfo?.materialDoor?.indexOf("Mural") === -1 &&
                 puertasInfo?.materialDoor?.indexOf("Corte") === -1 &&
                 materialDoorArray.push(puertasInfo?.materialDoor);
-              // console.log(materialDoorArray);
             }
           });
 
@@ -1451,7 +1385,6 @@ export const parseJson3D = async (json) => {
                 armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Corte") === -1;
               materialCabinetArray.push(armazonInfo?.materialCabinet);
-              // console.log(materialCabinetArray);
             }
           });
 
@@ -1477,7 +1410,6 @@ export const parseJson3D = async (json) => {
           let drawerMaterialDetails = [];
           let frente;
 
-          // console.log(item, "ITEM");
           item.subModels?.forEach((item) => {
             const customCodeSubstring = String(item.customCode).substring(0, 2);
             if (customCodeSubstring === CONFIG.CUSTOMCODE.DOOR) {
@@ -1612,22 +1544,21 @@ export const parseJson3D = async (json) => {
                   ...extra,
                 });
               }
-              console.log(item);
             });
 
           // const casco = item.subModels.find((x) =>
           //   x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
           // );
           // console.log(casco, "CASCO");
+
           let nameFinal = item.modelName;
           if (String(item.modelName).indexOf("L") > -1) {
-            //quitar los ultimoss 4 digitos y eliminar los guiones
+            //quitar los ultimos 4 digitos y eliminar los guiones
 
             nameFinal = String(item.modelName)
               .substring(0, String(item.modelName).length - 5)
               .replace(/-/g, "");
           }
-
           // nameFinal.toUpperCase().includes("LINERO")
           //   ? (armazonInfo = {
           //       materialCabinet: item.textureName,
@@ -1652,7 +1583,6 @@ export const parseJson3D = async (json) => {
               "COMPLEMENTOS"
             )
               isComplement = true;
-            // console.log(item);
             cabinets.push({
               ...items,
               obsBrandGoodId: item.obsBrandGoodId,
@@ -1824,14 +1754,10 @@ export const parseJson3D = async (json) => {
       designerName: json.partnerOrder?.designerName || "",
       storeName: json.partnerOrder?.storeName || "",
     };
-
     return orderJson;
-
-    // console.log(orderJson, "orderJSon");
 
     // const res = await createOrder(orderJson);
     // const { result, message: messageResult } = res;
-    // console.log(result, "res");
 
     // if (result && result._id) {
     //   message.success(messageResult);
