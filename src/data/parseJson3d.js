@@ -1,9 +1,4 @@
-// Funciones para obtener los valores de los muebles
-import { Empty, message } from "antd";
-import { createOrder } from "../handlers/order";
-
 import { CONFIG } from "../data/constants";
-import { FormItemInputContext } from "antd/es/form/context";
 
 // const zocalosw = [
 //   {
@@ -267,68 +262,63 @@ import { FormItemInputContext } from "antd/es/form/context";
 // };
 
 const traerFrente = (block) => {
-  let frente;
-  let tipo;
+  const FRENTE_FIJO = String(CONFIG.CUSTOMCODE.FRENTE_FIJO);
+  const DOOR_PREFIX = String(CONFIG.CUSTOMCODE.DOOR);
 
-  if (String(block.customCode) === CONFIG.CUSTOMCODE.FRENTE_FIJO) {
-    frente = block;
-    tipo = "frente";
-  } else {
-    block.subModels?.forEach((item) => {
-      if (item && item.subModels && item.subModels.length > 0) {
-        if (
-          String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DOOR ||
-          String(item.customCode) === CONFIG.CUSTOMCODE.FRENTE_FIJO
-        ) {
-          frente = item;
-          tipo = "cajon";
-        }
+  if (String(block.customCode) === FRENTE_FIJO) {
+    return { datos: block, tipo: "frente" };
+  }
+
+  const findFrente = (subModels) => {
+    if (!subModels) return undefined;
+
+    return subModels.find((item) => {
+      const customCode = String(item.customCode);
+      if (item.subModels && item.subModels.length > 0) {
+        return customCode.startsWith(DOOR_PREFIX) || customCode === FRENTE_FIJO;
       }
+      return false;
     });
+  };
+
+  const frente = findFrente(block.subModels);
+  if (frente) {
+    return { datos: frente, tipo: "cajon" };
   }
-  if (frente === undefined) {
-    return { datos: {}, tipo: "" };
-  }
-  return { datos: frente, tipo };
+
+  return { datos: {}, tipo: "" };
 };
 
 const getPrice = (parametros, tipo, materialCasco) => {
-  //el tipo traera cuando es casco con "cabinet" y cuando es un cajón la altura de este para calcular el precio con su altura y el resto undefined
+  const isCabinet = tipo === "cabinet";
+  const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
+
   let price = 0;
-  let cogerParametro;
-  tipo == "cabinet"
-    ? (cogerParametro = CONFIG.PRICE)
-    : (cogerParametro = "PTOTAL");
 
-  parametros.parameters?.forEach((item) => {
-    if (String(item.name).toUpperCase() === cogerParametro) {
-      price = parseFloat(item.value);
-    }
-  });
+  const findPrice = (items) => {
+    return items?.find(
+      (item) => String(item.name).toUpperCase() === cogerParametro
+    )?.value;
+  };
 
-  parametros.ignoreParameters?.forEach((item) => {
-    if (String(item.name).toUpperCase() === cogerParametro) {
-      price = parseFloat(item.value);
-    }
-  });
+  const priceFromParameters = findPrice(parametros.parameters);
+  const priceFromIgnoreParameters = findPrice(parametros.ignoreParameters);
 
-  if (tipo != undefined && tipo != "cabinet" && tipo >= 210) {
-    // tipo!=undefined && tipo !=cabinet, quiere decir que es cajon(la puerta trae el valor como undefined,el casco lo trae como "cabinet" y el cajon un number)
+  price = parseFloat(priceFromParameters || priceFromIgnoreParameters || 0);
 
-    price = parseFloat(price) + 25;
-  } else if (tipo != undefined && tipo != "cabinet" && tipo < 210) {
-    price = parseFloat(price) + 15;
+  if (tipo !== undefined && !isCabinet) {
+    price += tipo >= 210 ? 25 : 15;
   }
 
-  if (
-    tipo === "cabinet" &&
+  const needsMaterialSurcharge =
+    isCabinet &&
     materialCasco !== "00-ANTRACITA" &&
-    materialCasco !== "01-BLANCO"
-  ) {
-    price = price + (price * 6) / 100;
+    materialCasco !== "01-BLANCO";
+  if (needsMaterialSurcharge) {
+    price += price * 0.06;
   }
 
-  return parseFloat(price).toFixed(2);
+  return price.toFixed(2);
 };
 
 const getRef = (parametros, reference) => {
