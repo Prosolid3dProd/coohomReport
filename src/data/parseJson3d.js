@@ -330,7 +330,7 @@ const getRef = (parametros, reference) => {
     const trimmedValue = value.trim();
     const upperValue = trimmedValue.toLocaleUpperCase();
 
-    if (upperValue.startsWith(CONFIG.MODELNAME.SOBREENCIMERAS.CODE)) {
+    if (upperValue.includes(CONFIG.MODELNAME.SOBREENCIMERAS.CODE)) {
       reference.type = CONFIG.MODELNAME.MURALES.CODE;
     } else if (upperValue.startsWith(CONFIG.MODELNAME.FORRADO.CODE)) {
       reference.type = CONFIG.MODELNAME.FORRADO.CODE;
