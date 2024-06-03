@@ -402,38 +402,6 @@ const getRef = (parametros, reference) => {
   return reference;
 };
 
-// const getDoors = (submodels) => {
-//   console.log(submodels);
-//   let values = {};
-//   submodels.forEach((item) => {
-//     if (
-//       String(item.customCode).trim().substring(0, 2) === CONFIG.CUSTOMCODE.DOOR
-//     ) {
-//       let perfil;
-//       //ESE TIPO DE PUERTAS LLEVAN UN PERFIL Y HAY QUE SUMARLE EL PRECIO DE ESTE A LA PUERTA
-//       if (
-//         String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("PURA") !==
-//           -1 ||
-//         String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("GP") !==
-//           -1 ||
-//         String(item.modelBrandGoodName)
-//           .toLocaleUpperCase()
-//           .indexOf("MONTEA") !== -1
-//       ) {
-//         perfil = getPerfil(item.subModels);
-//       }
-//       values = {
-//         price: parseFloat(getPrice(item)) + parseFloat(perfil?.price || 0),
-//         // price: parseFloat(getPrice(item)) + perfil?.price !== undefined ? parseFloat(perfil?.price) : 0,
-//         material: item.textureName,
-//         name: item.modelProductNumber,
-//         acabadoTirador: perfil?.acabado || "",
-//       };
-//     }
-//   });
-//   return values;
-// };
-
 const getDoors = (submodels) => {
   let values = {};
 
@@ -466,54 +434,91 @@ const getDoors = (submodels) => {
   return values;
 };
 
+//----------------------------------------------------------------
+
+// const getInfoDoor = (submodels) => {
+//   console.log(submodels);
+//   let values = {
+//     materialDoor: null,
+//     modelDoor: null,
+//   };
+
+//   submodels.forEach((item) => {
+//     if (
+//       String(item.customCode).trim().substring(0, 2) ===
+//       CONFIG.CUSTOMCODE.DRAWER
+//     ) {
+//       item.subModels.forEach((item2) => {
+//         if (
+//           String(item2.customCode).trim().substring(0, 2) ===
+//           CONFIG.CUSTOMCODE.DOOR
+//         ) {
+//           values = {
+//             materialDoor: String(item2.textureName),
+//             modelDoor: String(item2.modelProductNumber),
+//             handler: getInfoHandler(item.subModels),
+//           };
+//         }
+//       });
+//     }
+//     if (
+//       String(item.customCode).trim().substring(0, 2) === CONFIG.CUSTOMCODE.DOOR
+//     ) {
+//       values = {
+//         materialDoor: String(item.textureName),
+//         modelDoor: String(item.modelProductNumber),
+//         handler: getInfoHandler(item.subModels),
+//       };
+//     }
+//   });
+//   return values;
+// };
 const getInfoDoor = (submodels) => {
   let values = {
     materialDoor: null,
     modelDoor: null,
+    handler: null,
+  };
+
+  const updateValues = (item) => {
+    values.materialDoor = String(item.textureName);
+    values.modelDoor = String(item.modelProductNumber);
+    values.handler = getInfoHandler(item.subModels);
   };
 
   submodels.forEach((item) => {
-    if (
-      String(item.customCode).trim().substring(0, 2) ===
-      CONFIG.CUSTOMCODE.DRAWER
-    ) {
+    const customCode = String(item.customCode).trim().substring(0, 2);
+
+    if (customCode === CONFIG.CUSTOMCODE.DRAWER) {
       item.subModels.forEach((item2) => {
         if (
           String(item2.customCode).trim().substring(0, 2) ===
           CONFIG.CUSTOMCODE.DOOR
         ) {
-          values = {
-            materialDoor: String(item2.textureName),
-            modelDoor: String(item2.modelProductNumber),
-            handler: getInfoHandler(item.subModels),
-          };
+          updateValues(item2);
         }
       });
-    }
-    if (
-      String(item.customCode).trim().substring(0, 2) === CONFIG.CUSTOMCODE.DOOR
-    ) {
-      values = {
-        materialDoor: String(item.textureName),
-        modelDoor: String(item.modelProductNumber),
-        handler: getInfoHandler(item.subModels),
-      };
+    } else if (customCode === CONFIG.CUSTOMCODE.DOOR) {
+      updateValues(item);
     }
   });
   return values;
 };
+//----------------------------------------------------------------
 
 const getInfoHandler = (submodels) => {
   let handler = "";
 
-  submodels?.forEach((item) => {
-    if (
-      String(item.customCode).trim().substring(0, 2) ===
-      CONFIG.CUSTOMCODE.HANDLER
-    ) {
-      handler = item.modelBrandGoodName;
-    }
-  });
+  if (submodels) {
+    submodels.forEach((item) => {
+      if (
+        String(item.customCode).trim().substring(0, 2) ===
+        CONFIG.CUSTOMCODE.HANDLER
+      ) {
+        handler = item.modelBrandGoodName;
+      }
+    });
+  }
   return handler;
 };
 
@@ -524,44 +529,43 @@ const getInfoCabinet = (submodels) => {
   };
 
   submodels.forEach((item) => {
-    if (
-      String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 ||
-      String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==
-        -1
-    ) {
-      values = {
-        materialCabinet: item.textureName,
-      };
-    }
+    const modelNameUpper = String(item.modelName).toLocaleUpperCase();
+    const modelBrandGoodNameUpper = String(
+      item.modelBrandGoodName
+    ).toLocaleUpperCase();
+    const customCode = String(item.customCode).trim().substring(0, 2);
 
     if (
-      String(item.customCode).trim().substring(0, 2) === CONFIG.CUSTOMCODE.CASCO
+      modelNameUpper.includes("CASCO") ||
+      modelBrandGoodNameUpper.includes("CASCO") ||
+      customCode === CONFIG.CUSTOMCODE.CASCO
     ) {
-      values = {
-        materialCabinet: item.textureName,
-      };
+      values.materialCabinet = item.textureName;
+      //El modelCabinet no se deberia de reasignar, tendria que ser null (cambio)
+      values.modelCabinet = item.modelProductNumber;
     }
   });
   return values;
 };
 
 const getInfoDrawer = (submodels) => {
-  let modelDrawer = null;
-  let textureDrawer = null;
-  let materialDrawer = null;
+  let values = {
+    modelDrawer: null,
+    textureDrawer: null,
+    materialDrawer: null,
+  };
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DRAWER) {
-      modelDrawer = item.modelBrandGoodName;
-      textureDrawer = item.textureName;
-      materialDrawer = item.textureName;
+      //Esto antes se pasaba igualando las variables y luego haciendo un objeto en el return con las 3 variables (cambio)
+      values = {
+        modelDrawer: item.modelBrandGoodName,
+        textureDrawer: item.textureName,
+        materialDrawer: item.textureName,
+      };
     }
   });
-  return {
-    modelDrawer,
-    textureDrawer,
-    materialDrawer,
-  };
+  return values;
 };
 
 const getPerfil = (perf) => {
@@ -569,7 +573,18 @@ const getPerfil = (perf) => {
   let priceTapa = 0;
   let acabado = undefined;
 
-  if (perf !== undefined) {
+  const getPriceFromParameters = (parameters, ignoreParameters) => {
+    let price = 0;
+    const allParameters = [...(parameters || []), ...(ignoreParameters || [])];
+    allParameters.forEach((item) => {
+      if (String(item.name).toUpperCase() === CONFIG.PRICE) {
+        price = parseFloat(item.value);
+      }
+    });
+    return price;
+  };
+
+  if (perf) {
     const perfil = perf.find((x) =>
       String(x.modelBrandGoodName).toLocaleUpperCase().includes("PERFIL")
     );
@@ -577,40 +592,25 @@ const getPerfil = (perf) => {
       String(x.modelBrandGoodName).toLocaleUpperCase().includes("TAPA")
     );
 
-    if (perfil != undefined) {
-      perfil.parameters?.forEach((item) => {
-        if (String(item.name).toUpperCase() === CONFIG.PRICE) {
-          price = parseFloat(item.value);
-        }
-      });
-
-      perfil.ignoreParameters?.forEach((item) => {
-        if (String(item.name).toUpperCase() === CONFIG.PRICE) {
-          price = parseFloat(item.value);
-        }
-      });
+    if (perfil) {
+      price = getPriceFromParameters(
+        perfil.parameters,
+        perfil.ignoreParameters
+      );
       acabado = perfil.textureName;
     }
 
-    if (tapa !== undefined) {
-      tapa.parameters?.forEach((item) => {
-        if (String(item.name).toUpperCase() === CONFIG.PRICE) {
-          priceTapa = parseFloat(item.value);
-        }
-      });
-
-      tapa.ignoreParameters?.forEach((item) => {
-        if (String(item.name).toUpperCase() === CONFIG.PRICE) {
-          priceTapa = parseFloat(item.value);
-        }
-      });
+    if (tapa) {
+      priceTapa = getPriceFromParameters(
+        tapa.parameters,
+        tapa.ignoreParameters
+      );
     }
   }
   return {
-    price: parseFloat(price) + parseFloat(priceTapa),
-    acabado: acabado,
+    price: price + priceTapa,
+    acabado,
   };
-  // return parseFloat(price) + parseFloat(priceTapa);
 };
 
 const getTotalDoors = (submodels) => {
@@ -618,24 +618,25 @@ const getTotalDoors = (submodels) => {
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DOOR) {
-      let perfil;
-      //ESE TIPO DE PUERTAS LLEVAN UN PERFIL Y HAY QUE SUMARLE EL PRECIO DE ESTE A LA PUERTA
+      let perfilPrice = 0;
+
+      // ESE TIPO DE PUERTAS LLEVAN UN PERFIL Y HAY QUE SUMARLE EL PRECIO DE ESTE A LA PUERTA
+      const brandNameUpper = String(
+        item.modelBrandGoodName
+      ).toLocaleUpperCase();
       if (
-        String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("PURA") !==
-          -1 ||
-        String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("GP") !==
-          -1 ||
-        String(item.modelBrandGoodName)
-          .toLocaleUpperCase()
-          .indexOf("MONTEA") !== -1
+        brandNameUpper.includes("PURA") ||
+        brandNameUpper.includes("GP") ||
+        brandNameUpper.includes("MONTEA")
       ) {
-        perfil = getPerfil(item.subModels);
+        const perfil = getPerfil(item.subModels);
+        perfilPrice = parseFloat(perfil?.price || 0);
       }
-      total =
-        parseFloat(getPrice(item)) + total + parseFloat(perfil?.price || 0);
+
+      total += parseFloat(getPrice(item)) + perfilPrice;
     }
   });
-  return parseFloat(total).toFixed(2);
+  return total.toFixed(2);
 };
 
 const getParameters = (param, tipoMueble) => {
@@ -645,97 +646,66 @@ const getParameters = (param, tipoMueble) => {
     x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
   );
 
-  if (casco !== undefined) {
+  if (casco) {
     const mcv = casco.subModels.find((x) => {
       const upperCaseModelName = x.modelName?.toLocaleUpperCase();
-
-      if (upperCaseModelName) {
-        if (
-          upperCaseModelName.includes("VISTO IZQ") ||
+      return upperCaseModelName &&
+        (upperCaseModelName.includes("VISTO IZQ") ||
           upperCaseModelName.includes("VISTO DER") ||
-          upperCaseModelName.includes("AMBOS")
-        ) {
-          return x.textureName;
-        }
-      }
+          upperCaseModelName.includes("AMBOS"))
+        ? x.textureName
+        : undefined;
     });
+
     const cv = casco.parameters.find((x) =>
-      x.name == "CV" && x.value > 0 ? x.value : undefined
+      x.name === "CV" && x.value > 0 ? x.value : undefined
     );
-    if (cv !== undefined) {
+
+    if (cv) {
       op.push({
         name: cv.displayName || null,
         value: parseFloat(cv.value) || null,
         description: cv.description || null,
-        nameValue: cv.optionValues[cv.options?.indexOf(cv.value)].name || null,
-        mcv: mcv.textureName || null,
+        nameValue:
+          cv.optionValues?.[cv.options?.indexOf(cv.value)]?.name || null,
+        mcv: mcv?.textureName || null,
       });
     }
   }
-  param.parameters.forEach((item) => {
-    //para quitar las variante que vienen activas por defecto
 
-    let bool = true;
-    if (
-      String(item.name) === "CIZ" ||
-      String(item.name) === "ELEC" ||
-      String(item.name) === "CVI" ||
-      String(item.name) === "CPI" ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "ME") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "MPF2P") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "PE") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "ME") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "MPF2P") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "PE") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "MTCEC") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "UM")
-      /* String(item.name) == "ME" ||
-      String(item.name) === "MPF2P" ||
-      String(item.name) === "PE" ||
-      String(item.name) === "MTCEC" ||
-      String(item.name) === "UM" ||
-      */
-    ) {
-      bool = false;
-    }
-    if (item.name == "FSK" && item.value < 0) {
+  const isMuebleTipoB = tipoMueble === "B";
+  const isMuebleTipoA = tipoMueble === "A";
+
+  const excludedNames = [
+    "CIZ",
+    "ELEC",
+    "CVI",
+    "CPI",
+    ...(isMuebleTipoB ? ["ME", "MPF2P", "PE"] : []),
+    ...(isMuebleTipoA ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
+  ];
+
+  param.parameters.forEach((item) => {
+    const itemName = String(item.name);
+
+    if (excludedNames.includes(itemName)) return;
+
+    if (itemName === "FSK" && item.value < 0) {
       op.push({
         name: item.displayName,
         value: parseFloat(item.value),
         description: item.description,
-        nameValue: item.optionValues[item.options?.indexOf(item.value)].name,
+        nameValue: item.optionValues?.[item.options?.indexOf(item.value)]?.name,
       });
-    } else if (
-      parseFloat(item.value) > 0 &&
-      item.description !== null &&
-      item.description !== "" &&
-      bool
-    ) {
-      let nameValue;
-      if (item.options.length > 2) {
-        nameValue = item.optionValues[item.options?.indexOf(item.value)].name;
-      }
+    } else if (parseFloat(item.value) > 0 && item.description) {
       op.push({
         name: item.displayName,
         value: parseFloat(item.value),
         description: item.description,
-        nameValue,
+        nameValue:
+          item.options.length > 2
+            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+            : undefined,
       });
     }
   });
@@ -744,118 +714,66 @@ const getParameters = (param, tipoMueble) => {
 
 const getPriceParameters = (param, tipoMueble) => {
   let precioVariant = 0;
+
+  const excludedNames = [
+    "CIZ",
+    "ELEC",
+    "CVI",
+    "CPI",
+    ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
+    ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
+  ];
+
   param.forEach((item) => {
-    //borrar
-    let bool = true;
+    const itemName = String(item.name);
 
-    if (
-      String(item.name) === "CIZ" ||
-      String(item.name) === "ELEC" ||
-      String(item.name) === "CVI" ||
-      String(item.name) === "CPI" ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "ME") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "MPF2P") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "PE") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "ME") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "MPF2P") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "PE") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "MTCEC") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "UM")
-      /* String(item.name) == "ME" ||
-      String(item.name) === "MPF2P" ||
-      String(item.name) === "PE" ||
-      String(item.name) === "MTCEC" ||
-      String(item.name) === "UM" ||
-      */
-    ) {
-      bool = false;
-    }
+    if (excludedNames.includes(itemName)) return;
 
-    if (
-      parseFloat(item.value) > 0 &&
-      item.description !== null &&
-      item.description !== "" &&
-      bool
-    ) {
+    if (parseFloat(item.value) > 0 && item.description) {
       precioVariant += parseFloat(item.value);
     }
-
-    //borrar
   });
   return parseFloat(precioVariant).toFixed(2);
 };
 
 const getCalculoFondo = (item) => {
-  let fondoPuerta = CONFIG.FONDOPUERTA;
+  const fondoPuerta = CONFIG.FONDOPUERTA;
   const size = {
-    x: 0,
-    y: 0,
-    z: 0,
+    x: item.boxSize.x,
+    y:
+      item.modelProductNumber &&
+      item.modelProductNumber.toUpperCase() !== "ACCESORIOS"
+        ? item.boxSize.y + fondoPuerta
+        : item.boxSize.y,
+    z: item.boxSize.z,
   };
-
-  // if (
-  //   String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
-  //   item.boxSize.y >= 150 &&
-  //   item.boxSize.y < 700
-  // ) {
-  //   size.y = item.boxSize.y + 2;
-  // } else if (
-  //   String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
-  //   item.boxSize.y >= 700
-  // ) {
-  //   size.y = item.boxSize.y + 4;
-  // } else
-
-  if (String(item.modelProductNumber).toUpperCase() !== "ACCESORIOS") {
-    size.y = item.boxSize.y + fondoPuerta;
-  }
-
-  size.x = item.boxSize.x;
-  size.z = item.boxSize.z;
-
-  /* item.subModels.forEach((item) => {
-      if (String(item.customCode).substring(0, 2) === config.customCode.drawer) {
-        item.subModels?.forEach((item) => {
-          if (item && item.subModels && item.subModels.length > 0) {
-            if (
-              String(item.customCode).substring(0, 2) === config.customCode.door
-            ) {
-              fondoPuerta = item.boxSize.y;
-            }
-          }
-        });
-      } else if (
-        String(item.customCode).substring(0, 2) === config.customCode.door
-      ) 
-        fondoPuerta = item.boxSize.y;
-      }
-    });*/
-
   return size;
 };
 
-const quitarDuplicados = (array) => {
+const removeDuplicates = (array) => {
+  // Se mapea cada elemento del array a mayúsculas y luego se filtran los elementos únicos
   return array
     .map((element) => element.toUpperCase())
     .filter((element, index, self) => {
+      // Se devuelve true solo para el primer índice de cada elemento único
       return self.indexOf(element) === index;
     });
+};
+
+const getPriceZocalo = (item) => {
+  for (const precio of item.ignoreParameters) {
+    if (precio.name === "PRICE") {
+      return parseFloat(precio.value);
+    }
+  }
+};
+
+const getReferenceZocalo = (item) => {
+  for (const reference of item.ignoreParameters) {
+    if (reference.name === "REF") {
+      return String(reference.value);
+    }
+  }
 };
 
 // main
@@ -872,7 +790,7 @@ export const parseJson3D = async (json) => {
     let puertasInfo;
     let cajonesInfo;
     let validarDoor = false;
-    let drawer;
+    // let drawer;
     let total = 0;
     let modelDrawer = null;
     let modeloDrawer = null;
@@ -933,35 +851,20 @@ export const parseJson3D = async (json) => {
         };
       }
 
-      const precioZocalo = (item) => {
-        for (const precio of item.ignoreParameters) {
-          if (precio.name === "PRICE") {
-            return parseFloat(precio.value);
-          }
-        }
-      };
-      const referenceZocalo = (item) => {
-        for (const reference of item.ignoreParameters) {
-          if (reference.name === "REF") {
-            return String(reference.value);
-          }
-        }
-      };
-
       if (item.customCode === CONFIG.CUSTOMCODE.ZOCALOS) {
         arrZocalos.push({
           tipo: "T",
           typeZocalo: "library",
           material: item.textureName,
-          reference: referenceZocalo(item),
+          reference: getReferenceZocalo(item),
           customCode: item.textureCustomCode,
           size: {
             x: item.size.x,
             y: item.size.y,
             z: item.size.z,
           },
-          total: precioZocalo(item),
-          priceCabinet: precioZocalo(item),
+          total: getPriceZocalo(item),
+          priceCabinet: getPriceZocalo(item),
           name: item.modelName,
           obsBrandGoodId: item.obsBrandGoodId,
           quantity: parseInt(item.modelCostInfo.quantity),
@@ -1640,25 +1543,25 @@ export const parseJson3D = async (json) => {
       infoZocalos: arrZocalos || null,
       ...door,
       ...cabinet,
-      modelDrawer: quitarDuplicados(modelDrawerArray)
+      modelDrawer: removeDuplicates(modelDrawerArray)
         .toString()
         .replace(/,/g, " / "),
-      materialDrawer: quitarDuplicados(materialDrawerArray)
+      materialDrawer: removeDuplicates(materialDrawerArray)
         .toString()
         .replace(/,/g, " / "),
-      modelDoor: quitarDuplicados(modelDoorArray)
+      modelDoor: removeDuplicates(modelDoorArray)
         .toString()
         .replace(/,/g, " / "),
-      materialDoor: quitarDuplicados(materialDoorArray)
+      materialDoor: removeDuplicates(materialDoorArray)
         .toString()
         .replace(/,/g, " / "),
-      modelCabinet: quitarDuplicados(modelCabinetArray)
+      modelCabinet: removeDuplicates(modelCabinetArray)
         .toString()
         .replace(/,/g, " / "),
-      materialCabinet: quitarDuplicados(materialCabinetArray)
+      materialCabinet: removeDuplicates(materialCabinetArray)
         .toString()
         .replace(/,/g, " / "),
-      modelHandler: quitarDuplicados(tiradoresCabecera)
+      modelHandler: removeDuplicates(tiradoresCabecera)
         .toString()
         .replace(/,/g, " / "),
       location: json.partnerOrder?.detailAddress || "",
