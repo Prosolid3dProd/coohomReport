@@ -37,8 +37,7 @@ export const createOrder = async (params) => {
         token: Settings.TOKEN,
       }
     );
-    // setLocalOrder(data.data.result)
-    // console.log(data.data.result, "createOrder");
+    console.log(data.data.result, "createOrder");
     return data.data;
   } catch (error) {
     console.log(error);

@@ -435,7 +435,6 @@ const getRef = (parametros, reference) => {
 // };
 
 const getDoors = (submodels) => {
-  console.log(submodels);
   let values = {};
 
   submodels.forEach((item) => {
@@ -461,7 +460,6 @@ const getDoors = (submodels) => {
         name: item.modelProductNumber,
         acabadoTirador: perfil?.acabado || "",
       };
-      console.log(values);
     }
   });
 
