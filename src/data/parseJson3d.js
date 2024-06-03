@@ -335,7 +335,7 @@ const getRef = (parametros, reference) => {
     } else if (upperValue.startsWith(CONFIG.MODELNAME.FORRADO.CODE)) {
       reference.type = CONFIG.MODELNAME.FORRADO.CODE;
     } else if (["RA", "RB", "RM"].includes(trimmedValue.substring(0, 2))) {
-      reference.type = trimmedValue.substring(1, 2);
+      reference.type = "R";
     } else if (trimmedValue.startsWith("AF")) {
       reference.type = "A";
     } else if (["BF", "BP", "BH"].includes(trimmedValue.substring(0, 2))) {
@@ -374,8 +374,8 @@ const getRef = (parametros, reference) => {
     reference.type = "F";
   } else if (modelNameUpper.includes("M.")) {
     reference.type = "M";
-  } else if (modelNameUpper.includes("MURAL")) {
-    reference.type = "M";
+  // } else if (modelNameUpper.includes("MURAL")) {
+  //   reference.type = "M";
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.INTEGRACIONES.NAME) {
     reference.type = CONFIG.MODELNAME.INTEGRACIONES.CODE;
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.REGLETAS.NAME) {
