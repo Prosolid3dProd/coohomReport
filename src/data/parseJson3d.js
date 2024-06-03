@@ -261,7 +261,7 @@ import { CONFIG } from "../data/constants";
 //   return newFootline;
 // };
 
-const traerFrente = (block) => {
+const getFrente = (block) => {
   const FRENTE_FIJO = String(CONFIG.CUSTOMCODE.FRENTE_FIJO);
   const DOOR_PREFIX = String(CONFIG.CUSTOMCODE.DOOR);
 
@@ -322,225 +322,149 @@ const getPrice = (parametros, tipo, materialCasco) => {
 };
 
 const getRef = (parametros, reference) => {
+  // Inicialización de referencia
   reference.ref = parametros.obsBrandGoodId;
   reference.type = "C";
-  parametros.parameters?.forEach((item) => {
-    if (item.name === CONFIG.REF) {
-      reference.ref = String(item.value);
-      reference.type = String(item.value).trim().substring(0, 1);
-      if (
-        String(item.value)
-          .toLocaleUpperCase()
-          .indexOf(CONFIG.MODELNAME.SOBREENCIMERAS.CODE) > -1
-      ) {
-        reference.type = CONFIG.MODELNAME.MURALES.CODE;
-      }
 
-      if (
-        String(item.value)
-          .toLocaleUpperCase()
-          .indexOf(CONFIG.MODELNAME.FORRADO.CODE) > -1
-      ) {
-        reference.type = CONFIG.MODELNAME.FORRADO.CODE;
-      }
+  const updateReference = (value) => {
+    const trimmedValue = value.trim();
+    const upperValue = trimmedValue.toLocaleUpperCase();
 
-      if (
-        String(item.value).trim().substring(0, 2) === "RA" ||
-        String(item.value).trim().substring(0, 2) === "RB" ||
-        String(item.value).trim().substring(0, 2) === "RM"
-      ) {
-        reference.ref = String(item.value);
-        reference.type = String(item.value).trim().substring(1, 2);
-      }
-
-      if (String(item.value).trim().substring(0, 2) === "AF") {
-        reference.ref = String(item.value);
-        reference.type = "A";
-      }
-
-      if (String(item.value).trim().substring(0, 2) === "BF") {
-        reference.ref = String(item.value);
-        reference.type = "B";
-      }
-
-      if (String(item.value).trim().substring(0, 2) === "BP") {
-        reference.ref = String(item.value);
-        reference.type = "B";
-      }
-      if (String(item.value).trim().substring(0, 2) === "BH") {
-        reference.ref = String(item.value);
-        reference.type = "B";
-      }
-    }
-  });
-
-  parametros.ignoreParameters?.forEach((item) => {
-    const newItemValue = item.value.replace(/['"]/g, "");
-    if (item.name === CONFIG.REF) {
-      reference.ref = String(item.value);
-      reference.type = String(item.value).trim().substring(0, 1);
-
-      if (
-        String(newItemValue)
-          .toLocaleUpperCase()
-          .indexOf(CONFIG.MODELNAME.SOBREENCIMERAS.CODE) > -1
-      ) {
-        reference.type = CONFIG.MODELNAME.MURALES.CODE;
-      }
-
-      if (
-        String(newItemValue)
-          .toLocaleUpperCase()
-          .indexOf(CONFIG.MODELNAME.FORRADO.CODE) > -1
-      ) {
-        reference.type = CONFIG.MODELNAME.FORRADO.CODE;
-      }
-    }
-
-    if (
-      String(newItemValue).trim().substring(0, 2) === "RA" ||
-      String(newItemValue).trim().substring(0, 2) === "RB" ||
-      String(newItemValue).trim().substring(0, 2) === "RM"
-    ) {
-      reference.ref = String(newItemValue);
-      reference.type = String(newItemValue).trim().substring(1, 2);
-    }
-
-    if (reference.type === "L") {
-      reference.type = "C";
-    }
-
-    if (String(newItemValue).trim().substring(0, 4) === "BD25") {
-      reference.ref = String(newItemValue);
-      reference.type = "T";
-    }
-
-    if (String(newItemValue).trim().substring(0, 2) === "BF") {
-      reference.ref = String(newItemValue);
-      reference.type = "B";
-    }
-
-    if (String(newItemValue).trim().substring(0, 2) === "BP") {
-      reference.ref = String(newItemValue);
-      reference.type = "B";
-    }
-
-    if (String(newItemValue).trim().substring(0, 2) === "MF") {
-      reference.ref = String(newItemValue);
-      reference.type = "M";
-    }
-
-    if (String(newItemValue).trim().substring(0, 2) === "AF") {
-      reference.ref = String(newItemValue);
+    if (upperValue.includes(CONFIG.MODELNAME.SOBREENCIMERAS.CODE)) {
+      reference.type = CONFIG.MODELNAME.MURALES.CODE;
+    } else if (upperValue.includes(CONFIG.MODELNAME.FORRADO.CODE)) {
+      reference.type = CONFIG.MODELNAME.FORRADO.CODE;
+    } else if (["RA", "RB", "RM"].includes(trimmedValue.substring(0, 2))) {
+      reference.type = trimmedValue.substring(1, 2);
+    } else if (trimmedValue.startsWith("AF")) {
       reference.type = "A";
-    }
-    if (String(newItemValue).trim().substring(0, 2) === "BF") {
-      reference.ref = String(newItemValue);
+    } else if (["BF", "BP", "BH"].includes(trimmedValue.substring(0, 2))) {
       reference.type = "B";
-    }
-    if (String(newItemValue).trim().substring(0, 2) === "BH") {
-      reference.ref = String(newItemValue);
+    } else if (trimmedValue.startsWith("BD25")) {
+      reference.type = "T";
+    } else if (trimmedValue.startsWith("MF")) {
+      reference.type = "M";
+    } else if (trimmedValue.startsWith("B")) {
       reference.type = "B";
+    } else {
+      reference.type = trimmedValue.substring(0, 1);
     }
-    if (String(newItemValue).trim().substring(0, 1) === "B") {
-      reference.ref = String(newItemValue);
-      reference.type = "B";
-    }
-  });
-  if (
-    String(parametros.modelName).toLocaleUpperCase().indexOf("FORRADO") > -1
-  ) {
+
+    reference.ref = value;
+  };
+
+  const processParameters = (items) => {
+    items?.forEach((item) => {
+      if (item.name === CONFIG.REF) {
+        updateReference(String(item.value).replace(/['"]/g, ""));
+      }
+    });
+  };
+
+  processParameters(parametros.parameters);
+  processParameters(parametros.ignoreParameters);
+
+  // Reasignar tipo específico para ciertos valores
+  const modelNameUpper = String(parametros.modelName).toLocaleUpperCase();
+  const modelProductNumberUpper = String(
+    parametros.modelProductNumber
+  )?.toUpperCase();
+
+  if (modelNameUpper.includes("FORRADO")) {
     reference.type = "F";
-  }
-
-  if (String(parametros.modelName).toLocaleUpperCase().indexOf("M.") > -1) {
+  } else if (modelNameUpper.includes("M.")) {
     reference.type = "M";
-  }
-
-  if (String(parametros.modelName).toLocaleUpperCase().indexOf("MURAL") > -1) {
+  } else if (modelNameUpper.includes("MURAL")) {
     reference.type = "M";
-  }
-
-  if (
-    String(parametros.modelProductNumber).toUpperCase() ===
-    CONFIG.MODELNAME.INTEGRACIONES.NAME
-  ) {
+  } else if (modelProductNumberUpper === CONFIG.MODELNAME.INTEGRACIONES.NAME) {
     reference.type = CONFIG.MODELNAME.INTEGRACIONES.CODE;
-  }
-
-  if (
-    String(parametros.modelProductNumber).toUpperCase() ===
-    CONFIG.MODELNAME.REGLETAS.NAME
-  ) {
+  } else if (modelProductNumberUpper === CONFIG.MODELNAME.REGLETAS.NAME) {
     reference.type = CONFIG.MODELNAME.REGLETAS.CODE;
-  }
-  if (
-    String(parametros.modelProductNumber).toUpperCase() ===
-    CONFIG.MODELNAME.ACCESORIOS.NAME
-  ) {
+  } else if (modelProductNumberUpper === CONFIG.MODELNAME.ACCESORIOS.NAME) {
     reference.type = CONFIG.MODELNAME.ACCESORIOS.CODE;
-  }
-
-  if (
-    String(parametros.modelProductNumber).toUpperCase() ===
-    CONFIG.MODELNAME.COMPLEMENTOS.NAME
-  ) {
+  } else if (modelProductNumberUpper === CONFIG.MODELNAME.COMPLEMENTOS.NAME) {
     reference.type = CONFIG.MODELNAME.COMPLEMENTOS.CODE;
-  }
-
-  if (
-    String(parametros.modelProductNumber)?.toUpperCase() ===
-    CONFIG.MODELNAME.DECORATIVOS.NAME
-  ) {
+  } else if (modelProductNumberUpper === CONFIG.MODELNAME.DECORATIVOS.NAME) {
     reference.type = CONFIG.MODELNAME.DECORATIVOS.CODE;
-  }
-
-  if (
-    String(parametros.modelProductNumber)?.toUpperCase() ===
-    CONFIG.MODELNAME.COSTADOS.NAME
-  ) {
+  } else if (modelProductNumberUpper === CONFIG.MODELNAME.COSTADOS.NAME) {
     reference.type = CONFIG.MODELNAME.COSTADOS.CODE;
-  }
-
-  if (String(parametros.modelProductNumber) === "脚线") {
+  } else if (parametros.modelProductNumber === "脚线") {
     reference.type = "T";
+  } else if (modelNameUpper.includes("PLACA")) {
+    reference.type = "B";
   }
 
-  if (String(parametros.modelName).toLocaleUpperCase()?.indexOf("PLACA") > -1) {
-    reference.type = "B";
+  // Ajuste especial si type es "L"
+  if (reference.type === "L") {
+    reference.type = "C";
   }
 
   return reference;
 };
 
+// const getDoors = (submodels) => {
+//   console.log(submodels);
+//   let values = {};
+//   submodels.forEach((item) => {
+//     if (
+//       String(item.customCode).trim().substring(0, 2) === CONFIG.CUSTOMCODE.DOOR
+//     ) {
+//       let perfil;
+//       //ESE TIPO DE PUERTAS LLEVAN UN PERFIL Y HAY QUE SUMARLE EL PRECIO DE ESTE A LA PUERTA
+//       if (
+//         String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("PURA") !==
+//           -1 ||
+//         String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("GP") !==
+//           -1 ||
+//         String(item.modelBrandGoodName)
+//           .toLocaleUpperCase()
+//           .indexOf("MONTEA") !== -1
+//       ) {
+//         perfil = getPerfil(item.subModels);
+//       }
+//       values = {
+//         price: parseFloat(getPrice(item)) + parseFloat(perfil?.price || 0),
+//         // price: parseFloat(getPrice(item)) + perfil?.price !== undefined ? parseFloat(perfil?.price) : 0,
+//         material: item.textureName,
+//         name: item.modelProductNumber,
+//         acabadoTirador: perfil?.acabado || "",
+//       };
+//     }
+//   });
+//   return values;
+// };
+
 const getDoors = (submodels) => {
+  console.log(submodels);
   let values = {};
+
   submodels.forEach((item) => {
-    if (
-      String(item.customCode).trim().substring(0, 2) === CONFIG.CUSTOMCODE.DOOR
-    ) {
-      let perfil;
-      //ESE TIPO DE PUERTAS LLEVAN UN PERFIL Y HAY QUE SUMARLE EL PRECIO DE ESTE A LA PUERTA
-      if (
-        String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("PURA") !==
-          -1 ||
-        String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("GP") !==
-          -1 ||
-        String(item.modelBrandGoodName)
-          .toLocaleUpperCase()
-          .indexOf("MONTEA") !== -1
-      ) {
+    const customCode = String(item.customCode).trim().substring(0, 2);
+    if (customCode === CONFIG.CUSTOMCODE.DOOR) {
+      let perfil = null;
+
+      // Verificar si el tipo de puerta requiere un perfil
+      const needsPerfil = ["PURA", "GP", "MONTEA"].some((keyword) =>
+        String(item.modelBrandGoodName).toLocaleUpperCase().includes(keyword)
+      );
+
+      if (needsPerfil) {
         perfil = getPerfil(item.subModels);
       }
+
+      const price =
+        parseFloat(getPrice(item)) + (perfil ? parseFloat(perfil.price) : 0);
+
       values = {
-        price: parseFloat(getPrice(item)) + parseFloat(perfil?.price || 0),
-        // price: parseFloat(getPrice(item)) + perfil?.price !== undefined ? parseFloat(perfil?.price) : 0,
+        price,
         material: item.textureName,
         name: item.modelProductNumber,
         acabadoTirador: perfil?.acabado || "",
       };
+      console.log(values);
     }
   });
+
   return values;
 };
 
@@ -1405,7 +1329,7 @@ export const parseJson3D = async (json) => {
             if (customCodeSubstring === CONFIG.CUSTOMCODE.DOOR) {
               item.subModels?.forEach((it) => {
                 if (it.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO) {
-                  frente = traerFrente(item);
+                  frente = getFrente(item);
                   const perfil = getPerfil(frente.datos.subModels);
 
                   drawerMaterialDetails.push({
@@ -1434,7 +1358,7 @@ export const parseJson3D = async (json) => {
                 customCodeSubstring === CONFIG.CUSTOMCODE.DRAWER) ||
               item.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO
             ) {
-              frente = traerFrente(item);
+              frente = getFrente(item);
 
               const perfil = getPerfil(frente.datos.subModels);
               drawerMaterialDetails.push({
