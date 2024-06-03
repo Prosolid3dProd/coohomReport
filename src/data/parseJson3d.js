@@ -632,7 +632,6 @@ const getTotalDoors = (submodels) => {
         const perfil = getPerfil(item.subModels);
         perfilPrice = parseFloat(perfil?.price || 0);
       }
-
       total += parseFloat(getPrice(item)) + perfilPrice;
     }
   });
@@ -761,19 +760,15 @@ const removeDuplicates = (array) => {
 };
 
 const getPriceZocalo = (item) => {
-  for (const precio of item.ignoreParameters) {
-    if (precio.name === "PRICE") {
-      return parseFloat(precio.value);
-    }
-  }
+  const priceParameter = item.ignoreParameters.find(
+    (param) => param.name === "PRICE"
+  );
+  return priceParameter ? parseFloat(priceParameter.value) : undefined;
 };
 
 const getReferenceZocalo = (item) => {
-  for (const reference of item.ignoreParameters) {
-    if (reference.name === "REF") {
-      return String(reference.value);
-    }
-  }
+  const reference = item.ignoreParameters.find((param) => param.name === "REF");
+  return reference ? String(reference.value) : undefined;
 };
 
 // main
@@ -790,7 +785,7 @@ export const parseJson3D = async (json) => {
     let puertasInfo;
     let cajonesInfo;
     let validarDoor = false;
-    // let drawer;
+    let drawer;
     let total = 0;
     let modelDrawer = null;
     let modeloDrawer = null;
