@@ -435,7 +435,6 @@ const getDoors = (submodels) => {
 };
 
 //----------------------------------------------------------------
-
 // const getInfoDoor = (submodels) => {
 //   console.log(submodels);
 //   let values = {
