@@ -1261,7 +1261,7 @@ export const parseJson3D = async (json) => {
                 modelDoorArray.push(puertasInfo?.modelDoor);
               }
             }
-            // console.log(modelDoorArray);
+            console.log(modelDoorArray);
           });
 
           item.subModels.map((filtroMaterialDoor) => {
