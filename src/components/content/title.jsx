@@ -55,12 +55,10 @@ const Actions = ({
 
   const handleChangeJSON = async (info) => {
     setLoading(true);
-
     const newData = await parseJson3D(info);
     const existingIndex = data.findIndex(
       (item) => item.orderCode === newData.orderCode
     );
-
     if (existingIndex !== -1) {
       const upData = await createOrder(newData);
       setData((prevData) => {
@@ -75,7 +73,6 @@ const Actions = ({
       setData((prevData) => [order.result, ...prevData]);
       message.success(order.result.projectName + " agregado correctamente");
     }
-
     setLoading(false);
   };
 

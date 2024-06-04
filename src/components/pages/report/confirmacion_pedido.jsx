@@ -1241,7 +1241,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           <Text>
                             {" "}
                             {item.name}: {item.nameValue || item.description} /
-                            [{itemvalue}] {item.mcv}
+                            [{item.value}] {item.mcv}
                           </Text>
                         ))}
                       </View>

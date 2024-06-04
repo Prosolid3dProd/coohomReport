@@ -98,7 +98,6 @@ export const getOrders = async (params) => {
       token: Settings.TOKEN,
     });
     // console.log(data.data)
-    // console.log("getOrders")
     return data.data;
   } catch (error) {
     console.log(error);

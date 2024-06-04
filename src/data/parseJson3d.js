@@ -374,8 +374,8 @@ const getRef = (parametros, reference) => {
     reference.type = "F";
   } else if (modelNameUpper.includes("M.")) {
     reference.type = "M";
-  // } else if (modelNameUpper.includes("MURAL")) {
-  //   reference.type = "M";
+    // } else if (modelNameUpper.includes("MURAL")) {
+    //   reference.type = "M";
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.INTEGRACIONES.NAME) {
     reference.type = CONFIG.MODELNAME.INTEGRACIONES.CODE;
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.REGLETAS.NAME) {
@@ -505,7 +505,6 @@ const getInfoDoor = (submodels) => {
 
 const getInfoHandler = (submodels) => {
   let handler = "";
-
   submodels?.forEach((item) => {
     if (
       String(item.customCode).trim().substring(0, 2) ===
@@ -674,10 +673,9 @@ const getParameters = (param, tipoMueble) => {
   }
   param.parameters.forEach((item) => {
     //para quitar las variante que vienen activas por defecto
-
     let bool = true;
     if (
-      String(item.name) === "CIZ" ||
+      // String(item.name) === "CIZ" ||
       String(item.name) === "ELEC" ||
       String(item.name) === "CVI" ||
       String(item.name) === "CPI" ||
@@ -749,7 +747,7 @@ const getPriceParameters = (param, tipoMueble) => {
     let bool = true;
 
     if (
-      String(item.name) === "CIZ" ||
+      // String(item.name) === "CIZ" ||
       String(item.name) === "ELEC" ||
       String(item.name) === "CVI" ||
       String(item.name) === "CPI" ||
@@ -1171,29 +1169,27 @@ export const parseJson3D = async (json) => {
               String(submodel.customCode) === "1001"
                 ? (puertasInfo = getInfoDoor(submodel.subModels))
                 : (puertasInfo = getInfoDoor(item.subModels));
-              // if (puertasInfo.handler) {
-              //   modelHandlerArray.push(puertasInfo.handler);
-              // }
             }
           });
 
+          const tapasArray = [];
           item.subModels?.forEach((item3) => {
             if (item3.customCode === "1001") {
               item3.subModels?.forEach((item4) => {
                 if (item4.customCode === "0301") {
                   puertasInfo = {
-                    modelDoor: item4.modelName,
+                    modelDoor: item4.modelProductNumber,
                     materialDoor: item4.textureName,
                   };
-                  // console.log(puertasInfo)
-                  // const tapasTiradores = item4.subModels.filter(
-                  //   (ti) => ti.customCode == "202" || ti.customCode == "203"
-                  // );
-                  // console.log(tapasTiradores)
+                 const tapasTiradores = item4.subModels.find(
+                    (ti) => ti.customCode !== null && ti.customCode == "202" || ti.customCode == "203" 
+                  );
+                  tapasArray.push(tapasTiradores);
                 }
               });
             }
           });
+          // console.log(tapasArray);
           // ----------------------------------------------------
           if (cajonesInfo.modelDrawer) {
             if (referenceType.ref?.indexOf(".BC") !== -1) {
@@ -1242,7 +1238,6 @@ export const parseJson3D = async (json) => {
             const isDoorCustomCode =
               String(filtroModelDoor.customCode).trim().substring(0, 2) ===
               CONFIG.CUSTOMCODE.DOOR;
-
             if (isCustomCode1001 || isDoorCustomCode) {
               if (
                 puertasInfo?.modelDoor &&
@@ -1256,6 +1251,7 @@ export const parseJson3D = async (json) => {
                 modelDoorArray.push(puertasInfo?.modelDoor);
               }
             }
+            // console.log(modelDoorArray);
           });
 
           item.subModels.map((filtroMaterialDoor) => {
