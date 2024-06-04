@@ -1181,8 +1181,10 @@ export const parseJson3D = async (json) => {
                     modelDoor: item4.modelProductNumber,
                     materialDoor: item4.textureName,
                   };
-                 const tapasTiradores = item4.subModels.find(
-                    (ti) => ti.customCode !== null && ti.customCode == "202" || ti.customCode == "203" 
+                  const tapasTiradores = item4.subModels.find(
+                    (ti) =>
+                      (ti.customCode !== null && ti.customCode == "202") ||
+                      ti.customCode == "203"
                   );
                   tapasArray.push(tapasTiradores);
                 }
@@ -1212,7 +1214,6 @@ export const parseJson3D = async (json) => {
             ...puertasInfo,
             ...cajonesInfo,
           };
-
           cajonesInfo?.modelDrawer &&
             cajonesInfo?.modelDrawer !== "undefined" &&
             cajonesInfo?.modelDrawer?.indexOf("Cajon") === -1 &&
@@ -1222,14 +1223,23 @@ export const parseJson3D = async (json) => {
             cajonesInfo?.modelDrawer?.indexOf("Corte") === -1 &&
             modelDrawerArray.push(cajonesInfo?.modelDrawer);
 
-          cajonesInfo?.materialDrawer &&
-            cajonesInfo?.materialDrawer !== "undefined" &&
-            cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
-            cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
-            cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
-            cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
-            cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
-            materialDrawerArray.push(cajonesInfo?.materialDrawer);
+          item.subModels.map((filtroMaterialDrawer) => {
+            if (filtroMaterialDrawer.customCode === "1001") {
+              filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
+                if (matInteriorDrawer.customCode === "0201") {
+                  cajonesInfo?.materialDrawer &&
+                    cajonesInfo?.materialDrawer !== "undefined" &&
+                    cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
+                    materialDrawerArray.push(cajonesInfo?.materialDrawer);
+                }
+              });
+            }
+          });
+          // console.log(materialDrawerArray);
 
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
