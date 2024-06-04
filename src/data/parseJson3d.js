@@ -675,7 +675,6 @@ const getParameters = (param, tipoMueble) => {
   const isMuebleTipoA = tipoMueble === "A";
 
   const excludedNames = [
-    "CIZ",
     "ELEC",
     "CVI",
     "CPI",
@@ -714,7 +713,6 @@ const getPriceParameters = (param, tipoMueble) => {
   let precioVariant = 0;
 
   const excludedNames = [
-    "CIZ",
     "ELEC",
     "CVI",
     "CPI",
@@ -1079,7 +1077,7 @@ export const parseJson3D = async (json) => {
               item3.subModels?.forEach((item4) => {
                 if (item4.customCode === "0301") {
                   puertasInfo = {
-                    modelDoor: item4.modelName,
+                    modelDoor: item4.modelProductNumber,
                     materialDoor: item4.textureName,
                   };
                   // console.log(puertasInfo)
