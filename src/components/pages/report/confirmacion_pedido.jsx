@@ -332,7 +332,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 }}
               >
                 <Text>{data?.modelDoor || "."}</Text>
-                <Text>{String(data?.materialDoor).toLowerCase() || "."}</Text>
+                <Text>{String(data?.materialDoor) || "."}</Text>
                 <Text>{data?.materialCabinet || "."}</Text>
                 <Text>
                   {/* {data.infoZocalos !== null ? data.infoZocalos.map((zocalo) => {
@@ -342,9 +342,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 </Text>
                 <Text>{data?.modelHandler || "."}</Text>
                 <Text>
-                  {String(
-                    data?.modelDrawer + "/" + data?.materialDrawer
-                  ).toLowerCase() || "."}
+                  {String(data?.modelDrawer + "/" + data?.materialDrawer) ||
+                    "."}
                   {/* {String(data?.materialDrawer).toLowerCase() || ""} */}
                 </Text>
               </View>

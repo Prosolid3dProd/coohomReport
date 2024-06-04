@@ -1072,6 +1072,7 @@ export const parseJson3D = async (json) => {
             }
           });
 
+          const tapasArray = [];
           item.subModels?.forEach((item3) => {
             if (item3.customCode === "1001") {
               item3.subModels?.forEach((item4) => {
@@ -1080,15 +1081,17 @@ export const parseJson3D = async (json) => {
                     modelDoor: item4.modelProductNumber,
                     materialDoor: item4.textureName,
                   };
-                  // console.log(puertasInfo)
-                  // const tapasTiradores = item4.subModels.filter(
-                  //   (ti) => ti.customCode == "202" || ti.customCode == "203"
-                  // );
-                  // console.log(tapasTiradores)
+                  const tapasTiradores = item4.subModels.find(
+                    (ti) =>
+                      (ti.customCode !== null && ti.customCode == "202") ||
+                      ti.customCode == "203"
+                  );
+                  tapasArray.push(tapasTiradores);
                 }
               });
             }
           });
+          // console.log(tapasTiradores);
           // ----------------------------------------------------
           if (cajonesInfo.modelDrawer) {
             if (referenceType.ref?.indexOf(".BC") !== -1) {
@@ -1121,14 +1124,23 @@ export const parseJson3D = async (json) => {
             cajonesInfo?.modelDrawer?.indexOf("Corte") === -1 &&
             modelDrawerArray.push(cajonesInfo?.modelDrawer);
 
-          cajonesInfo?.materialDrawer &&
-            cajonesInfo?.materialDrawer !== "undefined" &&
-            cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
-            cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
-            cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
-            cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
-            cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
-            materialDrawerArray.push(cajonesInfo?.materialDrawer);
+          item.subModels.map((filtroMaterialDrawer) => {
+            if (filtroMaterialDrawer.customCode === "1001") {
+              filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
+                if (matInteriorDrawer.customCode === "0201") {
+                  cajonesInfo?.materialDrawer &&
+                    cajonesInfo?.materialDrawer !== "undefined" &&
+                    cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
+                    materialDrawerArray.push(cajonesInfo?.materialDrawer);
+                }
+              });
+            }
+          });
+          // console.log(materialDrawerArray);
 
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
