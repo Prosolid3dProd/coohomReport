@@ -53,25 +53,58 @@ const Actions = ({
     }
   };
 
-  const handleChangeJSON = async (info) => {
+  // const handleChangeJSON = async (info) => {
+  //   setLoading(true);
+  //   const newData = await parseJson3D(info);
+  //   const existingIndex = data.findIndex(
+  //     (item) => item.orderCode === newData.orderCode
+  //   );
+  //   if (existingIndex !== -1) {
+  //     console.log("El pedido ya existe");
+  //     const upData = await createOrder(newData);
+  //     setData((prevData) => {
+  //       const updatedData = prevData.filter(
+  //         (item) => item.orderCode !== newData.orderCode
+  //       );
+  //       return [upData.result, ...updatedData];
+  //     });
+  //     message.success(upData.result.projectName + " actualizado correctamente");
+  //   } else {
+  //     console.log("El pedido no existe");
+  //     const order = await createOrder(newData);
+  //     setData((prevData) => [order.result, ...prevData]);
+  //     message.success(order.result.projectName + " agregado correctamente");
+  //   }
+  //   setLoading(false);
+  // };
+  const handleChangeJSON = async (json) => {
     setLoading(true);
-    const newData = await parseJson3D(info);
-    const existingIndex = data.findIndex(
-      (item) => item.orderCode === newData.orderCode
-    );
-    if (existingIndex !== -1) {
-      const upData = await createOrder(newData);
-      setData((prevData) => {
-        const updatedData = prevData.filter(
-          (item) => item.orderCode !== newData.orderCode
+    try {
+      const newData = await parseJson3D(json);
+      const existingIndex = data.findIndex(
+        (item) => item.orderCode === newData.orderCode
+      );
+      if (existingIndex !== -1) {
+        const upData = await createOrder(newData);
+        setData((prevData) => {
+          const updatedData = [...prevData];
+          updatedData[existingIndex] = upData.result;
+          return [
+            upData.result,
+            ...updatedData.filter((_, index) => index !== existingIndex),
+          ];
+        });
+        message.success(
+          upData.result.projectName + " actualizado correctamente"
         );
-        return [upData.result, ...updatedData];
-      });
-      message.success(upData.result.projectName + " actualizado correctamente");
-    } else {
-      const order = await createOrder(newData);
-      setData((prevData) => [order.result, ...prevData]);
-      message.success(order.result.projectName + " agregado correctamente");
+      } else {
+        const order = await createOrder(newData);
+        setData((prevData) => [order.result, ...prevData]);
+        message.success(order.result.projectName + " agregado correctamente");
+      }
+    } catch (error) {
+      console.error("Error updating data", error);
+      message.error("Error al actualizar los datos");
     }
     setLoading(false);
   };
@@ -180,10 +213,7 @@ const Exportar = ({ file }) => {
           <LabelAction
             text={
               <>
-                <input
-                  className="hidden z-10"
-                  onClick={file}
-                />
+                <input className="hidden z-10" onClick={file} />
                 {type(
                   breakpoint(screenWidth, breakPointMD),
                   "Descargar",

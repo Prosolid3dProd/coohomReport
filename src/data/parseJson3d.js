@@ -349,7 +349,6 @@ const getRef = (parametros, reference) => {
     } else {
       reference.type = trimmedValue.substring(0, 1);
     }
-
     reference.ref = value;
   };
 
@@ -820,8 +819,13 @@ const getCalculoFondo = (item) => {
   //   size.y = item.boxSize.y + 4;
   // } else
 
-  if (String(item.modelProductNumber).toUpperCase() !== "ACCESORIOS") {
+  if (
+    String(item.modelProductNumber).toUpperCase() !== "ACCESORIOS" &&
+    String(item.modelProductNumber).toUpperCase() !== "REGLETAS"
+  ) {
     size.y = item.boxSize.y + fondoPuerta;
+  } else {
+    size.y = item.boxSize.y;
   }
 
   size.x = item.boxSize.x;
@@ -1261,7 +1265,7 @@ export const parseJson3D = async (json) => {
                 modelDoorArray.push(puertasInfo?.modelDoor);
               }
             }
-            console.log(modelDoorArray);
+            // console.log(modelDoorArray);
           });
 
           item.subModels.map((filtroMaterialDoor) => {
@@ -1552,7 +1556,6 @@ export const parseJson3D = async (json) => {
           parseFloat(getTotalDoors(item.subModels)) +
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
       }
-
       const referenceTiradores = (item) => {
         for (const reference of item.ignoreParameters) {
           if (reference.name === "REF") {
@@ -1560,7 +1563,6 @@ export const parseJson3D = async (json) => {
           }
         }
       };
-
       for (const cabinet of cabinets) {
         if (
           String(cabinet.modelProductNumber).toLocaleUpperCase() ===
@@ -1578,7 +1580,6 @@ export const parseJson3D = async (json) => {
           }
         }
       }
-
       item.subModels
         .filter((element) => String(element.modelTypeId) === "1")
         .map((element) => {
@@ -1608,7 +1609,6 @@ export const parseJson3D = async (json) => {
             });
           }
         });
-
       modelHandlerArray.forEach((handler) => {
         tiradoresCabecera.push(handler.name);
       });
@@ -1635,6 +1635,7 @@ export const parseJson3D = async (json) => {
         costados.size.y = costados.size.y - 20;
       }
     });
+
     const orderJson = {
       ...(json.partnerOrder || null),
       projectName: json.designData.designName || "",

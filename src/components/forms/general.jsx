@@ -28,28 +28,29 @@ import { ButtonAction } from "../utils/btnAction";
 const General = ({ getData, data }) => {
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({
-    reference: data?.reference,
-    date: data?.date,
-    customerName: data?.customerName,
-    location: data?.location,
-    phone: data?.phone,
-    total: data?.total,
-    coefficient: data?.coefficient,
-    modelDoor: data?.modelDoor,
-    materialDoor: data?.materialDoor,
-    handle: data?.handle,
-    drawer: data?.drawer,
-    // drawer: data?.drawer + "/" + data?.materialDrawer,
-    materialCabinet: data?.materialCabinet,
-    observation: data?.observation, 
-    // observation: "fwefwf",
-    fecha: String(data?.fecha).split(" ")[0],
-    discountEncimeras: data?.discountEncimeras,
-    discountCabinets: data?.discountCabinets,
-    discountElectrodomesticos: data?.discountElectrodomesticos,
-    discountEquipamientos: data?.discountEquipamientos,
-    semanaEntrega: data?.semanaEntrega,
-    fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
+    ...data,
+    // reference: data?.reference,
+    // date: data?.date,
+    // customerName: data?.customerName,
+    // location: data?.location,
+    // phone: data?.phone,
+    // total: data?.total,
+    // coefficient: data?.coefficient,
+    // modelDoor: data?.modelDoor,
+    // materialDoor: data?.materialDoor,
+    // handle: data?.handle,
+    // drawer: data?.drawer,
+    // // drawer: data?.drawer + "/" + data?.materialDrawer,
+    // materialCabinet: data?.materialCabinet,
+    // observation: data?.observation,
+    // // observation: "fwefwf",
+    // fecha: String(data?.fecha).split(" ")[0],
+    // discountEncimeras: data?.discountEncimeras,
+    // discountCabinets: data?.discountCabinets,
+    // discountElectrodomesticos: data?.discountElectrodomesticos,
+    // discountEquipamientos: data?.discountEquipamientos,
+    // semanaEntrega: data?.semanaEntrega,
+    // fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
   });
 
   const onFinish = async (values) => {
@@ -58,8 +59,10 @@ const General = ({ getData, data }) => {
         ...values,
         _id: data._id,
       });
+
       if (result) {
         getData(result);
+        setInitialValues(result);
         setLocalOrder(result);
         message.success("Se ha actualizado correctamente");
         setTimeout(() => {
@@ -152,7 +155,7 @@ const General = ({ getData, data }) => {
               <Input placeholder="" maxLength="200" />
             </Form.Item>
           </Col>
-          
+
           <Col xs={24} sm={24} md={5}>
             <Form.Item label="Cajon" name="drawer">
               <Input placeholder="" maxLength="200" />

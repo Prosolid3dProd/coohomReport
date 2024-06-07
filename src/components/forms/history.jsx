@@ -38,7 +38,6 @@ const getDiferenciaDias = (creacionPresupuesto) => {
   const diffTiempo = creadoHoy
     ? 0
     : Math.ceil(Math.abs(actualDate - creationalDate) / (1000 * 3600 * 24));
-
   return [diffTiempo, creadoHoy];
 };
 
