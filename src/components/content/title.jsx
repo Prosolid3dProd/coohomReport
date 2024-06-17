@@ -113,7 +113,7 @@ const Actions = ({
     setLoading(true);
     if (info.file.status === "done") {
       message.success(`${info.file.name} biblioteca actualizada con exito`);
-      await fetchData(setLoading, setData);
+      await fetchData(setLoading, setData)
     } else if (info.file.status === "error") {
       message.error(`${info.file.name} error al actualizar la biblioteca.`);
     }
@@ -163,7 +163,7 @@ const Actions = ({
       )}
       {showUploadButtons && (
         <>
-          <Tooltip title="Cargar un excel con esta estructura de cabecera [Referencia/Nombre/Tipo/Ancho/Altura/Profundidad/Precio]">
+          <Tooltip title="Cargar un excel con esta estructura de cabecera [Referencia/Nombre/Tipo/Precio]">
             <Upload showUploadList={false} multiple={false} {...props1}>
               <Button
                 style={{

@@ -41,13 +41,13 @@ const exportarArchivo = (data) => {
       nombre = nombre.replace("\n", " ");
 
       return {
-        code: referencia,
-        name: nombre,
-        type: obj.type,
-        width: obj.width,
-        height: obj.height,
-        depth: obj.depth,
-        price: parseFloat(obj.price).toFixed(2),
+        Referencia: referencia,
+        Descripcion: nombre,
+        Marca: obj.type,
+        // width: obj.width,
+        // height: obj.height,
+        // depth: obj.depth,
+        Precio: parseFloat(obj.price).toFixed(2),
         // archived: obj.archived,
         // id: obj._id,
         // fecha1: obj.createdAt,

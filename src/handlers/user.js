@@ -32,6 +32,19 @@ export const createUser = async (params) => {
   }
 };
 
+export const deleteUser = async (params) => {
+  try {
+    const data = await axios.put(`${CONFIG.API.BACKEND_URL}/`, {
+      ...params,
+      token: Settings.TOKEN,
+    });
+    return data.data;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 export const getUsers = async (params) => {
   try {
     const { data } = await axios.post("/reportCoohomUserLists", {
@@ -47,10 +60,16 @@ export const getUsers = async (params) => {
 
 export const updateUser = async (params) => {
   try {
-    const { data } = await axios.put("/", { ...params, token });
-    return data;
+    const data = await axios.put(
+      `${CONFIG.API.BACKEND_URL}/`,
+      {
+        ...params,
+        token: Settings.TOKEN,
+      }
+    );
+    return data.data;
   } catch (error) {
-    handleAxiosError(error);
+    console.log(error);
     return false;
   }
 };

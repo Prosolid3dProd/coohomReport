@@ -323,13 +323,13 @@ const getPrice = (parametros, tipo, materialCasco) => {
 
 const getRef = (parametros, reference) => {
   // Inicialización de referencia
+
   reference.ref = parametros.obsBrandGoodId;
   reference.type = "C";
 
   const updateReference = (value) => {
     const trimmedValue = value.trim();
     const upperValue = trimmedValue.toLocaleUpperCase();
-
     if (upperValue.includes(CONFIG.MODELNAME.SOBREENCIMERAS.CODE)) {
       reference.type = CONFIG.MODELNAME.MURALES.CODE;
     } else if (upperValue.startsWith(CONFIG.MODELNAME.FORRADO.CODE)) {
@@ -388,7 +388,7 @@ const getRef = (parametros, reference) => {
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.COSTADOS.NAME) {
     reference.type = CONFIG.MODELNAME.COSTADOS.CODE;
   } else if (parametros.modelProductNumber === "脚线") {
-    reference.type = "T";
+    reference.type = "";
   } else if (modelNameUpper.includes("PLACA")) {
     reference.type = "B";
   }
@@ -1229,8 +1229,10 @@ export const parseJson3D = async (json) => {
 
           item.subModels.map((filtroMaterialDrawer) => {
             if (filtroMaterialDrawer.customCode === "1001") {
+              // console.log(filtroMaterialDrawer, "fuera")
               filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
                 if (matInteriorDrawer.customCode === "0201") {
+                  // console.log(matInteriorDrawer, "dentro")
                   cajonesInfo?.materialDrawer &&
                     cajonesInfo?.materialDrawer !== "undefined" &&
                     cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
@@ -1295,7 +1297,7 @@ export const parseJson3D = async (json) => {
 
           item.subModels.map((filtroArmazon) => {
             if (
-              String(filtroArmazon.modelName)
+              String(filtroArmazon.modelBrandGoodName)
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
@@ -1499,7 +1501,6 @@ export const parseJson3D = async (json) => {
             doors.push(getDoors(item.subModels));
 
             let isComplement = false;
-
             if (
               String(item.modelProductNumber).toLocaleUpperCase() ===
               "COMPLEMENTOS"
@@ -1630,9 +1631,10 @@ export const parseJson3D = async (json) => {
       drawerTemp = modelDrawer[0].modelDrawer;
       drawerTexture = modelDrawer[0].textureDrawer;
     }
-    cabinets.map((costados) => {
-      if (costados.tipo === "O") {
-        costados.size.y = costados.size.y - 20;
+
+    cabinets.map((filtro) => {
+      if (filtro.tipo === "O") {
+        filtro.size.y = filtro.size.y - 20;
       }
     });
 
@@ -1673,6 +1675,12 @@ export const parseJson3D = async (json) => {
       designerName: json.partnerOrder?.designerName || "",
       storeName: json.partnerOrder?.storeName || "",
     };
+
+    const orderJsonWhitoutZocalos = cabinets.filter(
+      (filtro) => filtro.modelProductNumber !== "脚线"
+    );
+    orderJson.cabinets = orderJsonWhitoutZocalos;
+
     return orderJson;
 
     // const res = await createOrder(orderJson);

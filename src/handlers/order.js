@@ -162,7 +162,7 @@ export const getOrderById = async (params) => {
     });
     localStorage.setItem("orderErp", JSON.stringify(data.data));
 
-    // console.log(data.data, "getOrderById");
+    console.log(data.data, "getOrderById");
     return data.data;
   } catch (error) {
     console.log(error);

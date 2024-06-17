@@ -163,6 +163,14 @@ export const fetchData = async (setEditado, setData) => {
     setEditado(true);
     const result = await getComplements();
     const newData = structuredClone(result);
+    // const arregladou = newData.map((el) => {
+    //   return {
+    //     ...el,
+    //     Marca: el.type,
+    //     Descripcion: el.name,
+    //   };
+    // });
+    // console.log(arregladou); 
     if (Array.isArray(result)) {
       const filteredData = newData.filter((el) => el.name);
       setData(filteredData);
@@ -182,11 +190,10 @@ const Encimeras = () => {
   }, []);
 
   const getFilterComplements = async (params) => {
-   setEditado(true)
+    setEditado(true);
     try {
       const result = await getComplementsByText(params);
       if (result && result.length > 0) setData(result);
-      
       else {
         message.error("No se encontraron resultados");
         fetchData(setEditado, setData);
@@ -194,12 +201,13 @@ const Encimeras = () => {
     } catch (error) {
       console.error("Error filtering orders:", error);
     }
-    setEditado(false)
+    setEditado(false);
   };
 
   const onDelete = async (item) => {
     setEditado(true);
     try {
+      console;
       const result = await deleteComplements(item);
       if (result) {
         setData((prevValues) =>
@@ -218,35 +226,36 @@ const Encimeras = () => {
 
   let columns = [
     {
-      title: "Codigo",
+      title: "Referencia",
       dataIndex: "code",
       key: "code",
     },
     {
-      title: "Nombre",
+      title: "Descripcion",
       dataIndex: "name",
       key: "name",
+      width: 720,
     },
     {
-      title: "Tipo",
+      title: "Marca",
       dataIndex: "type",
       key: "type",
     },
-    {
-      title: "Ancho",
-      dataIndex: "width",
-      key: "width",
-    },
-    {
-      title: "Alto",
-      dataIndex: "height",
-      key: "height",
-    },
-    {
-      title: "Profundidad",
-      dataIndex: "depth",
-      key: "depth",
-    },
+    // {
+    //   title: "Ancho",
+    //   dataIndex: "width",
+    //   key: "width",
+    // },
+    // {
+    //   title: "Alto",
+    //   dataIndex: "height",
+    //   key: "height",
+    // },
+    // {
+    //   title: "Profundidad",
+    //   dataIndex: "depth",
+    //   key: "depth",
+    // },
     {
       title: "Precio",
       dataIndex: "price",

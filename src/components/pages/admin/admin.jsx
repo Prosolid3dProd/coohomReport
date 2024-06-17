@@ -1,8 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../../index.css";
-import {} from "antd";
 import "./admin.css";
-
 import {
   Button,
   Divider,
@@ -23,11 +21,15 @@ import {
 
 import { Header } from "../../content";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { Label, TablaModal, Input } from "./../../content/modals";
+import { Label, TablaModal } from "./../../content/modals";
 import { archivedOrder } from "../../../handlers/order";
 
-import { createUser, getUsers } from "../../../handlers/user";
-
+import {
+  createUser,
+  getUsers,
+  deleteUser,
+  updateUser,
+} from "../../../handlers/user";
 const { Option } = Select;
 
 const { success, info, error } = message;
@@ -589,7 +591,6 @@ const ShopsForm = () => (
       wrapperCol={{
         offset: 14,
       }}
-
     >
       <Button className="bg-blue text-white" type="default" htmlType="submit">
         Crear
@@ -599,31 +600,72 @@ const ShopsForm = () => (
 );
 
 const Admin = () => {
-  let columns = [];
   const [listaTiendas, setListaTiendas] = useState([]);
   const [load, setLoad] = useState(true);
   const [pageSize, setPageSize] = useState(5);
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [form] = Form.useForm();
+
+  const showModal = (user) => {
+    console.log(user)
+    if (user) {
+      setSelectedUser(user);
+      const filteredUser = {
+        name: user.name,
+        shop: user.tienda,
+        email: user.email,
+        phone: user.phone,
+        password: user.password,
+        comment: user.observacion1,
+      };
+      form.setFieldsValue(filteredUser);
+      setOpen(true);
+    } else {
+      console.error('User is undefined');
+    }
+  };
+
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      setConfirmLoading(true);
+      console.log(values);
+      // await updateUser(selectedUser._id, values):
+      setListaTiendas((prevValues) =>
+        prevValues.map((user) =>
+          user._id === selectedUser._id ? { ...user, ...values } : user
+        )
+      );
+      message.success("Usuario actualizado correctamente");
+      setOpen(false);
+    } catch (error) {
+      console.error("Failed to update user:", error);
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
+  const handleCancel = () => setOpen(false);
+
+  const handleResize = () => {
+    const windowHeight = window.innerHeight;
+    const newRowHeight = 75;
+    const newPageSize = Math.floor((windowHeight - 200) / newRowHeight);
+    setPageSize(newPageSize);
+  };
+
   useEffect(() => {
-    const handleResize = () => {
-      const windowHeight = window.innerHeight;
-      const newRowHeight = 75;
-      const newPageSize = Math.floor((windowHeight - 200) / newRowHeight);
-      setPageSize(newPageSize);
-    };
-
     handleResize();
-
     window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoad(true);
       try {
-        setLoad(true);
         const result = await getUsers({});
         setListaTiendas(result);
       } catch (error) {
@@ -636,30 +678,28 @@ const Admin = () => {
     fetchData();
   }, []);
 
+  //No va
   const onDelete = async (item) => {
     setLoad(true);
     try {
-      const result = await archivedOrder(item);
+      const result = await deleteUser(item);
       if (result) {
-        setInitialValues((prevValues) =>
+        setListaTiendas((prevValues) =>
           prevValues.filter((value) => value._id !== item._id)
         );
         message.success(`Pedido ${item.orderCode} eliminado correctamente`);
-        setLoad(false);
       } else {
         message.error(`Error al eliminar el pedido ${item.orderCode}`);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       message.error(`Error al eliminar el pedido ${item.orderCode}`);
+    } finally {
+      setLoad(false);
     }
   };
 
-  const onUpdate = async (item) => {
-    
-  };
-
-  columns = [
+  const columns = [
     {
       title: "Propietario",
       width: 100,
@@ -673,50 +713,41 @@ const Admin = () => {
       dataIndex: "email",
       key: "email",
     },
-
     {
-      title: "Telefono",
+      title: "Teléfono",
       width: 60,
       dataIndex: "phone",
       key: "phone",
-      key: "1",
     },
     {
-      title: "Action",
+      title: "Acción",
       key: "operation",
       fixed: "right",
       width: 100,
       render: (text, record) => (
         <div className="flex flex-row justify-around">
           <Space>
-            <Typography.Link>
-              <Button type="default" onClick={() => {
-                onUpdate(record) 
-                }}>
-                Editar
-              </Button>
-            </Typography.Link>
+            <Button type="default" onClick={() => showModal(record)}>
+              Editar
+            </Button>
           </Space>
           <Space>
             <Popconfirm
               title="¿Estás seguro de que deseas eliminar este reporte?"
               icon={<QuestionCircleOutlined style={{ color: "red" }} />}
               onConfirm={() => onDelete(record)}
-              onCancel={() => {}}
               okType="default"
-              okText="Si"
+              okText="Sí"
               cancelText="No"
             >
-              <Typography.Link>
-                <Button danger>Eliminar</Button>
-              </Typography.Link>
+              <Button danger>Eliminar</Button>
             </Popconfirm>
           </Space>
         </div>
       ),
     },
   ];
-    
+
   return (
     <main className="overflow-y-scroll px-4 flex gap-4 flex-col">
       <Header actions={false} name={"Tiendas"} />
@@ -729,6 +760,77 @@ const Admin = () => {
           pagination={{ pageSize }}
         />
       </section>
+      <Modal
+        title="Actualizar Usuario"
+        centered
+        open={open}
+        onOk={handleOk}
+        confirmLoading={confirmLoading}
+        onCancel={handleCancel}
+        okButtonProps={{
+          style: { backgroundColor: "blue", borderColor: "blue" },
+        }}
+        maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+        bodyStyle={{ maxHeight: '50vh', maxHeight: '70vh', overflowY: 'auto' }}
+      >
+        <Form form={form} layout="vertical" name="userForm">
+          <Form.Item
+            name="name"
+            label="Propietario"
+            rules={[
+              {
+                message: "Por favor ingrese el nombre del propietario",
+              },
+            ]}
+          >
+            <Input_ant />
+          </Form.Item>
+          <Form.Item
+            name="shop"
+            label="Tienda"
+            rules={[
+              {
+                message: "Por favor ingrese el nombre de la tienda",
+              },
+            ]}
+          >
+            <Input_ant />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              {
+                type: "email",
+                message: "Por favor ingrese un email válido",
+              },
+            ]}
+          >
+            <Input_ant />
+          </Form.Item>
+          <Form.Item
+            name="phone"
+            label="Teléfono"
+            rules={[
+              {
+                message: "Por favor ingrese el número de teléfono",
+              },
+            ]}
+          >
+            <Input_ant />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="Contraseña"
+            rules={[{ message: "Por favor ingrese una contraseña" }]}
+          >
+            <Input_ant.Password />
+          </Form.Item>
+          <Form.Item name="comment" label="Comentario">
+            <Input_ant.TextArea />
+          </Form.Item>
+        </Form>
+      </Modal>
     </main>
   );
 };
