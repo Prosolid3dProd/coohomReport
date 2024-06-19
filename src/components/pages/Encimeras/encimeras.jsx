@@ -260,6 +260,7 @@ const Encimeras = () => {
       title: "Precio",
       dataIndex: "price",
       key: "price",
+      render: (text) => parseFloat(text).toFixed(2),
     },
     {
       title: "Acciones",

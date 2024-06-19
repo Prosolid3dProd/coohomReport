@@ -42,8 +42,8 @@ const exportarArchivo = (data) => {
 
       return {
         Referencia: referencia,
-        Descripcion: nombre,
-        Marca: obj.type,
+        Nombre: nombre,
+        Tipo: obj.type,
         // width: obj.width,
         // height: obj.height,
         // depth: obj.depth,

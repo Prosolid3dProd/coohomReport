@@ -85,24 +85,38 @@ const Presupuesto_Cliente = ({
 
   const logoUrl = (name) => {
     if (name === "Aller Alvarez") {
-      return <Image style={{ width: "50" }} src={LogoALLER} />;
+      return <Image style={{ width: "30" }} src={LogoALLER} />;
     } else if (name === "decormobiliario") {
-      return <Image style={{ width: "50" }} src={LogoDecor} />;
+      return <Image style={{ width: "30" }} src={LogoDecor} />;
     } else if (name === "KUBS") {
-      return <Image style={{ width: "50" }} src={LogoKUBS} />;
+      return <Image style={{ width: "30" }} src={LogoKUBS} />;
     } else if (name === "j10") {
-      return <Image style={{ width: "50" }} src={LogoJ10} />;
+      return <Image style={{ width: "30" }} src={LogoJ10} />;
     } else if (name === "RAEL") {
-      return <Image style={{ width: "50" }} src={LogoRAEL} />;
+      return <Image style={{ width: "30" }} src={LogoRAEL} />;
+    } else if (name === "CERAPAL") {
+      return <Image style={{ width: "30" }} src={LogoCERAPAL} />;
+    } else {
+      return <Image style={{ width: "30" }} src={LogoSola} />;
+    }
+  };
+
+  const logoUrlGrande = (name) => {
+    if (name === "Aller Alvarez") {
+      return <Image style={{ width: "100" }} src={LogoALLER} />;
+    } else if (name === "decormobiliario") {
+      return <Image style={{ width: "100" }} src={LogoDecor} />;
+    } else if (name === "KUBS") {
+      return <Image style={{ width: "100" }} src={LogoKUBS} />;
+    } else if (name === "j10") {
+      return <Image style={{ width: "100" }} src={LogoJ10} />;
+    } else if (name === "RAEL") {
+      return <Image style={{ width: "100" }} src={LogoRAEL} />;
     } else if (name === "CERAPAL") {
       return <Image style={{ width: "50" }} src={LogoCERAPAL} />;
     } else {
       return <Image style={{ width: "100" }} src={LogoSola} />;
     }
-  };
-
-  const logoLocal = (name) => {
-    return <Image style={{ width: "30" }} src={LogoSola} />;
   };
 
   // const formatNumber = (x) => {
@@ -127,7 +141,7 @@ const Presupuesto_Cliente = ({
 
   const calcularIva = (imp, descuento) => {
     const importe = calcularImporteDescuento(imp, descuento);
-    return parseFloat((importe * 21) / 100).toFixed(2);
+    return parseFloat((importe * parseFloat(data.profile.iva)) / 100).toFixed(2);
   };
 
   const calcularTotalDescuento = (imp, descuento) => {
@@ -259,7 +273,7 @@ const Presupuesto_Cliente = ({
               marginBottom: "18",
             }}
           >
-            <View>{logoUrl(data.userId?.name)}</View>
+            <View>{logoUrlGrande(data.userId?.name)}</View>
             <Text
               style={{
                 color: "#CFCFCF",
@@ -916,7 +930,7 @@ const Presupuesto_Cliente = ({
                 </>
               )}
               <View>
-                <Text>I.V.A. (21,00%)</Text>
+                <Text>I.V.A. ({parseFloat(data.profile.iva).toFixed(2)}%)</Text>
               </View>
               <View style={{ marginTop: "1" }}>
                 <Text>
@@ -1402,7 +1416,7 @@ const Presupuesto_Cliente = ({
               fixed
             />
           </View>
-          {logoLocal(data.userId?.name)}
+          {logoUrl(data.userId?.name)}
         </View>
       </Page>
     </Document>

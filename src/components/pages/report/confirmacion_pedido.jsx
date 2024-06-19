@@ -8,6 +8,12 @@ import {
   Font,
   StyleSheet,
 } from "@react-pdf/renderer";
+import LogoALLER from "../../../assets/ALLER.jpeg";
+import LogoRAEL from "../../../assets/RAEL.jpeg";
+import LogoKUBS from "../../../assets/KUBS.jpeg";
+import LogoCERAPAL from "../../../assets/CERAPAL.jpeg";
+import LogoJ10 from "../../../assets/J10.jpeg";
+import LogoDecor from "../../../assets/DECORMOBILIARIO.jpeg";
 import LogoSola from "../../../assets/sola.png";
 import { CONFIG } from "../../../data/constants";
 import { SolaImagenes } from "./solaImages";
@@ -31,8 +37,47 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     accesorios: [],
   });
 
+  const logoUrl = (name) => {
+    if (name === "Aller Alvarez") {
+      return <Image style={{ width: "30" }} src={LogoALLER} />;
+    } else if (name === "decormobiliario") {
+      return <Image style={{ width: "30" }} src={LogoDecor} />;
+    } else if (name === "KUBS") {
+      return <Image style={{ width: "30" }} src={LogoKUBS} />;
+    } else if (name === "j10") {
+      return <Image style={{ width: "30" }} src={LogoJ10} />;
+    } else if (name === "RAEL") {
+      return <Image style={{ width: "30" }} src={LogoRAEL} />;
+    } else if (name === "CERAPAL") {
+      return <Image style={{ width: "30" }} src={LogoCERAPAL} />;
+    } else {
+      return <Image style={{ width: "30" }} src={LogoSola} />;
+    }
+  };
+
+  const logoUrlGrande = (name) => {
+    if (name === "Aller Alvarez") {
+      return <Image style={{ width: "100" }} src={LogoALLER} />;
+    } else if (name === "decormobiliario") {
+      return <Image style={{ width: "100" }} src={LogoDecor} />;
+    } else if (name === "KUBS") {
+      return <Image style={{ width: "100" }} src={LogoKUBS} />;
+    } else if (name === "j10") {
+      return <Image style={{ width: "100" }} src={LogoJ10} />;
+    } else if (name === "RAEL") {
+      return <Image style={{ width: "100" }} src={LogoRAEL} />;
+    } else if (name === "CERAPAL") {
+      return <Image style={{ width: "50" }} src={LogoCERAPAL} />;
+    } else {
+      return <Image style={{ width: "100" }} src={LogoSola} />;
+    }
+  };
+
   const logoLocal = (name) => {
-    return <Image style={{ width: "30" }} src={LogoSola} />;
+    return <Image src={LogoSola} style={{ width: "30" }} />;
+  };
+  const logoLocalGrande = (name) => {
+    return <Image src={name} style={{ width: "100" }} />;
   };
 
   const grayscaleFilter = (color) => {
@@ -145,6 +190,13 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
       });
   }, [data]);
 
+  // const changeRegletas = (largoRegletas) => {
+  //   data.map((largoReg) => {
+  //     console.log(largoReg);
+  //   });
+  //   console.log(largoRegletas);
+  // };
+
   // Función para calcular la suma total de los precios
   const calcularSumaTotal = (productos) => {
     return productos.reduce(
@@ -157,6 +209,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     (total, zocalo) => total + (zocalo.precio ? zocalo.precio : 0),
     0
   );
+
   const calcularTotalDescuentos = (data) => {
     let totalDescuentos = 0;
     const descuentos = [
@@ -181,13 +234,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     return totalDescuentos;
   };
 
-  const changeRegletas = (largoRegletas) => {
-    data.map((largoReg) => {
-      console.log(largoReg);
-    });
-    console.log(largoRegletas);
-  };
-
   const calcularTotalConDescuento = (
     sumaTotal,
     totalZocalo,
@@ -201,17 +247,24 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     totalZocalo,
     totalDescuentos
   ) => {
-    const total = (sumaTotal + totalZocalo) * 1.21;
+    const total =
+      (sumaTotal + totalZocalo) * (1 + parseFloat(data.profile.iva) / 100);
     const totalConDescuento = total - totalDescuentos;
     return parseFloat(totalConDescuento).toFixed(2);
   };
 
   const calcularIva = (sumaTotalSinDescuento) => {
-    return parseFloat(sumaTotalSinDescuento * 0.21).toFixed(2);
+    const iva = parseFloat(
+      sumaTotalSinDescuento * (parseFloat(data.profile.iva) / 100)
+    ).toFixed(2);
+    data.iva = iva;
+    return iva;
   };
 
   const calcularTotal = (sumaTotalSinDescuento) => {
-    return parseFloat(sumaTotalSinDescuento * 1.21).toFixed(2);
+    return parseFloat(
+      sumaTotalSinDescuento * (1 + parseFloat(data.profile.iva) / 100)
+    ).toFixed(2);
   };
 
   const sumaTotal = calcularSumaTotal(data.cabinets);
@@ -240,9 +293,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               justifyContent: "space-between",
             }}
           >
-            <View>
-              <Image style={{ width: "100" }} src={LogoSola} />
-            </View>
+            <View>{logoUrlGrande(data.userId?.name)}</View>
+            {/* <View>{logoLocalGrande(data.userId?.image)}</View> */}
             <Text
               style={{
                 fontSize: "14",
@@ -342,9 +394,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 </Text>
                 <Text>{data?.modelHandler || "."}</Text>
                 <Text>
-                  {String(
-                    data?.modelDrawer + "/" + data?.materialDrawer
-                  ) || "."}
+                  {String(data?.modelDrawer + "/" + data?.materialDrawer) ||
+                    "."}
                   {/* {String(data?.materialDrawer).toLowerCase() || ""} */}
                 </Text>
               </View>
@@ -2200,7 +2251,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               fixed
             />
           </View>
-          {logoLocal(data.userId?.name)}
+          {logoUrl(data.userId?.name)}
+          {/* {logoLocal(data.userId?.name)} */}
         </View>
         {price && (
           <View
@@ -2269,9 +2321,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     <Text>IMPORTE</Text>
                   </View>
                 )}
-
                 <View>
-                  <Text>I.V.A. (21,00%)</Text>
+                  <Text>
+                    I.V.A. ({parseFloat(data.profile.iva).toFixed(2)}%)
+                  </Text>
                 </View>
                 <View style={{ marginTop: "1" }}>
                   <Text>

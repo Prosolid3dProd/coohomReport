@@ -4,7 +4,7 @@ import { Table, message, Typography } from "antd";
 import { getComplements, getComplementsByText } from "../../../handlers/order";
 import { Header } from "../../content";
 
-const Encimeras = ({ setEncimera }) => {
+const Encimeras = ({ title, setEncimera }) => {
   const [data, setData] = useState([]);
 
   const getDataComplements = async () => {
@@ -47,12 +47,11 @@ const Encimeras = ({ setEncimera }) => {
   return (
     <main className="overflow-y-scroll">
       <Header
-        name={"Encimera"}
+        name={title}
         actions={false}
         input={true}
         getFilter={getFilterComplements}
       />
-
       <Table
         loading={editado}
         dataSource={data}
@@ -71,9 +70,9 @@ const Encimeras = ({ setEncimera }) => {
             key: "name",
           },
           {
-            title: "Nombre",
-            dataIndex: "name",
-            key: "name",
+            title: "Acciones",
+            dataIndex: "acciones",
+            key: "acciones",
             render: (text, record) => (
               <Typography.Link
                 onClick={() => {

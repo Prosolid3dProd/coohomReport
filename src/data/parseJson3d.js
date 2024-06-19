@@ -269,6 +269,8 @@ const getFrente = (block) => {
     return { datos: block, tipo: "frente" };
   }
 
+  // console.log(block, "TODOS LOS CAJONES");
+
   const findFrente = (subModels) => {
     if (!subModels) return undefined;
 
@@ -276,6 +278,8 @@ const getFrente = (block) => {
       const customCode = String(item.customCode);
       if (item.subModels && item.subModels.length > 0) {
         return customCode.startsWith(DOOR_PREFIX) || customCode === FRENTE_FIJO;
+      } else if (block.customCode === "1002") {
+        return block.subModels.find((int) => { return int.modelBrandGoodName.toLocaleUpperCase().indexOf("BASE") !== -1});
       }
       return false;
     });
@@ -283,6 +287,7 @@ const getFrente = (block) => {
 
   const frente = findFrente(block.subModels);
   if (frente) {
+    // console.log(frente, "FRENTE");
     return { datos: frente, tipo: "cajon" };
   }
 
@@ -1364,8 +1369,7 @@ export const parseJson3D = async (json) => {
               });
             }
             if (
-              (item.customCode !== "1002" &&
-                customCodeSubstring === CONFIG.CUSTOMCODE.DRAWER) ||
+              customCodeSubstring === CONFIG.CUSTOMCODE.DRAWER ||
               item.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO
             ) {
               frente = getFrente(item);
@@ -1470,6 +1474,7 @@ export const parseJson3D = async (json) => {
               }
             });
 
+          // Buscar casco para pasarlo directamente
           // const casco = item.subModels.find((x) =>
           //   x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
           // );
