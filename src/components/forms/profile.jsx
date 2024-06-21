@@ -154,7 +154,7 @@ const General = ({ data }) => {
           </Col>
           <Col xs={24} sm={24} md={2}>
             <Form.Item label="IVA" name="iva">
-              <Input placeholder="" maxLength="5"   disabled/>
+              <Input placeholder="" maxLength="5"  disabled/>
             </Form.Item>
           </Col>
           <Divider orientation="left" className="px-10">
