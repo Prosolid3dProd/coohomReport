@@ -380,7 +380,7 @@ export const fixOrder = (order, onSuccess = () => {}) => {
         parseFloat(total) * (parseFloat(order.discountEquipamientos) / 100);
     }
 
-    const iva = parseFloat((total.toFixed(2) * 21) / 100);
+    const iva = parseFloat(21);
     const orderJson = {
       ...order,
       importe: parseFloat(total).toFixed(2),
