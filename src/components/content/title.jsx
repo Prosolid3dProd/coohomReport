@@ -81,26 +81,33 @@ const Actions = ({
     setLoading(true);
     try {
       const newData = await parseJson3D(json);
-      const existingIndex = data.findIndex(
-        (item) => item.orderCode === newData.orderCode
-      );
-      if (existingIndex !== -1) {
-        const upData = await createOrder(newData);
-        setData((prevData) => {
-          const updatedData = [...prevData];
-          updatedData[existingIndex] = upData.result;
-          return [
-            upData.result,
-            ...updatedData.filter((_, index) => index !== existingIndex),
-          ];
-        });
-        message.success(
-          upData.result.projectName + " actualizado correctamente"
-        );
-      } else {
+      if (!data || data.length === 0) {
         const order = await createOrder(newData);
-        setData((prevData) => [order.result, ...prevData]);
+        setData([order.result]);
         message.success(order.result.projectName + " agregado correctamente");
+      } else {
+        const existingIndex = data.findIndex(
+          (item) => item.orderCode === newData.orderCode
+        );
+  
+        if (existingIndex !== -1) {
+          const upData = await createOrder(newData);
+          setData((prevData) => {
+            const updatedData = [...prevData];
+            updatedData[existingIndex] = upData.result;
+            return [
+              upData.result,
+              ...updatedData.filter((_, index) => index !== existingIndex),
+            ];
+          });
+          message.success(
+            upData.result.projectName + " actualizado correctamente"
+          );
+        } else {
+          const order = await createOrder(newData);
+          setData((prevData) => [order.result, ...prevData]);
+          message.success(order.result.projectName + " agregado correctamente");
+        }
       }
     } catch (error) {
       console.error("Error updating data", error);
@@ -108,6 +115,7 @@ const Actions = ({
     }
     setLoading(false);
   };
+  
 
   const handleChange = async (info) => {
     setLoading(true);

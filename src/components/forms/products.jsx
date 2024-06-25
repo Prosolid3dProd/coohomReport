@@ -54,8 +54,12 @@ const Product = ({ getData }) => {
     const result = await updateOrderDetails({
       details: {
         ...values,
-        unidad: unidadValue,
-        total: parseFloat(values.qty) * parseFloat(unidadValue),
+        unidad:
+          values.discount !== undefined
+            ? parseFloat(unidadValue) -
+              (parseFloat(values.discount) / 100) * parseFloat(unidadValue)
+            : parseFloat(unidadValue),
+        // total: parseFloat(values.qty) * parseFloat(unidadValue),
       },
       isUpdate,
       _id: data._id,
@@ -233,13 +237,13 @@ const Product = ({ getData }) => {
               />
             </Form.Item>
           </Col>
-          {type !== "Equipamiento" && (
-            <Col xs={24} sm={24} md={6}>
-              <Form.Item label="Marca" name="marca" rules={[]}>
-                <Input placeholder="" maxLength="60" />
-              </Form.Item>
-            </Col>
-          )}
+          {/* {type !== "Equipamiento" && ( */}
+          <Col xs={24} sm={24} md={6}>
+            <Form.Item label="Marca" name="marca" rules={[]}>
+              <Input placeholder="" maxLength="60" />
+            </Form.Item>
+          </Col>
+          {/* )}*/}
           {type === "Encimera" && (
             <Col xs={24} sm={24} md={2}>
               <Form.Item label="Grosor" name="grosor" rules={[]}>
@@ -252,8 +256,17 @@ const Product = ({ getData }) => {
               <Input
                 type="number"
                 className="border-border shadow-sm"
-                onChange={(e) => setUnidad(e.target.value)}
-                defaultValue={unidad}
+                onChange={(e) => setUnidad(parseFloat(e.target.value))}
+                defaultValue={parseFloat(unidad).toFixed(2)}
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={3}>
+            <Form.Item label="Descuento(%)" name="discount">
+              <Input
+                type="number"
+                defaultValue="0"
+                className="border-border shadow-sm"
               />
             </Form.Item>
           </Col>
@@ -312,7 +325,7 @@ const Product = ({ getData }) => {
                 {
                   title: "Descripción",
                   dataIndex: "descripcion",
-                  key: "name",
+                  key: "descripcion",
                   render: (text, record) => <>{record.descripcion}</>,
                 },
 

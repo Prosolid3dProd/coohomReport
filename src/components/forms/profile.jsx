@@ -141,7 +141,7 @@ const General = ({ data }) => {
             </Form.Item>
           </Col> */}
 
-          <Divider orientation="left">
+          {/* <Divider orientation="left">
             <p className="uppercase">
               {" "}
               <b>Acerca de los Precios</b>
@@ -156,7 +156,7 @@ const General = ({ data }) => {
             <Form.Item label="IVA" name="iva">
               <Input placeholder="" maxLength="5"  disabled/>
             </Form.Item>
-          </Col>
+          </Col> */}
           <Divider orientation="left" className="px-10">
             <b className="uppercase">Observaciones</b>{" "}
             <span className="italic text-slate-400">(%)</span>

@@ -14,6 +14,8 @@ import LogoKUBS from "../../../assets/KUBS.jpeg";
 import LogoCERAPAL from "../../../assets/CERAPAL.jpeg";
 import LogoJ10 from "../../../assets/J10.jpeg";
 import LogoDecor from "../../../assets/DECORMOBILIARIO.jpeg";
+import Sukaldeak from "../../../assets/Sukaldeak.jpeg";
+import Alkain from "../../../assets/Alkain.jpeg";
 import LogoSola from "../../../assets/sola.png";
 import { CONFIG } from "../../../data/constants";
 import { SolaImagenes } from "./solaImages";
@@ -50,6 +52,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
       return <Image style={{ width: "30" }} src={LogoRAEL} />;
     } else if (name === "CERAPAL") {
       return <Image style={{ width: "30" }} src={LogoCERAPAL} />;
+    } else if (name === "Kitchen sukaldeak") {
+      return <Image style={{ width: "30" }} src={Sukaldeak} />;
+    } else if (name === "Alkain") {
+      return <Image style={{ width: "30" }} src={Alkain} />;
     } else {
       return <Image style={{ width: "30" }} src={LogoSola} />;
     }
@@ -67,7 +73,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     } else if (name === "RAEL") {
       return <Image style={{ width: "100" }} src={LogoRAEL} />;
     } else if (name === "CERAPAL") {
-      return <Image style={{ width: "50" }} src={LogoCERAPAL} />;
+      return <Image style={{ width: "100" }} src={LogoCERAPAL} />;
+    } else if (name === "Kitchen sukaldeak") {
+      return <Image style={{ width: "100" }} src={Sukaldeak} />;
+    } else if (name === "Alkain") {
+      return <Image style={{ width: "100" }} src={Alkain} />;
     } else {
       return <Image style={{ width: "100" }} src={LogoSola} />;
     }
@@ -247,24 +257,27 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     totalZocalo,
     totalDescuentos
   ) => {
-    const total =
-      (sumaTotal + totalZocalo) * (1 + parseFloat(data.profile.iva) / 100);
+    // const total =
+    //   (sumaTotal + totalZocalo) * (1 + parseFloat(data.profile.iva) / 100);
+    const total = (sumaTotal + totalZocalo) * 1.21;
     const totalConDescuento = total - totalDescuentos;
     return parseFloat(totalConDescuento).toFixed(2);
   };
 
   const calcularIva = (sumaTotalSinDescuento) => {
-    const iva = parseFloat(
-      sumaTotalSinDescuento * (parseFloat(data.profile.iva) / 100)
-    ).toFixed(2);
-    data.iva = iva;
-    return iva;
+    return parseFloat(sumaTotalSinDescuento * 0.21).toFixed(2);
+    // const iva = parseFloat(
+    //   sumaTotalSinDescuento * (parseFloat(data.profile.iva) / 100)
+    // ).toFixed(2);
+    // data.iva = iva;
+    // return iva;
   };
 
   const calcularTotal = (sumaTotalSinDescuento) => {
-    return parseFloat(
-      sumaTotalSinDescuento * (1 + parseFloat(data.profile.iva) / 100)
-    ).toFixed(2);
+    return parseFloat(sumaTotalSinDescuento * 1.21).toFixed(2);
+    // return parseFloat(
+    //   sumaTotalSinDescuento * (1 + parseFloat(data.profile.iva) / 100)
+    // ).toFixed(2);
   };
 
   const sumaTotal = calcularSumaTotal(data.cabinets);
@@ -2322,9 +2335,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   </View>
                 )}
                 <View>
-                  <Text>
-                    I.V.A. ({parseFloat(data.profile.iva).toFixed(2)}%)
-                  </Text>
+                  <Text>I.V.A. (21%)</Text>
                 </View>
                 <View style={{ marginTop: "1" }}>
                   <Text>

@@ -70,6 +70,17 @@ const Encimeras = ({ title, setEncimera }) => {
             key: "name",
           },
           {
+            title: "Marca",
+            dataIndex: "type",
+            key: "type",
+          },
+          {
+            title: "Precio",
+            dataIndex: "price",
+            key: "price",
+            render: (text) => parseFloat(text).toFixed(2),
+          },
+          {
             title: "Acciones",
             dataIndex: "acciones",
             key: "acciones",
