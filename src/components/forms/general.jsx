@@ -35,7 +35,7 @@ const General = ({ getData, data }) => {
     location: data?.location,
     phone: data?.phone,
     total: data?.total,
-    coefficient: data?.profile?.coefficient,
+    coefficient: data?.coefficient,
     modelDoor: data?.modelDoor,
     materialDoor: data?.materialDoor,
     handle: data?.handle,
@@ -54,7 +54,6 @@ const General = ({ getData, data }) => {
   });
 
   const onFinish = async (values) => {
-
     if (data._id) {
       const result = await updateOrder({
         ...values,
@@ -178,11 +177,11 @@ const General = ({ getData, data }) => {
               <b>Acerca de los Precios</b>
             </p>
           </Divider>
-          {/* <Col xs={24} sm={24} md={4}>
+          <Col xs={24} sm={24} md={4}>
             <Form.Item label="Coeficiente Tiendas" name="coefficient">
               <Input placeholder="" maxLength="5" max={10} min={0} />
             </Form.Item>
-          </Col> */}
+          </Col>
           <Col xs={24} sm={24} md={2}>
             <Form.Item label="IVA" name="iva">
               <Input placeholder="" maxLength="5" defaultValue="21%" disabled />
