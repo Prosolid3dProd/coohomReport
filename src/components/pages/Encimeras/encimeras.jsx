@@ -162,15 +162,9 @@ export const fetchData = async (setEditado, setData) => {
   try {
     setEditado(true);
     const result = await getComplements();
+    console.log(result);
     const newData = structuredClone(result);
-    // const arregladou = newData.map((el) => {
-    //   return {
-    //     ...el,
-    //     Marca: el.type,
-    //     Descripcion: el.name,
-    //   };
-    // });
-    // console.log(arregladou); 
+  
     if (Array.isArray(result)) {
       const filteredData = newData.filter((el) => el.name);
       setData(filteredData);
@@ -184,7 +178,6 @@ export const fetchData = async (setEditado, setData) => {
 const Encimeras = () => {
   const [data, setData] = useState([]);
   const [editado, setEditado] = useState(false);
-
   useEffect(() => {
     fetchData(setEditado, setData);
   }, []);
@@ -223,7 +216,6 @@ const Encimeras = () => {
       message.error(`Error al eliminar ${item.code}`);
     }
   };
-
   let columns = [
     {
       title: "Referencia",
@@ -237,9 +229,14 @@ const Encimeras = () => {
       width: 720,
     },
     {
-      title: "Marca",
+      title: "Tipo",
       dataIndex: "type",
       key: "type",
+    },
+    {
+      title: "Marca",
+      dataIndex: "marca",
+      key: "marca",
     },
     // {
     //   title: "Ancho",
@@ -251,11 +248,7 @@ const Encimeras = () => {
     //   dataIndex: "height",
     //   key: "height",
     // },
-    // {
-    //   title: "Profundidad",
-    //   dataIndex: "depth",
-    //   key: "depth",
-    // },
+    
     {
       title: "Precio",
       dataIndex: "price",

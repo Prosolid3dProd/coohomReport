@@ -37,7 +37,7 @@ export const createOrder = async (params) => {
         token: Settings.TOKEN,
       }
     );
-    // console.log(data.data.result, "createOrder");
+    console.log(data.data.result, "createOrder");
     return data.data;
   } catch (error) {
     console.log(error);
@@ -109,6 +109,7 @@ export const getComplements = async (params) => {
   try {
     const data = await _AXIOS_.get(
       `${CONFIG.API.BACKEND_URL}/reportCoohomComplements`,
+      // "http://localhost:3000/verTodosComplementos2", 
       {
         ...params,
         token: Settings.TOKEN,
@@ -162,7 +163,7 @@ export const getOrderById = async (params) => {
     });
     localStorage.setItem("orderErp", JSON.stringify(data.data));
 
-    console.log(data.data, "getOrderById");
+    // console.log(data.data, "getOrderById");
     return data.data;
   } catch (error) {
     console.log(error);

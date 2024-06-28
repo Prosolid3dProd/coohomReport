@@ -291,9 +291,9 @@ const Presupuesto_Cliente = ({
               }}
             ></Text>
             <View style={{ fontSize: "8", marginRight: "110" }}>
-              <Text>Transformados de la Madera Jesús Sola, S.L</Text>
-              <Text>948 850 545 / 602 564 450</Text>
-              <Text>www.solacocinas.com / info@solacocinas.com</Text>
+              <Text>{data.userId.name}</Text>
+              <Text>{data.userId.phone}</Text>
+              <Text>{data.userId.email}</Text>
             </View>
           </View>
 
@@ -1424,7 +1424,8 @@ const Presupuesto_Cliente = ({
               fixed
             />
           </View>
-          {logoUrl(data.userId?.name)}
+          <Image style={{ width: "30" }} src={LogoSola}/>
+          {/* {logoUrl(data.userId?.name)} */}
         </View>
       </Page>
     </Document>

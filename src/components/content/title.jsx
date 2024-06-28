@@ -131,6 +131,7 @@ const Actions = ({
   const props1 = {
     name: "sampleFile",
     action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
+    // action:"http://localhost:3000/cargarNuevoXlsxSola2",
     method: "POST",
     headers: {
       authorization: "authorization-text",

@@ -39,14 +39,14 @@ const exportarArchivo = (data) => {
       const referencia = typeof obj.code === "string" ? obj.code : "";
       let nombre = typeof obj.name === "string" ? obj.name : "";
       nombre = nombre.replace("\n", " ");
-
+      console.log(obj);
       return {
         Referencia: referencia,
         Nombre: nombre,
         Tipo: obj.type,
         // width: obj.width,
         // height: obj.height,
-        // depth: obj.depth,
+        Marca: obj.marca,
         Precio: parseFloat(obj.price).toFixed(2),
         // archived: obj.archived,
         // id: obj._id,

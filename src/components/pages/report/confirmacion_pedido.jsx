@@ -104,11 +104,14 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
   const formatNumber = (x) => {
     if (!x) return 0;
     const result = (
+      // parseFloat(x).toFixed(0) * parseFloat(data.profile.role === "admin" ? data.userId.coefficient : data.coefficient).toFixed(2)
       parseFloat(x).toFixed(0) * parseFloat(data.coefficient).toFixed(2)
+
     ).toFixed(0);
     return result;
   };
-
+  console.log(data)
+  
   let contador = 1;
   let totalDescuentos = 0;
 
@@ -2264,7 +2267,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               fixed
             />
           </View>
-          {logoUrl(data.userId?.name)}
+          <Image style={{ width: "30" }} src={LogoSola}/>
+          {/* {logoUrl(data.userId?.name)} */}
           {/* {logoLocal(data.userId?.name)} */}
         </View>
         {price && (
