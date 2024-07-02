@@ -665,9 +665,7 @@ const getParameters = (param, tipoMueble) => {
     const cv = casco.parameters.find((x) =>
       x.name == "CV" && x.value > 0 ? x.value : undefined
     );
-    console.log(cv)
     if (cv !== undefined) {
-      console.log(mcv)
       op.push({
         name: cv.displayName || null,
         value: parseFloat(cv.value) || null,
