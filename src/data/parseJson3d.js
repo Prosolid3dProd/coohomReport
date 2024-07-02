@@ -537,13 +537,13 @@ const getInfoCabinet = (submodels) => {
       };
     }
 
-    if (
+    /*if (
       String(item.customCode).trim().substring(0, 2) === CONFIG.CUSTOMCODE.CASCO
     ) {
       values = {
         materialCabinet: item.textureName,
       };
-    }
+    }*/
   });
   return values;
 };
