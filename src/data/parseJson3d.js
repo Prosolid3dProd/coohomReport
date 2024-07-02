@@ -656,7 +656,9 @@ const getParameters = (param, tipoMueble) => {
         if (
           upperCaseModelName.includes("VISTO IZQ") ||
           upperCaseModelName.includes("VISTO DER") ||
-          upperCaseModelName.includes("AMBOS")
+          upperCaseModelName.includes("AMBOS")||
+          upperCaseModelName.includes("TODOS ACABADOS")
+          
         ) {
           return x.textureName;
         }
