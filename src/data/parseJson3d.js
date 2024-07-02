@@ -522,16 +522,15 @@ const getInfoHandler = (submodels) => {
 
 const getInfoCabinet = (submodels) => {
   let values = {
-    materialCabinet: null,
-    modelCabinet: null,
+    materialCabinet:null,
   };
 
   submodels.forEach((item) => {
     if (
-      String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 ||
-      String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==
-        -1
+      String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 &&item.customCode===undefined||
+      String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==-1&&item.customCode===undefined
     ) {
+      
       values = {
         materialCabinet: item.textureName,
       };
@@ -545,6 +544,7 @@ const getInfoCabinet = (submodels) => {
       };
     }*/
   });
+
   return values;
 };
 
@@ -899,6 +899,7 @@ export const parseJson3D = async (json) => {
     const materialDoorArray = [];
     const modelCabinetArray = [];
     const materialCabinetArray = [];
+  
 
     let opening;
     let zocalo = 0;
@@ -1292,7 +1293,7 @@ export const parseJson3D = async (json) => {
                 materialDoorArray.push(puertasInfo?.materialDoor);
             }
           });
-
+ 
           armazonInfo?.modelCabinet &&
             armazonInfo?.modelCabinet !== "undefined" &&
             armazonInfo?.modelCabinet?.indexOf("Cajon") === -1 &&
@@ -1301,6 +1302,7 @@ export const parseJson3D = async (json) => {
             armazonInfo?.modelCabinet?.indexOf("Mural") === -1 &&
             armazonInfo?.modelCabinet?.indexOf("Corte") === -1 &&
             modelCabinetArray.push(armazonInfo?.modelCabinet);
+            
 
           item.subModels.map((filtroArmazon) => {
             if (
@@ -1308,13 +1310,15 @@ export const parseJson3D = async (json) => {
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
+              
               armazonInfo?.materialCabinet &&
                 armazonInfo?.materialCabinet !== "undefined" &&
+                armazonInfo?.materialCabinet !== null &&
                 armazonInfo?.materialCabinet?.indexOf("Cajon") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Gaveta") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Sola") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
-                armazonInfo?.materialCabinet?.indexOf("Corte") === -1;
+                armazonInfo?.materialCabinet?.indexOf("Corte") === -1&&
               materialCabinetArray.push(armazonInfo?.materialCabinet);
             }
           });
