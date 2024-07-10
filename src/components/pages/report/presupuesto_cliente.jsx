@@ -18,6 +18,7 @@ import LogoCERAPAL from "../../../assets/CERAPAL.jpeg";
 import LogoJ10 from "../../../assets/J10.jpeg";
 import Sukaldeak from "../../../assets/Sukaldeak.jpeg";
 import Alkain from "../../../assets/Alkain.jpeg";
+import Sukaldatu from "../../../assets/Sukaldatu.jpeg";
 import LogoDecor from "../../../assets/DECORMOBILIARIO.jpeg";
 import LogoSola from "../../../assets/sola.png";
 import { data } from "autoprefixer";
@@ -124,6 +125,8 @@ const Presupuesto_Cliente = ({
       return <Image style={{ width: "100" }} src={Sukaldeak} />;
     } else if (name === "Alkain") {
       return <Image style={{ width: "100" }} src={Alkain} />;
+    } else if (name === "Sukaldatu") {
+      return <Image style={{ width: "100" }} src={Sukaldatu} />;
     } else {
       return <Image style={{ width: "100" }} src={LogoSola} />;
     }
@@ -292,7 +295,8 @@ const Presupuesto_Cliente = ({
             ></Text>
             <View style={{ fontSize: "8", marginRight: "110" }}>
               <Text>{data.userId.name}</Text>
-              <Text>{data.userId.phone}</Text>
+              <Text>T.-{data.userId.phone}</Text>
+              <Text>{data.userId.location}</Text>
               <Text>{data.userId.email}</Text>
             </View>
           </View>
@@ -1385,7 +1389,7 @@ const Presupuesto_Cliente = ({
               }}
               id="observaciones"
             >
-              {String(data.observation).length >= 15
+              {String(data.observation).length > 0
                 ? String(data.observation).trim()
                 : ""}
             </Text>
@@ -1424,7 +1428,7 @@ const Presupuesto_Cliente = ({
               fixed
             />
           </View>
-          <Image style={{ width: "30" }} src={LogoSola}/>
+          <Image style={{ width: "30" }} src={LogoSola} />
           {/* {logoUrl(data.userId?.name)} */}
         </View>
       </Page>

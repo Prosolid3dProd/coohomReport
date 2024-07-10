@@ -20,7 +20,7 @@ axios.interceptors.request.use(
 
 export const createUser = async (params) => {
   try {
-    const { data } = await axios.post("/reportCoohomUser", {
+    const { data } = await axios.post("/createUserCoohom", {
       ...params,
       token,
     });
@@ -28,16 +28,32 @@ export const createUser = async (params) => {
     return data;
   } catch (error) {
     handleAxiosError(error);
-    return false;
+    return error;
+  }
+};
+
+export const resetPassword = async (params) => {
+  try {
+    const { data } = await axios.post("/resetPasswordUserCoohom", {
+      ...params,
+    });
+    console.log(data);
+    return data;
+  } catch (error) {
+    handleAxiosError(error);
+    return error;
   }
 };
 
 export const deleteUser = async (params) => {
   try {
-    const data = await axios.put(`${CONFIG.API.BACKEND_URL}/`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
+    const data = await axios.post(
+      `${CONFIG.API.BACKEND_URL}/deleteUserCoohom`,
+      {
+        ...params,
+        token,
+      }
+    );
     return data.data;
   } catch (error) {
     console.log(error);
@@ -51,6 +67,7 @@ export const getUsers = async (params) => {
       ...params,
       token,
     });
+    console.log(data);
     return data;
   } catch (error) {
     handleAxiosError(error);
@@ -60,13 +77,10 @@ export const getUsers = async (params) => {
 
 export const updateUser = async (params) => {
   try {
-    const data = await axios.put(
-      `${CONFIG.API.BACKEND_URL}/`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
+    const data = await axios.post(`${CONFIG.API.BACKEND_URL}/editUserCoohom`, {
+      ...params,
+      token,
+    });
     return data.data;
   } catch (error) {
     console.log(error);

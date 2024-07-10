@@ -42,7 +42,8 @@ const Product = ({ getData }) => {
 
   const onFinish = async (values) => {
     const unidadValue = values.unidad !== undefined ? values.unidad : 0;
-    setUnidad(unidadValue);
+    const parseUnidadValue =parseFloat(unidadValue).toFixed(2)
+    setUnidad(parseUnidadValue);
 
     if (!values.type) {
       message.error("Por favor seleccione un TIPO DE COMPONENTE");
@@ -56,9 +57,9 @@ const Product = ({ getData }) => {
         ...values,
         unidad:
           values.discount !== undefined
-            ? parseFloat(unidadValue) -
-              (parseFloat(values.discount) / 100) * parseFloat(unidadValue)
-            : parseFloat(unidadValue),
+            ? parseFloat(parseUnidadValue) -
+              (parseFloat(values.discount) / 100) * parseFloat(parseUnidadValue)
+            : parseFloat(parseUnidadValue),
         // total: parseFloat(values.qty) * parseFloat(unidadValue),
       },
       isUpdate,
@@ -129,7 +130,7 @@ const Product = ({ getData }) => {
     const fields = {
       descripcion: encimera?.name,
       marca: encimera?.type,
-      unidad: encimera?.price,
+      unidad: parseFloat(encimera?.price).toFixed(2),
       referencia: encimera?.code,
       qty: 1,
     };
@@ -149,6 +150,7 @@ const Product = ({ getData }) => {
         : parseFloat(cantidad) * parseFloat(unidad);
     setTotal(newTotal);
   }, [cantidad, unidad]);
+
 
   return (
     <Card className="rounded-none bg-gray border border-border">
@@ -256,7 +258,10 @@ const Product = ({ getData }) => {
               <Input
                 type="number"
                 className="border-border shadow-sm"
-                onChange={(e) => setUnidad(parseFloat(e.target.value))}
+                onChange={(e) => {
+                  const unidad =parseFloat(e.target.value).toFixed(2)
+                  setUnidad(unidad)
+                }}
                 defaultValue={parseFloat(unidad).toFixed(2)}
               />
             </Form.Item>

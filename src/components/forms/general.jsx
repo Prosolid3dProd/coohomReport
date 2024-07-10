@@ -494,7 +494,7 @@ import {
 
 const General = ({ getData, data }) => {
   let role = "";
-  role = data.profile.role
+  role = data.profile.role;
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({
     reference: data?.reference,
@@ -504,8 +504,6 @@ const General = ({ getData, data }) => {
     phone: data?.phone,
     total: data?.total,
     coefficient: data?.coefficient,
-    // coefficient: role === "admin" ? data.coefficient : data.userId.coefficient,
-    // coefficient: data.userId.coefficient,
     modelDoor: data?.modelDoor,
     materialDoor: data?.materialDoor,
     handle: data?.handle,
@@ -517,6 +515,10 @@ const General = ({ getData, data }) => {
     discountCabinets: data?.discountCabinets,
     discountElectrodomesticos: data?.discountElectrodomesticos,
     discountEquipamientos: data?.discountEquipamientos,
+    ivaEncimeras: data?.ivaEncimeras,
+    ivaCabinets: data?.ivaCabinets,
+    ivaElectrodomesticos: data?.ivaElectrodomesticos,
+    ivaEquipamientos: data?.ivaEquipamientos,
     semanaEntrega: data?.semanaEntrega,
     fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
   });
@@ -526,7 +528,6 @@ const General = ({ getData, data }) => {
   const [isClient, setIsClient] = useState(false);
   const correctPassword = "1234";
 
-  
   useEffect(() => {
     if (role) {
       if (role === "client") {
@@ -537,7 +538,7 @@ const General = ({ getData, data }) => {
     } else {
       setIsInputEditable(true);
     }
-  }, []);
+  }, [role]);
 
   const showModal = () => {
     if (isClient) {
@@ -548,9 +549,9 @@ const General = ({ getData, data }) => {
   const handleOk = () => {
     if (password === correctPassword) {
       setIsInputEditable(true);
-      message.success("Coeficiente desbloqueado")
+      message.success("Coeficiente desbloqueado");
     } else {
-      message.error("Contraseña incorrecta")
+      message.error("Contraseña incorrecta");
     }
     setIsOpenModal(false);
     setPassword("");
@@ -564,12 +565,11 @@ const General = ({ getData, data }) => {
   const onFinish = async (values) => {
     if (data._id) {
       const result = await updateOrder({ ...values, _id: data._id });
-      console.log(result, "R");
+      console.log(result)
       if (result) {
         getData(result);
         setInitialValues(result);
         setLocalOrder(result);
-        console.log(initialValues, "I");
         message.success("Se ha actualizado correctamente");
         setTimeout(() => {
           location.reload();
@@ -714,82 +714,60 @@ const General = ({ getData, data }) => {
               <Input placeholder="" maxLength="5" defaultValue="21%" disabled />
             </Form.Item>
           </Col>
-          <Divider orientation="left" className="px-10">
-            <b className="uppercase">Descuento</b>{" "}
-            <span className="italic text-slate-400">(%)</span>
+          <Divider orientation="left">
+            <p className="uppercase">
+              <b>Descuentos</b>
+            </p>
           </Divider>
-          <Row className="w-full px-10 gap-4">
-            <Col xs={12} sm={12} md={3}>
-              <Form.Item label="Encimeras" name="discountEncimeras">
-                <Input
-                  maxLength="3"
-                  max={100}
-                  min={0}
-                  onBlur={(e) => {
-                    const newDiscount = e.target.value.trim();
-                    setInitialValues((prevValues) => ({
-                      ...prevValues,
-                      discountEncimeras: newDiscount,
-                    }));
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={12} sm={12} md={3}>
-              <Form.Item label="Muebles" name="discountCabinets">
-                <Input
-                  defaultValue={0}
-                  maxLength="3"
-                  max={100}
-                  min={0}
-                  onBlur={(e) => {
-                    const newDiscount = e.target.value.trim();
-                    setInitialValues((prevValues) => ({
-                      ...prevValues,
-                      discountCabinets: newDiscount,
-                    }));
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={12} sm={12} md={3}>
-              <Form.Item label="Equipamientos" name="discountEquipamientos">
-                <Input
-                  defaultValue={0}
-                  maxLength="3"
-                  max={100}
-                  min={0}
-                  onBlur={(e) => {
-                    const newDiscount = e.target.value.trim();
-                    setInitialValues((prevValues) => ({
-                      ...prevValues,
-                      discountEquipamientos: newDiscount,
-                    }));
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={12} sm={12} md={3}>
-              <Form.Item
-                label="Electrodomesticos"
-                name="discountElectrodomesticos"
-              >
-                <Input
-                  defaultValue={0}
-                  maxLength="3"
-                  max={100}
-                  min={0}
-                  onBlur={(e) => {
-                    const newDiscount = e.target.value.trim();
-                    setInitialValues((prevValues) => ({
-                      ...prevValues,
-                      discountElectrodomesticos: newDiscount,
-                    }));
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Encimeras" name="discountEncimeras">
+              <Input placeholder="" maxLength="50" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Muebles" name="discountCabinets">
+              <Input placeholder="" maxLength="50" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item
+              label="Electrodomésticos"
+              name="discountElectrodomesticos"
+            >
+              <Input placeholder="" maxLength="50" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Equipamientos" name="discountEquipamientos">
+              <Input placeholder="" maxLength="50" />
+            </Form.Item>
+          </Col>
+          {/* <Divider orientation="left">
+            <p className="uppercase">
+              <b>IVA</b>
+            </p>
+          </Divider>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Encimeras" name="ivaEncimeras">
+              <Input placeholder="" maxLength="50" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Muebles" name="ivaCabinets">
+              <Input placeholder="" maxLength="50" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Electrodomésticos" name="ivaElectrodomesticos">
+              <Input placeholder="" maxLength="50" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={4}>
+            <Form.Item label="Equipamientos" name="ivaEquipamientos">
+              <Input placeholder="" maxLength="50" />
+            </Form.Item>
+          </Col> */}
+
           <Col xs={24} sm={24} md={24}>
             <Row>
               <Divider orientation="left">

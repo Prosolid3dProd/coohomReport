@@ -527,8 +527,8 @@ const getInfoCabinet = (submodels) => {
 
   submodels.forEach((item) => {
     if (
-      String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 &&item.customCode===undefined||
-      String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==-1&&item.customCode===undefined
+      String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 && item.customCode === undefined ||
+      String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !== -1 && item.customCode === undefined
     ) {
       
       values = {
@@ -1257,6 +1257,7 @@ export const parseJson3D = async (json) => {
 
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
+            // console.log(item)
             const isCustomCode1001 =
               String(filtroModelDoor.customCode).trim() === "1001";
             const isDoorCustomCode =
@@ -1272,6 +1273,7 @@ export const parseJson3D = async (json) => {
                 !puertasInfo?.modelDoor.includes("Sola") &&
                 !puertasInfo?.modelDoor.includes("Corte")
               ) {
+                // console.log(filtroModelDoor)
                 modelDoorArray.push(puertasInfo?.modelDoor);
               }
             }
@@ -1279,10 +1281,12 @@ export const parseJson3D = async (json) => {
           });
 
           item.subModels.map((filtroMaterialDoor) => {
+            // console.log(item)
             if (
               String(filtroMaterialDoor.customCode).trim().substring(0, 2) ===
               CONFIG.CUSTOMCODE.DOOR
             ) {
+              // console.log(filtroMaterialDoor)
               puertasInfo?.materialDoor &&
                 puertasInfo?.materialDoor !== "undefined" &&
                 puertasInfo?.materialDoor?.indexOf("Cajon") === -1 &&
@@ -1292,6 +1296,7 @@ export const parseJson3D = async (json) => {
                 puertasInfo?.materialDoor?.indexOf("Corte") === -1 &&
                 materialDoorArray.push(puertasInfo?.materialDoor);
             }
+            // console.log(materialDoorArray)
           });
  
           armazonInfo?.modelCabinet &&
@@ -1305,6 +1310,7 @@ export const parseJson3D = async (json) => {
             
 
           item.subModels.map((filtroArmazon) => {
+            console.log(item)
             if (
               String(filtroArmazon.modelBrandGoodName)
                 .toLocaleUpperCase()

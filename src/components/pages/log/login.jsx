@@ -43,7 +43,7 @@ const Login = () => {
     localStorage.setItem("token", JSON.stringify(result));
     localStorage.removeItem("init");
 
-    window.location.reload();
+    // window.location.reload();
 
     window.location.href = "/Dashboard/Presupuestos";
   };

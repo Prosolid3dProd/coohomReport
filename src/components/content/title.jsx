@@ -172,7 +172,7 @@ const Actions = ({
       )}
       {showUploadButtons && (
         <>
-          <Tooltip title="Cargar un excel con esta estructura de cabecera [Referencia/Nombre/Tipo/Precio]">
+          <Tooltip title="Cargar un excel con esta estructura de cabecera [Referencia/Nombre/Tipo/Marca/Precio]">
             <Upload showUploadList={false} multiple={false} {...props1}>
               <Button
                 style={{

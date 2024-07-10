@@ -39,7 +39,6 @@ const exportarArchivo = (data) => {
       const referencia = typeof obj.code === "string" ? obj.code : "";
       let nombre = typeof obj.name === "string" ? obj.name : "";
       nombre = nombre.replace("\n", " ");
-      console.log(obj);
       return {
         Referencia: referencia,
         Nombre: nombre,
