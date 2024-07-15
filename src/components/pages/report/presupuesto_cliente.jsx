@@ -44,8 +44,8 @@ const totales = [];
 
 const convertirFecha = (fecha) => {
   try {
-    const partes = fecha.split(" ");
-    const fechaPartes = partes[0].split("-");
+    const partes = fecha?.split(" ");
+    const fechaPartes = partes[0]?.split("-");
 
     const año = fechaPartes[0];
     const mes = fechaPartes[1];
@@ -294,10 +294,10 @@ const Presupuesto_Cliente = ({
               }}
             ></Text>
             <View style={{ fontSize: "8", marginRight: "110" }}>
-              <Text>{data.userId.name}</Text>
-              <Text>T.-{data.userId.phone}</Text>
+              {/* <Text>{data.userId.name}</Text> */}
               <Text>{data.userId.location}</Text>
-              <Text>{data.userId.email}</Text>
+              <Text>{data.userId.phone}</Text>
+              {/* <Text>{data.userId.email}</Text> */}
             </View>
           </View>
 
@@ -987,13 +987,11 @@ const Presupuesto_Cliente = ({
                 </View>
               )}
               <View>
-                {data?.discountCabinets && data?.discountCabinets != 0 ? (
-                  <Text>
-                    {calcularIva(data.importe, data.discountCabinets)}
-                  </Text>
-                ) : (
+                {/* {data?.discountCabinets && data?.discountCabinets != 0 ? ( */}
+                <Text>{calcularIva(data.importe, data.discountCabinets)}</Text>
+                {/* ) : (
                   <Text>{data.iva}</Text>
-                )}
+                 )} */}
               </View>
               <View
                 style={{

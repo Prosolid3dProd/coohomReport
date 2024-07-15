@@ -103,26 +103,15 @@ const ShopsForm = ({ setListaTiendas }) => (
       </Form.Item>
       <Form.Item
         name="location"
-        label="Location"
+        label="Info1"
         className="w-full p-4 flex items-center m-0"
-        rules={[
-          { required: true, message: "Porfavor introduce un localizacion" },
-        ]}
       >
         <Input_ant />
       </Form.Item>
       <Form.Item
         name="phone"
         className="w-full p-4 flex items-center m-0"
-        label="Teléfono"
-        rules={[
-          {
-            max: 9,
-            min: 9,
-            required: true,
-            message: "Introduce un número de teléfono correcto",
-          },
-        ]}
+        label="Info2"
       >
         <Input_ant className="" />
       </Form.Item>
@@ -245,10 +234,19 @@ const Admin = () => {
     try {
       const values = await form.validateFields();
       setConfirmLoading(true);
+      console.log(selectedUser.password);
+
+      // Comprobar si la contraseña está en listaTiendas
+      // const passwordExistsInStores = listaTiendas.some(store => store.password === selectedUser.password);
+      // if (!passwordExistsInStores) {
+      //   message.error("La contraseña del usuario seleccionado no coincide con ninguna tienda en la lista");
+      //   setConfirmLoading(false);
+      //   return;
+      // }
+
       if (values.oldPassword && values.newPassword) {
         const resetResult = await resetPassword({
           email: selectedUser.email,
-          // oldPassword: values.oldPassword,
           password: values.newPassword,
         });
         if (resetResult.error) {
@@ -257,7 +255,7 @@ const Admin = () => {
         }
         message.success("Contraseña cambiada correctamente");
       }
-      console.log(selectedUser);
+
       const updateResult = await updateUser({ ...selectedUser, ...values });
       if (!updateResult) {
         message.error("Error al actualizar el usuario");
@@ -274,6 +272,7 @@ const Admin = () => {
     } catch (error) {
       console.error("Failed to update user:", error);
     } finally {
+      form.resetFields(["oldPassword", "newPassword"]);
       setConfirmLoading(false);
     }
   };
@@ -336,6 +335,18 @@ const Admin = () => {
       ),
     },
   ];
+
+  const validateEmail = (_, value) => {
+    if (
+      !value ||
+      /^[^@]*[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)
+    ) {
+      return Promise.resolve();
+    }
+    return Promise.reject(
+      new Error("El email no es válido: no se permiten símbolos antes del @")
+    );
+  };
   return (
     <main className="overflow-y-scroll px-4 flex gap-4 flex-col">
       <Header actions={false} name={"Tiendas"} />
@@ -381,27 +392,23 @@ const Admin = () => {
             rules={[
               { type: "email", message: "El email no es valido" },
               { required: true, message: "Porfavor introduce un email" },
+              { validator: validateEmail, message: "Email no es valido" },
             ]}
           >
             <Input_ant />
           </Form.Item>
           <Form.Item
             name="location"
-            label="Location"
-            rules={[
-              { required: true, message: "Porfavor introduce un localizacion" },
-            ]}
+            label="Info1"
+            rules={[{ message: "Porfavor introduce un localizacion" }]}
           >
             <Input_ant />
           </Form.Item>
           <Form.Item
             name="phone"
-            label="Teléfono"
+            label="Info2"
             rules={[
               {
-                max: 9,
-                min: 9,
-                required: true,
                 message: "Introduce un número de teléfono correcto",
               },
             ]}

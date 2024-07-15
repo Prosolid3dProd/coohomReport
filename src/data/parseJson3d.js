@@ -279,7 +279,11 @@ const getFrente = (block) => {
       if (item.subModels && item.subModels.length > 0) {
         return customCode.startsWith(DOOR_PREFIX) || customCode === FRENTE_FIJO;
       } else if (block.customCode === "1002") {
-        return block.subModels.find((int) => { return int.modelBrandGoodName.toLocaleUpperCase().indexOf("BASE") !== -1});
+        return block.subModels.find((int) => {
+          return (
+            int.modelBrandGoodName.toLocaleUpperCase().indexOf("BASE") !== -1
+          );
+        });
       }
       return false;
     });
@@ -522,15 +526,17 @@ const getInfoHandler = (submodels) => {
 
 const getInfoCabinet = (submodels) => {
   let values = {
-    materialCabinet:null,
+    materialCabinet: null,
   };
 
   submodels.forEach((item) => {
     if (
-      String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 && item.customCode === undefined ||
-      String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !== -1 && item.customCode === undefined
+      (String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 &&
+        item.customCode === undefined) ||
+      (String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==
+        -1 &&
+        item.customCode === undefined)
     ) {
-      
       values = {
         materialCabinet: item.textureName,
       };
@@ -641,167 +647,282 @@ const getTotalDoors = (submodels) => {
   return parseFloat(total).toFixed(2);
 };
 
+// const getParameters = (param, tipoMueble) => {
+//   let op = [];
+
+//   const casco = param.subModels.find((x) =>
+
+//     x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
+
+//   );
+
+//   if (casco !== undefined) {
+//     const mcv = casco.subModels.find((x) => {
+//       const upperCaseModelName = x.modelName?.toLocaleUpperCase();
+
+//       if (upperCaseModelName) {
+//         if (
+//           upperCaseModelName.includes("VISTO IZQ") ||
+//           upperCaseModelName.includes("VISTO DER") ||
+//           upperCaseModelName.includes("AMBOS")||
+//           upperCaseModelName.includes("TODOS ACABADOS")
+
+//         ) {
+//           return x.textureName;
+//         }
+//       }
+//     });
+//     const cv = casco.parameters.find((x) =>
+//       x.name == "CV" && x.value > 0 ? x.value : undefined
+//     );
+//     if (cv !== undefined) {
+//       op.push({
+//         name: cv.displayName || null,
+//         value: parseFloat(cv.value) || null,
+//         description: cv.description || null,
+//         nameValue: cv.optionValues[cv.options?.indexOf(cv.value)].name || null,
+//         mcv: mcv&&mcv!==undefined?mcv.textureName : null,
+//       });
+//     }
+//   }
+//   param.parameters.forEach((item) => {
+//     //para quitar las variante que vienen activas por defecto
+//     let bool = true;
+//     if (
+//       // String(item.name) === "CIZ" ||
+//       String(item.name) === "ELEC" ||
+//       String(item.name) === "CVI" ||
+//       String(item.name) === "CPI" ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "ME") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "MPF2P") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "PE") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "ME") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "MPF2P") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "PE") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "MTCEC") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "UM")
+//       /* String(item.name) == "ME" ||
+//       String(item.name) === "MPF2P" ||
+//       String(item.name) === "PE" ||
+//       String(item.name) === "MTCEC" ||
+//       String(item.name) === "UM" ||
+//       */
+//     ) {
+//       bool = false;
+//     }
+//     if (item.name == "FSK" && item.value < 0) {
+//       op.push({
+//         name: item.displayName,
+//         value: parseFloat(item.value),
+//         description: item.description,
+//         nameValue: item.optionValues[item.options?.indexOf(item.value)].name,
+//       });
+//     } else if (
+//       parseFloat(item.value) > 0 &&
+//       item.description !== null &&
+//       item.description !== "" &&
+//       bool
+//     ) {
+//       let nameValue;
+//       if (item.options.length > 2) {
+//         nameValue = item.optionValues[item.options?.indexOf(item.value)].name;
+//       }
+//       op.push({
+//         name: item.displayName,
+//         value: parseFloat(item.value),
+//         description: item.description,
+//         nameValue,
+//       });
+//     }
+//   });
+//   return op;
+// };
+
 const getParameters = (param, tipoMueble) => {
   let op = [];
-
   const casco = param.subModels.find((x) =>
     x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
   );
 
-  if (casco !== undefined) {
+  if (casco) {
     const mcv = casco.subModels.find((x) => {
       const upperCaseModelName = x.modelName?.toLocaleUpperCase();
-
-      if (upperCaseModelName) {
-        if (
-          upperCaseModelName.includes("VISTO IZQ") ||
+      return upperCaseModelName &&
+        (upperCaseModelName.includes("VISTO IZQ") ||
           upperCaseModelName.includes("VISTO DER") ||
-          upperCaseModelName.includes("AMBOS")||
-          upperCaseModelName.includes("TODOS ACABADOS")
-          
-        ) {
-          return x.textureName;
-        }
-      }
+          upperCaseModelName.includes("AMBOS"))
+        ? x.textureName
+        : undefined;
     });
+
     const cv = casco.parameters.find((x) =>
-      x.name == "CV" && x.value > 0 ? x.value : undefined
+      x.name === "CV" && x.value > 0 ? x.value : undefined
     );
-    if (cv !== undefined) {
+
+    if (cv) {
       op.push({
         name: cv.displayName || null,
         value: parseFloat(cv.value) || null,
         description: cv.description || null,
-        nameValue: cv.optionValues[cv.options?.indexOf(cv.value)].name || null,
-        mcv: mcv&&mcv!==undefined?mcv.textureName : null,
+        nameValue:
+          cv.optionValues?.[cv.options?.indexOf(cv.value)]?.name || null,
+        mcv: mcv?.textureName || null,
       });
     }
   }
+
+  const isMuebleTipoB = tipoMueble === "B";
+  const isMuebleTipoA = tipoMueble === "A";
+
+  const excludedNames = [
+    "ELEC",
+    "CVI",
+    "CPI",
+    ...(isMuebleTipoB ? ["ME", "MPF2P", "PE"] : []),
+    ...(isMuebleTipoA ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
+  ];
+
   param.parameters.forEach((item) => {
-    //para quitar las variante que vienen activas por defecto
-    let bool = true;
-    if (
-      // String(item.name) === "CIZ" ||
-      String(item.name) === "ELEC" ||
-      String(item.name) === "CVI" ||
-      String(item.name) === "CPI" ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "ME") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "MPF2P") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "PE") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "ME") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "MPF2P") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "PE") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "MTCEC") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "UM")
-      /* String(item.name) == "ME" ||
-      String(item.name) === "MPF2P" ||
-      String(item.name) === "PE" ||
-      String(item.name) === "MTCEC" ||
-      String(item.name) === "UM" ||
-      */
-    ) {
-      bool = false;
-    }
-    if (item.name == "FSK" && item.value < 0) {
+    const itemName = String(item.name);
+
+    if (itemName === "PVA") {
       op.push({
         name: item.displayName,
-        value: parseFloat(item.value),
+        value: item.value,
         description: item.description,
-        nameValue: item.optionValues[item.options?.indexOf(item.value)].name,
+        nameValue:
+          item.options.length > 2
+            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+            : undefined,
       });
-    } else if (
-      parseFloat(item.value) > 0 &&
-      item.description !== null &&
-      item.description !== "" &&
-      bool
-    ) {
-      let nameValue;
-      if (item.options.length > 2) {
-        nameValue = item.optionValues[item.options?.indexOf(item.value)].name;
-      }
+      return;
+    }
+
+    if (itemName === "FSK" && item.value < 0) {
       op.push({
         name: item.displayName,
         value: parseFloat(item.value),
         description: item.description,
-        nameValue,
+        nameValue: item.optionValues?.[item.options?.indexOf(item.value)]?.name,
+      });
+    } else if (parseFloat(item.value) > 0 && item.description) {
+      op.push({
+        name: item.displayName,
+        value: parseFloat(item.value),
+        description: item.description,
+        nameValue:
+          item.options.length > 2
+            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+            : undefined,
       });
     }
   });
   return op;
 };
 
+// const getPriceParameters = (param, tipoMueble) => {
+//   let precioVariant = 0;
+//   param.forEach((item) => {
+//     //borrar
+//     let bool = true;
+
+//     if (
+//       // String(item.name) === "CIZ" ||
+//       String(item.name) === "ELEC" ||
+//       String(item.name) === "CVI" ||
+//       String(item.name) === "CPI" ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "ME") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "MPF2P") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "PE") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "ME") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "MPF2P") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "PE") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "MTCEC") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "UM")
+//       /* String(item.name) == "ME" ||
+//       String(item.name) === "MPF2P" ||
+//       String(item.name) === "PE" ||
+//       String(item.name) === "MTCEC" ||
+//       String(item.name) === "UM" ||
+//       */
+//     ) {
+//       bool = false;
+//     }
+
+//     if (
+//       parseFloat(item.value) > 0 &&
+//       item.description !== null &&
+//       item.description !== "" &&
+//       bool
+//     ) {
+//       precioVariant += parseFloat(item.value);
+//     }
+
+//     //borrar
+//   });
+//   return parseFloat(precioVariant).toFixed(2);
+// };
+
 const getPriceParameters = (param, tipoMueble) => {
   let precioVariant = 0;
+  const excludedNames = [
+    "ELEC",
+    "CVI",
+    "CPI",
+    ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
+    ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
+  ];
+
   param.forEach((item) => {
-    //borrar
-    let bool = true;
+    const itemName = String(item.name);
 
-    if (
-      // String(item.name) === "CIZ" ||
-      String(item.name) === "ELEC" ||
-      String(item.name) === "CVI" ||
-      String(item.name) === "CPI" ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "ME") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "MPF2P") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "B" &&
-        String(item.name) === "PE") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "ME") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "MPF2P") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "PE") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "MTCEC") ||
-      (tipoMueble != undefined &&
-        String(tipoMueble) == "A" &&
-        String(item.name) === "UM")
-      /* String(item.name) == "ME" ||
-      String(item.name) === "MPF2P" ||
-      String(item.name) === "PE" ||
-      String(item.name) === "MTCEC" ||
-      String(item.name) === "UM" ||
-      */
-    ) {
-      bool = false;
+    if (excludedNames.includes(itemName)) return;
+
+    if (itemName === "PVA") {
+      precioVariant += 15;
     }
 
-    if (
-      parseFloat(item.value) > 0 &&
-      item.description !== null &&
-      item.description !== "" &&
-      bool
-    ) {
-      precioVariant += parseFloat(item.value);
-    }
+    if (itemName === "AP") return;
 
-    //borrar
+    const itemValue = itemName === "PVA" ? 15 : parseFloat(item.value);
+
+    if (itemValue > 0 && item.description) {
+      precioVariant += itemValue;
+    }
   });
+
   return parseFloat(precioVariant).toFixed(2);
 };
 
@@ -899,7 +1020,6 @@ export const parseJson3D = async (json) => {
     const materialDoorArray = [];
     const modelCabinetArray = [];
     const materialCabinetArray = [];
-  
 
     let opening;
     let zocalo = 0;
@@ -1298,7 +1418,7 @@ export const parseJson3D = async (json) => {
             }
             // console.log(materialDoorArray)
           });
- 
+
           armazonInfo?.modelCabinet &&
             armazonInfo?.modelCabinet !== "undefined" &&
             armazonInfo?.modelCabinet?.indexOf("Cajon") === -1 &&
@@ -1307,16 +1427,14 @@ export const parseJson3D = async (json) => {
             armazonInfo?.modelCabinet?.indexOf("Mural") === -1 &&
             armazonInfo?.modelCabinet?.indexOf("Corte") === -1 &&
             modelCabinetArray.push(armazonInfo?.modelCabinet);
-            
 
           item.subModels.map((filtroArmazon) => {
-            console.log(item)
+            // console.log(item)
             if (
               String(filtroArmazon.modelBrandGoodName)
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
-              
               armazonInfo?.materialCabinet &&
                 armazonInfo?.materialCabinet !== "undefined" &&
                 armazonInfo?.materialCabinet !== null &&
@@ -1324,8 +1442,8 @@ export const parseJson3D = async (json) => {
                 armazonInfo?.materialCabinet?.indexOf("Gaveta") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Sola") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
-                armazonInfo?.materialCabinet?.indexOf("Corte") === -1&&
-              materialCabinetArray.push(armazonInfo?.materialCabinet);
+                armazonInfo?.materialCabinet?.indexOf("Corte") === -1 &&
+                materialCabinetArray.push(armazonInfo?.materialCabinet);
             }
           });
 

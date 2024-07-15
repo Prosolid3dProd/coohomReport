@@ -660,8 +660,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {it.name}: {it.nameValue || it.description} /{" "}
-                              {it.mcv}
+                              {it.name}: {it.nameValue || it.description}{" "}
+                              {it.value} / {it.mcv}
                             </Text>
                           ))}
                         </View>
@@ -934,8 +934,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {it.name}: {it.nameValue || it.description} /{" "}
-                              {it.mcv}
+                              {it.name}: {it.nameValue || it.description}{" "}
+                              {it.value} / {it.mcv}
                             </Text>
                           ))}
                         </View>
@@ -1133,11 +1133,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       >
                         {" "}
                         <Text>Variantes: </Text>
-                        {item.variants.map((item) => (
+                        {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.nameValue || item.description} /{" "}
-                            {item.mcv}
+                            {it.name}: {it.nameValue || it.description}{" "}
+                            {it.value} / {it.mcv}
                           </Text>
                         ))}
                       </View>
@@ -1324,11 +1324,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       >
                         {" "}
                         <Text>Variantes: </Text>
-                        {item.variants.map((item) => (
+                        {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.nameValue || item.description} /
-                            {item.mcv}
+                            {it.name}: {it.nameValue || it.description}{" "}
+                            {it.value} / {it.mcv}
                           </Text>
                         ))}
                       </View>
@@ -1533,11 +1533,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       >
                         {" "}
                         <Text>Variantes: </Text>
-                        {item.variants.map((item) => (
+                        {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.nameValue || item.description} /
-                            {item.mcv}
+                            {it.name}: {it.nameValue || it.description}{" "}
+                            {it.value} / {it.mcv}
                           </Text>
                         ))}
                       </View>
@@ -1720,11 +1720,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       >
                         {" "}
                         <Text>Variantes: </Text>
-                        {item.variants.map((item) => (
+                        {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.nameValue || item.description} /
-                            {item.mcv}
+                            {it.name}: {it.nameValue || it.description}{" "}
+                            {it.value} / {it.mcv}
                           </Text>
                         ))}
                       </View>
@@ -2211,6 +2211,24 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
                   </View>
+                  {formatNumber(item.priceVariants) > 0 && (
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                        }}
+                      >
+                        {" "}
+                        <Text>Variantes: </Text>
+                        {item.variants.map((it) => (
+                          <Text>
+                            {" "}
+                            {it.name}: {it.nameValue || it.description}{" "}
+                            {it.value} / {it.mcv}
+                          </Text>
+                        ))}
+                      </View>
+                    )}
                   {item?.observation !== undefined &&
                     item?.observation.length > 0 && (
                       <View

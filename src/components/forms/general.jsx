@@ -742,7 +742,7 @@ const General = ({ getData, data }) => {
               <Input placeholder="" maxLength="50" />
             </Form.Item>
           </Col>
-          {/* <Divider orientation="left">
+          <Divider orientation="left">
             <p className="uppercase">
               <b>IVA</b>
             </p>
@@ -766,7 +766,7 @@ const General = ({ getData, data }) => {
             <Form.Item label="Equipamientos" name="ivaEquipamientos">
               <Input placeholder="" maxLength="50" />
             </Form.Item>
-          </Col> */}
+          </Col>
 
           <Col xs={24} sm={24} md={24}>
             <Row>
