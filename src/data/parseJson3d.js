@@ -324,7 +324,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
     materialCasco !== "00-ANTRACITA" &&
     materialCasco !== "01-BLANCO";
   if (needsMaterialSurcharge) {
-    price += price * 0.06;
+    price += price * 0.10;
   }
 
   return price.toFixed(2);
