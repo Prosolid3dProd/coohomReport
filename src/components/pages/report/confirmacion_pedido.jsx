@@ -647,7 +647,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           </Text>
                         </Text>
                       )}
-
                       {formatNumber(item.priceVariants) > 0 && (
                         <View
                           style={{

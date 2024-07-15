@@ -324,7 +324,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
     materialCasco !== "00-ANTRACITA" &&
     materialCasco !== "01-BLANCO";
   if (needsMaterialSurcharge) {
-    price += price * 0.10;
+    price += price * 0.1;
   }
 
   return price.toFixed(2);
@@ -804,15 +804,16 @@ const getParameters = (param, tipoMueble) => {
     if (itemName === "PVA") {
       op.push({
         name: item.displayName,
-        value: item.value,
+        value: parseFloat(item.value),
         description: item.description,
         nameValue:
           item.options.length > 2
             ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
             : undefined,
       });
-      return;
     }
+
+    if (excludedNames.includes(itemName)) return;
 
     if (itemName === "FSK" && item.value < 0) {
       op.push({
@@ -833,8 +834,10 @@ const getParameters = (param, tipoMueble) => {
       });
     }
   });
+
   return op;
 };
+
 
 // const getPriceParameters = (param, tipoMueble) => {
 //   let precioVariant = 0;
@@ -922,7 +925,6 @@ const getPriceParameters = (param, tipoMueble) => {
       precioVariant += itemValue;
     }
   });
-
   return parseFloat(precioVariant).toFixed(2);
 };
 
@@ -1655,7 +1657,7 @@ export const parseJson3D = async (json) => {
               total: parseFloat(Math.ceil(totalPrice)).toFixed(0),
               size: getCalculoFondo(item), // { width: 0, height: 0, depth: 0 },
               variants: getParameters(item, referenceType.type),
-              priceVariants: getPriceParameters(
+              priceVariants:getPriceParameters(
                 item.parameters,
                 referenceType.type
               ),
