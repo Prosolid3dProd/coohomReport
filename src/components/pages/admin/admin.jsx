@@ -102,6 +102,13 @@ const ShopsForm = ({ setListaTiendas }) => (
         <Input_ant />
       </Form.Item>
       <Form.Item
+        name="cif"
+        label="CIF"
+        className="w-full p-4 flex items-center m-0"
+      >
+        <Input_ant />
+      </Form.Item>
+      <Form.Item
         name="location"
         label="Info1"
         className="w-full p-4 flex items-center m-0"
@@ -112,6 +119,13 @@ const ShopsForm = ({ setListaTiendas }) => (
         name="phone"
         className="w-full p-4 flex items-center m-0"
         label="Info2"
+      >
+        <Input_ant className="" />
+      </Form.Item>
+      <Form.Item
+        name="info3"
+        className="w-full p-4 flex items-center m-0"
+        label="Info3"
       >
         <Input_ant className="" />
       </Form.Item>
@@ -212,8 +226,10 @@ const Admin = () => {
       const filteredUser = {
         name: user.name,
         password: user.password,
+        cif: user.cif,
         email: user.email,
         phone: user.phone,
+        info3: user.info3,
         location: user.location,
         coefficient: user.coefficient,
         role: user.role,
@@ -397,6 +413,9 @@ const Admin = () => {
           >
             <Input_ant />
           </Form.Item>
+          <Form.Item name="cif" label="CIF">
+            <Input_ant />
+          </Form.Item>
           <Form.Item
             name="location"
             label="Info1"
@@ -414,6 +433,9 @@ const Admin = () => {
             ]}
           >
             <Input_ant className="" />
+          </Form.Item>
+          <Form.Item name="info3" label="Info3">
+            <Input_ant />
           </Form.Item>
           <Form.Item
             name="coefficient"

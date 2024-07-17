@@ -494,7 +494,7 @@ import {
 
 const General = ({ getData, data }) => {
   let role = "";
-  role = data.profile.role;
+  role = data?.profile?.role;
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({
     reference: data?.reference,

@@ -838,7 +838,6 @@ const getParameters = (param, tipoMueble) => {
   return op;
 };
 
-
 // const getPriceParameters = (param, tipoMueble) => {
 //   let precioVariant = 0;
 //   param.forEach((item) => {
@@ -1657,7 +1656,7 @@ export const parseJson3D = async (json) => {
               total: parseFloat(Math.ceil(totalPrice)).toFixed(0),
               size: getCalculoFondo(item), // { width: 0, height: 0, depth: 0 },
               variants: getParameters(item, referenceType.type),
-              priceVariants:getPriceParameters(
+              priceVariants: getPriceParameters(
                 item.parameters,
                 referenceType.type
               ),

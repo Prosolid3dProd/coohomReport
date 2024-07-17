@@ -296,6 +296,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
       ? true
       : false;
 
+  console.log(data);
   return (
     <Document title="Presupuesto COOHOM">
       <Page
@@ -2211,23 +2212,23 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     )}
                   </View>
                   {formatNumber(item.priceVariants) > 0 && (
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                        }}
-                      >
-                        {" "}
-                        <Text>Variantes: </Text>
-                        {item.variants.map((it) => (
-                          <Text>
-                            {" "}
-                            {it.name}: {it.nameValue || it.description}{" "}
-                            {it.value} / {it.mcv}
-                          </Text>
-                        ))}
-                      </View>
-                    )}
+                    <View
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      {" "}
+                      <Text>Variantes: </Text>
+                      {item.variants.map((it) => (
+                        <Text>
+                          {" "}
+                          {it.name}: {it.nameValue || it.description} {it.value}{" "}
+                          / {it.mcv}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
                   {item?.observation !== undefined &&
                     item?.observation.length > 0 && (
                       <View
