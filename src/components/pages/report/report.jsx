@@ -100,13 +100,13 @@ const Report = () => {
         </div>
       ),
     },
-    {
-      "Tabla de Muebles": (
-        <div className="alturaPreview">
-          <Muebles />
-        </div>
-      ),
-    },
+    // {
+    //   "Tabla de Muebles": (
+    //     <div className="alturaPreview">
+    //       <Muebles />
+    //     </div>
+    //   ),
+    // },
     {
       "Información General": (
         <div className="alturaPreview">

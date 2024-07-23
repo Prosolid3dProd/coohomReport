@@ -38,7 +38,6 @@ const getDiferenciaDias = (creacionPresupuesto) => {
   const diffTiempo = creadoHoy
     ? 0
     : Math.ceil(Math.abs(actualDate - creationalDate) / (1000 * 3600 * 24));
-
   return [diffTiempo, creadoHoy];
 };
 
@@ -88,8 +87,8 @@ const History = () => {
       try {
         setLoad(true);
         const result = await getOrders({});
-        result.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
         setInitialValues(result);
+          // result.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       } catch (error) {
         console.error("Error fetching orders:", error);
       } finally {

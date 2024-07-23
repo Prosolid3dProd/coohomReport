@@ -53,37 +53,75 @@ const Actions = ({
     }
   };
 
-  const handleChangeJSON = async (info) => {
+  // const handleChangeJSON = async (info) => {
+  //   setLoading(true);
+  //   const newData = await parseJson3D(info);
+  //   const existingIndex = data.findIndex(
+  //     (item) => item.orderCode === newData.orderCode
+  //   );
+  //   if (existingIndex !== -1) {
+  //     console.log("El pedido ya existe");
+  //     const upData = await createOrder(newData);
+  //     setData((prevData) => {
+  //       const updatedData = prevData.filter(
+  //         (item) => item.orderCode !== newData.orderCode
+  //       );
+  //       return [upData.result, ...updatedData];
+  //     });
+  //     message.success(upData.result.projectName + " actualizado correctamente");
+  //   } else {
+  //     console.log("El pedido no existe");
+  //     const order = await createOrder(newData);
+  //     setData((prevData) => [order.result, ...prevData]);
+  //     message.success(order.result.projectName + " agregado correctamente");
+  //   }
+  //   setLoading(false);
+  // };
+  const handleChangeJSON = async (json) => {
     setLoading(true);
-
-    const newData = await parseJson3D(info);
-    const existingIndex = data.findIndex(
-      (item) => item.orderCode === newData.orderCode
-    );
-
-    if (existingIndex !== -1) {
-      const upData = await createOrder(newData);
-      setData((prevData) => {
-        const updatedData = prevData.filter(
-          (item) => item.orderCode !== newData.orderCode
+    try {
+      const newData = await parseJson3D(json);
+      if (!data || data.length === 0) {
+        const order = await createOrder(newData);
+        setData([order.result]);
+        message.success(order.result.projectName + " agregado correctamente");
+      } else {
+        const existingIndex = data.findIndex(
+          (item) => item.orderCode === newData.orderCode
         );
-        return [upData.result, ...updatedData];
-      });
-      message.success(upData.result.projectName + " actualizado correctamente");
-    } else {
-      const order = await createOrder(newData);
-      setData((prevData) => [order.result, ...prevData]);
-      message.success(order.result.projectName + " agregado correctamente");
+  
+        if (existingIndex !== -1) {
+          const upData = await createOrder(newData);
+          setData((prevData) => {
+            const updatedData = [...prevData];
+            updatedData[existingIndex] = upData.result;
+            return [
+              upData.result,
+              ...updatedData.filter((_, index) => index !== existingIndex),
+            ];
+          });
+          message.success(
+            upData.result.projectName + " actualizado correctamente"
+          );
+        } else {
+          const order = await createOrder(newData);
+          setData((prevData) => [order.result, ...prevData]);
+          message.success(order.result.projectName + " agregado correctamente");
+        }
+      }
+    } catch (error) {
+      console.error("Error updating data", error);
+      message.error("Error al actualizar los datos");
     }
-
     setLoading(false);
   };
+  
 
   const handleChange = async (info) => {
     setLoading(true);
     if (info.file.status === "done") {
       message.success(`${info.file.name} biblioteca actualizada con exito`);
-      await fetchData(setLoading, setData);
+      await fetchData(setLoading, setData)
     } else if (info.file.status === "error") {
       message.error(`${info.file.name} error al actualizar la biblioteca.`);
     }
@@ -93,6 +131,7 @@ const Actions = ({
   const props1 = {
     name: "sampleFile",
     action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
+    // action:"http://localhost:3000/cargarNuevoXlsxSola2",
     method: "POST",
     headers: {
       authorization: "authorization-text",
@@ -133,7 +172,7 @@ const Actions = ({
       )}
       {showUploadButtons && (
         <>
-          <Tooltip title="Cargar un excel con esta estructura de cabecera [Referencia/Nombre/Tipo/Ancho/Altura/Profundidad/Precio]">
+          <Tooltip title="Cargar un excel con esta estructura de cabecera [Referencia/Nombre/Tipo/Marca/Precio]">
             <Upload showUploadList={false} multiple={false} {...props1}>
               <Button
                 style={{
@@ -183,10 +222,7 @@ const Exportar = ({ file }) => {
           <LabelAction
             text={
               <>
-                <input
-                  className="hidden z-10"
-                  onClick={file}
-                />
+                <input className="hidden z-10" onClick={file} />
                 {type(
                   breakpoint(screenWidth, breakPointMD),
                   "Descargar",

@@ -17,7 +17,8 @@ const Menu = () => {
 
   return (
     <aside className="col-span-1 row-start-2 row-span-2 bg-gray flex flex-col gap-4">
-      <ul className="flex items-center h-full w-full flex-col pt-4 list-disc [&>*:last-child]:absolute [&>*:last-child]:bottom-4 relative">
+      {/* <ul className="flex items-center h-full w-full flex-col pt-4 list-disc [&>*:last-child]:absolute [&>*:last-child]:bottom-4 relative"> */}
+      <ul className="flex items-center h-full w-full flex-col pt-4 list-disc relative">
         <BotonPlegar fn={onClick} change={change} />
         <Lista change={change} textShown={mostrarTexto} />
       </ul>

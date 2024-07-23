@@ -16,6 +16,9 @@ import LogoRAEL from "../../../assets/RAEL.jpeg";
 import LogoKUBS from "../../../assets/KUBS.jpeg";
 import LogoCERAPAL from "../../../assets/CERAPAL.jpeg";
 import LogoJ10 from "../../../assets/J10.jpeg";
+import Sukaldeak from "../../../assets/Sukaldeak.jpeg";
+import Alkain from "../../../assets/Alkain.jpeg";
+import Sukaldatu from "../../../assets/Sukaldatu.jpeg";
 import LogoDecor from "../../../assets/DECORMOBILIARIO.jpeg";
 import LogoSola from "../../../assets/sola.png";
 import { data } from "autoprefixer";
@@ -41,8 +44,8 @@ const totales = [];
 
 const convertirFecha = (fecha) => {
   try {
-    const partes = fecha.split(" ");
-    const fechaPartes = partes[0].split("-");
+    const partes = fecha?.split(" ");
+    const fechaPartes = partes[0]?.split("-");
 
     const año = fechaPartes[0];
     const mes = fechaPartes[1];
@@ -85,24 +88,48 @@ const Presupuesto_Cliente = ({
 
   const logoUrl = (name) => {
     if (name === "Aller Alvarez") {
-      return <Image style={{ width: "50" }} src={LogoALLER} />;
+      return <Image style={{ width: "30" }} src={LogoALLER} />;
     } else if (name === "decormobiliario") {
-      return <Image style={{ width: "50" }} src={LogoDecor} />;
+      return <Image style={{ width: "30" }} src={LogoDecor} />;
     } else if (name === "KUBS") {
-      return <Image style={{ width: "50" }} src={LogoKUBS} />;
+      return <Image style={{ width: "30" }} src={LogoKUBS} />;
     } else if (name === "j10") {
-      return <Image style={{ width: "50" }} src={LogoJ10} />;
+      return <Image style={{ width: "30" }} src={LogoJ10} />;
     } else if (name === "RAEL") {
-      return <Image style={{ width: "50" }} src={LogoRAEL} />;
+      return <Image style={{ width: "30" }} src={LogoRAEL} />;
     } else if (name === "CERAPAL") {
-      return <Image style={{ width: "50" }} src={LogoCERAPAL} />;
+      return <Image style={{ width: "30" }} src={LogoCERAPAL} />;
+    } else if (name === "Kitchen sukaldeak") {
+      return <Image style={{ width: "30" }} src={Sukaldeak} />;
+    } else if (name === "Alkain") {
+      return <Image style={{ width: "30" }} src={Alkain} />;
     } else {
-      return <Image style={{ width: "100" }} src={LogoSola} />;
+      return <Image style={{ width: "30" }} src={LogoSola} />;
     }
   };
 
-  const logoLocal = (name) => {
-    return <Image style={{ width: "30" }} src={LogoSola} />;
+  const logoUrlGrande = (name) => {
+    if (name === "Aller Alvarez") {
+      return <Image style={{ width: "100" }} src={LogoALLER} />;
+    } else if (name === "decormobiliario") {
+      return <Image style={{ width: "100" }} src={LogoDecor} />;
+    } else if (name === "KUBS") {
+      return <Image style={{ width: "100" }} src={LogoKUBS} />;
+    } else if (name === "j10") {
+      return <Image style={{ width: "100" }} src={LogoJ10} />;
+    } else if (name === "RAEL") {
+      return <Image style={{ width: "100" }} src={LogoRAEL} />;
+    } else if (name === "CERAPAL") {
+      return <Image style={{ width: "100" }} src={LogoCERAPAL} />;
+    } else if (name === "Kitchen sukaldeak") {
+      return <Image style={{ width: "100" }} src={Sukaldeak} />;
+    } else if (name === "Alkain") {
+      return <Image style={{ width: "100" }} src={Alkain} />;
+    } else if (name === "Sukaldatu") {
+      return <Image style={{ width: "100" }} src={Sukaldatu} />;
+    } else {
+      return <Image style={{ width: "100" }} src={LogoSola} />;
+    }
   };
 
   // const formatNumber = (x) => {
@@ -242,7 +269,6 @@ const Presupuesto_Cliente = ({
       </View>
     );
   };
-
   return (
     <Document title="Presupuesto COOHOM" pageMode="fullScreen">
       <Page
@@ -259,7 +285,7 @@ const Presupuesto_Cliente = ({
               marginBottom: "18",
             }}
           >
-            <View>{logoUrl(data.userId?.name)}</View>
+            <View>{logoUrlGrande(data.userId?.name)}</View>
             <Text
               style={{
                 color: "#CFCFCF",
@@ -268,9 +294,10 @@ const Presupuesto_Cliente = ({
               }}
             ></Text>
             <View style={{ fontSize: "8", marginRight: "110" }}>
-              <Text>Transformados de la Madera Jesús Sola, S.L</Text>
-              <Text>948 850 545 / 602 564 450</Text>
-              <Text>www.solacocinas.com / info@solacocinas.com</Text>
+              {/* <Text>{data.userId.name}</Text> */}
+              <Text>{data.userId.location}</Text>
+              <Text>{data.userId.phone}</Text>
+              {/* <Text>{data.userId.email}</Text> */}
             </View>
           </View>
 
@@ -916,7 +943,7 @@ const Presupuesto_Cliente = ({
                 </>
               )}
               <View>
-                <Text>I.V.A. (21,00%)</Text>
+                <Text>I.V.A. (21%)</Text>
               </View>
               <View style={{ marginTop: "1" }}>
                 <Text>
@@ -960,13 +987,11 @@ const Presupuesto_Cliente = ({
                 </View>
               )}
               <View>
-                {data?.discountCabinets && data?.discountCabinets != 0 ? (
-                  <Text>
-                    {calcularIva(data.importe, data.discountCabinets)}
-                  </Text>
-                ) : (
+                {/* {data?.discountCabinets && data?.discountCabinets != 0 ? ( */}
+                <Text>{calcularIva(data.importe, data.discountCabinets)}</Text>
+                {/* ) : (
                   <Text>{data.iva}</Text>
-                )}
+                 )} */}
               </View>
               <View
                 style={{
@@ -994,11 +1019,11 @@ const Presupuesto_Cliente = ({
           </View>
         </View>
         <View wrap={false}>
-          {filterData(data.details, "encimera").length > 0 && (
+          {filterData(data.details, "Encimera").length > 0 && (
             <View>
               <View style={{ marginBottom: totalEncimeras ? "0" : "20" }}>
                 {data.details &&
-                  filterData(data.details, "encimera") !== "" && (
+                  filterData(data.details, "Encimera") !== "" && (
                     <View>
                       <View
                         style={{
@@ -1058,11 +1083,10 @@ const Presupuesto_Cliente = ({
                   )}
                 {data &&
                   data.details &&
-                  filterData(data.details, "encimera").map((item) => {
+                  filterData(data.details, "Encimera").map((item) => {
                     const iva = calcularIva(item.total, data.discountEncimeras);
                     const totalConIva =
                       parseFloat(item.total) + parseFloat(iva);
-
                     return (
                       <View
                         style={{
@@ -1093,23 +1117,23 @@ const Presupuesto_Cliente = ({
               </View>
               {data.details &&
                 totalEncimeras &&
-                filterData(data.details, "encimera") !== "" && (
+                filterData(data.details, "Encimera") !== "" && (
                   <Total2
                     descuento={data.discountEncimeras}
                     importe={data.details}
-                    seccion={"encimera"}
+                    seccion={"Encimera"}
                   />
                 )}
             </View>
           )}
         </View>
         <View wrap={false}>
-          {filterData(data.details, "equipamiento").length > 0 && (
+          {filterData(data.details, "Equipamiento").length > 0 && (
             <View>
               <View style={{ marginBottom: totalEquipamiento ? "0" : "20" }}>
                 <View>
                   {data.details &&
-                    filterData(data.details, "equipamiento") !== "" && (
+                    filterData(data.details, "Equipamiento") !== "" && (
                       <View>
                         <View
                           style={{
@@ -1170,7 +1194,7 @@ const Presupuesto_Cliente = ({
                     )}
                   {data &&
                     data.details &&
-                    filterData(data.details, "equipamiento").map((item) => {
+                    filterData(data.details, "Equipamiento").map((item) => {
                       const iva = calcularIva(
                         item.total,
                         data.discountEncimeras
@@ -1218,11 +1242,11 @@ const Presupuesto_Cliente = ({
               >
                 {data.details &&
                   totalEquipamiento &&
-                  filterData(data.details, "equipamiento") !== "" && (
+                  filterData(data.details, "Equipamiento") !== "" && (
                     <Total2
                       descuento={data.discountEquipamientos}
                       importe={data.details}
-                      seccion={"equipamiento"}
+                      seccion={"Equipamiento"}
                     />
                   )}
               </View>
@@ -1230,13 +1254,13 @@ const Presupuesto_Cliente = ({
           )}
         </View>
         <View wrap={false}>
-          {filterData(data.details, "electrodomestico").length > 0 && (
+          {filterData(data.details, "Electrodomestico").length > 0 && (
             <View>
               <View
                 style={{ marginBottom: totalElectrodomesticos ? "0" : "20" }}
               >
                 {data.details &&
-                  filterData(data.details, "electrodomestico") !== "" && (
+                  filterData(data.details, "Electrodomestico") !== "" && (
                     <View>
                       <View
                         style={{
@@ -1292,7 +1316,7 @@ const Presupuesto_Cliente = ({
                   )}
                 {data &&
                   data.details &&
-                  filterData(data.details, "electrodomestico").map((item) => {
+                  filterData(data.details, "Electrodomestico").map((item) => {
                     const iva = calcularIva(item.total, data.discountEncimeras);
                     const totalConIva =
                       parseFloat(item.total) + parseFloat(iva);
@@ -1331,11 +1355,11 @@ const Presupuesto_Cliente = ({
               </View>
               {data.details &&
                 totalElectrodomesticos &&
-                filterData(data.details, "electrodomestico") !== "" && (
+                filterData(data.details, "Electrodomestico") !== "" && (
                   <Total2
                     descuento={data.discountElectrodomesticos}
                     importe={data.details}
-                    seccion={"electrodomestico"}
+                    seccion={"Electrodomestico"}
                   />
                 )}
             </View>
@@ -1363,7 +1387,7 @@ const Presupuesto_Cliente = ({
               }}
               id="observaciones"
             >
-              {String(data.observation).length >= 15
+              {String(data.observation).length > 0
                 ? String(data.observation).trim()
                 : ""}
             </Text>
@@ -1402,7 +1426,8 @@ const Presupuesto_Cliente = ({
               fixed
             />
           </View>
-          {logoLocal(data.userId?.name)}
+          <Image style={{ width: "30" }} src={LogoSola} />
+          {/* {logoUrl(data.userId?.name)} */}
         </View>
       </Page>
     </Document>

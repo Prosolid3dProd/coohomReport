@@ -98,7 +98,6 @@ export const getOrders = async (params) => {
       token: Settings.TOKEN,
     });
     // console.log(data.data)
-    // console.log("getOrders")
     return data.data;
   } catch (error) {
     console.log(error);
@@ -110,6 +109,7 @@ export const getComplements = async (params) => {
   try {
     const data = await _AXIOS_.get(
       `${CONFIG.API.BACKEND_URL}/reportCoohomComplements`,
+      // "http://localhost:3000/verTodosComplementos2",
       {
         ...params,
         token: Settings.TOKEN,
@@ -163,6 +163,7 @@ export const getOrderById = async (params) => {
     });
     localStorage.setItem("orderErp", JSON.stringify(data.data));
 
+    // console.log(data.data, "getOrderById");
     return data.data;
   } catch (error) {
     console.log(error);
@@ -360,6 +361,16 @@ export const fixOrder = (order, onSuccess = () => {}) => {
     let discountElectrodomesticosPorcentaje = 0;
     let discountEquipamientosPorcentaje = 0;
 
+    let ivaEncimerasPorcentaje = 0;
+    let ivaCabinetsPorcentaje = 0;
+    let ivaElectrodomesticosPorcentaje = 0;
+    let ivaEquipamientosPorcentaje = 0;
+    // let ivaEncimeras = 0;
+    // let ivaCabinets = 0;
+    // let ivaElectrodomesticos = 0;
+    // let ivaEquipamientos = 0;
+
+    // Calculando los descuentos individuales
     if (parseFloat(order.discountEncimeras) > 0) {
       discountEncimerasPorcentaje =
         parseFloat(total) * (parseFloat(order.discountEncimeras) / 100);
@@ -380,7 +391,33 @@ export const fixOrder = (order, onSuccess = () => {}) => {
         parseFloat(total) * (parseFloat(order.discountEquipamientos) / 100);
     }
 
-    const iva = parseFloat((total.toFixed(2) * 21) / 100);
+    // Calculando los IVA individuales
+    if (parseFloat(order.ivaEncimeras) > 0) {
+      ivaEncimerasPorcentaje =
+        (parseFloat(total) * parseFloat(order.ivaEncimeras)) / 100;
+    }
+
+    if (parseFloat(order.ivaCabinets) > 0) {
+      ivaCabinetsPorcentaje =
+        (parseFloat(total) * parseFloat(order.ivaCabinets)) / 100;
+    }
+
+    if (parseFloat(order.ivaElectrodomesticos) > 0) {
+      ivaElectrodomesticosPorcentaje =
+        (parseFloat(total) * parseFloat(order.ivaElectrodomesticos)) / 100;
+    }
+
+    if (parseFloat(order.ivaEquipamientos) > 0) {
+      ivaEquipamientosPorcentaje =
+        (parseFloat(total) * parseFloat(order.ivaEquipamientos)) / 100;
+    }
+
+    const iva =
+      ivaEncimerasPorcentaje +
+      ivaCabinetsPorcentaje +
+      ivaElectrodomesticosPorcentaje +
+      ivaEquipamientosPorcentaje;
+
     const orderJson = {
       ...order,
       importe: parseFloat(total).toFixed(2),
@@ -399,6 +436,14 @@ export const fixOrder = (order, onSuccess = () => {}) => {
       discountCabinetsPorcentaje,
       discountElectrodomesticosPorcentaje,
       discountEquipamientosPorcentaje,
+      ivaEncimerasPorcentaje,
+      ivaCabinetsPorcentaje,
+      ivaElectrodomesticosPorcentaje,
+      ivaEquipamientosPorcentaje,
+      // ivaEncimeras,
+      // ivaCabinets,
+      // ivaElectrodomesticos,
+      // ivaEquipamientos,
     };
 
     setLocalOrder(orderJson);

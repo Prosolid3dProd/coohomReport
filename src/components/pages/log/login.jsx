@@ -30,11 +30,12 @@ const Login = () => {
    * @return {Component} --> mensaje error | fin de programa
    */
   const onFinish = async (values) => {
+    
     const result = await login({
       email: values.email,
       password: values.password,
     });
-
+    console.log(result)
     const { ok, message } = result;
 
     if (!ok) return onFailed(message);
@@ -43,7 +44,7 @@ const Login = () => {
     localStorage.setItem("token", JSON.stringify(result));
     localStorage.removeItem("init");
 
-    window.location.reload();
+    // window.location.reload();
 
     window.location.href = "/Dashboard/Presupuestos";
   };

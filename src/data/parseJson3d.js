@@ -269,6 +269,8 @@ const getFrente = (block) => {
     return { datos: block, tipo: "frente" };
   }
 
+  // console.log(block, "TODOS LOS CAJONES");
+
   const findFrente = (subModels) => {
     if (!subModels) return undefined;
 
@@ -276,6 +278,12 @@ const getFrente = (block) => {
       const customCode = String(item.customCode);
       if (item.subModels && item.subModels.length > 0) {
         return customCode.startsWith(DOOR_PREFIX) || customCode === FRENTE_FIJO;
+      } else if (block.customCode === "1002") {
+        return block.subModels.find((int) => {
+          return (
+            int.modelBrandGoodName.toLocaleUpperCase().indexOf("BASE") !== -1
+          );
+        });
       }
       return false;
     });
@@ -283,6 +291,7 @@ const getFrente = (block) => {
 
   const frente = findFrente(block.subModels);
   if (frente) {
+    // console.log(frente, "FRENTE");
     return { datos: frente, tipo: "cajon" };
   }
 
@@ -315,7 +324,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
     materialCasco !== "00-ANTRACITA" &&
     materialCasco !== "01-BLANCO";
   if (needsMaterialSurcharge) {
-    price += price * 0.06;
+    price += price * 0.1;
   }
 
   return price.toFixed(2);
@@ -323,19 +332,19 @@ const getPrice = (parametros, tipo, materialCasco) => {
 
 const getRef = (parametros, reference) => {
   // Inicialización de referencia
+
   reference.ref = parametros.obsBrandGoodId;
   reference.type = "C";
 
   const updateReference = (value) => {
     const trimmedValue = value.trim();
     const upperValue = trimmedValue.toLocaleUpperCase();
-
-    if (upperValue.startsWith(CONFIG.MODELNAME.SOBREENCIMERAS.CODE)) {
+    if (upperValue.includes(CONFIG.MODELNAME.SOBREENCIMERAS.CODE)) {
       reference.type = CONFIG.MODELNAME.MURALES.CODE;
     } else if (upperValue.startsWith(CONFIG.MODELNAME.FORRADO.CODE)) {
       reference.type = CONFIG.MODELNAME.FORRADO.CODE;
     } else if (["RA", "RB", "RM"].includes(trimmedValue.substring(0, 2))) {
-      reference.type = trimmedValue.substring(1, 2);
+      reference.type = "R";
     } else if (trimmedValue.startsWith("AF")) {
       reference.type = "A";
     } else if (["BF", "BP", "BH"].includes(trimmedValue.substring(0, 2))) {
@@ -349,7 +358,6 @@ const getRef = (parametros, reference) => {
     } else {
       reference.type = trimmedValue.substring(0, 1);
     }
-
     reference.ref = value;
   };
 
@@ -374,8 +382,8 @@ const getRef = (parametros, reference) => {
     reference.type = "F";
   } else if (modelNameUpper.includes("M.")) {
     reference.type = "M";
-  } else if (modelNameUpper.includes("MURAL")) {
-    reference.type = "M";
+    // } else if (modelNameUpper.includes("MURAL")) {
+    //   reference.type = "M";
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.INTEGRACIONES.NAME) {
     reference.type = CONFIG.MODELNAME.INTEGRACIONES.CODE;
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.REGLETAS.NAME) {
@@ -389,7 +397,7 @@ const getRef = (parametros, reference) => {
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.COSTADOS.NAME) {
     reference.type = CONFIG.MODELNAME.COSTADOS.CODE;
   } else if (parametros.modelProductNumber === "脚线") {
-    reference.type = "T";
+    reference.type = "";
   } else if (modelNameUpper.includes("PLACA")) {
     reference.type = "B";
   }
@@ -507,43 +515,44 @@ const getInfoDoor = (submodels) => {
 
 const getInfoHandler = (submodels) => {
   let handler = "";
-
-  if (submodels) {
-    submodels.forEach((item) => {
-      if (
-        String(item.customCode).trim().substring(0, 2) ===
-        CONFIG.CUSTOMCODE.HANDLER
-      ) {
-        handler = item.modelBrandGoodName;
-      }
-    });
-  }
+  submodels?.forEach((item) => {
+    if (
+      String(item.customCode).trim().substring(0, 2) ===
+      CONFIG.CUSTOMCODE.HANDLER
+    ) {
+      handler = item.modelBrandGoodName;
+    }
+  });
   return handler;
 };
 
 const getInfoCabinet = (submodels) => {
   let values = {
     materialCabinet: null,
-    modelCabinet: null,
   };
 
   submodels.forEach((item) => {
-    const modelNameUpper = String(item.modelName).toLocaleUpperCase();
-    const modelBrandGoodNameUpper = String(
-      item.modelBrandGoodName
-    ).toLocaleUpperCase();
-    const customCode = String(item.customCode).trim().substring(0, 2);
-
     if (
-      modelNameUpper.includes("CASCO") ||
-      modelBrandGoodNameUpper.includes("CASCO") ||
-      customCode === CONFIG.CUSTOMCODE.CASCO
+      (String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 &&
+        item.customCode === undefined) ||
+      (String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==
+        -1 &&
+        item.customCode === undefined)
     ) {
-      values.materialCabinet = item.textureName;
-      //El modelCabinet no se deberia de reasignar, tendria que ser null (cambio)
-      values.modelCabinet = item.modelProductNumber;
+      values = {
+        materialCabinet: item.textureName,
+      };
     }
+
+    /*if (
+      String(item.customCode).trim().substring(0, 2) === CONFIG.CUSTOMCODE.CASCO
+    ) {
+      values = {
+        materialCabinet: item.textureName,
+      };
+    }*/
   });
+
   return values;
 };
 
@@ -617,29 +626,135 @@ const getTotalDoors = (submodels) => {
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DOOR) {
-      let perfilPrice = 0;
-
-      // ESE TIPO DE PUERTAS LLEVAN UN PERFIL Y HAY QUE SUMARLE EL PRECIO DE ESTE A LA PUERTA
-      const brandNameUpper = String(
-        item.modelBrandGoodName
-      ).toLocaleUpperCase();
+      let perfil;
+      //ESE TIPO DE PUERTAS LLEVAN UN PERFIL Y HAY QUE SUMARLE EL PRECIO DE ESTE A LA PUERTA
       if (
-        brandNameUpper.includes("PURA") ||
-        brandNameUpper.includes("GP") ||
-        brandNameUpper.includes("MONTEA")
+        String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("PURA") !==
+          -1 ||
+        String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("GP") !==
+          -1 ||
+        String(item.modelBrandGoodName)
+          .toLocaleUpperCase()
+          .indexOf("MONTEA") !== -1
       ) {
-        const perfil = getPerfil(item.subModels);
-        perfilPrice = parseFloat(perfil?.price || 0);
+        perfil = getPerfil(item.subModels);
       }
-      total += parseFloat(getPrice(item)) + perfilPrice;
+      total =
+        parseFloat(getPrice(item)) + total + parseFloat(perfil?.price || 0);
     }
   });
-  return total.toFixed(2);
+  return parseFloat(total).toFixed(2);
 };
+
+// const getParameters = (param, tipoMueble) => {
+//   let op = [];
+
+//   const casco = param.subModels.find((x) =>
+
+//     x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
+
+//   );
+
+//   if (casco !== undefined) {
+//     const mcv = casco.subModels.find((x) => {
+//       const upperCaseModelName = x.modelName?.toLocaleUpperCase();
+
+//       if (upperCaseModelName) {
+//         if (
+//           upperCaseModelName.includes("VISTO IZQ") ||
+//           upperCaseModelName.includes("VISTO DER") ||
+//           upperCaseModelName.includes("AMBOS")||
+//           upperCaseModelName.includes("TODOS ACABADOS")
+
+//         ) {
+//           return x.textureName;
+//         }
+//       }
+//     });
+//     const cv = casco.parameters.find((x) =>
+//       x.name == "CV" && x.value > 0 ? x.value : undefined
+//     );
+//     if (cv !== undefined) {
+//       op.push({
+//         name: cv.displayName || null,
+//         value: parseFloat(cv.value) || null,
+//         description: cv.description || null,
+//         nameValue: cv.optionValues[cv.options?.indexOf(cv.value)].name || null,
+//         mcv: mcv&&mcv!==undefined?mcv.textureName : null,
+//       });
+//     }
+//   }
+//   param.parameters.forEach((item) => {
+//     //para quitar las variante que vienen activas por defecto
+//     let bool = true;
+//     if (
+//       // String(item.name) === "CIZ" ||
+//       String(item.name) === "ELEC" ||
+//       String(item.name) === "CVI" ||
+//       String(item.name) === "CPI" ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "ME") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "MPF2P") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "PE") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "ME") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "MPF2P") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "PE") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "MTCEC") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "UM")
+//       /* String(item.name) == "ME" ||
+//       String(item.name) === "MPF2P" ||
+//       String(item.name) === "PE" ||
+//       String(item.name) === "MTCEC" ||
+//       String(item.name) === "UM" ||
+//       */
+//     ) {
+//       bool = false;
+//     }
+//     if (item.name == "FSK" && item.value < 0) {
+//       op.push({
+//         name: item.displayName,
+//         value: parseFloat(item.value),
+//         description: item.description,
+//         nameValue: item.optionValues[item.options?.indexOf(item.value)].name,
+//       });
+//     } else if (
+//       parseFloat(item.value) > 0 &&
+//       item.description !== null &&
+//       item.description !== "" &&
+//       bool
+//     ) {
+//       let nameValue;
+//       if (item.options.length > 2) {
+//         nameValue = item.optionValues[item.options?.indexOf(item.value)].name;
+//       }
+//       op.push({
+//         name: item.displayName,
+//         value: parseFloat(item.value),
+//         description: item.description,
+//         nameValue,
+//       });
+//     }
+//   });
+//   return op;
+// };
 
 const getParameters = (param, tipoMueble) => {
   let op = [];
-
   const casco = param.subModels.find((x) =>
     x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
   );
@@ -685,6 +800,18 @@ const getParameters = (param, tipoMueble) => {
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
 
+    if (itemName === "PVA") {
+      op.push({
+        name: item.displayName,
+        value: parseFloat(item.value),
+        description: item.description,
+        nameValue:
+          item.options.length > 2
+            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+            : undefined,
+      });
+    }
+
     if (excludedNames.includes(itemName)) return;
 
     if (itemName === "FSK" && item.value < 0) {
@@ -706,12 +833,71 @@ const getParameters = (param, tipoMueble) => {
       });
     }
   });
+
   return op;
 };
 
+// const getPriceParameters = (param, tipoMueble) => {
+//   let precioVariant = 0;
+//   param.forEach((item) => {
+//     //borrar
+//     let bool = true;
+
+//     if (
+//       // String(item.name) === "CIZ" ||
+//       String(item.name) === "ELEC" ||
+//       String(item.name) === "CVI" ||
+//       String(item.name) === "CPI" ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "ME") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "MPF2P") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "B" &&
+//         String(item.name) === "PE") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "ME") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "MPF2P") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "PE") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "MTCEC") ||
+//       (tipoMueble != undefined &&
+//         String(tipoMueble) == "A" &&
+//         String(item.name) === "UM")
+//       /* String(item.name) == "ME" ||
+//       String(item.name) === "MPF2P" ||
+//       String(item.name) === "PE" ||
+//       String(item.name) === "MTCEC" ||
+//       String(item.name) === "UM" ||
+//       */
+//     ) {
+//       bool = false;
+//     }
+
+//     if (
+//       parseFloat(item.value) > 0 &&
+//       item.description !== null &&
+//       item.description !== "" &&
+//       bool
+//     ) {
+//       precioVariant += parseFloat(item.value);
+//     }
+
+//     //borrar
+//   });
+//   return parseFloat(precioVariant).toFixed(2);
+// };
+
 const getPriceParameters = (param, tipoMueble) => {
   let precioVariant = 0;
-
   const excludedNames = [
     "ELEC",
     "CVI",
@@ -725,8 +911,16 @@ const getPriceParameters = (param, tipoMueble) => {
 
     if (excludedNames.includes(itemName)) return;
 
-    if (parseFloat(item.value) > 0 && item.description) {
-      precioVariant += parseFloat(item.value);
+    if (itemName === "PVA") {
+      precioVariant += 15;
+    }
+
+    if (itemName === "AP") return;
+
+    const itemValue = itemName === "PVA" ? 15 : parseFloat(item.value);
+
+    if (itemValue > 0 && item.description) {
+      precioVariant += itemValue;
     }
   });
   return parseFloat(precioVariant).toFixed(2);
@@ -735,14 +929,54 @@ const getPriceParameters = (param, tipoMueble) => {
 const getCalculoFondo = (item) => {
   const fondoPuerta = CONFIG.FONDOPUERTA;
   const size = {
-    x: item.boxSize.x,
-    y:
-      item.modelProductNumber &&
-      item.modelProductNumber.toUpperCase() !== "ACCESORIOS"
-        ? item.boxSize.y + fondoPuerta
-        : item.boxSize.y,
-    z: item.boxSize.z,
+    x: 0,
+    y: 0,
+    z: 0,
   };
+
+  // if (
+  //   String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
+  //   item.boxSize.y >= 150 &&
+  //   item.boxSize.y < 700
+  // ) {
+  //   size.y = item.boxSize.y + 2;
+  // } else if (
+  //   String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
+  //   item.boxSize.y >= 700
+  // ) {
+  //   size.y = item.boxSize.y + 4;
+  // } else
+
+  if (
+    String(item.modelProductNumber).toUpperCase() !== "ACCESORIOS" &&
+    String(item.modelProductNumber).toUpperCase() !== "REGLETAS"
+  ) {
+    size.y = item.boxSize.y + fondoPuerta;
+  } else {
+    size.y = item.boxSize.y;
+  }
+
+  size.x = item.boxSize.x;
+  size.z = item.boxSize.z;
+
+  /* item.subModels.forEach((item) => {
+      if (String(item.customCode).substring(0, 2) === config.customCode.drawer) {
+        item.subModels?.forEach((item) => {
+          if (item && item.subModels && item.subModels.length > 0) {
+            if (
+              String(item.customCode).substring(0, 2) === config.customCode.door
+            ) {
+              fondoPuerta = item.boxSize.y;
+            }
+          }
+        });
+      } else if (
+        String(item.customCode).substring(0, 2) === config.customCode.door
+      ) 
+        fondoPuerta = item.boxSize.y;
+      }
+    });*/
+
   return size;
 };
 
@@ -1066,9 +1300,6 @@ export const parseJson3D = async (json) => {
               String(submodel.customCode) === "1001"
                 ? (puertasInfo = getInfoDoor(submodel.subModels))
                 : (puertasInfo = getInfoDoor(item.subModels));
-              // if (puertasInfo.handler) {
-              //   modelHandlerArray.push(puertasInfo.handler);
-              // }
             }
           });
 
@@ -1091,7 +1322,7 @@ export const parseJson3D = async (json) => {
               });
             }
           });
-          // console.log(tapasTiradores);
+          // console.log(tapasArray);
           // ----------------------------------------------------
           if (cajonesInfo.modelDrawer) {
             if (referenceType.ref?.indexOf(".BC") !== -1) {
@@ -1114,7 +1345,6 @@ export const parseJson3D = async (json) => {
             ...puertasInfo,
             ...cajonesInfo,
           };
-
           cajonesInfo?.modelDrawer &&
             cajonesInfo?.modelDrawer !== "undefined" &&
             cajonesInfo?.modelDrawer?.indexOf("Cajon") === -1 &&
@@ -1126,8 +1356,10 @@ export const parseJson3D = async (json) => {
 
           item.subModels.map((filtroMaterialDrawer) => {
             if (filtroMaterialDrawer.customCode === "1001") {
+              // console.log(filtroMaterialDrawer, "fuera")
               filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
                 if (matInteriorDrawer.customCode === "0201") {
+                  // console.log(matInteriorDrawer, "dentro")
                   cajonesInfo?.materialDrawer &&
                     cajonesInfo?.materialDrawer !== "undefined" &&
                     cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
@@ -1144,12 +1376,12 @@ export const parseJson3D = async (json) => {
 
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
+            // console.log(item)
             const isCustomCode1001 =
               String(filtroModelDoor.customCode).trim() === "1001";
             const isDoorCustomCode =
               String(filtroModelDoor.customCode).trim().substring(0, 2) ===
               CONFIG.CUSTOMCODE.DOOR;
-
             if (isCustomCode1001 || isDoorCustomCode) {
               if (
                 puertasInfo?.modelDoor &&
@@ -1160,16 +1392,20 @@ export const parseJson3D = async (json) => {
                 !puertasInfo?.modelDoor.includes("Sola") &&
                 !puertasInfo?.modelDoor.includes("Corte")
               ) {
+                // console.log(filtroModelDoor)
                 modelDoorArray.push(puertasInfo?.modelDoor);
               }
             }
+            // console.log(modelDoorArray);
           });
 
           item.subModels.map((filtroMaterialDoor) => {
+            // console.log(item)
             if (
               String(filtroMaterialDoor.customCode).trim().substring(0, 2) ===
               CONFIG.CUSTOMCODE.DOOR
             ) {
+              // console.log(filtroMaterialDoor)
               puertasInfo?.materialDoor &&
                 puertasInfo?.materialDoor !== "undefined" &&
                 puertasInfo?.materialDoor?.indexOf("Cajon") === -1 &&
@@ -1179,6 +1415,7 @@ export const parseJson3D = async (json) => {
                 puertasInfo?.materialDoor?.indexOf("Corte") === -1 &&
                 materialDoorArray.push(puertasInfo?.materialDoor);
             }
+            // console.log(materialDoorArray)
           });
 
           armazonInfo?.modelCabinet &&
@@ -1191,19 +1428,21 @@ export const parseJson3D = async (json) => {
             modelCabinetArray.push(armazonInfo?.modelCabinet);
 
           item.subModels.map((filtroArmazon) => {
+            // console.log(item)
             if (
-              String(filtroArmazon.modelName)
+              String(filtroArmazon.modelBrandGoodName)
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
               armazonInfo?.materialCabinet &&
                 armazonInfo?.materialCabinet !== "undefined" &&
+                armazonInfo?.materialCabinet !== null &&
                 armazonInfo?.materialCabinet?.indexOf("Cajon") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Gaveta") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Sola") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
-                armazonInfo?.materialCabinet?.indexOf("Corte") === -1;
-              materialCabinetArray.push(armazonInfo?.materialCabinet);
+                armazonInfo?.materialCabinet?.indexOf("Corte") === -1 &&
+                materialCabinetArray.push(armazonInfo?.materialCabinet);
             }
           });
 
@@ -1259,8 +1498,7 @@ export const parseJson3D = async (json) => {
               });
             }
             if (
-              (item.customCode !== "1002" &&
-                customCodeSubstring === CONFIG.CUSTOMCODE.DRAWER) ||
+              customCodeSubstring === CONFIG.CUSTOMCODE.DRAWER ||
               item.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO
             ) {
               frente = getFrente(item);
@@ -1365,6 +1603,7 @@ export const parseJson3D = async (json) => {
               }
             });
 
+          // Buscar casco para pasarlo directamente
           // const casco = item.subModels.find((x) =>
           //   x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
           // );
@@ -1396,7 +1635,6 @@ export const parseJson3D = async (json) => {
             doors.push(getDoors(item.subModels));
 
             let isComplement = false;
-
             if (
               String(item.modelProductNumber).toLocaleUpperCase() ===
               "COMPLEMENTOS"
@@ -1453,7 +1691,6 @@ export const parseJson3D = async (json) => {
           parseFloat(getTotalDoors(item.subModels)) +
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
       }
-
       const referenceTiradores = (item) => {
         for (const reference of item.ignoreParameters) {
           if (reference.name === "REF") {
@@ -1461,7 +1698,6 @@ export const parseJson3D = async (json) => {
           }
         }
       };
-
       for (const cabinet of cabinets) {
         if (
           String(cabinet.modelProductNumber).toLocaleUpperCase() ===
@@ -1479,7 +1715,6 @@ export const parseJson3D = async (json) => {
           }
         }
       }
-
       item.subModels
         .filter((element) => String(element.modelTypeId) === "1")
         .map((element) => {
@@ -1509,7 +1744,6 @@ export const parseJson3D = async (json) => {
             });
           }
         });
-
       modelHandlerArray.forEach((handler) => {
         tiradoresCabecera.push(handler.name);
       });
@@ -1531,11 +1765,13 @@ export const parseJson3D = async (json) => {
       drawerTemp = modelDrawer[0].modelDrawer;
       drawerTexture = modelDrawer[0].textureDrawer;
     }
-    cabinets.map((costados) => {
-      if (costados.tipo === "O") {
-        costados.size.y = costados.size.y - 20;
+
+    cabinets.map((filtro) => {
+      if (filtro.tipo === "O") {
+        filtro.size.y = filtro.size.y - 20;
       }
     });
+
     const orderJson = {
       ...(json.partnerOrder || null),
       projectName: json.designData.designName || "",
@@ -1573,6 +1809,12 @@ export const parseJson3D = async (json) => {
       designerName: json.partnerOrder?.designerName || "",
       storeName: json.partnerOrder?.storeName || "",
     };
+
+    const orderJsonWhitoutZocalos = cabinets.filter(
+      (filtro) => filtro.modelProductNumber !== "脚线"
+    );
+    orderJson.cabinets = orderJsonWhitoutZocalos;
+
     return orderJson;
 
     // const res = await createOrder(orderJson);

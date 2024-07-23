@@ -20,7 +20,50 @@ axios.interceptors.request.use(
 
 export const createUser = async (params) => {
   try {
-    const { data } = await axios.post("/reportCoohomUser", {
+    const { data } = await axios.post("/createUserCoohom", {
+      ...params,
+      token,
+    });
+    console.log(data);
+    return data;
+  } catch (error) {
+    handleAxiosError(error);
+    return error;
+  }
+};
+
+export const resetPassword = async (params) => {
+  try {
+    const { data } = await axios.post("/resetPasswordUserCoohom", {
+      ...params,
+    });
+    console.log(data);
+    return data;
+  } catch (error) {
+    handleAxiosError(error);
+    return error;
+  }
+};
+
+export const deleteUser = async (params) => {
+  try {
+    const data = await axios.post(
+      `${CONFIG.API.BACKEND_URL}/deleteUserCoohom`,
+      {
+        ...params,
+        token,
+      }
+    );
+    return data.data;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+export const getUsers = async (params) => {
+  try {
+    const { data } = await axios.post("/reportCoohomUserLists", {
       ...params,
       token,
     });
@@ -32,25 +75,15 @@ export const createUser = async (params) => {
   }
 };
 
-export const getUsers = async (params) => {
+export const updateUser = async (params) => {
   try {
-    const { data } = await axios.post("/reportCoohomUserLists", {
+    const data = await axios.post(`${CONFIG.API.BACKEND_URL}/editUserCoohom`, {
       ...params,
       token,
     });
-    return data;
+    return data.data;
   } catch (error) {
-    handleAxiosError(error);
-    return false;
-  }
-};
-
-export const updateUser = async (params) => {
-  try {
-    const { data } = await axios.put("/", { ...params, token });
-    return data;
-  } catch (error) {
-    handleAxiosError(error);
+    console.log(error);
     return false;
   }
 };

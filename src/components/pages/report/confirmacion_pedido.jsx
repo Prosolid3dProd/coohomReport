@@ -8,6 +8,15 @@ import {
   Font,
   StyleSheet,
 } from "@react-pdf/renderer";
+import LogoALLER from "../../../assets/ALLER.jpeg";
+import LogoRAEL from "../../../assets/RAEL.jpeg";
+import LogoKUBS from "../../../assets/KUBS.jpeg";
+import LogoCERAPAL from "../../../assets/CERAPAL.jpeg";
+import LogoJ10 from "../../../assets/J10.jpeg";
+import LogoDecor from "../../../assets/DECORMOBILIARIO.jpeg";
+import Sukaldeak from "../../../assets/Sukaldeak.jpeg";
+import Alkain from "../../../assets/Alkain.jpeg";
+import Sukaldatu from "../../../assets/Sukaldatu.jpeg";
 import LogoSola from "../../../assets/sola.png";
 import { CONFIG } from "../../../data/constants";
 import { SolaImagenes } from "./solaImages";
@@ -31,8 +40,57 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     accesorios: [],
   });
 
+  const logoUrl = (name) => {
+    if (name === "Aller Alvarez") {
+      return <Image style={{ width: "30" }} src={LogoALLER} />;
+    } else if (name === "decormobiliario") {
+      return <Image style={{ width: "30" }} src={LogoDecor} />;
+    } else if (name === "KUBS") {
+      return <Image style={{ width: "30" }} src={LogoKUBS} />;
+    } else if (name === "j10") {
+      return <Image style={{ width: "30" }} src={LogoJ10} />;
+    } else if (name === "RAEL") {
+      return <Image style={{ width: "30" }} src={LogoRAEL} />;
+    } else if (name === "CERAPAL") {
+      return <Image style={{ width: "30" }} src={LogoCERAPAL} />;
+    } else if (name === "Kitchen sukaldeak") {
+      return <Image style={{ width: "30" }} src={Sukaldeak} />;
+    } else if (name === "Alkain") {
+      return <Image style={{ width: "30" }} src={Alkain} />;
+    } else {
+      return <Image style={{ width: "30" }} src={LogoSola} />;
+    }
+  };
+
+  const logoUrlGrande = (name) => {
+    if (name === "Aller Alvarez") {
+      return <Image style={{ width: "100" }} src={LogoALLER} />;
+    } else if (name === "decormobiliario") {
+      return <Image style={{ width: "100" }} src={LogoDecor} />;
+    } else if (name === "KUBS") {
+      return <Image style={{ width: "100" }} src={LogoKUBS} />;
+    } else if (name === "j10") {
+      return <Image style={{ width: "100" }} src={LogoJ10} />;
+    } else if (name === "RAEL") {
+      return <Image style={{ width: "100" }} src={LogoRAEL} />;
+    } else if (name === "CERAPAL") {
+      return <Image style={{ width: "100" }} src={LogoCERAPAL} />;
+    } else if (name === "Kitchen sukaldeak") {
+      return <Image style={{ width: "100" }} src={Sukaldeak} />;
+    } else if (name === "Alkain") {
+      return <Image style={{ width: "100" }} src={Alkain} />;
+    } else if (name === "Sukaldatu") {
+      return <Image style={{ width: "100" }} src={Sukaldatu} />;
+    } else {
+      return <Image style={{ width: "100" }} src={LogoSola} />;
+    }
+  };
+
   const logoLocal = (name) => {
-    return <Image style={{ width: "30" }} src={LogoSola} />;
+    return <Image src={LogoSola} style={{ width: "30" }} />;
+  };
+  const logoLocalGrande = (name) => {
+    return <Image src={name} style={{ width: "100" }} />;
   };
 
   const grayscaleFilter = (color) => {
@@ -48,9 +106,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
    */
   const formatNumber = (x) => {
     if (!x) return 0;
-    const result = (
-      parseFloat(x).toFixed(0) * parseFloat(data.coefficient).toFixed(2)
-    ).toFixed(0);
+    const result =
+      // parseFloat(x).toFixed(0) * parseFloat(data.profile.role === "admin" ? data.userId.coefficient : data.coefficient).toFixed(2)
+      (
+        parseFloat(x).toFixed(0) * parseFloat(data.coefficient).toFixed(2)
+      ).toFixed(0);
     return result;
   };
 
@@ -145,6 +205,13 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
       });
   }, [data]);
 
+  // const changeRegletas = (largoRegletas) => {
+  //   data.map((largoReg) => {
+  //     console.log(largoReg);
+  //   });
+  //   console.log(largoRegletas);
+  // };
+
   // Función para calcular la suma total de los precios
   const calcularSumaTotal = (productos) => {
     return productos.reduce(
@@ -157,6 +224,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     (total, zocalo) => total + (zocalo.precio ? zocalo.precio : 0),
     0
   );
+
   const calcularTotalDescuentos = (data) => {
     let totalDescuentos = 0;
     const descuentos = [
@@ -181,13 +249,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     return totalDescuentos;
   };
 
-  const changeRegletas = (largoRegletas) => {
-    data.map((largoReg) => {
-      console.log(largoReg);
-    });
-    console.log(largoRegletas);
-  };
-
   const calcularTotalConDescuento = (
     sumaTotal,
     totalZocalo,
@@ -201,6 +262,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     totalZocalo,
     totalDescuentos
   ) => {
+    // const total =
+    //   (sumaTotal + totalZocalo) * (1 + parseFloat(data.profile.iva) / 100);
     const total = (sumaTotal + totalZocalo) * 1.21;
     const totalConDescuento = total - totalDescuentos;
     return parseFloat(totalConDescuento).toFixed(2);
@@ -208,10 +271,18 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
   const calcularIva = (sumaTotalSinDescuento) => {
     return parseFloat(sumaTotalSinDescuento * 0.21).toFixed(2);
+    // const iva = parseFloat(
+    //   sumaTotalSinDescuento * (parseFloat(data.profile.iva) / 100)
+    // ).toFixed(2);
+    // data.iva = iva;
+    // return iva;
   };
 
   const calcularTotal = (sumaTotalSinDescuento) => {
     return parseFloat(sumaTotalSinDescuento * 1.21).toFixed(2);
+    // return parseFloat(
+    //   sumaTotalSinDescuento * (1 + parseFloat(data.profile.iva) / 100)
+    // ).toFixed(2);
   };
 
   const sumaTotal = calcularSumaTotal(data.cabinets);
@@ -225,6 +296,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
       ? true
       : false;
 
+  console.log(data);
   return (
     <Document title="Presupuesto COOHOM">
       <Page
@@ -240,9 +312,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               justifyContent: "space-between",
             }}
           >
-            <View>
-              <Image style={{ width: "100" }} src={LogoSola} />
-            </View>
+            <View>{logoUrlGrande(data.userId?.name)}</View>
+            {/* <View>{logoLocalGrande(data.userId?.image)}</View> */}
             <Text
               style={{
                 fontSize: "14",
@@ -448,14 +519,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       {formatNumber(item.priceDrawers) > 0 && (
                         <Text>
                           - Frente:{" "}
-                          <Text
-                            style={{
-                              fontFamily: CONFIG.BOLD,
-                              fontSize: "8",
-                            }}
-                          >
-                            {formatNumber(item.priceDrawers)}
-                          </Text>
                           {item.drawerMaterialDetails.length > 0 &&
                             item.drawerPriceDetails.length > 0 && (
                               <View>
@@ -475,9 +538,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                                       ? `${modelo}-`
                                       : "";
 
-                                    return `[${formatNumber(
-                                      it
-                                    )}] ${modeloInfo}${acabado}/ `;
+                                    return `${modeloInfo}${acabado}/ `;
                                   })}
                                 </Text>
                               </View>
@@ -492,7 +553,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             - Tiradores: {`${item.doors.acabadoTirador}/ `}
                           </Text>
                         )}
-                      {item.drawerMaterialDetails !== undefined &&
+                      {/* {item.drawerMaterialDetails !== undefined &&
                         item.drawerMaterialDetails.length > 0 && (
                           <View>
                             {item.drawerPriceDetails.some((it, index) => {
@@ -523,7 +584,42 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                               </Text>
                             )}
                           </View>
+                        )} */}
+                      {item.drawerMaterialDetails !== undefined &&
+                        item.drawerMaterialDetails.length > 0 && (
+                          <View>
+                            {item.drawerMaterialDetails.some(
+                              (materialDetail) => {
+                                const acabadoTirador =
+                                  materialDetail?.acabadoTirador;
+                                return (
+                                  acabadoTirador !== undefined &&
+                                  acabadoTirador.trim() !== ""
+                                );
+                              }
+                            ) && (
+                              <Text>
+                                - Tiradores:
+                                {item.drawerMaterialDetails.map(
+                                  (materialDetail, index) => {
+                                    const acabadoTirador =
+                                      materialDetail?.acabadoTirador;
+                                    if (
+                                      acabadoTirador !== undefined &&
+                                      acabadoTirador.trim() !== ""
+                                    ) {
+                                      const acabadoInfo = `${acabadoTirador}`;
+                                      return `${acabadoInfo} / `;
+                                    } else {
+                                      return "";
+                                    }
+                                  }
+                                )}
+                              </Text>
+                            )}
+                          </View>
                         )}
+
                       {formatNumber(item.priceDoor) > 0 && (
                         <Text>
                           - Puertas:{" "}
@@ -535,7 +631,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           >
                             {/* {formatNumber(item.priceDoor)} */}
                           </Text>
-                          {`[${formatNumber(item.doors.price)}] ${
+                          {`${
                             item.doors.name?.toLocaleUpperCase() +
                             "-" +
                             item.doors.material
@@ -547,12 +643,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         <Text>
                           - Armazón:{" "}
                           <Text style={{ fontSize: "8" }}>
-                            {item.material || item.materialCabinet} / [{" "}
-                            {formatNumber(item.priceCabinet)}]
+                            {item.material || item.materialCabinet}
+                            {/* / [{" "}{formatNumber(item.priceCabinet)}] */}
                           </Text>
                         </Text>
                       )}
-
                       {formatNumber(item.priceVariants) > 0 && (
                         <View
                           style={{
@@ -565,8 +660,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {it.name}: {it.nameValue || it.description} / [
-                              {it.value}] {it.mcv}
+                              {it.name}: {it.nameValue || it.description}{" "}
+                              {it.value} / {it.mcv}
                             </Text>
                           ))}
                         </View>
@@ -708,15 +803,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       {formatNumber(item.priceDrawers) > 0 && (
                         <Text>
                           - Frente:{" "}
-                          <Text
-                            style={{
-                              fontFamily: CONFIG.BOLD,
-                              fontSize: "8",
-                            }}
-                          >
-                            {" "}
-                            {formatNumber(item.priceDrawers)}
-                          </Text>
                           {item.drawerMaterialDetails.length > 0 &&
                             item.drawerPriceDetails.length > 0 && (
                               <View>
@@ -727,12 +813,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                                 >
                                   {item.drawerPriceDetails.map(
                                     (it, index) =>
-                                      `[${formatNumber(it)}]  ${
-                                        item.drawerMaterialDetails[index].modelo
-                                      }-${
-                                        item.drawerMaterialDetails[index]
-                                          .Acabado
-                                      }/ `
+                                      `${item.drawerMaterialDetails[index].modelo}-${item.drawerMaterialDetails[index].Acabado}/ `
                                   )}
                                 </Text>
                               </View>
@@ -750,7 +831,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           >
                             {/* {formatNumber(item.priceDoor)} */}
                           </Text>
-                          {`[${formatNumber(item.doors.price)}] ${
+                          {` ${
                             item.doors.name.toLocaleUpperCase() +
                             "-" +
                             item.doors.material
@@ -764,7 +845,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             - Tiradores: {`${item.doors.acabadoTirador}/ `}
                           </Text>
                         )}
-                      {item.drawerMaterialDetails !== undefined &&
+                      {/* {item.drawerMaterialDetails !== undefined &&
                         item.drawerMaterialDetails.length > 0 && (
                           <View>
                             {item.drawerPriceDetails.some((it, index) => {
@@ -795,13 +876,48 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                               </Text>
                             )}
                           </View>
+                        )} */}
+                      {item.drawerMaterialDetails !== undefined &&
+                        item.drawerMaterialDetails.length > 0 && (
+                          <View>
+                            {item.drawerMaterialDetails.some(
+                              (materialDetail) => {
+                                const acabadoTirador =
+                                  materialDetail?.acabadoTirador;
+                                return (
+                                  acabadoTirador !== undefined &&
+                                  acabadoTirador.trim() !== ""
+                                );
+                              }
+                            ) && (
+                              <Text>
+                                - Tiradores:
+                                {item.drawerMaterialDetails.map(
+                                  (materialDetail, index) => {
+                                    const acabadoTirador =
+                                      materialDetail?.acabadoTirador;
+                                    if (
+                                      acabadoTirador !== undefined &&
+                                      acabadoTirador.trim() !== ""
+                                    ) {
+                                      const acabadoInfo = `${acabadoTirador}-`;
+                                      return `${acabadoInfo}/ `;
+                                    } else {
+                                      return "";
+                                    }
+                                  }
+                                )}
+                              </Text>
+                            )}
+                          </View>
                         )}
+
                       {formatNumber(item.priceCabinet) > -1 && (
                         <Text>
                           - Armazón:{" "}
                           <Text style={{ fontSize: "8" }}>
-                            {item.material || item.materialCabinet} / [{" "}
-                            {formatNumber(item.priceCabinet)} ]
+                            {item.material || item.materialCabinet}
+                            {/* / [{" "}{formatNumber(item.priceCabinet)} ] */}
                           </Text>
                         </Text>
                       )}
@@ -818,8 +934,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {it.name}: {it.nameValue || it.description} / [
-                              {it.value}] {it.mcv}
+                              {it.name}: {it.nameValue || it.description}{" "}
+                              {it.value} / {it.mcv}
                             </Text>
                           ))}
                         </View>
@@ -971,21 +1087,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
                     {formatNumber(item.priceDrawers) > 0 && (
-                      <Text>
-                        - Frente:{" "}
-                        <Text
-                          style={{
-                            fontFamily: CONFIG.BOLD,
-                            fontSize: "8",
-                          }}
-                        >
-                          {" "}
-                          {formatNumber(item.priceDrawers)}
-                        </Text>
-                        {item.drawerPriceDetails.map(
-                          (item) => ` [${formatNumber(item)}] `
-                        )}
-                      </Text>
+                      <Text>- Frente: </Text>
                     )}
                     {formatNumber(item.priceDoor) > 0 && (
                       <View
@@ -1016,8 +1118,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text>
                         - Armazón:{" "}
                         <Text style={{ fontSize: "8" }}>
-                          {item.material || item.materialCabinet} / [{" "}
-                          {formatNumber(item.priceCabinet)} ]
+                          {item.material || item.materialCabinet}
+                          {/* / [{" "}{formatNumber(item.priceCabinet)} ] */}
                         </Text>
                       </Text>
                     )}
@@ -1031,11 +1133,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       >
                         {" "}
                         <Text>Variantes: </Text>
-                        {item.variants.map((item) => (
+                        {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.nameValue || item.description} /
-                            [{item.value}] {item.mcv}
+                            {it.name}: {it.nameValue || it.description}{" "}
+                            {it.value} / {it.mcv}
                           </Text>
                         ))}
                       </View>
@@ -1174,21 +1276,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
                     {formatNumber(item.priceDrawers) > 0 && (
-                      <Text>
-                        - Frente:{" "}
-                        <Text
-                          style={{
-                            fontFamily: CONFIG.BOLD,
-                            fontSize: "8",
-                          }}
-                        >
-                          {" "}
-                          {formatNumber(item.priceDrawers)}
-                        </Text>
-                        {item.drawerPriceDetails.map(
-                          (item) => ` [${formatNumber(item)}] `
-                        )}
-                      </Text>
+                      <Text>- Frente: </Text>
                     )}
                     <Text>- Frente: {item.materialRegletaF}</Text>
 
@@ -1221,8 +1309,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text>
                         - Armazón:{" "}
                         <Text style={{ fontSize: "8" }}>
-                          {item.materialRegleta} / [{" "}
-                          {formatNumber(item.priceCabinet)} ]
+                          {item.materialRegleta}
+                          {/* / [{" "}{formatNumber(item.priceCabinet)} ] */}
                         </Text>
                       </Text>
                     )}
@@ -1236,11 +1324,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       >
                         {" "}
                         <Text>Variantes: </Text>
-                        {item.variants.map((item) => (
+                        {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.nameValue || item.description} /
-                            [{item.value}] {item.mcv}
+                            {it.name}: {it.nameValue || it.description}{" "}
+                            {it.value} / {it.mcv}
                           </Text>
                         ))}
                       </View>
@@ -1400,21 +1488,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       </View>
                     )}
                     {formatNumber(item.priceDrawers) > 0 && (
-                      <Text>
-                        - Frente:{" "}
-                        <Text
-                          style={{
-                            fontFamily: CONFIG.BOLD,
-                            fontSize: "8",
-                          }}
-                        >
-                          {" "}
-                          {formatNumber(item.priceDrawers)}
-                        </Text>
-                        {item.drawerPriceDetails.map(
-                          (item) => ` [${formatNumber(item)}] `
-                        )}
-                      </Text>
+                      <Text>- Frente: </Text>
                     )}
                     {formatNumber(item.priceDoor) > 0 && (
                       <View
@@ -1445,8 +1519,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text>
                         - Acabado:{" "}
                         <Text style={{ fontSize: "8" }}>
-                          {item.materialCostado || "No hay acabado"} / [{" "}
-                          {formatNumber(item.priceCabinet)} ]
+                          {item.materialCostado || "No hay acabado"}
                         </Text>
                       </Text>
                     )}
@@ -1460,11 +1533,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       >
                         {" "}
                         <Text>Variantes: </Text>
-                        {item.variants.map((item) => (
+                        {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.nameValue || item.description} /
-                            [{item.value}] {item.mcv}
+                            {it.name}: {it.nameValue || it.description}{" "}
+                            {it.value} / {it.mcv}
                           </Text>
                         ))}
                       </View>
@@ -1602,21 +1675,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
                     {formatNumber(item.priceDrawers) > 0 && (
-                      <Text>
-                        - Frente:{" "}
-                        <Text
-                          style={{
-                            fontFamily: CONFIG.BOLD,
-                            fontSize: "8",
-                          }}
-                        >
-                          {" "}
-                          {formatNumber(item.priceDrawers)}
-                        </Text>
-                        {item.drawerPriceDetails.map(
-                          (item) => ` [${formatNumber(item)}] `
-                        )}
-                      </Text>
+                      <Text>- Frente: </Text>
                     )}
                     {formatNumber(item.priceDoor) > 0 && (
                       <View
@@ -1648,10 +1707,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
                         - Acabado:{" "}
-                        <Text style={{ fontSize: "8" }}>
-                          {item.material} / [ {formatNumber(item.priceCabinet)}{" "}
-                          ]
-                        </Text>
+                        <Text style={{ fontSize: "8" }}>{item.material}</Text>
                       </Text>
                     )}
 
@@ -1664,11 +1720,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       >
                         {" "}
                         <Text>Variantes: </Text>
-                        {item.variants.map((item) => (
+                        {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {item.name}: {item.nameValue || item.description} /
-                            [{item.value}] {item.mcv}
+                            {it.name}: {it.nameValue || it.description}{" "}
+                            {it.value} / {it.mcv}
                           </Text>
                         ))}
                       </View>
@@ -2155,6 +2211,24 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
                   </View>
+                  {formatNumber(item.priceVariants) > 0 && (
+                    <View
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      {" "}
+                      <Text>Variantes: </Text>
+                      {item.variants.map((it) => (
+                        <Text>
+                          {" "}
+                          {it.name}: {it.nameValue || it.description} {it.value}{" "}
+                          / {it.mcv}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
                   {item?.observation !== undefined &&
                     item?.observation.length > 0 && (
                       <View
@@ -2199,7 +2273,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               fixed
             />
           </View>
-          {logoLocal(data.userId?.name)}
+          <Image style={{ width: "30" }} src={LogoSola} />
+          {/* {logoUrl(data.userId?.name)} */}
+          {/* {logoLocal(data.userId?.name)} */}
         </View>
         {price && (
           <View
@@ -2268,9 +2344,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     <Text>IMPORTE</Text>
                   </View>
                 )}
-
                 <View>
-                  <Text>I.V.A. (21,00%)</Text>
+                  <Text>I.V.A. (21%)</Text>
                 </View>
                 <View style={{ marginTop: "1" }}>
                   <Text>

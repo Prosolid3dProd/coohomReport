@@ -32,100 +32,100 @@ import {
   agregarMueble,
 } from "./logic/index";
 
-const createRows = (
-  cols,
-  cabs,
-  cabinets,
-  setModal,
-  setColsM,
-  setRowsM,
-  setCab,
-  setBool,
-  setModalVariante,
-  setIndexMueble
-) => {
-  const vals = [];
-  for (let i = 0; i < cabinets.length; i++) {
-    let cab = cabinets[i];
-    cab = {
-      ...cab,
-      ["action"]: (
-        <div className="flex gap-2">
-          <Button
-            className="w-[65px] text-blue border-blue cursor-pointer transition-all ease-out duration-350 hover:text-blue/75 grid place-content-center"
-            onClick={(evento) => {
-              setIndexMueble(obtenerMuebleIndex(evento));
-              setModalVariante((modal) => (modal = true));
-            }}
-            data-index={i}
-          >
-            Agregar
-          </Button>
-          <Button
-            className="w-[65px] text-blue border-blue cursor-pointer transition-all ease-out duration-350 hover:text-blue/75"
-            onClick={() => {
-              setModal((modal) => !modal);
-              const titulos = [];
-              const datos = [];
-              const muebles = Object.entries(cab);
+// const createRows = (
+//   cols,
+//   cabs,
+//   cabinets,
+//   setModal,
+//   setColsM,
+//   setRowsM,
+//   setCab,
+//   setBool,
+//   setModalVariante,
+//   setIndexMueble
+// ) => {
+//   const vals = [];
+//   for (let i = 0; i < cabinets.length; i++) {
+//     let cab = cabinets[i];
+//     cab = {
+//       ...cab,
+//       ["action"]: (
+//         <div className="flex gap-2">
+//           <Button
+//             className="w-[65px] text-blue border-blue cursor-pointer transition-all ease-out duration-350 hover:text-blue/75 grid place-content-center"
+//             onClick={(evento) => {
+//               setIndexMueble(obtenerMuebleIndex(evento));
+//               setModalVariante((modal) => (modal = true));
+//             }}
+//             data-index={i}
+//           >
+//             Agregar
+//           </Button>
+//           <Button
+//             className="w-[65px] text-blue border-blue cursor-pointer transition-all ease-out duration-350 hover:text-blue/75"
+//             onClick={() => {
+//               setModal((modal) => !modal);
+//               const titulos = [];
+//               const datos = [];
+//               const muebles = Object.entries(cab);
 
-              for (let i = 0; i < muebles.length; i++) {
-                const mueble = muebles[i];
-                const key = mueble[0];
+//               for (let i = 0; i < muebles.length; i++) {
+//                 const mueble = muebles[i];
+//                 const key = mueble[0];
 
-                if (key === "action") continue; //No queremos los botones
-                const val = mueble[1];
+//                 if (key === "action") continue; //No queremos los botones
+//                 const val = mueble[1];
 
-                if (typeof val === "object") continue; //No queremos los valores tipo object (arrays, objects, etc)
+//                 if (typeof val === "object") continue; //No queremos los valores tipo object (arrays, objects, etc)
 
-                titulos.push(key);
-                datos.push(val);
-              }
+//                 titulos.push(key);
+//                 datos.push(val);
+//               }
 
-              setColsM((cols) => (cols = titulos));
-              setRowsM((rows) => (rows = datos));
-              setCab((c) => (c = { index: i, muebles: cabinets, cab: cab }));
-            }}
-          >
-            Edit
-          </Button>
-          <PopUpDelete
-            confirmar={() => {
-              eliminarMueble(i);
-              setBool((bool) => (bool = true));
-            }}
-          />
-        </div>
-      ),
-    };
-    const cabIncl = Object.keys(cab)
-      .map((key) => {
-        if (!omitirColumnas(cabs).includes(key)) {
-          return cab[key];
-        }
-        return;
-      })
-      .filter((col) => col !== undefined);
-    cabIncl.unshift(i.toString());
-    cabIncl.push(cab.variants);
-    vals.push(cabIncl);
-  }
-  const final = [];
-  for (let i = 0; i < vals.length; i++) {
-    const val = vals[i];
-    let x = {};
-    for (let j = 0; j < val.length; j++) {
-      const col = j === 0 ? "key" : cols[j - 1]?.title;
-      if (col === undefined) {
-        x = { ...x, ["variants"]: val[j] }; //Agregando 'variants'
-        continue;
-      }
-      x = { ...x, [col]: val[j] };
-    }
-    final.push(x);
-  }
-  return final;
-};
+//               setColsM((cols) => (cols = titulos));
+//               setRowsM((rows) => (rows = datos));
+//               setCab((c) => (c = { index: i, muebles: cabinets, cab: cab }));
+//             }}
+//           >
+//             Edit
+//           </Button>
+//           <PopUpDelete
+//             confirmar={() => {
+//               eliminarMueble(i);
+//               setBool((bool) => (bool = true));
+//             }}
+//           />
+//         </div>
+//       ),
+//     };
+//     const cabIncl = Object.keys(cab)
+//       .map((key) => {
+//         if (!omitirColumnas(cabs).includes(key)) {
+//           return cab[key];
+//         }
+//         return;
+//       })
+//       .filter((col) => col !== undefined);
+//     cabIncl.unshift(i.toString());
+//     cabIncl.push(cab.variants);
+//     vals.push(cabIncl);
+//   }
+//   const final = [];
+//   for (let i = 0; i < vals.length; i++) {
+//     const val = vals[i];
+//     let x = {};
+//     for (let j = 0; j < val.length; j++) {
+//       const col = j === 0 ? "key" : cols[j - 1]?.title;
+//       if (col === undefined) {
+//         x = { ...x, ["variants"]: val[j] }; //Agregando 'variants'
+//         continue;
+//       }
+//       x = { ...x, [col]: val[j] };
+//     }
+//     final.push(x);
+//   }
+//   return final;
+// };
 
 // const expandedRowRender = (e) => {
 //   const [data, columnas] = tablaExpansible(e);
