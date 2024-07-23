@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import {
   Button,
   Input,
@@ -10,70 +9,65 @@ import {
   message,
   Divider,
   Space,
-  Checkbox,
-  Upload,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import {
-  updateOrder,
-  setLocalOrder,
-  updateProfile,
-} from "../../handlers/order";
-import { existePrecio, getPrecio, setPrecio } from "../../data/localStorage";
+import { updateProfile } from "../../handlers/order";
+import { getUsers } from "../../handlers/user";
 
 const General = ({ data }) => {
   const [form] = Form.useForm();
-  const [initialValues] = useState({
-    email: data?.profile?.email,
-    phone: data?.profile?.phone,
-    location: data?.profile?.location,
-    logo: data?.profile?.logo,
-    coefficient: data?.profile?.coefficient,
-    iva: data?.profile?.iva,
-    observacion1: data?.profile?.observacion1,
-    observacion2: data?.profile?.observacion2,
-    observacion3: data?.profile?.observacion3,
-    observacion4: data?.profile?.observacion4,
-    observacion5: data?.profile?.observacion5,
-  });
+  const [initialValues, setInitialValues] = useState({});
 
-  // const [imageUrl, setImageUrl] = useState("");
-
-  // const getBase64 = (file, callback) => {
-  //   const reader = new FileReader();
-  //   reader.readAsDataURL(file);
-  //   reader.onload = () => callback(reader.result);
-  // };
-
-  // const handleChange = (info) => {
-  //   if (info.file.status === "done") {
-  //     // Get this url from response in real world.
-  //     getBase64(info.file.originFileObj, (imageUrl) => setImageUrl(imageUrl));
-  //   }
-  // };
-
-  // const customRequest = ({ file, onSuccess }) => {
-  //   setTimeout(() => {
-  //     onSuccess("ok");
-  //   }, 0);
-  // };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const users = await getUsers();
+        const currentUser = users.find(
+          (user) => user.email === data.profile.email
+        );
+        // console.log(data)
+        if (currentUser) {
+          const updatedValues = {
+            email: currentUser.email,
+            phone: currentUser.phone,
+            location: currentUser.location,
+            logo: currentUser.logo,
+            coefficient: currentUser.coefficient,
+            iva: currentUser.iva,
+            observacion1: currentUser.observacion1,
+            observacion2: currentUser.observacion2,
+            observacion3: currentUser.observacion3,
+            observacion4: currentUser.observacion4,
+            observacion5: currentUser.observacion5,
+          };
+          setInitialValues(updatedValues);
+          form.setFieldsValue(updatedValues);
+        }
+      } catch (error) {
+        message.error("Error al cargar los datos del usuario");
+      }
+    };
+    fetchUserData();
+  }, [data, form]);
 
   const onFinish = async (values) => {
-    if (data._id) {
-      const result = await updateProfile({
-        ...values,
-      });
-
-      if (result) {
-        message.success("Se ha actualizado correctamente");
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
+    try {
+      if (data._id) {
+        const result = await updateProfile({ ...values });
+        if (result) {
+          message.success("Se ha actualizado correctamente");
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        }
       }
+    } catch (error) {
+      message.error("Error al actualizar el perfil");
     }
   };
+
   return (
-    <Card className="rounded-nonel bg-gray rounded-none border border-border">
+    <Card className="rounded-none bg-gray border border-border">
       <Form
         layout="vertical"
         form={form}
@@ -81,7 +75,7 @@ const General = ({ data }) => {
         onFinish={onFinish}
       >
         <Row gutter={16}>
-          <Col xs={24} sm={24} md={24}>
+          <Col xs={24}>
             <Divider orientation="left">
               <p className="uppercase">
                 <b>Mi perfil de tienda</b>
@@ -89,120 +83,63 @@ const General = ({ data }) => {
             </Divider>
           </Col>
 
-          <Col xs={24} sm={24} md={8}>
+          <Col xs={24} md={8}>
             <Form.Item label="Email" name="email">
               <Input placeholder="" maxLength="100" />
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={24} md={8}>
+          <Col xs={24} md={8}>
             <Form.Item label="Télefono" name="phone">
               <Input placeholder="" />
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={24} md={8}>
+          <Col xs={24} md={8}>
             <Form.Item label="Localizacion" name="location">
               <Input placeholder="" maxLength="100" />
             </Form.Item>
           </Col>
 
-          {/* <Col xs={24} sm={24} md={8}>
-            <Form.Item label="Logo" name="logo">
-              <Input placeholder="" maxLength="100" />
-            </Form.Item>
-          </Col> */}
+          <Col xs={24}>
+            <Divider orientation="left">
+              <p className="uppercase">
+                <b>Acerca de los Precios</b>
+              </p>
+            </Divider>
+          </Col>
 
-          {/* <Col xs={24} sm={24} md={12}>
-            <Form.Item label="Logo" name="logo">
-              <div>
-                <Upload
-                  name="avatar"
-                  listType="picture-card"
-                  className="avatar-uploader"
-                  showUploadList={false}
-                  customRequest={customRequest}
-                  onChange={handleChange}
-                >
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt="avatar"
-                      style={{ width: "100%" }}
-                    />
-                  ) : (
-                    <div>
-                      <UploadOutlined />
-                      <div style={{ marginTop: 8 }}>Subir</div>
-                    </div>
-                  )}
-                </Upload>
-              </div>
+          <Col xs={24} md={4}>
+            <Form.Item label="Punto de Compra" name="coefficient">
+              <Input
+                placeholder=""
+                maxLength="5"
+                max={10}
+                min={0}
+                disabled={data.profile.role === "client"}
+              />
             </Form.Item>
-          </Col> */}
+          </Col>
 
-          <Divider orientation="left">
-            <p className="uppercase">
-              {" "}
-              <b>Acerca de los Precios</b>
-            </p>
-          </Divider>
+          <Col xs={24}>
+            <Divider orientation="left">
+              <b className="uppercase">Observaciones</b>{" "}
+              <span className="italic text-slate-400">(%)</span>
+            </Divider>
+          </Col>
 
-          {data.profile.role === "client" ? (
-            <Col xs={24} sm={24} md={4}>
-              <Form.Item label="Coeficiente Tiendas" name="coefficient">
-                <Input placeholder="" maxLength="5" max={10} min={0} disabled />
-              </Form.Item>
-            </Col>
-          ) : (
-            <Col xs={24} sm={24} md={4}>
-              <Form.Item label="Coeficiente Tiendas" name="coefficient">
-                <Input placeholder="" maxLength="5" max={10} min={0} />
-              </Form.Item>
-            </Col>
-          )}
-          {/* <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Coeficiente Tiendas" name="coefficient">
-              <Input placeholder="" maxLength="5" max={10} min={0} />
-            </Form.Item>
-          </Col> */}
-          {/* <Col xs={24} sm={24} md={2}>
-            <Form.Item label="IVA" name="iva">
-              <Input placeholder="" maxLength="5"  disabled/>
-            </Form.Item>
-          </Col> */}
-          <Divider orientation="left" className="px-10">
-            <b className="uppercase">Observaciones</b>{" "}
-            <span className="italic text-slate-400">(%)</span>
-          </Divider>
-          <Row className="w-full px-10 gap-4">
-            <Col xs={24} sm={24} md={24}>
-              <Form.Item label="Observación Linea 1" name="observacion1">
+          {[...Array(5)].map((_, index) => (
+            <Col key={index} xs={24}>
+              <Form.Item
+                label={`Observación Linea ${index + 1}`}
+                name={`observacion${index + 1}`}
+              >
                 <Input />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={24}>
-              <Form.Item label="Observación Linea 2" name="observacion2">
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={24}>
-              <Form.Item label="Observación Linea 3" name="observacion3">
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={24}>
-              <Form.Item label="Observación Linea 4" name="observacion4">
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={24}>
-              <Form.Item label="Observación Linea 5" name="observacion5">
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Col xs={24} sm={24} md={24}>
+          ))}
+
+          <Col xs={24}>
             <Space>
               <Button
                 htmlType="submit"
@@ -226,4 +163,5 @@ const General = ({ data }) => {
     </Card>
   );
 };
+
 export default General;

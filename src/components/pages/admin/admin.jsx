@@ -54,7 +54,7 @@ const onFinish = async (values, setListaTiendas) => {
       return MENSAJES.ERROR("Conexión Base de Datos");
     }
     setListaTiendas(tiendasTemporal);
-    MENSAJES.INFO(nuevaTienda.name);
+    MENSAJES.INFO(nuevaTienda[0].name);
   } catch (error) {
     console.error("Error en onFinish:", error);
   }
@@ -322,7 +322,7 @@ const Admin = () => {
       fixed: "left",
     },
     { title: "Email", width: 100, dataIndex: "email", key: "email" },
-    { title: "Teléfono", width: 60, dataIndex: "phone", key: "phone" },
+    
     {
       title: "Acción",
       key: "operation",

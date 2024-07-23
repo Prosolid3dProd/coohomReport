@@ -322,10 +322,70 @@ const getPrice = (parametros, tipo, materialCasco) => {
   const needsMaterialSurcharge =
     isCabinet &&
     materialCasco !== "00-ANTRACITA" &&
-    materialCasco !== "01-BLANCO";
+    materialCasco !== "01-BLANCO"
+    materialCasco !== "02-ANGORA";
   if (needsMaterialSurcharge) {
     price += price * 0.1;
   }
+
+  if (
+    isCabinet &&
+    parametros.textureCustomCode === "PLAM" &&
+    materialCasco === "171-EUCALIPTO"
+  ) {
+    price += price * 0.1;
+  }
+  if (
+    isCabinet &&
+    parametros.textureCustomCode === "PLAM" &&
+    materialCasco === "172-ROBLE"
+  ) {
+    price += price * 0.1;
+  }
+  if (
+    isCabinet &&
+    parametros.textureCustomCode === "PLAM" &&
+    materialCasco === "169-NOGAL NATURAL"
+  ) {
+    price += price * 0.1;
+  }
+
+  if (isCabinet && parametros.textureCustomCode === "PLAM") {
+    price += price * 0.25;
+  }
+
+  if (
+    (isCabinet && parametros.textureCustomCode === "ESTB") ||
+    parametros.textureCustomCode === "ESTF" ||
+    parametros.textureCustomCode === "ESTM"
+  ) {
+    price += price * 0.4;
+  }
+
+  if (
+    (isCabinet && parametros.textureCustomCode === "NP300") ||
+    parametros.textureCustomCode === "NP200" ||
+    parametros.textureCustomCode === "P200L"
+  ) {
+    price += price * 0.6;
+  }
+
+  if (
+    (isCabinet && parametros.textureCustomCode === "LACAM") ||
+    parametros.textureCustomCode === "LACAB"
+  ) {
+    price += price * 0.6;
+  }
+
+  if (isCabinet && parametros.textureCustomCode === "PANT") {
+    price += price * 0.35;
+  }
+
+  console.log(
+    parametros,
+    parametros.textureCustomCode,
+    materialCasco || "Nada"
+  );
 
   return price.toFixed(2);
 };
@@ -801,7 +861,7 @@ const getParameters = (param, tipoMueble) => {
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
 
-    if (itemName === "PVA") {
+    if (itemName === "PVA" || itemName === "PVL") {
       op.push({
         name: item.displayName,
         value: parseFloat(item.value),
@@ -912,13 +972,14 @@ const getPriceParameters = (param, tipoMueble) => {
 
     if (excludedNames.includes(itemName)) return;
 
-    if (itemName === "PVA") {
+    if (itemName === "PVA" || itemName === "PVL") {
       precioVariant += 15;
     }
 
-    if (itemName === "AP") return;
+    if (itemName === "AP" || itemName === "INTV") return;
 
-    const itemValue = itemName === "PVA" ? 15 : parseFloat(item.value);
+    const itemValue =
+      itemName === "PVA" || itemName === "PVL" ? 15 : parseFloat(item.value);
 
     if (itemValue > 0 && item.description) {
       precioVariant += itemValue;

@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-
 import { General, Product, Profile } from "./../../index";
-
 import { Tabs, FloatButton, Card, Button, Space } from "antd";
 import {
   getOrders,
@@ -12,20 +10,14 @@ import {
   getProfile,
 } from "../../../handlers/order";
 import { Header, Muebles } from "../../content";
-
 import { PDFViewer } from "@react-pdf/renderer";
-
 import LogoERP from "../../../assets/logoERP.png";
-
 import { Presupuesto_Cliente, Presupuesto_Fabrica } from "./index";
-
 import {
   existePrecio,
   existeTotales,
   getPrecio,
-  getTabActual,
   getTotales,
-  setTabActual,
 } from "../../../data/localStorage";
 import { ArrowUp } from "../../icons";
 import "./report.css";
@@ -34,13 +26,11 @@ import Confirmacion_Pedido from "./confirmacion_pedido";
 async function buscarNodoPorCodigo(codigoBuscado) {}
 
 const Report = () => {
-  const [main, setMain] = useState(document.getElementById("main"));
-
-  window.onload = () =>
-    setMain((main) => (main = document.getElementById("main")));
-
-  const [data, setData] = useState(null); // [{}
+  const [main, setMain] = useState(null);
+  const [data, setData] = useState(null);
   const [orderId, setOrderId] = useState(getLocalOrder());
+  const [visible, setBtnVisible] = useState(false);
+  const [tabActivo, setTabActivo] = useState(0); // Set the initial active tab to 0
 
   const priceC = existePrecio(getPrecio("C"));
   const priceF = existePrecio(getPrecio("F"));
@@ -52,11 +42,21 @@ const Report = () => {
   );
 
   useEffect(() => {
+    setMain(document.getElementById("main"));
+  }, [window.location]);
+
+  useEffect(() => {
     if (orderId._id) {
       getOrden();
       buscarNodoPorCodigo("3FO3XYGTXB12");
     }
   }, [orderId]);
+
+  useEffect(() => {
+    if (orderId._id) {
+      fixOrder(data, () => {}, tabActivo);
+    }
+  }, [tabActivo]);
 
   const tabs = [
     {
@@ -86,7 +86,20 @@ const Report = () => {
       ),
     },
     {
-      "Vista previa Cliente": (
+      "Presupuesto Venta Detallado": (
+        <div className="alturaPreview">
+          <PDFViewer className="h-full w-full">
+            <Confirmacion_Pedido
+              price={priceP}
+              data={data}
+              title="Presupuesto"
+            />
+          </PDFViewer>
+        </div>
+      ),
+    },
+    {
+      "Presupuesto Venta Simplificado": (
         <div className="alturaPreview">
           <PDFViewer className="h-full w-full">
             <Presupuesto_Cliente
@@ -100,13 +113,6 @@ const Report = () => {
         </div>
       ),
     },
-    // {
-    //   "Tabla de Muebles": (
-    //     <div className="alturaPreview">
-    //       <Muebles />
-    //     </div>
-    //   ),
-    // },
     {
       "Información General": (
         <div className="alturaPreview">
@@ -130,6 +136,10 @@ const Report = () => {
     },
   ];
 
+  const handleTabChange = (key) => {
+    setTabActivo(parseInt(key));
+  };
+
   const getOrden = async () => {
     try {
       const result = await getOrderById({ _id: orderId._id });
@@ -149,42 +159,27 @@ const Report = () => {
   };
 
   useEffect(() => {
-    if (orderId._id) {
-      getOrden();
+    if (main) {
+      const handleScroll = () => {
+        if (main.scrollTop > 100) {
+          setBtnVisible(true);
+        } else {
+          setBtnVisible(false);
+        }
+      };
+
+      main.addEventListener("scroll", handleScroll);
+      return () => main.removeEventListener("scroll", handleScroll);
     }
-  }, []);
-
-  const [visible, setBtnVisible] = useState(false);
-
-  useEffect(() => {
-    setMain((main) => (main = document.getElementById("main")));
-  }, [window.location]);
-
-  useEffect(() => {
-    window.onload = () =>
-      setMain((main) => (main = document.getElementById("main")));
-    main?.addEventListener("scroll", () => {
-      if (main?.scrollTop > 100) {
-        setBtnVisible((visible) => (visible = true));
-        return;
-      }
-      setBtnVisible((visible) => (visible = false));
-    });
-  });
-
-  const [tabActivo, setTabActivo] = useState(getTabActual());
-
-  useEffect(() => {
-    setTabActual(tabActivo);
-  }, [tabActivo]);
+  }, [main]);
 
   return (
     data &&
     data._id && (
-      <main className="flex flex-col">
+      <main className="flex flex-col" id="main">
         <Card className="rounded-none m-0 pt-0 border-0">
           <header
-            className=" border border-border bg-gray py-4"
+            className="border border-border bg-gray py-4"
             style={{ padding: 20 }}
           >
             <a href="#ancla" className="hidden" />
@@ -210,7 +205,6 @@ const Report = () => {
                   type: "application/json",
                 });
                 const url = URL.createObjectURL(blob);
-
                 const enlace = document.createElement("a");
                 enlace.href = url;
                 enlace.download = `${
@@ -228,14 +222,14 @@ const Report = () => {
             </Button>
           </header>
           <Tabs
-            onChange={(e) => setTabActivo((tab) => (tab = e))}
-            defaultActiveKey={tabActivo || 0}
+            onChange={handleTabChange}
+            activeKey={tabActivo.toString()}
             centered
             className="overflow-scroll"
             items={tabs.map((tabItem, i) => {
               return {
                 label: `${Object.keys(tabItem)}`,
-                key: i,
+                key: i.toString(),
                 children: Object.values(tabItem),
               };
             })}
