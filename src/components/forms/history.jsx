@@ -87,8 +87,12 @@ const History = () => {
       try {
         setLoad(true);
         const result = await getOrders({});
-        setInitialValues(result);
-          // result.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        if (Array.isArray(result)) {
+          result.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+          setInitialValues(result);
+        } else {
+          console.error("Error: getOrders() did not return an array.");
+        }
       } catch (error) {
         console.error("Error fetching orders:", error);
       } finally {

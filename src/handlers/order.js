@@ -163,7 +163,7 @@ export const getOrderById = async (params) => {
     });
     localStorage.setItem("orderErp", JSON.stringify(data.data));
 
-    // console.log(data.data, "getOrderById");
+    console.log(data.data, "getOrderById");
     return data.data;
   } catch (error) {
     console.log(error);
@@ -331,15 +331,48 @@ export const importLibrary = async (formData) => {
   }
 };
 
-export const fixOrder = (order, onSuccess = () => {}) => {
+export const fixOrder = (order, onSuccess = () => {}, tab = 0) => {
   let total = 0;
   let priceTotal = 0;
   let cabinetsArray = [];
+  // const role = order.profile.role;
+  // let coefficient;
+  
+  // // Check if order and profile are defined
+  // if (!order || !order.profile) {
+  //   console.error("Order or order profile is undefined");
+  //   return;
+  // }
+
+  // console.log("Order:", order);
+  // console.log("Role:", role);
+  // console.log("Tab:", tab);
+
+  // if (!data) {
+  //   console.error("Data is undefined");
+  //   return;
+  // }
+
+  // if ((role === "admin" && tab === 0) || tab === 1) {
+  //   coefficient = order.coefficient;
+  // } else if ((role === "client" && tab === 0) || tab === 1) {
+  //   coefficient = order.userId.coefficientVentaTienda;
+  // } else if ((role === "admin" && tab === 2) || tab === 3) {
+  //   coefficient = order.profile.coefficient;
+  // } else if ((role === "client" && tab === 2) || tab === 3) {
+  //   coefficient = order.userId.coefficientVentaTienda;
+  // }
+
+  // if (!coefficient) {
+  //   console.error("Coefficient is undefined");
+  //   return;
+  // }
+
+  // console.log("Coefficient:", coefficient);
 
   if (order) {
     order.cabinets.forEach((item) => {
       let totalVariants = 0;
-
       priceTotal = parseFloat(item.total) * parseFloat(order.coefficient);
       total = total + priceTotal;
 
@@ -348,7 +381,6 @@ export const fixOrder = (order, onSuccess = () => {}) => {
           parseFloat(variant.value) * parseFloat(order.coefficient) +
           totalVariants;
       });
-
       cabinetsArray.push({
         ...item,
         priceTotal,
