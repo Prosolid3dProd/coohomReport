@@ -42,7 +42,7 @@ const General = ({ getData, data }) => {
     handle: data?.handle,
     drawer: data?.drawer,
     materialCabinet: data?.materialCabinet,
-    observation: data.observation.includes("null") ? "" : data.observation,
+    observation: data?.observation?.includes("null") ? "" : data.observation,
     fecha: String(data?.fecha).split(" ")[0],
     discountEncimeras: data?.discountEncimeras,
     discountCabinets: data?.discountCabinets,
