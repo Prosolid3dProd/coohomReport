@@ -1167,6 +1167,7 @@ const Presupuesto_Cliente = ({
                             flexDirection: "row",
                             marginTop: "4",
                             fontSize: "8",
+                            fontFamily: "Helvetica-Bold",
                           }}
                         >
                           <View
@@ -1278,6 +1279,7 @@ const Presupuesto_Cliente = ({
                               flexDirection: "row",
                               fontSize: "8",
                               marginTop: "4",
+                              fontFamily: "Helvetica-Bold",
                             }}
                           >
                             <View
@@ -1406,6 +1408,7 @@ const Presupuesto_Cliente = ({
                             flexDirection: "row",
                             fontSize: "8",
                             marginTop: "4",
+                            fontFamily: "Helvetica-Bold",
                           }}
                         >
                           <View style={{ width: "30" }}>
