@@ -32,8 +32,8 @@ const setTabActual = (tab) => localStorage.setItem('tabActual', JSON.stringify(t
  * @param {string} presupuesto
  * @returns {boolean}
  */
-const getPrecio = (presupuesto) => JSON.parse(localStorage.getItem(`Mostrar_Precios_${presupuesto.toUpperCase()}`))
-const getTotales = (presupuesto) => JSON.parse(localStorage.getItem(`Mostrar_Totales_${presupuesto.toUpperCase()}`))
+const getPrecio = (key) => JSON.parse(localStorage.getItem(`Mostrar_Precios_${key}`));
+const getTotales = (key) => JSON.parse(localStorage.getItem(`Mostrar_Totales_${key}`));
 
 /**
  *
@@ -42,15 +42,15 @@ const getTotales = (presupuesto) => JSON.parse(localStorage.getItem(`Mostrar_Tot
  * @param {boolean} toggle
  * @return {boolean}
  */
-const setPrecio = (presupuesto, toggle) => {
-    localStorage.setItem(`Mostrar_Precios_${presupuesto.toUpperCase()}`, JSON.stringify(toggle))
-    return getPrecio(presupuesto)
-}
+const setPrecio = (key, value) => {
+    localStorage.setItem(`Mostrar_Precios_${key}`, JSON.stringify(value));
+    return value;
+  };
 
-const setTotales = (presupuesto, toggle) => {
-    localStorage.setItem(`Mostrar_Totales_${presupuesto.toUpperCase()}`, JSON.stringify(toggle))
-    return getTotales(presupuesto)
-}
+  const setTotales = (key, value) => {
+    localStorage.setItem(`Mostrar_Totales_${key}`, JSON.stringify(value));
+    return value;
+  };
 
 /**
  *
@@ -58,8 +58,8 @@ const setTotales = (presupuesto, toggle) => {
  * @param {boolean | null} mostrarPrecio
  * @returns {boolean}
  */
-const existePrecio = (mostrarPrecio) => mostrarPrecio !== null ? mostrarPrecio : true
-const existeTotales = (mostrarTotales) => mostrarTotales !== null ? mostrarTotales : true
+const existePrecio = (value) => value !== null ? value : true;
+const existeTotales = (value) => value !== null ? value : true;
 
 const getLocalToken = () => JSON.parse(localStorage.getItem('token'))
 

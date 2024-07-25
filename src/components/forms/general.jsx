@@ -61,6 +61,30 @@ const General = ({ getData, data }) => {
   const [isClient, setIsClient] = useState(role === "client");
   const correctPassword = "1234";
 
+  const [precios, setPrecios] = useState({
+    C: existePrecio(getPrecio("C")),
+    F: existePrecio(getPrecio("F")),
+    P: existePrecio(getPrecio("P")),
+  });
+
+  const [totales, setTotales] = useState({
+    Encimeras: existeTotales(getTotales("Encimeras")),
+    Equipamiento: existeTotales(getTotales("Equipamiento")),
+    Electrodomesticos: existeTotales(getTotales("Electrodomesticos")),
+  });
+
+  const handlePrecioChange = (key) => {
+    const newPrecios = { ...precios, [key]: !precios[key] };
+    setPrecios(newPrecios);
+    setPrecio(key, newPrecios[key]);
+  };
+
+  const handleTotalesChange = (key) => {
+    const newTotales = { ...totales, [key]: !totales[key] };
+    setTotales(newTotales);
+    setTotales(key, newTotales[key]);
+  };
+
   const showModal = () => {
     if (isClient) {
       setIsOpenModal(true);
@@ -299,20 +323,20 @@ const General = ({ getData, data }) => {
               </Divider>
               <div className="flex flex-col">
                 <Checkbox
-                  checked={existePrecio(getPrecio("C"))}
-                  onChange={(e) => setPrecio("C", e.target.checked)}
+                  checked={precios.C}
+                  onChange={() => handlePrecioChange("C")}
                 >
                   Mostrar Precios Clientes
                 </Checkbox>
                 <Checkbox
-                  checked={existePrecio(getPrecio("F"))}
-                  onChange={(e) => setPrecio("F", e.target.checked)}
+                  checked={precios.F}
+                  onChange={() => handlePrecioChange("F")}
                 >
                   Mostrar Precios Fabrica
                 </Checkbox>
                 <Checkbox
-                  checked={existePrecio(getPrecio("P"))}
-                  onChange={(e) => setPrecio("P", e.target.checked)}
+                  checked={precios.P}
+                  onChange={() => handlePrecioChange("P")}
                 >
                   Mostrar Precios Confirmación Pedido
                 </Checkbox>
@@ -326,22 +350,20 @@ const General = ({ getData, data }) => {
               </Divider>
               <div className="flex flex-col">
                 <Checkbox
-                  checked={existeTotales(getTotales("Encimeras"))}
-                  onChange={(e) => setTotales("Encimeras", e.target.checked)}
+                  checked={totales.Encimeras}
+                  onChange={() => handleTotalesChange("Encimeras")}
                 >
                   Mostrar Totales Encimeras
                 </Checkbox>
                 <Checkbox
-                  checked={existeTotales(getTotales("Equipamiento"))}
-                  onChange={(e) => setTotales("Equipamiento", e.target.checked)}
+                  checked={totales.Equipamiento}
+                  onChange={() => handleTotalesChange("Equipamiento")}
                 >
                   Mostrar Totales Equipamiento
                 </Checkbox>
                 <Checkbox
-                  checked={existeTotales(getTotales("Electrodomesticos"))}
-                  onChange={(e) =>
-                    setTotales("Electrodomesticos", e.target.checked)
-                  }
+                  checked={totales.Electrodomesticos}
+                  onChange={() => handleTotalesChange("Electrodomesticos")}
                 >
                   Mostrar Totales Electrodomesticos
                 </Checkbox>

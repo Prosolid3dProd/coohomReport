@@ -102,8 +102,8 @@ const ShopsForm = ({ setListaTiendas }) => (
         <Input_ant />
       </Form.Item>
       <Form.Item
-        name="cif"
-        label="CIF"
+        name="nif"
+        label="NIF"
         className="w-full p-4 flex items-center m-0"
       >
         <Input_ant />
@@ -209,7 +209,7 @@ const Admin = () => {
     const fetchData = async () => {
       setLoad(true);
       try {
-        const result = await getUsers({});
+        const result = await getUsers();
         setListaTiendas(result);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -226,7 +226,7 @@ const Admin = () => {
       const filteredUser = {
         name: user.name,
         password: user.password,
-        cif: user.cif,
+        nif: user.nif,
         email: user.email,
         phone: user.phone,
         info3: user.info3,
@@ -250,8 +250,6 @@ const Admin = () => {
     try {
       const values = await form.validateFields();
       setConfirmLoading(true);
-      console.log(selectedUser.password);
-
       // Comprobar si la contraseña está en listaTiendas
       // const passwordExistsInStores = listaTiendas.some(store => store.password === selectedUser.password);
       // if (!passwordExistsInStores) {
@@ -322,7 +320,7 @@ const Admin = () => {
       fixed: "left",
     },
     { title: "Email", width: 100, dataIndex: "email", key: "email" },
-    
+
     {
       title: "Acción",
       key: "operation",
@@ -363,6 +361,7 @@ const Admin = () => {
       new Error("El email no es válido: no se permiten símbolos antes del @")
     );
   };
+
   return (
     <main className="overflow-y-scroll px-4 flex gap-4 flex-col">
       <Header actions={false} name={"Tiendas"} />
@@ -413,7 +412,7 @@ const Admin = () => {
           >
             <Input_ant />
           </Form.Item>
-          <Form.Item name="cif" label="CIF">
+          <Form.Item name="nif" label="NIF">
             <Input_ant />
           </Form.Item>
           <Form.Item

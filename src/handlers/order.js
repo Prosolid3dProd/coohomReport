@@ -161,6 +161,7 @@ export const getOrderById = async (params) => {
       ...params,
       token: Settings.TOKEN,
     });
+    //OrderErp es lo que me devuelve reporthomById si se quieren añadir campos supongo que habra que añadirlos al crear el reporte, (reportCoohom (post, put))
     localStorage.setItem("orderErp", JSON.stringify(data.data));
 
     console.log(data.data, "getOrderById");
@@ -331,55 +332,37 @@ export const importLibrary = async (formData) => {
   }
 };
 
-export const fixOrder = (order, onSuccess = () => {}, tab = 0) => {
+export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
   let total = 0;
   let priceTotal = 0;
   let cabinetsArray = [];
-  // const role = order.profile.role;
-  // let coefficient;
-  
-  // // Check if order and profile are defined
-  // if (!order || !order.profile) {
-  //   console.error("Order or order profile is undefined");
-  //   return;
-  // }
+  const role = JSON.parse(localStorage.getItem("token")).user.role;
 
-  // console.log("Order:", order);
-  // console.log("Role:", role);
-  // console.log("Tab:", tab);
+  let coefficient;
 
-  // if (!data) {
-  //   console.error("Data is undefined");
-  //   return;
-  // }
-
-  // if ((role === "admin" && tab === 0) || tab === 1) {
-  //   coefficient = order.coefficient;
-  // } else if ((role === "client" && tab === 0) || tab === 1) {
-  //   coefficient = order.userId.coefficientVentaTienda;
-  // } else if ((role === "admin" && tab === 2) || tab === 3) {
-  //   coefficient = order.profile.coefficient;
-  // } else if ((role === "client" && tab === 2) || tab === 3) {
-  //   coefficient = order.userId.coefficientVentaTienda;
-  // }
-
-  // if (!coefficient) {
-  //   console.error("Coefficient is undefined");
-  //   return;
-  // }
-
-  // console.log("Coefficient:", coefficient);
+  if (role === "admin") {
+    if (tab === 0 || tab === 1) {
+      coefficient = order?.userId?.coefficient;
+    } else if (tab === 2 || tab === 3) {
+      coefficient = order?.userId?.coefficient;
+    }
+  } else if (role === "client") {
+    if (tab === 0 || tab === 1) {
+      coefficient = order?.userId?.coefficientVentaTienda;
+    } else if (tab === 2 || tab === 3) {
+      coefficient = order?.userId?.coefficientVentaTienda;
+      // coefficient = "10";
+    }
+  }
 
   if (order) {
     order.cabinets.forEach((item) => {
       let totalVariants = 0;
-      priceTotal = parseFloat(item.total) * parseFloat(order.coefficient);
-      total = total + priceTotal;
+      priceTotal = parseFloat(item.total) * parseFloat(coefficient);
+      total += priceTotal;
 
       item.variants?.forEach((variant) => {
-        totalVariants =
-          parseFloat(variant.value) * parseFloat(order.coefficient) +
-          totalVariants;
+        totalVariants += parseFloat(variant.value) * parseFloat(coefficient);
       });
       cabinetsArray.push({
         ...item,
@@ -397,10 +380,6 @@ export const fixOrder = (order, onSuccess = () => {}, tab = 0) => {
     let ivaCabinetsPorcentaje = 0;
     let ivaElectrodomesticosPorcentaje = 0;
     let ivaEquipamientosPorcentaje = 0;
-    // let ivaEncimeras = 0;
-    // let ivaCabinets = 0;
-    // let ivaElectrodomesticos = 0;
-    // let ivaEquipamientos = 0;
 
     // Calculando los descuentos individuales
     if (parseFloat(order.discountEncimeras) > 0) {
@@ -452,17 +431,15 @@ export const fixOrder = (order, onSuccess = () => {}, tab = 0) => {
 
     const orderJson = {
       ...order,
-      importe: parseFloat(total).toFixed(2),
-      iva: parseFloat(iva).toFixed(2),
+      importe: parseFloat(total),
+      iva: parseFloat(iva),
       total:
-        (
-          parseFloat(total) -
+        parseFloat(total) -
           discountEncimerasPorcentaje -
           discountCabinetsPorcentaje -
           discountElectrodomesticosPorcentaje -
           discountEquipamientosPorcentaje +
-          parseFloat(iva)
-        ).toFixed(2) || 0,
+          parseFloat(iva) || 0,
       cabinets: cabinetsArray,
       discountEncimerasPorcentaje,
       discountCabinetsPorcentaje,
@@ -472,10 +449,6 @@ export const fixOrder = (order, onSuccess = () => {}, tab = 0) => {
       ivaCabinetsPorcentaje,
       ivaElectrodomesticosPorcentaje,
       ivaEquipamientosPorcentaje,
-      // ivaEncimeras,
-      // ivaCabinets,
-      // ivaElectrodomesticos,
-      // ivaEquipamientos,
     };
 
     setLocalOrder(orderJson);

@@ -362,7 +362,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
     materialCasco || ""
   );
 
-  return price.toFixed(2);
+  return price;
 };
 
 const getRef = (parametros, reference) => {
@@ -678,7 +678,7 @@ const getTotalDoors = (submodels) => {
         parseFloat(getPrice(item)) + total + parseFloat(perfil?.price || 0);
     }
   });
-  return parseFloat(total).toFixed(2);
+  return parseFloat(total);
 };
 
 // const getParameters = (param, tipoMueble) => {
@@ -959,7 +959,7 @@ const getPriceParameters = (param, tipoMueble) => {
       precioVariant += itemValue;
     }
   });
-  return parseFloat(precioVariant).toFixed(2);
+  return parseFloat(precioVariant);
 };
 
 const getCalculoFondo = (item) => {
@@ -1066,7 +1066,6 @@ export const parseJson3D = async (json) => {
     const modelDrawerArray = [];
     const materialDrawerArray = [];
     const modelDoorArray = [];
-    const modelHandlerArray = [];
     const materialDoorArray = [];
     const modelCabinetArray = [];
     const materialCabinetArray = [];
@@ -1074,6 +1073,7 @@ export const parseJson3D = async (json) => {
     let opening;
     let zocalo = 0;
     let arrZocalos = [];
+    let modelHandlerArray = [];
     let arrEncimeras = [];
     let tiradoresCabecera = [];
 
@@ -1205,6 +1205,7 @@ export const parseJson3D = async (json) => {
           ),
           reference: referenceType.ref,
           tipo: referenceType.type,
+          customcode:item.customCode || null,
           campana,
         };
 
@@ -1616,11 +1617,9 @@ export const parseJson3D = async (json) => {
                   tipo: CONFIG.MODELNAME.ACCESORIOS.CODE,
                   reference: referenceTemp,
                   doors: 0,
-                  priceDoor: parseFloat(getTotalDoors(item.subModels)).toFixed(
-                    2
-                  ),
+                  priceDoor: parseFloat(getTotalDoors(item.subModels)),
                   total:
-                    parseFloat(itemx.price).toFixed(2) *
+                    parseFloat(itemx.price) *
                     parseFloat(itemx.quantity || 1),
                   size: item.boxSize, // { width: 0, height: 0, depth: 0 },
                   variants: getParameters(item),
@@ -1687,7 +1686,7 @@ export const parseJson3D = async (json) => {
               modelDrawer: modeloDrawer,
               zocalo: zocalo,
               priceDoor: parseInt(getTotalDoors(item.subModels)),
-              total: parseFloat(Math.ceil(totalPrice)).toFixed(0),
+              total: parseFloat(totalPrice),
               size: getCalculoFondo(item), // { width: 0, height: 0, depth: 0 },
               variants: getParameters(item, referenceType.type),
               priceVariants: getPriceParameters(
@@ -1849,6 +1848,7 @@ export const parseJson3D = async (json) => {
     const orderJsonWhitoutZocalos = cabinets.filter(
       (filtro) => filtro.modelProductNumber !== "脚线"
     );
+    
     orderJson.cabinets = orderJsonWhitoutZocalos;
 
     return orderJson;

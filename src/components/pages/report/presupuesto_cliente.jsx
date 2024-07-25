@@ -150,22 +150,22 @@ const Presupuesto_Cliente = ({
   //   });
   //   return total.toFixed(2); // Retornar el total como string con 2 decimales
   // };
-  
+
   // const calcularDescuento = (importe, descuento) => {
   //   return ((importe * descuento) / 100).toFixed(2);
   // };
-  
+
   // const calcularImporteDescuento = (importe, desc) => {
   //   const descuento = calcularDescuento(importe, desc);
   //   return (importe - descuento).toFixed(2);
   // };
-  
+
   // const calcularIva = (imp, descuento, iva) => {
   //   const importe = calcularImporteDescuento(imp, descuento);
   //   const ivaAplicable = iva || 21; // Valor por defecto del 21% si 'iva' no está definido
   //   return ((importe * ivaAplicable) / 100).toFixed(2);
   // };
-  
+
   // const calcularTotalDescuento = (imp, descuento, iva) => {
   //   const importe = calcularImporteDescuento(imp, descuento);
   //   const ivaAplicable = iva || 21; // Valor por defecto del 21% si 'iva' no está definido
@@ -176,7 +176,7 @@ const Presupuesto_Cliente = ({
   // const Total2 = ({ descuento, importe, seccion, iva }) => {
   //   const sumaImportes = calcularTotal(importe, seccion);
   //   const ivaPorcentaje = iva || 21; // Usa el porcentaje de IVA proporcionado o 21% si no está disponible
-  
+
   //   return (
   //     <View
   //       style={{
@@ -253,34 +253,45 @@ const Presupuesto_Cliente = ({
     });
     return total.toFixed(2); // Retornar el total como string con 2 decimales
   };
-  
+
   const calcularDescuento = (importe, descuento) => {
     return parseFloat((importe * descuento) / 100).toFixed(2);
   };
-  
+
   const calcularImporteDescuento = (importe, desc) => {
     const descuento = calcularDescuento(importe, desc);
     return (importe - descuento).toFixed(2);
   };
-  
+
   const calcularIva = (imp, descuento, iva) => {
     const importe = calcularImporteDescuento(imp, descuento);
     const ivaAplicable = iva || 21; // Valor por defecto del 21% si 'iva' no está definido
     return parseFloat((importe * ivaAplicable) / 100).toFixed(2);
   };
-  
+
   const calcularTotalDescuento = (imp, descuento, iva) => {
     const importe = parseFloat(calcularImporteDescuento(imp, descuento));
     const ivaCalculado = parseFloat(calcularIva(imp, descuento, iva));
     const total = importe + ivaCalculado;
     return total.toFixed(2);
   };
-  
-  
+
+  const calcularIvaCabinets = (imp, descuento, ivaCabinets = 21) => {
+    const importeConDescuento = calcularImporteDescuento(imp, descuento);
+    return parseFloat((importeConDescuento * ivaCabinets) / 100).toFixed(2);
+  };
+
+  const calcularTotalDescuentoIvaCabinets = (imp, descuento, ivaCabinets = 21) => {
+    const importeConDescuento = calcularImporteDescuento(imp, descuento);
+    const iva = calcularIvaCabinets(imp, descuento, ivaCabinets);
+    const total = parseFloat(importeConDescuento) + parseFloat(iva);
+    return parseFloat(total).toFixed(2);
+  };
+
   const Total2 = ({ descuento, importe, seccion, iva }) => {
     const sumaImportes = parseFloat(calcularTotal(importe, seccion));
     const ivaPorcentaje = parseFloat(iva || 21); // Usa el porcentaje de IVA proporcionado o 21% si no está disponible
-  
+
     return (
       <View
         style={{
@@ -337,7 +348,9 @@ const Presupuesto_Cliente = ({
               <Text>
                 {(
                   parseFloat(sumaImportes) +
-                  parseFloat(calcularIva(sumaImportes, descuento, ivaPorcentaje))
+                  parseFloat(
+                    calcularIva(sumaImportes, descuento, ivaPorcentaje)
+                  )
                 ).toFixed(2)}
               </Text>
             )}
@@ -346,8 +359,6 @@ const Presupuesto_Cliente = ({
       </View>
     );
   };
-  
-
 
   useEffect(() => {
     data &&
@@ -387,7 +398,14 @@ const Presupuesto_Cliente = ({
         size={"A4"}
         wrap
       >
-        <View fixed style={{ display: "flex", flexDirection: "row" }}>
+        <View
+          fixed
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
           <View
             style={{
               display: "flex",
@@ -1054,7 +1072,7 @@ const Presupuesto_Cliente = ({
                 </>
               )}
               <View>
-                <Text>I.V.A. (21%)</Text>
+                <Text>I.V.A. ({data.ivaCabinets || "21"}%)</Text>
               </View>
               <View style={{ marginTop: "1" }}>
                 <Text>
@@ -1078,7 +1096,7 @@ const Presupuesto_Cliente = ({
                   textAlign: "right",
                 }}
               >
-                <Text>{data.importe}</Text>
+                <Text>{data.importe.toFixed(2)}</Text>
               </View>
               {data?.discountCabinets && data?.discountCabinets != 0 && (
                 <View style={{ textAlign: "right", paddingLeft: "12" }}>
@@ -1098,11 +1116,13 @@ const Presupuesto_Cliente = ({
                 </View>
               )}
               <View>
-                {/* {data?.discountCabinets && data?.discountCabinets != 0 ? ( */}
-                <Text>{calcularIva(data.importe, data.discountCabinets)}</Text>
-                {/* ) : (
-                  <Text>{data.iva}</Text>
-                 )} */}
+                <Text>
+                  {calcularIvaCabinets(
+                    data.importe,
+                    data.discountCabinets,
+                    data.ivaCabinets
+                  )}
+                </Text>
               </View>
               <View
                 style={{
@@ -1111,19 +1131,12 @@ const Presupuesto_Cliente = ({
                   marginTop: "1",
                 }}
               >
-                {/* {data?.discountCabinets && data?.discountCabinets != 0 ? (
-                  <Text>
-                    {calcularTotalDescuento(
-                      data.importe,
-                      data.discountCabinets
-                    )}
-                  </Text>
-                ) : (
-                  <Text>{precioZocalos(totales)}</Text>
-                )} */}
-
                 <Text>
-                  {calcularTotalDescuento(data.importe, data.discountCabinets)}
+                  {calcularTotalDescuentoIvaCabinets(
+                    data.importe,
+                    data.discountCabinets,
+                    data.ivaCabinets
+                  )}
                 </Text>
               </View>
             </View>
@@ -1221,7 +1234,7 @@ const Presupuesto_Cliente = ({
                           <Text>{item.descripcion}</Text>
                         </View>
                         <View style={{ width: "100", textAlign: "right" }}>
-                        <Text>{parseFloat(item.total).toFixed(2)}</Text>
+                          <Text>{parseFloat(item.total).toFixed(2)}</Text>
                         </View>
                       </View>
                     );
@@ -1338,7 +1351,7 @@ const Presupuesto_Cliente = ({
                             <Text>{item.descripcion}</Text>
                           </View>
                           <View style={{ width: "120", textAlign: "right" }}>
-                          <Text>{parseFloat(item.total).toFixed(2)}</Text>
+                            <Text>{parseFloat(item.total).toFixed(2)}</Text>
                           </View>
                         </View>
                       );

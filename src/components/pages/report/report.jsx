@@ -51,12 +51,19 @@ const Report = () => {
       buscarNodoPorCodigo("3FO3XYGTXB12");
     }
   }, [orderId]);
-
-  useEffect(() => {
-    if (orderId._id) {
-      fixOrder(data, () => {}, tabActivo);
-    }
-  }, [tabActivo]);
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        if (orderId._id && tabActivo <= 3) {
+          const updatedInfo = fixOrder(data, tabActivo);
+          const profile = await getProfile();
+          setData({ ...updatedInfo, profile });
+          getOrders({ ...updatedInfo, profile });
+        }
+      };
+      fetchData();
+    }, [tabActivo]);
+  
 
   const tabs = [
     {
@@ -73,7 +80,7 @@ const Report = () => {
       ),
     },
     {
-      "Presupuesto": (
+      Presupuesto: (
         <div className="alturaPreview">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
@@ -92,7 +99,7 @@ const Report = () => {
             <Confirmacion_Pedido
               price={priceP}
               data={data}
-              title="Presupuesto"
+              title="Presupuesto Venta"
             />
           </PDFViewer>
         </div>
@@ -116,21 +123,21 @@ const Report = () => {
     {
       "Información General": (
         <div className="alturaPreview">
-          <General getData={setData} data={data} />,
+          <General getData={setData} data={data} />
         </div>
       ),
     },
     {
-      "Complementos": (
+      Complementos: (
         <div className="alturaPreview">
-          <Product getData={setData} />,
+          <Product getData={setData} />
         </div>
       ),
     },
     {
       "Mi Perfil": (
         <div className="alturaPreview">
-          <Profile getData={setData} data={data} />,
+          <Profile getData={setData} data={data} />
         </div>
       ),
     },
@@ -235,7 +242,7 @@ const Report = () => {
             })}
           />
         </Card>
-        <FloatButton
+        {/* <FloatButton
           icon={<ArrowUp />}
           className={`${
             visible ? "opacity-100" : "opacity-0"
@@ -244,7 +251,7 @@ const Report = () => {
           onClick={() => (main.scrollTop = 0)}
         >
           Ancla
-        </FloatButton>
+        </FloatButton> */}
       </main>
     )
   );

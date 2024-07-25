@@ -72,7 +72,7 @@ const History = () => {
       const result = await getOrderById({
         _id: item._id,
       });
-      fixOrder(result, () => {
+      fixOrder(result, 0 ,() => {
         navigate("/Dashboard/Report/", {
           replace: true,
         });

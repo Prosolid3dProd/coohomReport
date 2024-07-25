@@ -230,19 +230,16 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
   const calcularTotalDescuentos = (data) => {
     let totalDescuentos = 0;
     if (data.discountCabinets > 0) {
-      totalDescuentos += parseFloat(data.discountCabinetsPorcentaje);
+      totalDescuentos += parseFloat(data.discountCabinetsPorcentaje) || 0;
     }
     return totalDescuentos;
   };
 
   const calcularTotalIva = (data) => {
-    let ivaCabinetsPorcentaje = parseFloat(data.ivaCabinetsPorcentaje);
-    if (isNaN(ivaCabinetsPorcentaje) || ivaCabinetsPorcentaje <= 0) {
-      ivaCabinetsPorcentaje = 21;
-    }
-
+    // Asegúrate de que el porcentaje de IVA se extraiga correctamente
+    let ivaCabinetsPorcentaje = parseFloat(data.ivaCabinets) || 21; // Default to 21% if not specified
     const totalIva = {
-      ivaCabinets: ivaCabinetsPorcentaje,
+      ivaCabinetsPorcentaje: ivaCabinetsPorcentaje,
     };
     return totalIva;
   };
@@ -264,19 +261,20 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     const total = sumaTotal + totalZocalo;
     const totalConDescuento = total - totalDescuentos;
     const totalConIva =
-      totalConDescuento * (1 + parseFloat(totalIva.ivaCabinets) / 100);
+      totalConDescuento *
+      (1 + parseFloat(totalIva.ivaCabinetsPorcentaje) / 100);
     return parseFloat(totalConIva).toFixed(2);
   };
 
   const calcularIva = (sumaTotalSinDescuento, totalIva) => {
-    const ivaCabinetsPorcentaje = totalIva.ivaCabinets || 21;
+    const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
     return parseFloat(
       sumaTotalSinDescuento * (ivaCabinetsPorcentaje / 100)
     ).toFixed(2);
   };
 
   const calcularTotal = (sumaTotalSinDescuento, totalIva) => {
-    const ivaCabinetsPorcentaje = totalIva.ivaCabinets || 21;
+    const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
     return parseFloat(
       sumaTotalSinDescuento * (1 + ivaCabinetsPorcentaje / 100)
     ).toFixed(2);
@@ -364,7 +362,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 <Text>{convertirFecha(data?.fecha) || "."}</Text>
                 <Text>
                   {convertirFecha(data.fechaEntrega) || "."}
-                  {data.semana ? "  (" + data.semanaEntrega + ")" : "."}
+                  {data.semanaEntrega ? "  (" + data.semanaEntrega + ")" : "."}
                 </Text>
                 <Text>{data?.customerName}</Text>
                 <Text>{data?.storeName}</Text>
@@ -2286,9 +2284,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               display: "flex",
               flexDirection: "row",
               justifyContent: "flex-end",
-              fontSize: "8",
-              marginTop: "20",
-              marginBottom: "20",
+              fontSize: 8,
+              marginTop: 20,
+              marginBottom: 20,
             }}
           >
             <View
@@ -2296,15 +2294,15 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "flex-end",
-                fontSize: "8",
+                fontSize: 8,
               }}
             >
               <View>
-                <View style={{ marginBottom: "1" }}>
+                <View style={{ marginBottom: 1 }}>
                   <Text>IMPORTE</Text>
                 </View>
 
-                <View style={{ marginBottom: "1" }}>
+                <View style={{ marginBottom: 1 }}>
                   {data?.discountCabinets > 0 && (
                     <View>
                       <Text>
@@ -2318,13 +2316,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     <Text>IMPORTE</Text>
                   </View>
                 )}
-                <View style={{ marginTop: "1" }}>
-                  <Text>I.V.A. ({totalIva.ivaCabinets}% en muebles)</Text>
+                <View style={{ marginTop: 1 }}>
+                  <Text>I.V.A. ({data.ivaCabinets || "21"}% en muebles)</Text>
                 </View>
-                <View style={{ marginTop: "1" }}>
-                  <Text>
-                    <Text>PRECIO TOTAL</Text>
-                  </Text>
+                <View style={{ marginTop: 1 }}>
+                  <Text>PRECIO TOTAL</Text>
                 </View>
               </View>
 
@@ -2346,7 +2342,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 >
                   <Text>{parseFloat(sumaTotal + totalZocalo).toFixed(2)}</Text>
                 </View>
-
                 <View>
                   {data?.discountCabinets > 0 && (
                     <View>
@@ -2369,17 +2364,14 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   </View>
                 )}
 
-                {data?.discountCabinets > 0 && (
-                  <View>
-                    <Text>{calcularIva(sumaTotal, totalIva)}</Text>
-                  </View>
-                )}
-
-                {totalDescuentos === 0 && (
-                  <View>
-                    <Text>{calcularIva(sumaTotal, totalIva)}</Text>
-                  </View>
-                )}
+                <View>
+                  <Text>
+                    {calcularIva(
+                      sumaTotal + totalZocalo - totalDescuentos,
+                      totalIva
+                    )}
+                  </Text>
+                </View>
 
                 <View
                   style={{
@@ -2388,26 +2380,16 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     marginTop: 1,
                   }}
                 >
-                  {totalDescuentos > 0 && (
-                    <View>
-                      <Text>
-                        {calcularTotalConDescuentoEIVA(
-                          sumaTotal,
-                          totalZocalo,
-                          totalDescuentos,
-                          totalIva
-                        )}
-                      </Text>
-                    </View>
-                  )}
-
-                  {totalDescuentos === 0 && (
-                    <View>
-                      <Text>
-                        {calcularTotal(sumaTotalSinDescuento, totalIva)}
-                      </Text>
-                    </View>
-                  )}
+                  <View>
+                    <Text>
+                      {calcularTotalConDescuentoEIVA(
+                        sumaTotal,
+                        totalZocalo,
+                        totalDescuentos,
+                        totalIva
+                      )}
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
