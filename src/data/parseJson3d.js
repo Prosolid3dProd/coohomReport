@@ -355,13 +355,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
     }
   }
 
-  console.log(
-    parametros,
-    parametros.textureCustomCode,
-    price,
-    materialCasco || ""
-  );
-
   return price;
 };
 
@@ -1205,7 +1198,7 @@ export const parseJson3D = async (json) => {
           ),
           reference: referenceType.ref,
           tipo: referenceType.type,
-          customcode:item.customCode || null,
+          customcode: item.customCode || null,
           campana,
         };
 
@@ -1349,17 +1342,24 @@ export const parseJson3D = async (json) => {
                     modelDoor: item4.modelProductNumber,
                     materialDoor: item4.textureName,
                   };
-                  const tapasTiradores = item4.subModels.find(
-                    (ti) =>
+                  item4.subModels.forEach((ti) => {
+                    if (
                       (ti.customCode !== null && ti.customCode == "202") ||
                       ti.customCode == "203"
-                  );
-                  tapasArray.push(tapasTiradores);
+                    ) {
+                      tapasArray.push({
+                        textureCustomCode: ti.textureCustomCode,
+                        modelName: ti.modelName,
+                        textureName: ti.textureName,
+                      });
+                    }
+                  });
                 }
               });
             }
           });
-          // console.log(tapasArray);
+          console.log(tapasArray);
+
           // ----------------------------------------------------
           if (cajonesInfo.modelDrawer) {
             if (referenceType.ref?.indexOf(".BC") !== -1) {
@@ -1619,8 +1619,7 @@ export const parseJson3D = async (json) => {
                   doors: 0,
                   priceDoor: parseFloat(getTotalDoors(item.subModels)),
                   total:
-                    parseFloat(itemx.price) *
-                    parseFloat(itemx.quantity || 1),
+                    parseFloat(itemx.price) * parseFloat(itemx.quantity || 1),
                   size: item.boxSize, // { width: 0, height: 0, depth: 0 },
                   variants: getParameters(item),
                   priceVariants: 0,
@@ -1848,7 +1847,7 @@ export const parseJson3D = async (json) => {
     const orderJsonWhitoutZocalos = cabinets.filter(
       (filtro) => filtro.modelProductNumber !== "脚线"
     );
-    
+
     orderJson.cabinets = orderJsonWhitoutZocalos;
 
     return orderJson;

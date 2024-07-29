@@ -2317,7 +2317,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   </View>
                 )}
                 <View style={{ marginTop: 1 }}>
-                  <Text>I.V.A. ({data.ivaCabinets || "21"}% en muebles)</Text>
+                  <Text>
+                    {console.log(data)}
+                    I.V.A. ({data.ivaCabinets || data.ivaCabinets == 0 ? data.ivaCabinets : "21"}
+                    % en muebles)
+                  </Text>
                 </View>
                 <View style={{ marginTop: 1 }}>
                   <Text>PRECIO TOTAL</Text>

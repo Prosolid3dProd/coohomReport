@@ -215,7 +215,7 @@ const General = ({ getData, data }) => {
             </p>
           </Divider>
           <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Coeficiente Tiendas" name="coefficient">
+            <Form.Item label="Coeficiente Compra" name="coefficient">
               <div style={{ position: "relative" }}>
                 <Input
                   defaultValue={initialValues.coefficient}
@@ -240,6 +240,35 @@ const General = ({ getData, data }) => {
               </div>
             </Form.Item>
           </Col>
+          {role === "admin" && (
+            <Col xs={24} sm={24} md={4}>
+              <Form.Item label="Coeficiente Venta" name="coefficient">
+                <div style={{ position: "relative" }}>
+                  <Input
+                    defaultValue={data.coefficient}
+                    readOnly={!isInputEditable}
+                    style={!isInputEditable ? { opacity: 0.7 } : {}}
+                    disabled={role === "admin" ? true : false}
+                  />
+                  {!isInputEditable && (
+                    <div
+                      onClick={showModal}
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(255, 255, 255, 0.2)",
+                        cursor: "pointer",
+                      }}
+                    ></div>
+                  )}
+                </div>
+              </Form.Item>
+            </Col>
+          )}
+
           <Modal
             title="Introduce la contraseña"
             open={isOpenModal}
