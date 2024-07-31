@@ -48,15 +48,13 @@ const General = ({ getData, data }) => {
     discountCabinets: data?.discountCabinets,
     discountElectrodomesticos: data?.discountElectrodomesticos,
     discountEquipamientos: data?.discountEquipamientos,
-    ivaEncimeras: data?.ivaEncimeras || "0",
-    ivaCabinets: data?.ivaCabinets || "0",
-    ivaElectrodomesticos: data?.ivaElectrodomesticos || "0",
-    ivaEquipamientos: data?.ivaEquipamientos || "0",
+    ivaEncimeras: data?.ivaEncimeras,
+    ivaCabinets: data?.ivaCabinets,
+    ivaElectrodomesticos: data?.ivaElectrodomesticos,
+    ivaEquipamientos: data?.ivaEquipamientos,
     semanaEntrega: data?.semanaEntrega,
     fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
   });
-  console.log(initialValues)
-  console.log(data)
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isInputEditable, setIsInputEditable] = useState(role !== "client");
   const [password, setPassword] = useState("");

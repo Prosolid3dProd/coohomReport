@@ -1358,7 +1358,7 @@ export const parseJson3D = async (json) => {
               });
             }
           });
-          console.log(tapasArray);
+          // console.log(tapasArray);
 
           // ----------------------------------------------------
           if (cajonesInfo.modelDrawer) {
@@ -1803,6 +1803,9 @@ export const parseJson3D = async (json) => {
     cabinets.map((filtro) => {
       if (filtro.tipo === "O") {
         filtro.size.y = filtro.size.y - 20;
+      }
+      if (String(filtro.modelProductNumber).toUpperCase() === "REGLETAS") {
+        filtro.size.x = 150;
       }
     });
 

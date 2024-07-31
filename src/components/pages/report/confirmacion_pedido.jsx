@@ -1279,7 +1279,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       {item.name.toLocaleUpperCase().includes("REGLETA")
                         ? 150
                         : item.size.x}
-                      F: {item.size?.y} A: {item.size?.z}
+                       F: {item.size?.y} A: {item.size?.z}
                     </Text>
                     {item.opening && (
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
