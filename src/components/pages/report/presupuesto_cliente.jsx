@@ -311,6 +311,7 @@ const Presupuesto_Cliente = ({
               {/* <Text>{data.userId.name}</Text> */}
               <Text>{data.userId.location}</Text>
               <Text>{data.userId.phone}</Text>
+              <Text>{data.userId.info3}</Text>
               {/* <Text>{data.userId.email}</Text> */}
             </View>
           </View>

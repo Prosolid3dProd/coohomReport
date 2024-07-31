@@ -39,8 +39,8 @@ const General = ({ getData, data }) => {
         : data?.userId?.coefficient,
     modelDoor: data?.modelDoor,
     materialDoor: data?.materialDoor,
-    handle: data?.handle,
-    drawer: data?.drawer,
+    handle: data?.modelHandle,
+    drawer: data?.modelDrawer + data?.materialDrawer,
     materialCabinet: data?.materialCabinet,
     observation: data?.observation?.includes("null") ? "" : data.observation,
     fecha: String(data?.fecha).split(" ")[0],
@@ -55,6 +55,8 @@ const General = ({ getData, data }) => {
     semanaEntrega: data?.semanaEntrega,
     fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
   });
+  console.log(initialValues)
+  console.log(data)
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isInputEditable, setIsInputEditable] = useState(role !== "client");
   const [password, setPassword] = useState("");
