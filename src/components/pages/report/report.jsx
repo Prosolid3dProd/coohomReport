@@ -59,6 +59,7 @@ const Report = () => {
           const profile = await getProfile();
           setData({ ...updatedInfo, profile });
           getOrders({ ...updatedInfo, profile });
+          console.log(data)
         }
       };
       fetchData();

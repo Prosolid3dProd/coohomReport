@@ -109,13 +109,6 @@ const ShopsForm = ({ setListaTiendas }) => (
         <Input_ant />
       </Form.Item>
       <Form.Item
-        name="cif"
-        label="CIF"
-        className="w-full p-4 flex items-center m-0"
-      >
-        <Input_ant />
-      </Form.Item>
-      <Form.Item
         name="location"
         label="Info1"
         className="w-full p-4 flex items-center m-0"
@@ -236,7 +229,6 @@ const Admin = () => {
         name: user.name,
         password: user.password,
         nif: user.nif,
-        cif: user.cif,
         email: user.email,
         phone: user.phone,
         info3: user.info3,
@@ -423,9 +415,6 @@ const Admin = () => {
             <Input_ant />
           </Form.Item>
           <Form.Item name="nif" label="NIF">
-            <Input_ant />
-          </Form.Item>
-          <Form.Item name="cif" label="CIF">
             <Input_ant />
           </Form.Item>
           <Form.Item

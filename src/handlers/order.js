@@ -98,7 +98,7 @@ export const getOrders = async (params) => {
       token: Settings.TOKEN,
     });
     // console.log(data.data)
-    return data.data;
+    return data?.data;
   } catch (error) {
     console.log(error);
     return false;
@@ -164,7 +164,7 @@ export const getOrderById = async (params) => {
     //OrderErp es lo que me devuelve reporthomById si se quieren añadir campos supongo que habra que añadirlos al crear el reporte, (reportCoohom (post, put))
     localStorage.setItem("orderErp", JSON.stringify(data.data));
 
-    console.log(data.data, "getOrderById");
+    // console.log(data.data, "getOrderById");
     return data.data;
   } catch (error) {
     console.log(error);
@@ -186,7 +186,7 @@ export const getProfile = async (params) => {
 
 export const updateOrderDetails = async (params) => {
   try {
-    console.log(params);
+    // console.log(params);
     const data = await _AXIOS_.post(
       `${CONFIG.API.BACKEND_URL}/reporthomDetails`,
       {
@@ -348,7 +348,7 @@ export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
     }
   } else if (role === "client") {
     if (tab === 0 || tab === 1) {
-      coefficient = order?.coefficient;
+      coefficient = order?.userId?.coefficient;
     } else if (tab === 2 || tab === 3) {
       coefficient = order?.userId?.coefficientVentaTienda;
       

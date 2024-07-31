@@ -7,6 +7,7 @@ import {
   Image,
   Font,
   StyleSheet,
+  Svg,
 } from "@react-pdf/renderer";
 import LogoALLER from "../../../assets/ALLER.jpeg";
 import LogoRAEL from "../../../assets/RAEL.jpeg";
@@ -62,6 +63,13 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     }
   };
 
+  const urlObject = {
+    uri: "https://ca.slack-edge.com/T01FDFA152Q-U059GUC3KHD-7c3fcf45349d-512",
+    method: 'GET',
+    headers: "CORS",
+    body: ''
+  };
+
   const logoUrlGrande = (name) => {
     if (name === "Aller Alvarez") {
       return <Image style={{ width: "100" }} src={LogoALLER} />;
@@ -82,7 +90,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     } else if (name === "Sukaldatu") {
       return <Image style={{ width: "100" }} src={Sukaldatu} />;
     } else {
-      return <Image style={{ width: "100" }} src={LogoSola} />;
+      return <Image style={{ width: "100px" }} src={LogoSola} />;
     }
   };
 
@@ -273,24 +281,22 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     ).toFixed(2);
   };
 
-  const calcularTotal = (sumaTotalSinDescuento, totalIva) => {
-    const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
-    return parseFloat(
-      sumaTotalSinDescuento * (1 + ivaCabinetsPorcentaje / 100)
-    ).toFixed(2);
-  };
+  // const calcularTotal = (sumaTotalSinDescuento, totalIva) => {
+  //   const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
+  //   return parseFloat(
+  //     sumaTotalSinDescuento * (1 + ivaCabinetsPorcentaje / 100)
+  //   ).toFixed(2);
+  // };
 
   const sumaTotal = calcularSumaTotal(data.cabinets);
   totalIva = calcularTotalIva(data);
   totalDescuentos = calcularTotalDescuentos(data);
-  const sumaTotalSinDescuento = sumaTotal + totalZocalo;
+  // const sumaTotalSinDescuento = sumaTotal + totalZocalo;
 
   const complementos =
     data.infoZocalos.length > 0 || cabinets.complementos.length > 0
       ? true
       : false;
-
-  // console.log(data)
   return (
     <Document title="Presupuesto COOHOM">
       <Page
@@ -2318,7 +2324,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 )}
                 <View style={{ marginTop: 1 }}>
                   <Text>
-                    {console.log(data)}
                     I.V.A. ({data.ivaCabinets || data.ivaCabinets == 0 ? data.ivaCabinets : "21"}
                     % en muebles)
                   </Text>
