@@ -1344,8 +1344,11 @@ export const parseJson3D = async (json) => {
                   textureCustomCode: model.textureCustomCode,
                   modelName: model.modelName,
                   textureName: model.textureName,
+                  x: model.size.x,
+                  y: model.size.y,
+                  z: model.size.z,
                 });
-                // console.log(model, "perfiles");
+                console.log(model, "perfiles");
               }
               // Búsqueda recursiva en submodelos anidados
               if (model.subModels) {
