@@ -65,9 +65,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
   const urlObject = {
     uri: "https://ca.slack-edge.com/T01FDFA152Q-U059GUC3KHD-7c3fcf45349d-512",
-    method: 'GET',
+    method: "GET",
     headers: "CORS",
-    body: ''
+    body: "",
   };
 
   const logoUrlGrande = (name) => {
@@ -325,12 +325,12 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
             </Text>
           </View>
           <View style={{ fontSize: "8", marginRight: "110" }}>
-              {/* <Text>{data.userId.name}</Text> */}
-              <Text>{data.userId.location}</Text>
-              <Text>{data.userId.phone}</Text>
-              <Text>{data.userId.info3}</Text>
-              {/* <Text>{data.userId.email}</Text> */}
-            </View>
+            {/* <Text>{data.userId.name}</Text> */}
+            <Text>{data.userId.location}</Text>
+            <Text>{data.userId.phone}</Text>
+            <Text>{data.userId.info3}</Text>
+            {/* <Text>{data.userId.email}</Text> */}
+          </View>
           <View
             style={{
               display: "flex",
@@ -1279,7 +1279,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       {item.name.toLocaleUpperCase().includes("REGLETA")
                         ? 150
                         : item.size.x}
-                       F: {item.size?.y} A: {item.size?.z}
+                      F: {item.size?.y} A: {item.size?.z}
                     </Text>
                     {item.opening && (
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
@@ -2330,7 +2330,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 )}
                 <View style={{ marginTop: 1 }}>
                   <Text>
-                    I.V.A. ({data.ivaCabinets || data.ivaCabinets == 0 ? data.ivaCabinets : "21"}
+                    I.V.A. (
+                    {data.ivaCabinets || data.ivaCabinets == "0"
+                      ? "21"
+                      : data.ivaCabinets}
                     % en muebles)
                   </Text>
                 </View>

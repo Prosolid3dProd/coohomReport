@@ -1333,32 +1333,60 @@ export const parseJson3D = async (json) => {
             }
           });
 
-          const tapasArray = [];
-          item.subModels?.forEach((item3) => {
-            if (item3.customCode === "1001") {
-              item3.subModels?.forEach((item4) => {
-                if (item4.customCode === "0301") {
-                  puertasInfo = {
-                    modelDoor: item4.modelProductNumber,
-                    materialDoor: item4.textureName,
+          const tiradores = [];
+
+          function buscarTiradores(subModels) {
+            if (!subModels) return;
+
+            subModels.forEach((model) => {
+              if (model.customCode === "202" || model.customCode === "203") {
+                tiradores.push({
+                  textureCustomCode: model.textureCustomCode,
+                  modelName: model.modelName,
+                  textureName: model.textureName,
+                });
+                // console.log(model, "perfiles");
+              }
+              // Búsqueda recursiva en submodelos anidados
+              if (model.subModels) {
+                buscarTiradores(model.subModels);
+              }
+            });
+          }
+
+          function buscarCajonesYPuertas(subModels) {
+            if (!subModels) return;
+
+            subModels.forEach((model) => {
+              if (model.customCode === "1001" || model.customCode === "0301") {
+                if (model.customCode === "1001") {
+                  cajonesInfo = {
+                    modelName: model.modelName,
+                    materialDrawer: model.textureName,
                   };
-                  item4.subModels.forEach((ti) => {
-                    if (
-                      (ti.customCode !== null && ti.customCode == "202") ||
-                      ti.customCode == "203"
-                    ) {
-                      tapasArray.push({
-                        textureCustomCode: ti.textureCustomCode,
-                        modelName: ti.modelName,
-                        textureName: ti.textureName,
-                      });
-                    }
-                  });
+                  // console.log(model, "cajones");
+                } else if (model.customCode === "0301") {
+                  puertasInfo = {
+                    modelDoor: model.modelProductNumber,
+                    materialDoor: model.textureName,
+                  };
+                  // console.log(model, "puertas");
                 }
-              });
-            }
-          });
-          // console.log(tapasArray);
+
+                // Buscar tiradores en submodelos del nivel actual
+                buscarTiradores(model.subModels);
+
+                // Buscar recursivamente en submodelos de 1001 o 0301
+                buscarCajonesYPuertas(model.subModels);
+              } else {
+                // Continuar la búsqueda recursiva en submodelos anidados
+                buscarCajonesYPuertas(model.subModels);
+              }
+            });
+          }
+
+          // Llamada a la función con el item principal
+          buscarCajonesYPuertas(item.subModels);
 
           // ----------------------------------------------------
           if (cajonesInfo.modelDrawer) {
@@ -1697,6 +1725,7 @@ export const parseJson3D = async (json) => {
                 : "",
               drawerPriceDetails,
               drawerMaterialDetails,
+              tiradores,
               // material: isComplement
               //   ? item.textureName
               //   : getInfoArmazon(item.subModels) || null,

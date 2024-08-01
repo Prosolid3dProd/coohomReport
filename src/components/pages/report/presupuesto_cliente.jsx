@@ -131,9 +131,9 @@ const Presupuesto_Cliente = ({
     const data = dat?.filter((item) => item.type === name) || [];
     let total = 0;
     data.forEach((element) => {
-      total += parseFloat(element.total); 
+      total += parseFloat(element.total);
     });
-    return total.toFixed(2); 
+    return total.toFixed(2);
   };
 
   const calcularDescuento = (importe, descuento) => {
@@ -145,10 +145,9 @@ const Presupuesto_Cliente = ({
     return (importe - descuento).toFixed(2);
   };
 
-  const calcularIva = (imp, descuento, iva = 21) => {
+  const calcularIva = (imp, descuento, iva) => {
     const importe = calcularImporteDescuento(imp, descuento);
-    const ivaAplicable = iva || 21;
-    return parseFloat((importe * ivaAplicable) / 100).toFixed(2);
+    return parseFloat((importe * iva) / 100).toFixed(2);
   };
 
   const calcularTotalDescuento = (imp, descuento, iva) => {
@@ -158,16 +157,13 @@ const Presupuesto_Cliente = ({
     return total.toFixed(2);
   };
 
-  const calcularIvaCabinets = (imp, descuento, ivaCabinets = 21) => {
+  const calcularIvaCabinets = (imp, descuento, ivaCabinets) => {
+    const ivaAplicable = ivaCabinets || 21;
     const importeConDescuento = calcularImporteDescuento(imp, descuento);
-    return parseFloat((importeConDescuento * ivaCabinets) / 100).toFixed(2);
+    return parseFloat((importeConDescuento * ivaAplicable) / 100).toFixed(2);
   };
 
-  const calcularTotalDescuentoIvaCabinets = (
-    imp,
-    descuento,
-    ivaCabinets = 21
-  ) => {
+  const calcularTotalDescuentoIvaCabinets = (imp, descuento, ivaCabinets) => {
     const importeConDescuento = calcularImporteDescuento(imp, descuento);
     const iva = calcularIvaCabinets(imp, descuento, ivaCabinets);
     const total = parseFloat(importeConDescuento) + parseFloat(iva);
@@ -959,7 +955,11 @@ const Presupuesto_Cliente = ({
               )}
               <View>
                 <Text>
-                  I.V.A. ({data.ivaCabinets ? "21" : data.ivaCabinets}%)
+                  I.V.A. (
+                  {data.ivaCabinets || data.ivaCabinets === "0"
+                    ? "21"
+                    : data.ivaCabinets}
+                  %)
                 </Text>
               </View>
               <View style={{ marginTop: "1" }}>
@@ -1008,7 +1008,9 @@ const Presupuesto_Cliente = ({
                   {calcularIvaCabinets(
                     data.importe,
                     data.discountCabinets,
-                    data.ivaCabinets
+                    data.ivaCabinets || data.ivaCabinets == "0"
+                      ? 21
+                      : data.ivaCabinets
                   )}
                 </Text>
               </View>
@@ -1023,7 +1025,9 @@ const Presupuesto_Cliente = ({
                   {calcularTotalDescuentoIvaCabinets(
                     data.importe,
                     data.discountCabinets,
-                    data.ivaCabinets
+                    data.ivaCabinets || data.ivaCabinets == "0"
+                      ? 21
+                      : data.ivaCabinets
                   )}
                 </Text>
               </View>

@@ -27,7 +27,7 @@ async function buscarNodoPorCodigo(codigoBuscado) {}
 
 const Report = () => {
   const [main, setMain] = useState(null);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
   const [orderId, setOrderId] = useState(getLocalOrder());
   const [visible, setBtnVisible] = useState(false);
   const [tabActivo, setTabActivo] = useState(0); // Set the initial active tab to 0
@@ -81,7 +81,7 @@ const Report = () => {
       ),
     },
     {
-      Presupuesto: (
+      "Presupuesto": (
         <div className="alturaPreview">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
@@ -129,7 +129,7 @@ const Report = () => {
       ),
     },
     {
-      Complementos: (
+      "Complementos": (
         <div className="alturaPreview">
           <Product getData={setData} />
         </div>
