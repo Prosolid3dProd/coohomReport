@@ -324,22 +324,22 @@ const General = ({ getData, data }) => {
           </Divider>
           <Col xs={24} sm={24} md={4}>
             <Form.Item label="Encimeras" name="ivaEncimeras">
-              <Input placeholder="" maxLength="50" />
+              <Input placeholder="" maxLength="50" defaultValue={21} />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={4}>
             <Form.Item label="Muebles" name="ivaCabinets">
-              <Input placeholder="" maxLength="50" />
+              <Input placeholder="" maxLength="50" defaultValue={21} />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={4}>
             <Form.Item label="Electrodomésticos" name="ivaElectrodomesticos">
-              <Input placeholder="" maxLength="50" />
+              <Input placeholder="" maxLength="50" defaultValue={21} />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={4}>
             <Form.Item label="Equipamientos" name="ivaEquipamientos">
-              <Input placeholder="" maxLength="50" />
+              <Input placeholder="" maxLength="50" defaultValue={21} />
             </Form.Item>
           </Col>
 

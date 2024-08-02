@@ -1340,15 +1340,36 @@ export const parseJson3D = async (json) => {
 
             subModels.forEach((model) => {
               if (model.customCode === "202" || model.customCode === "203") {
+                const referencia = model.ignoreParameters
+                  .filter(
+                    (ref) =>
+                      ref.displayName.toLocaleUpperCase() === "REFERENCIA"
+                  )
+                  .map((ref) => {
+                    return ref.originalValue;
+                  })[0];
+
+                const nombre = model.ignoreParameters
+                  .filter(
+                    (ref) => ref.displayName.toLocaleUpperCase() === "NOMBRE"
+                  )
+                  .map((ref) => {
+                    return ref.originalValue;
+                  })[0];
+
                 tiradores.push({
+                  reference: referencia,
+                  name: nombre,
                   textureCustomCode: model.textureCustomCode,
                   modelName: model.modelName,
                   textureName: model.textureName,
-                  x: model.size.x,
-                  y: model.size.y,
-                  z: model.size.z,
+                  size: {
+                    x: model.size.x,
+                    y: model.size.y,
+                    z: model.size.z,
+                  },
                 });
-                console.log(model, "perfiles");
+                // console.log(model, "perfiles");
               }
               // Búsqueda recursiva en submodelos anidados
               if (model.subModels) {
