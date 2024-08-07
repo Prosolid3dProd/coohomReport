@@ -30,7 +30,7 @@ const Report = () => {
   const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
   const [orderId, setOrderId] = useState(getLocalOrder());
   const [visible, setBtnVisible] = useState(false);
-  const [tabActivo, setTabActivo] = useState(0); // Set the initial active tab to 0
+  const [tabActivo, setTabActivo] = useState(0);
 
   const priceC = existePrecio(getPrecio("C"));
   const priceF = existePrecio(getPrecio("F"));
@@ -59,7 +59,6 @@ const Report = () => {
           const profile = await getProfile();
           setData({ ...updatedInfo, profile });
           getOrders({ ...updatedInfo, profile });
-          console.log(data)
         }
       };
       fetchData();

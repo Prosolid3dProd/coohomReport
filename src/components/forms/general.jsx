@@ -112,13 +112,14 @@ const General = ({ getData, data }) => {
       const result = await updateOrder({ ...values, _id: data._id });
       if (result) {
         getData(result);
-        setInitialValues((prevValues) => ({
-          ...prevValues,
-          // coefficient:
-          //   role === "client"
-          //     ? values.userId.coefficientVentaTienda
-          //     : data?.userId?.coefficient,
-        }));
+        setInitialValues(result)
+        // setInitialValues((prevValues) => ({
+        //   ...prevValues,
+        //   coefficient:
+        //     role === "client"
+        //       ? values.userId.coefficientVentaTienda
+        //       : data?.userId?.coefficient,
+        // }));
         setLocalOrder(result);
         message.success("Se ha actualizado correctamente");
         setTimeout(() => {

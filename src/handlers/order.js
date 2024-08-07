@@ -28,6 +28,11 @@ export const axiosToken = axios.create({
   },
 });
 
+export const pruebaFileStack = (params) => {
+  console.log(params)
+  //Necesito que en el back se iguale la url que le paso a traves de esta consulta con la variable 'logo' que tiene el endpoint editUserCoohom y createUserCoohom para que cuando haga un getUsers me venga el perfil con la url del logo
+}
+
 export const createOrder = async (params) => {
   try {
     const data = await _AXIOS_.post(

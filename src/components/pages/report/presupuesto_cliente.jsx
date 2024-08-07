@@ -956,7 +956,7 @@ const Presupuesto_Cliente = ({
               <View>
                 <Text>
                   I.V.A. (
-                  {data.ivaCabinets || data.ivaCabinets === "0"
+                  {data.ivaCabinets == "0"
                     ? "21"
                     : data.ivaCabinets}
                   %)
@@ -984,7 +984,7 @@ const Presupuesto_Cliente = ({
                   textAlign: "right",
                 }}
               >
-                <Text>{data.importe.toFixed(2)}</Text>
+                <Text>{parseFloat(data.importe).toFixed(2)}</Text>
               </View>
               {data?.discountCabinets && data?.discountCabinets != 0 && (
                 <View style={{ textAlign: "right", paddingLeft: "12" }}>
@@ -1008,7 +1008,7 @@ const Presupuesto_Cliente = ({
                   {calcularIvaCabinets(
                     data.importe,
                     data.discountCabinets,
-                    data.ivaCabinets || data.ivaCabinets == "0"
+                    data.ivaCabinets == "0"
                       ? 21
                       : data.ivaCabinets
                   )}
@@ -1025,7 +1025,7 @@ const Presupuesto_Cliente = ({
                   {calcularTotalDescuentoIvaCabinets(
                     data.importe,
                     data.discountCabinets,
-                    data.ivaCabinets || data.ivaCabinets == "0"
+                    data.ivaCabinets == "0"
                       ? 21
                       : data.ivaCabinets
                   )}

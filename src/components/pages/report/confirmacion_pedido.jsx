@@ -41,35 +41,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     accesorios: [],
   });
 
-  const logoUrl = (name) => {
-    if (name === "Aller Alvarez") {
-      return <Image style={{ width: "30" }} src={LogoALLER} />;
-    } else if (name === "decormobiliario") {
-      return <Image style={{ width: "30" }} src={LogoDecor} />;
-    } else if (name === "KUBS") {
-      return <Image style={{ width: "30" }} src={LogoKUBS} />;
-    } else if (name === "j10") {
-      return <Image style={{ width: "30" }} src={LogoJ10} />;
-    } else if (name === "RAEL") {
-      return <Image style={{ width: "30" }} src={LogoRAEL} />;
-    } else if (name === "CERAPAL") {
-      return <Image style={{ width: "30" }} src={LogoCERAPAL} />;
-    } else if (name === "Kitchen sukaldeak") {
-      return <Image style={{ width: "30" }} src={Sukaldeak} />;
-    } else if (name === "Alkain") {
-      return <Image style={{ width: "30" }} src={Alkain} />;
-    } else {
-      return <Image style={{ width: "30" }} src={LogoSola} />;
-    }
-  };
-
-  const urlObject = {
-    uri: "https://ca.slack-edge.com/T01FDFA152Q-U059GUC3KHD-7c3fcf45349d-512",
-    method: "GET",
-    headers: "CORS",
-    body: "",
-  };
-
   const logoUrlGrande = (name) => {
     if (name === "Aller Alvarez") {
       return <Image style={{ width: "100" }} src={LogoALLER} />;
@@ -94,13 +65,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     }
   };
 
-  const logoLocal = (name) => {
-    return <Image src={LogoSola} style={{ width: "30" }} />;
-  };
-  const logoLocalGrande = (name) => {
-    return <Image src={name} style={{ width: "100" }} />;
-  };
-
+  console.log(data)
   const grayscaleFilter = (color) => {
     const r = Math.floor(0.299 * color.r + 0.587 * color.g + 0.114 * color.b);
     return { r, g: r, b: r };
@@ -2331,7 +2296,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 <View style={{ marginTop: 1 }}>
                   <Text>
                     I.V.A. (
-                    {data.ivaCabinets || data.ivaCabinets == "0"
+                    {data.ivaCabinets == "0"
                       ? "21"
                       : data.ivaCabinets}
                     % en muebles)

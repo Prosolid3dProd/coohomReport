@@ -116,7 +116,7 @@ const General = ({ data }) => {
                 maxLength="5"
                 max={10}
                 min={0}
-                disabled={data.profile.role === "client"}
+                disabled={data.profile?.role === "client"}
               />
             </Form.Item>
           </Col>

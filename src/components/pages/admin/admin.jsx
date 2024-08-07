@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { FileAddOutlined } from '@ant-design/icons';
+import * as filestack from 'filestack-js';
 import "../../../index.css";
 import "./admin.css";
 import {
@@ -17,11 +19,13 @@ import {
   Table,
   Checkbox,
   Space,
+  notification
 } from "antd";
 import { Header } from "../../content";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { Label, TablaModal } from "./../../content/modals";
 import { archivedOrder } from "../../../handlers/order";
+import { pruebaFileStack } from "../../../handlers/order";
 import {
   createUser,
   getUsers,
@@ -64,6 +68,47 @@ const onFinishFailed = (errorInfo) => {
   console.log("Failed:", errorInfo);
 };
 
+const handleUpload = () => {
+  const client = filestack.init("AXPWPBPSTvSKYoyHwByaaz");
+  const options = {
+    accept: "image/*",
+    maxSize: 4 * 1024 * 1024, // Limitar tamaño de archivo a 4 MB
+    fromSources: ["local_file_system"],
+    onUploadDone: async (file) => {
+      try {
+        const result = await pruebaFileStack({
+          logo: file.filesUploaded[0].url,
+        });
+        if (result.ok) {
+          notification.success({
+            message: 'Actualización exitosa!',
+            description: 'La imagen de perfil se ha actualizado correctamente.',
+            duration: 2, // Duración en segundos
+          });
+          location.reload();
+        } else {
+          throw new Error('Error al actualizar el logo');
+        }
+      } catch (error) {
+        notification.error({
+          message: 'Error!',
+          description: error.message,
+          duration: 2, // Duración en segundos
+        });
+      }
+    },
+    onFileUploadFailed: (error) => {
+      notification.error({
+        message: 'Error en la carga del archivo',
+        description: error.message,
+        duration: 2, // Duración en segundos
+      });
+    }
+  };
+  const picker = client.picker(options);
+  picker.open();
+};
+
 const ShopsForm = ({ setListaTiendas }) => (
   <div style={{ height: "400px", overflowY: "scroll" }}>
     <Form
@@ -101,6 +146,11 @@ const ShopsForm = ({ setListaTiendas }) => (
       >
         <Input_ant />
       </Form.Item>
+      <Form.Item>
+      <Button type="default" size="large" onClick={handleUpload}>
+        <FileAddOutlined /> Imagen de perfil
+      </Button>
+    </Form.Item>
       <Form.Item
         name="nif"
         label="NIF"
@@ -189,8 +239,6 @@ const Admin = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [form] = Form.useForm();
-
-  console.log(listaTiendas)
 
   const handleCancel = () => setOpen(false);
 

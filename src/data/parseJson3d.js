@@ -1906,6 +1906,8 @@ export const parseJson3D = async (json) => {
 
     orderJson.cabinets = orderJsonWhitoutZocalos;
 
+    console.log(orderJson);
+
     return orderJson;
 
     // const res = await createOrder(orderJson);
