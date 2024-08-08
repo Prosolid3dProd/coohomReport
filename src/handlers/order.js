@@ -4,8 +4,8 @@ import Cookies from "js-cookie";
 import { CONFIG } from "../data/constants";
 
 const Settings = {
-  // BACKEND_URL: "http://localhost:2002",
-  BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
+  BACKEND_URL: "http://localhost:2002",
+  // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
   ENDPOINT: "reportCoohom",
   TOKEN: "Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH",
 };

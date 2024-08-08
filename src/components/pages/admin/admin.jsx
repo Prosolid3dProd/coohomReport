@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { FileAddOutlined } from '@ant-design/icons';
-import * as filestack from 'filestack-js';
+import { FileAddOutlined } from "@ant-design/icons";
+import * as filestack from "filestack-js";
 import "../../../index.css";
 import "./admin.css";
 import {
@@ -19,7 +19,7 @@ import {
   Table,
   Checkbox,
   Space,
-  notification
+  notification,
 } from "antd";
 import { Header } from "../../content";
 import { QuestionCircleOutlined } from "@ant-design/icons";
@@ -44,192 +44,198 @@ const MENSAJES = {
   DELETE: (nombreTienda) => info(`Se ha eliminado la Tienda: ${nombreTienda}`),
 };
 
-const onFinish = async (values, setListaTiendas) => {
-  try {
-    const nuevaTienda = await createUser(values);
-    if (nuevaTienda.response?.data.message === "Usuario ya existe") {
-      return MENSAJES.ERROR("Usuario existente");
-    }
-    if (!nuevaTienda) {
-      return MENSAJES.ERROR("Conexión Base de Datos");
-    }
-    const tiendasTemporal = await getUsers();
-    if (!tiendasTemporal) {
-      return MENSAJES.ERROR("Conexión Base de Datos");
-    }
-    setListaTiendas(tiendasTemporal);
-    MENSAJES.INFO(nuevaTienda[0].name);
-  } catch (error) {
-    console.error("Error en onFinish:", error);
-  }
-};
+const ShopsForm = ({ setListaTiendas }) => {
+  const [logoUrl, setLogoUrl] = useState(""); // Estado para URL del logo
 
-const onFinishFailed = (errorInfo) => {
-  console.log("Failed:", errorInfo);
-};
+  // Función para manejar la subida del logo
+  const handleUpload = () => {
+    const client = filestack.init("AXPWPBPSTvSKYoyHwByaaz");
+    const options = {
+      onUploadDone: async (file) => {
+        const uploadedUrl = file.filesUploaded[0].url;
+        setLogoUrl(uploadedUrl); // Actualiza la URL del logo
+        console.log("Logo URL después de la carga:", uploadedUrl);
+      },
+      onFileUploadFailed: (error) => {
+        console.error("Error en la carga del archivo:", error);
+      },
+    };
+    const picker = client.picker(options);
+    picker.open();
+  };
 
-const handleUpload = () => {
-  const client = filestack.init("AXPWPBPSTvSKYoyHwByaaz");
-  const options = {
-    accept: "image/*",
-    maxSize: 4 * 1024 * 1024, // Limitar tamaño de archivo a 4 MB
-    fromSources: ["local_file_system"],
-    onUploadDone: async (file) => {
-      try {
-        const result = await pruebaFileStack({
-          logo: file.filesUploaded[0].url,
-        });
-        if (result.ok) {
-          notification.success({
-            message: 'Actualización exitosa!',
-            description: 'La imagen de perfil se ha actualizado correctamente.',
-            duration: 2, // Duración en segundos
-          });
-          location.reload();
-        } else {
-          throw new Error('Error al actualizar el logo');
-        }
-      } catch (error) {
-        notification.error({
-          message: 'Error!',
-          description: error.message,
-          duration: 2, // Duración en segundos
-        });
+  // Función para manejar el envío del formulario
+  const onFinish = async (values) => {
+    try {
+      // Incluye el logo solo si hay una URL
+      const finalValues = { ...values, logo: logoUrl || "" }; // Usa logoUrl si existe, sino una cadena vacía
+
+      // Llama a la API para crear el usuario
+      const nuevaTienda = await createUser(finalValues);
+      if (nuevaTienda.response?.data.message === "Usuario ya existe") {
+        return MENSAJES.ERROR("Usuario existente");
       }
-    },
-    onFileUploadFailed: (error) => {
-      notification.error({
-        message: 'Error en la carga del archivo',
-        description: error.message,
-        duration: 2, // Duración en segundos
-      });
+      if (!nuevaTienda) {
+        return MENSAJES.ERROR("Conexión Base de Datos");
+      }
+
+      // Obtén la lista actualizada de tiendas
+      const tiendasTemporal = await getUsers();
+      if (!tiendasTemporal) {
+        return MENSAJES.ERROR("Conexión Base de Datos");
+      }
+
+      // Actualiza el estado de la lista de tiendas
+      setListaTiendas(tiendasTemporal);
+      MENSAJES.INFO(nuevaTienda[0].name);
+    } catch (error) {
+      console.error("Error en onFinish:", error);
     }
   };
-  const picker = client.picker(options);
-  picker.open();
-};
 
-const ShopsForm = ({ setListaTiendas }) => (
-  <div style={{ height: "400px", overflowY: "scroll" }}>
-    <Form
-      name="basic"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      initialValues={{ remember: true }}
-      onFinish={(values) => onFinish(values, setListaTiendas)}
-      onFinishFailed={onFinishFailed}
-      autoComplete="off"
-      className="w-full"
-    >
-      <Form.Item
-        name="name"
-        label="Propietario"
-        className="p-4 flex items-center m-0"
-        rules={[
-          {
-            required: true,
-            message: "Porfavor introduce tu Propietario",
-            whitespace: true,
-          },
-        ]}
+  // Función para manejar el fallo del envío del formulario
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
+
+  return (
+    <div style={{ height: "400px", overflowY: "scroll" }}>
+      <Form
+        name="basic"
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
+        initialValues={{ remember: true }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+        autoComplete="off"
+        className="w-full"
       >
-        <Input_ant id="firstInputForm" />
-      </Form.Item>
-      <Form.Item
-        name="email"
-        label="E-mail"
-        className="w-full p-4 flex items-center m-0"
-        rules={[
-          { type: "email", message: "El email no es valido" },
-          { required: true, message: "Porfavor introduce un email" },
-        ]}
-      >
-        <Input_ant />
-      </Form.Item>
-      <Form.Item>
-      <Button type="default" size="large" onClick={handleUpload}>
-        <FileAddOutlined /> Imagen de perfil
-      </Button>
-    </Form.Item>
-      <Form.Item
-        name="nif"
-        label="NIF"
-        className="w-full p-4 flex items-center m-0"
-      >
-        <Input_ant />
-      </Form.Item>
-      <Form.Item
-        name="location"
-        label="Info1"
-        className="w-full p-4 flex items-center m-0"
-      >
-        <Input_ant />
-      </Form.Item>
-      <Form.Item
-        name="phone"
-        className="w-full p-4 flex items-center m-0"
-        label="Info2"
-      >
-        <Input_ant className="" />
-      </Form.Item>
-      <Form.Item
-        name="info3"
-        className="w-full p-4 flex items-center m-0"
-        label="Info3"
-      >
-        <Input_ant className="" />
-      </Form.Item>
-      <Form.Item
-        name="password"
-        className="w-full p-4 flex items-center m-0"
-        label="Contraseña"
-        rules={[{ required: true, whitespace: true, type: "password" }]}
-      >
-        <Input_ant className="" />
-      </Form.Item>
-      <Form.Item
-        name="coefficient"
-        label="Coeficiente"
-        className="w-full p-4 flex items-center m-0"
-        rules={[
-          { required: true, message: "Porfavor introduce un coeficiente" },
-        ]}
-      >
-        <Input_ant className="" />
-      </Form.Item>
-      <Form.Item
-        name="role"
-        label="Rol"
-        className="w-full p-4 flex items-center m-0"
-        rules={[{ required: true, message: "Porfavor introduce un rol" }]}
-      >
-        <Select
-          defaultValue=""
-          style={{ width: 150 }}
-          options={[
-            { value: "admin", label: "Administrador" },
-            { value: "client", label: "Cliente" },
-          ]}
-        />
-      </Form.Item>
-      {[...Array(5).keys()].map((index) => (
         <Form.Item
-          key={`observacion${index + 1}`}
-          name={`observacion${index + 1}`}
-          label={`Observacion${index + 1}`}
+          name="name"
+          label="Propietario"
+          className="p-4 flex items-center m-0"
+          rules={[
+            {
+              required: true,
+              message: "Por favor introduce tu Propietario",
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input_ant id="firstInputForm" />
+        </Form.Item>
+        <Form.Item
+          name="email"
+          label="E-mail"
           className="w-full p-4 flex items-center m-0"
+          rules={[
+            { type: "email", message: "El email no es válido" },
+            { required: true, message: "Por favor introduce un email" },
+          ]}
+        >
+          <Input_ant />
+        </Form.Item>
+        <Form.Item
+          name="logo"
+          label="Logo"
+          className="w-full p-4 flex items-center m-0"
+        >
+          <Button type="default" size="large" onClick={handleUpload}>
+            <FileAddOutlined /> Logo
+          </Button>
+          {logoUrl && (
+            <img
+              src={logoUrl + `?${new Date().getTime()}`} // Forzar la recarga de la imagen
+              alt="Logo"
+              style={{ width: 100, height: 100, borderRadius: 8, marginTop: 10 }}
+            />
+          )}
+        </Form.Item>
+        <Form.Item
+          name="nif"
+          label="NIF"
+          className="w-full p-4 flex items-center m-0"
+        >
+          <Input_ant />
+        </Form.Item>
+        <Form.Item
+          name="location"
+          label="Info1"
+          className="w-full p-4 flex items-center m-0"
+        >
+          <Input_ant />
+        </Form.Item>
+        <Form.Item
+          name="phone"
+          className="w-full p-4 flex items-center m-0"
+          label="Info2"
         >
           <Input_ant className="" />
         </Form.Item>
-      ))}
-      <Form.Item wrapperCol={{ offset: 14 }}>
-        <Button className="bg-blue text-white" type="default" htmlType="submit">
-          Crear
-        </Button>
-      </Form.Item>
-    </Form>
-  </div>
-);
+        <Form.Item
+          name="info3"
+          className="w-full p-4 flex items-center m-0"
+          label="Info3"
+        >
+          <Input_ant className="" />
+        </Form.Item>
+        <Form.Item
+          name="password"
+          className="w-full p-4 flex items-center m-0"
+          label="Contraseña"
+          rules={[{ required: true, whitespace: true, type: "password" }]}
+        >
+          <Input_ant className="" />
+        </Form.Item>
+        <Form.Item
+          name="coefficient"
+          label="Coeficiente"
+          className="w-full p-4 flex items-center m-0"
+          rules={[
+            { required: true, message: "Por favor introduce un coeficiente" },
+          ]}
+        >
+          <Input_ant className="" />
+        </Form.Item>
+        <Form.Item
+          name="role"
+          label="Rol"
+          className="w-full p-4 flex items-center m-0"
+          rules={[{ required: true, message: "Por favor introduce un rol" }]}
+        >
+          <Select
+            defaultValue=""
+            style={{ width: 150 }}
+            options={[
+              { value: "admin", label: "Administrador" },
+              { value: "client", label: "Cliente" },
+            ]}
+          />
+        </Form.Item>
+        {[...Array(5).keys()].map((index) => (
+          <Form.Item
+            key={`observacion${index + 1}`}
+            name={`observacion${index + 1}`}
+            label={`Observacion${index + 1}`}
+            className="w-full p-4 flex items-center m-0"
+          >
+            <Input_ant className="" />
+          </Form.Item>
+        ))}
+        <Form.Item wrapperCol={{ offset: 14 }}>
+          <Button
+            className="bg-blue text-white"
+            type="default"
+            htmlType="submit"
+          >
+            Crear
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
+  );
+};
+
 
 const Admin = () => {
   const [listaTiendas, setListaTiendas] = useState([]);
@@ -238,6 +244,7 @@ const Admin = () => {
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [logoUrl, setLogoUrl] = useState("");
   const [form] = Form.useForm();
 
   const handleCancel = () => setOpen(false);
@@ -254,6 +261,16 @@ const Admin = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (open && selectedUser) {
+      setLogoUrl(selectedUser.logo);
+      form.setFieldsValue({
+        ...selectedUser,
+        logo: selectedUser.logo, // Asegúrate de que la URL del logo se pase aquí si es necesario
+      });
+    }
+  }, [open, selectedUser]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -273,23 +290,11 @@ const Admin = () => {
   const showModal = (user) => {
     if (user) {
       setSelectedUser(user);
-      const filteredUser = {
-        name: user.name,
-        password: user.password,
-        nif: user.nif,
-        email: user.email,
-        phone: user.phone,
-        info3: user.info3,
-        location: user.location,
-        coefficient: user.coefficient,
-        role: user.role,
-        observacion1: user.observacion1,
-        observacion2: user.observacion2,
-        observacion3: user.observacion3,
-        observacion4: user.observacion4,
-        observacion5: user.observacion5,
-      };
-      form.setFieldsValue(filteredUser);
+      form.setFieldsValue({
+        ...user,
+        logo: user.logo, // Asegúrate de que la URL del logo se pase aquí si es necesario
+      });
+      setLogoUrl(user.logo); // Establecer la URL del logo en el estado
       setOpen(true);
     } else {
       console.error("User is undefined");
@@ -300,13 +305,6 @@ const Admin = () => {
     try {
       const values = await form.validateFields();
       setConfirmLoading(true);
-      // Comprobar si la contraseña está en listaTiendas
-      // const passwordExistsInStores = listaTiendas.some(store => store.password === selectedUser.password);
-      // if (!passwordExistsInStores) {
-      //   message.error("La contraseña del usuario seleccionado no coincide con ninguna tienda en la lista");
-      //   setConfirmLoading(false);
-      //   return;
-      // }
 
       if (values.oldPassword && values.newPassword) {
         const resetResult = await resetPassword({
@@ -320,7 +318,12 @@ const Admin = () => {
         message.success("Contraseña cambiada correctamente");
       }
 
-      const updateResult = await updateUser({ ...selectedUser, ...values });
+      // Incluye la URL del logo en los valores a actualizar
+      const updateResult = await updateUser({
+        ...selectedUser,
+        ...values,
+        logo: logoUrl,
+      });
       if (!updateResult) {
         message.error("Error al actualizar el usuario");
         return;
@@ -328,7 +331,9 @@ const Admin = () => {
 
       setListaTiendas((prevValues) =>
         prevValues.map((user) =>
-          user._id === selectedUser._id ? { ...user, ...values } : user
+          user._id === selectedUser._id
+            ? { ...user, ...values, logo: logoUrl }
+            : user
         )
       );
       message.success("Usuario actualizado correctamente");
@@ -412,6 +417,22 @@ const Admin = () => {
     );
   };
 
+  const handleUpload = () => {
+    const client = filestack.init("AXPWPBPSTvSKYoyHwByaaz");
+    const options = {
+      onUploadDone: async (file) => {
+        const uploadedUrl = file.filesUploaded[0].url;
+        setLogoUrl(uploadedUrl); // Actualiza el estado con la nueva URL del logo
+        console.log("Logo URL después de la carga:", uploadedUrl);
+      },
+      onFileUploadFailed: (error) => {
+        console.error("Error en la carga del archivo:", error);
+      },
+    };
+    const picker = client.picker(options);
+    picker.open();
+  };
+
   return (
     <main className="overflow-y-scroll px-4 flex gap-4 flex-col">
       <Header actions={false} name={"Tiendas"} />
@@ -444,7 +465,7 @@ const Admin = () => {
             rules={[
               {
                 required: true,
-                message: "Porfavor introduce tu Propietario",
+                message: "Por favor introduce tu Propietario",
                 whitespace: true,
               },
             ]}
@@ -456,19 +477,35 @@ const Admin = () => {
             label="E-mail"
             rules={[
               { type: "email", message: "El email no es valido" },
-              { required: true, message: "Porfavor introduce un email" },
+              { required: true, message: "Por favor introduce un email" },
               { validator: validateEmail, message: "Email no es valido" },
             ]}
           >
             <Input_ant />
           </Form.Item>
+
+          <Form.Item name="logo" label="Logo" className="w-full">
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <Button type="default" size="large" onClick={handleUpload}>
+                <FileAddOutlined /> Logo
+              </Button>
+              {logoUrl && (
+                <img
+                  src={logoUrl + `?${new Date().getTime()}`} // Forzar la recarga de la imagen
+                  alt="Logo"
+                  style={{ width: 150, height: 120, objectFit: 'cover'}}
+                />
+              )}
+            </div>
+          </Form.Item>
+
           <Form.Item name="nif" label="NIF">
             <Input_ant />
           </Form.Item>
           <Form.Item
             name="location"
             label="Info1"
-            rules={[{ message: "Porfavor introduce un localizacion" }]}
+            rules={[{ message: "Por favor introduce una localización" }]}
           >
             <Input_ant />
           </Form.Item>
@@ -490,59 +527,22 @@ const Admin = () => {
             name="coefficient"
             label="Coeficiente"
             rules={[
-              { required: true, message: "Porfavor introduce un coeficiente" },
-            ]}
-          >
-            <Input_ant className="" />
-          </Form.Item>
-          <Form.Item
-            name="role"
-            label="Rol"
-            rules={[{ required: true, message: "Porfavor introduce un rol" }]}
-          >
-            <Select
-              defaultValue=""
-              options={[
-                { value: "admin", label: "Administrador" },
-                { value: "client", label: "Cliente" },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item
-            name="oldPassword"
-            label="Contraseña Antigua"
-            rules={[
               {
-                required: false,
-                message: "Porfavor introduce tu contraseña antigua",
-                whitespace: true,
+                required: true,
+                message: "Por favor introduce el coeficiente",
               },
             ]}
           >
-            <Input_ant defaultValue={""} />
+            <Input_ant />
           </Form.Item>
-          <Form.Item
-            name="newPassword"
-            label="Nueva Contraseña"
-            rules={[
-              {
-                required: false,
-                message: "Porfavor introduce tu nueva contraseña",
-                whitespace: true,
-              },
-            ]}
-          >
-            <Input_ant defaultValue={""} />
+
+          <Form.Item name="oldPassword" label="Contraseña antigua">
+            <Input_ant />
           </Form.Item>
-          {[...Array(5).keys()].map((index) => (
-            <Form.Item
-              key={`observacion${index + 1}`}
-              name={`observacion${index + 1}`}
-              label={`Observacion${index + 1}`}
-            >
-              <Input_ant className="" />
-            </Form.Item>
-          ))}
+
+          <Form.Item name="newPassword" label="Nueva contraseña">
+            <Input_ant />
+          </Form.Item>
         </Form>
       </Modal>
     </main>

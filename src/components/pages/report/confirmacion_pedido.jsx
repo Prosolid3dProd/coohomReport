@@ -41,31 +41,13 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     accesorios: [],
   });
 
-  const logoUrlGrande = (name) => {
-    if (name === "Aller Alvarez") {
-      return <Image style={{ width: "100" }} src={LogoALLER} />;
-    } else if (name === "decormobiliario") {
-      return <Image style={{ width: "100" }} src={LogoDecor} />;
-    } else if (name === "KUBS") {
-      return <Image style={{ width: "100" }} src={LogoKUBS} />;
-    } else if (name === "j10") {
-      return <Image style={{ width: "100" }} src={LogoJ10} />;
-    } else if (name === "RAEL") {
-      return <Image style={{ width: "100" }} src={LogoRAEL} />;
-    } else if (name === "CERAPAL") {
-      return <Image style={{ width: "100" }} src={LogoCERAPAL} />;
-    } else if (name === "Kitchen sukaldeak") {
-      return <Image style={{ width: "100" }} src={Sukaldeak} />;
-    } else if (name === "Alkain") {
-      return <Image style={{ width: "100" }} src={Alkain} />;
-    } else if (name === "Sukaldatu") {
-      return <Image style={{ width: "100" }} src={Sukaldatu} />;
-    } else {
+  const logoGrande = (url) => {
+    if (!url || url === "") {
       return <Image style={{ width: "100px" }} src={LogoSola} />;
+    } else {
+      return <Image style={{ width: "100px" }} src={url} />;
     }
   };
-
-  console.log(data)
   const grayscaleFilter = (color) => {
     const r = Math.floor(0.299 * color.r + 0.587 * color.g + 0.114 * color.b);
     return { r, g: r, b: r };
@@ -277,8 +259,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               justifyContent: "space-between",
             }}
           >
-            <View>{logoUrlGrande(data.userId?.name)}</View>
-            {/* <View>{logoLocalGrande(data.userId?.image)}</View> */}
+            {/* <View><Image style={{ width: "150px" }} src={data.userId.logo ? data.userId.logo : LogoSola} /></View> */}
+            <View>{logoGrande(data.userId?.logo)}</View>
             <Text
               style={{
                 fontSize: "14",
@@ -291,9 +273,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
           </View>
           <View style={{ fontSize: "8", marginRight: "110" }}>
             {/* <Text>{data.userId.name}</Text> */}
-            <Text>{data.userId.location}</Text>
-            <Text>{data.userId.phone}</Text>
-            <Text>{data.userId.info3}</Text>
+            <Text>{data.userId?.location}</Text>
+            <Text>{data.userId?.phone}</Text>
+            <Text>{data.userId?.info3}</Text>
             {/* <Text>{data.userId.email}</Text> */}
           </View>
           <View
@@ -2295,11 +2277,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 )}
                 <View style={{ marginTop: 1 }}>
                   <Text>
-                    I.V.A. (
-                    {data.ivaCabinets == "0"
-                      ? "21"
-                      : data.ivaCabinets}
-                    % en muebles)
+                    I.V.A. ({data.ivaCabinets == "0" ? "21" : data.ivaCabinets}%
+                    en muebles)
                   </Text>
                 </View>
                 <View style={{ marginTop: 1 }}>

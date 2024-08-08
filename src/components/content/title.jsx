@@ -93,8 +93,8 @@ const Actions = ({
 
   const props1 = {
     name: "sampleFile",
-    // action: "http://localhost:2002/cargarNuevoXlsxSola",
-    action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
+    action: "http://localhost:2002/cargarNuevoXlsxSola",
+    // action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",
@@ -104,8 +104,8 @@ const Actions = ({
 
   const props2 = {
     name: "sampleFile",
-    // action: "http://localhost:2002/cargarNuevoXlsxSola",
-    action: "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
+    action: "http://localhost:2002/cargarNuevoXlsxSola",
+    // action: "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",

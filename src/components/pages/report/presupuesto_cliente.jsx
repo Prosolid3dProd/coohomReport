@@ -77,49 +77,11 @@ const Presupuesto_Cliente = ({
     accesorios: [],
   });
 
-  const logoUrl = (name) => {
-    if (name === "Aller Alvarez") {
-      return <Image style={{ width: "30" }} src={LogoALLER} />;
-    } else if (name === "decormobiliario") {
-      return <Image style={{ width: "30" }} src={LogoDecor} />;
-    } else if (name === "KUBS") {
-      return <Image style={{ width: "30" }} src={LogoKUBS} />;
-    } else if (name === "j10") {
-      return <Image style={{ width: "30" }} src={LogoJ10} />;
-    } else if (name === "RAEL") {
-      return <Image style={{ width: "30" }} src={LogoRAEL} />;
-    } else if (name === "CERAPAL") {
-      return <Image style={{ width: "30" }} src={LogoCERAPAL} />;
-    } else if (name === "Kitchen sukaldeak") {
-      return <Image style={{ width: "30" }} src={Sukaldeak} />;
-    } else if (name === "Alkain") {
-      return <Image style={{ width: "30" }} src={Alkain} />;
+  const logoGrande = (url) => {
+    if (!url || url === "") {
+      return <Image style={{ width: "100px" }} src={LogoSola} />;
     } else {
-      return <Image style={{ width: "30" }} src={LogoSola} />;
-    }
-  };
-
-  const logoUrlGrande = (name) => {
-    if (name === "Aller Alvarez") {
-      return <Image style={{ width: "100" }} src={LogoALLER} />;
-    } else if (name === "decormobiliario") {
-      return <Image style={{ width: "100" }} src={LogoDecor} />;
-    } else if (name === "KUBS") {
-      return <Image style={{ width: "100" }} src={LogoKUBS} />;
-    } else if (name === "j10") {
-      return <Image style={{ width: "100" }} src={LogoJ10} />;
-    } else if (name === "RAEL") {
-      return <Image style={{ width: "100" }} src={LogoRAEL} />;
-    } else if (name === "CERAPAL") {
-      return <Image style={{ width: "100" }} src={LogoCERAPAL} />;
-    } else if (name === "Kitchen sukaldeak") {
-      return <Image style={{ width: "100" }} src={Sukaldeak} />;
-    } else if (name === "Alkain") {
-      return <Image style={{ width: "100" }} src={Alkain} />;
-    } else if (name === "Sukaldatu") {
-      return <Image style={{ width: "100" }} src={Sukaldatu} />;
-    } else {
-      return <Image style={{ width: "100" }} src={LogoSola} />;
+      return <Image style={{ width: "100px" }} src={url} />;
     }
   };
 
@@ -295,7 +257,8 @@ const Presupuesto_Cliente = ({
               marginBottom: "18",
             }}
           >
-            <View>{logoUrlGrande(data.userId?.name)}</View>
+            <View>{logoGrande(data.userId?.logo)}</View>
+            {/* <View>{logoUrlGrande(data.userId?.name)}</View> */}
             <Text
               style={{
                 color: "#CFCFCF",
@@ -955,10 +918,7 @@ const Presupuesto_Cliente = ({
               )}
               <View>
                 <Text>
-                  I.V.A. (
-                  {data.ivaCabinets == "0"
-                    ? "21"
-                    : data.ivaCabinets}
+                  I.V.A. ({data.ivaCabinets == "0" ? "21" : data.ivaCabinets}
                   %)
                 </Text>
               </View>
@@ -1008,9 +968,7 @@ const Presupuesto_Cliente = ({
                   {calcularIvaCabinets(
                     data.importe,
                     data.discountCabinets,
-                    data.ivaCabinets == "0"
-                      ? 21
-                      : data.ivaCabinets
+                    data.ivaCabinets == "0" ? 21 : data.ivaCabinets
                   )}
                 </Text>
               </View>
@@ -1025,9 +983,7 @@ const Presupuesto_Cliente = ({
                   {calcularTotalDescuentoIvaCabinets(
                     data.importe,
                     data.discountCabinets,
-                    data.ivaCabinets == "0"
-                      ? 21
-                      : data.ivaCabinets
+                    data.ivaCabinets == "0" ? 21 : data.ivaCabinets
                   )}
                 </Text>
               </View>
