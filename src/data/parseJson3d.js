@@ -354,7 +354,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
       price += price * 0.1;
     }
   }
-
   return price;
 };
 
@@ -1189,15 +1188,16 @@ export const parseJson3D = async (json) => {
         referenceType = getRef(item, referenceType);
         opening = "";
         contador = contador + 1;
+        let priceCabinet=referenceType.type!=='A'&& referenceType.type!=='B'&&referenceType.type!=='M'?parseFloat(item.parameters.find((item)=>String(item.name).toUpperCase() === "PRICE")?.value):getPrice(
+          item,
+          "cabinet",
+          item.textureName,
+          item.modelCostInfo.quotationRate
+        )
         let items = {
           id: `id_${contador}`,
           name: item.modelName,
-          priceCabinet: getPrice(
-            item,
-            "cabinet",
-            item.textureName,
-            item.modelCostInfo.quotationRate
-          ),
+          priceCabinet:priceCabinet,
           reference: referenceType.ref,
           tipo: referenceType.type,
           customcode: item.customCode || null,
@@ -1729,6 +1729,7 @@ export const parseJson3D = async (json) => {
             )
 
               isComplement = true;
+            
             cabinets.push({
               ...items,
               obsBrandGoodId: item.obsBrandGoodId,
@@ -1774,10 +1775,10 @@ export const parseJson3D = async (json) => {
             });
           }
         }
-
         total =
           parseFloat(total) +
-          parseFloat(getPrice(item, "cabinet")) +
+          //parseFloat(getPrice(item, "cabinet")) +
+          parseFloat(priceCabinet) +
           parseFloat(getTotalDoors(item.subModels)) +
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
       }

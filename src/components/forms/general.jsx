@@ -216,7 +216,7 @@ const General = ({ getData, data }) => {
             </p>
           </Divider>
           <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Coeficiente Compra" name="coefficient">
+            <Form.Item label="Coeficiente de Venta" name="coefficient">
               <div style={{ position: "relative" }}>
                 <Input
                   defaultValue={initialValues.coefficient}
