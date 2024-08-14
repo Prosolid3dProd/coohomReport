@@ -291,7 +291,7 @@ const getFrente = (block) => {
 
   const frente = findFrente(block.subModels);
   if (frente) {
-    // console.log(frente, "FRENTE");
+        // console.log(frente, "FRENTE");
     return { datos: frente, tipo: "cajon" };
   }
 
@@ -439,6 +439,7 @@ const getRef = (parametros, reference) => {
 };
 
 const getDoors = (submodels) => {
+  
   let values = {};
 
   submodels.forEach((item) => {
@@ -828,10 +829,11 @@ const getParameters = (param, tipoMueble) => {
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
 
-    if (itemName === "PVA" || itemName === "PVL") {
+    if (itemName === "PVA"&& parseFloat(item.value) > 0 || itemName === "PVL" && parseFloat(item.value) > 0) {
+     
       op.push({
-        name: item.displayName,
-        value: parseFloat(item.value),
+        name: item.displayName+": "+item.value,
+        value: 0, //parseFloat(item.value),
         description: item.description,
         nameValue:
           item.options.length > 2
@@ -1725,6 +1727,7 @@ export const parseJson3D = async (json) => {
               String(item.modelProductNumber).toLocaleUpperCase() ===
               "COMPLEMENTOS"
             )
+
               isComplement = true;
             cabinets.push({
               ...items,
@@ -1906,7 +1909,7 @@ export const parseJson3D = async (json) => {
 
     orderJson.cabinets = orderJsonWhitoutZocalos;
 
-    console.log(orderJson);
+    //console.log(orderJson);
 
     return orderJson;
 
