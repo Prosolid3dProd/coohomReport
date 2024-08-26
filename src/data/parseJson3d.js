@@ -291,7 +291,7 @@ const getFrente = (block) => {
 
   const frente = findFrente(block.subModels);
   if (frente) {
-        // console.log(frente, "FRENTE");
+    // console.log(frente, "FRENTE");
     return { datos: frente, tipo: "cajon" };
   }
 
@@ -438,7 +438,6 @@ const getRef = (parametros, reference) => {
 };
 
 const getDoors = (submodels) => {
-  
   let values = {};
 
   submodels.forEach((item) => {
@@ -827,10 +826,12 @@ const getParameters = (param, tipoMueble) => {
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
 
-    if (itemName === "PVA"&& parseFloat(item.value) > 0 || itemName === "PVL" && parseFloat(item.value) > 0) {
-     
+    if (
+      (itemName === "PVA" && parseFloat(item.value) > 0) ||
+      (itemName === "PVL" && parseFloat(item.value) > 0)
+    ) {
       op.push({
-        name: item.displayName+": "+item.value,
+        name: item.displayName + ": " + item.value,
         value: 0, //parseFloat(item.value),
         description: item.description,
         nameValue:
@@ -1187,16 +1188,25 @@ export const parseJson3D = async (json) => {
         referenceType = getRef(item, referenceType);
         opening = "";
         contador = contador + 1;
-        let priceCabinet=referenceType.type!=='A'&& referenceType.type!=='B'&&referenceType.type!=='M'?parseFloat(item.parameters.find((item)=>String(item.name).toUpperCase() === "PRICE")?.value):getPrice(
-          item,
-          "cabinet",
-          item.textureName,
-          item.modelCostInfo.quotationRate
-        )
+        let priceCabinet =
+          referenceType.type !== "A" &&
+          referenceType.type !== "B" &&
+          referenceType.type !== "M"
+            ? parseFloat(
+                item.parameters.find(
+                  (item) => String(item.name).toUpperCase() === "PRICE"
+                )?.value
+              )
+            : getPrice(
+                item,
+                "cabinet",
+                item.textureName,
+                item.modelCostInfo.quotationRate
+              );
         let items = {
           id: `id_${contador}`,
           name: item.modelName,
-          priceCabinet:priceCabinet,
+          priceCabinet: priceCabinet,
           reference: referenceType.ref,
           tipo: referenceType.type,
           customcode: item.customCode || null,
@@ -1414,7 +1424,7 @@ export const parseJson3D = async (json) => {
           buscarCajonesYPuertas(item.subModels);
 
           // ----------------------------------------------------
-          if (cajonesInfo.modelDrawer) {
+          if (cajonesInfo && cajonesInfo.modelDrawer) {
             if (referenceType.ref?.indexOf(".BC") !== -1) {
               cajonesInfo = {
                 ...cajonesInfo,
@@ -1426,9 +1436,11 @@ export const parseJson3D = async (json) => {
                 modelDrawer: CONFIG.DRAWERMODEL.LEGRABOX,
               };
             }
-          } else {
+          } 
+          else if (!cajonesInfo) {
             cajonesInfo = null;
           }
+          
 
           extra = {
             ...armazonInfo,
@@ -1444,25 +1456,52 @@ export const parseJson3D = async (json) => {
             cajonesInfo?.modelDrawer?.indexOf("Corte") === -1 &&
             modelDrawerArray.push(cajonesInfo?.modelDrawer);
 
-            item.subModels.map((filtroMaterialDrawer) => {
-              if (filtroMaterialDrawer.customCode === "1001") {
-                filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
-                  if (matInteriorDrawer.customCode === "0201") {
-                    cajonesInfo?.materialDrawer &&
-                      cajonesInfo?.materialDrawer !== "undefined" &&
-                      cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
-                      cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
-                      cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
-                      cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
-                      cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
-                      materialDrawerArray.push(cajonesInfo?.materialDrawer);
-                  }
-                });
-              }
-            });
+          item.subModels.map((filtroMaterialDrawer) => {
+            if (filtroMaterialDrawer.customCode === "1001") {
+              console.log(filtroMaterialDrawer)
+              filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
+                if (matInteriorDrawer.customCode === "0201" ) {
+                  cajonesInfo?.materialDrawer &&
+                    cajonesInfo?.materialDrawer !== "undefined" &&
+                    cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
+                    materialDrawerArray.push(cajonesInfo?.materialDrawer);
+                }
+              });
+            }
+          });
 
-          // console.log(materialDrawerArray);
+          console.log(cajonesInfo?.materialDrawer);
 
+          // item.subModels.map((filtroMaterialDrawer) => {
+          //   if (filtroMaterialDrawer.customCode === "1001") {
+          //     filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
+          //       if (matInteriorDrawer.customCode === "0201") {
+          //         console.log("cajonesInfo:", cajonesInfo);
+          //         console.log("cajonesInfo?.materialDrawer:", cajonesInfo?.materialDrawer);
+          
+          //         if (
+          //           cajonesInfo?.materialDrawer &&
+          //           cajonesInfo?.materialDrawer !== "undefined" &&
+          //           cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
+          //           cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
+          //           cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
+          //           cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
+          //           cajonesInfo?.materialDrawer?.indexOf("Corte") === -1
+          //         ) {
+          //           materialDrawerArray.push(cajonesInfo?.materialDrawer);
+          //           console.log("Pushed:", cajonesInfo?.materialDrawer);
+          //         }
+          //       }
+          //     });
+          //   }
+          // });
+          
+          // console.log("materialDrawerArray:", materialDrawerArray);
+          
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
             // console.log(item)
@@ -1725,9 +1764,8 @@ export const parseJson3D = async (json) => {
               String(item.modelProductNumber).toLocaleUpperCase() ===
               "COMPLEMENTOS"
             )
-
               isComplement = true;
-            
+
             cabinets.push({
               ...items,
               obsBrandGoodId: item.obsBrandGoodId,

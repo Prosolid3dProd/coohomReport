@@ -27,34 +27,38 @@ const General = ({ getData, data }) => {
   let role = data?.profile?.role || "";
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({
-    reference: data?.reference,
-    date: data?.date,
-    customerName: data?.customerName,
-    location: data?.location,
-    phone: data?.phone,
-    total: data?.total,
+    ...data,
+    iva: undefined,
+    // reference: data?.reference,
+    // date: data?.date,
+    // customerName: data?.customerName,
+    // location: data?.location,
+    // phone: data?.phone,
+    // total: data?.total,
     coefficient:
       role === "client"
         ? data.userId.coefficientVentaTienda
-        : data?.userId?.coefficient,
-    modelDoor: data?.modelDoor,
-    materialDoor: data?.materialDoor,
-    handle: data?.modelHandle,
-    drawer: data?.modelDrawer + data?.materialDrawer,
-    materialCabinet: data?.materialCabinet,
-    observation: data?.observation?.includes("null") ? "" : data.observation,
-    fecha: String(data?.fecha).split(" ")[0],
-    discountEncimeras: data?.discountEncimeras,
-    discountCabinets: data?.discountCabinets,
-    discountElectrodomesticos: data?.discountElectrodomesticos,
-    discountEquipamientos: data?.discountEquipamientos,
-    ivaEncimeras: data?.ivaEncimeras,
-    ivaCabinets: data?.ivaCabinets,
-    ivaElectrodomesticos: data?.ivaElectrodomesticos,
-    ivaEquipamientos: data?.ivaEquipamientos,
-    semanaEntrega: data?.semanaEntrega,
-    fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
+        : data?.userId?.coefficient
+    // modelDoor: data?.modelDoor,
+    // materialDoor: data?.materialDoor,
+    // handle: data?.modelHandle,
+    // drawer: data?.modelDrawer + data?.materialDrawer,
+    // // drawer: data?.materialDrawer,
+    // materialCabinet: data?.materialCabinet,
+    // observation: data?.observation?.includes("null") ? "" : data.observation,
+    // fecha: String(data?.fecha).split(" ")[0],
+    // discountEncimeras: data?.discountEncimeras,
+    // discountCabinets: data?.discountCabinets,
+    // discountElectrodomesticos: data?.discountElectrodomesticos,
+    // discountEquipamientos: data?.discountEquipamientos,
+    // ivaEncimeras: data?.ivaEncimeras,
+    // ivaCabinets: data?.ivaCabinets,
+    // ivaElectrodomesticos: data?.ivaElectrodomesticos,
+    // ivaEquipamientos: data?.ivaEquipamientos,
+    // semanaEntrega: data?.semanaEntrega,
+    // fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
   });
+  console.log(initialValues)
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isInputEditable, setIsInputEditable] = useState(role !== "client");
   const [password, setPassword] = useState("");
@@ -122,9 +126,9 @@ const General = ({ getData, data }) => {
         // }));
         setLocalOrder(result);
         message.success("Se ha actualizado correctamente");
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
+        // setTimeout(() => {
+        //   location.reload();
+        // }, 1000);
       }
     }
   };
@@ -247,7 +251,6 @@ const General = ({ getData, data }) => {
               <Form.Item label="Coeficiente Venta" name="coefficient">
                 <div style={{ position: "relative" }}>
                   <Input
-                  //antes era userId
                     defaultValue={data?.userId?.coefficientVentaTienda}
                     readOnly={!isInputEditable}
                     style={!isInputEditable ? { opacity: 0.7 } : {}}
