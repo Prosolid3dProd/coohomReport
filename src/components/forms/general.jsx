@@ -38,14 +38,14 @@ const General = ({ getData, data }) => {
     coefficient:
       role === "client"
         ? data.userId.coefficientVentaTienda
-        : data?.userId?.coefficient
+        : data?.userId?.coefficient,
     // modelDoor: data?.modelDoor,
     // materialDoor: data?.materialDoor,
     // handle: data?.modelHandle,
     // drawer: data?.modelDrawer + data?.materialDrawer,
     // // drawer: data?.materialDrawer,
     // materialCabinet: data?.materialCabinet,
-    // observation: data?.observation?.includes("null") ? "" : data.observation,
+    observation: data?.observation?.includes("null") ? "" : data.observation,
     // fecha: String(data?.fecha).split(" ")[0],
     // discountEncimeras: data?.discountEncimeras,
     // discountCabinets: data?.discountCabinets,

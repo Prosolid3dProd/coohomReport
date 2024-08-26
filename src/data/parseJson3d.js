@@ -595,6 +595,7 @@ const getInfoDrawer = (submodels) => {
       materialDrawer = item.textureName;
     }
   });
+  
   return {
     modelDrawer,
     textureDrawer,
