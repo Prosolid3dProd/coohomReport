@@ -585,23 +585,22 @@ const getInfoCabinet = (submodels) => {
 };
 
 const getInfoDrawer = (submodels) => {
-  let values = {
-    modelDrawer: null,
-    textureDrawer: null,
-    materialDrawer: null,
-  };
+  let modelDrawer = null;
+  let textureDrawer = null;
+  let materialDrawer = null;
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DRAWER) {
-      //Esto antes se pasaba igualando las variables y luego haciendo un objeto en el return con las 3 variables (cambio)
-      values = {
-        modelDrawer: item.modelBrandGoodName,
-        textureDrawer: item.textureName,
-        materialDrawer: item.textureName,
-      };
+      modelDrawer = item.modelBrandGoodName;
+      textureDrawer = item.textureName;
+      materialDrawer = item.textureName;
     }
   });
-  return values;
+  return {
+    modelDrawer,
+    textureDrawer,
+    materialDrawer,
+  };
 };
 
 const getPerfil = (perf) => {
@@ -1340,7 +1339,7 @@ export const parseJson3D = async (json) => {
 
             subModels.forEach((model) => {
               if (model.customCode === "202" || model.customCode === "203") {
-                const referencia = model.ignoreParameters
+                const referencia = model?.ignoreParameters
                   .filter(
                     (ref) =>
                       ref.displayName.toLocaleUpperCase() === "REFERENCIA"
@@ -1443,24 +1442,23 @@ export const parseJson3D = async (json) => {
             cajonesInfo?.modelDrawer?.indexOf("Corte") === -1 &&
             modelDrawerArray.push(cajonesInfo?.modelDrawer);
 
-          item.subModels.map((filtroMaterialDrawer) => {
-            if (filtroMaterialDrawer.customCode === "1001") {
-              // console.log(filtroMaterialDrawer, "fuera")
-              filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
-                if (matInteriorDrawer.customCode === "0201") {
-                  // console.log(matInteriorDrawer, "dentro")
-                  cajonesInfo?.materialDrawer &&
-                    cajonesInfo?.materialDrawer !== "undefined" &&
-                    cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
-                    cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
-                    cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
-                    cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
-                    cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
-                    materialDrawerArray.push(cajonesInfo?.materialDrawer);
-                }
-              });
-            }
-          });
+            item.subModels.map((filtroMaterialDrawer) => {
+              if (filtroMaterialDrawer.customCode === "1001") {
+                filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
+                  if (matInteriorDrawer.customCode === "0201") {
+                    cajonesInfo?.materialDrawer &&
+                      cajonesInfo?.materialDrawer !== "undefined" &&
+                      cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
+                      cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
+                      cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
+                      cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
+                      cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
+                      materialDrawerArray.push(cajonesInfo?.materialDrawer);
+                  }
+                });
+              }
+            });
+
           // console.log(materialDrawerArray);
 
           //Puertas y puertas dentro de gavetas
@@ -1905,8 +1903,6 @@ export const parseJson3D = async (json) => {
     );
 
     orderJson.cabinets = orderJsonWhitoutZocalos;
-
-    console.log(orderJson);
 
     return orderJson;
 

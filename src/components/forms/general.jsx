@@ -129,6 +129,7 @@ const General = ({ getData, data }) => {
     }
   };
 
+  console.log(data)
   return (
     <Card className="rounded-none bg-gray border border-border">
       <Form
@@ -246,7 +247,8 @@ const General = ({ getData, data }) => {
               <Form.Item label="Coeficiente Venta" name="coefficient">
                 <div style={{ position: "relative" }}>
                   <Input
-                    defaultValue={data.userId.coefficientVentaTienda}
+                  //antes era userId
+                    defaultValue={data?.userId?.coefficientVentaTienda}
                     readOnly={!isInputEditable}
                     style={!isInputEditable ? { opacity: 0.7 } : {}}
                     disabled={role === "admin" ? true : false}
