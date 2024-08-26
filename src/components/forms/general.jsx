@@ -58,7 +58,7 @@ const General = ({ getData, data }) => {
     // semanaEntrega: data?.semanaEntrega,
     // fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
   });
-  console.log(initialValues)
+  
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isInputEditable, setIsInputEditable] = useState(role !== "client");
   const [password, setPassword] = useState("");
@@ -126,9 +126,9 @@ const General = ({ getData, data }) => {
         // }));
         setLocalOrder(result);
         message.success("Se ha actualizado correctamente");
-        // setTimeout(() => {
-        //   location.reload();
-        // }, 1000);
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
       }
     }
   };
