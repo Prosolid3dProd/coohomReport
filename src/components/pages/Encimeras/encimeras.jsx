@@ -173,6 +173,7 @@ export const fetchData = async (setEditado, setData) => {
     setEditado(false);
   }
 };
+
 const Encimeras = () => {
   const [data, setData] = useState([]);
   const [editado, setEditado] = useState(false);
@@ -214,6 +215,7 @@ const Encimeras = () => {
       message.error(`Error al eliminar ${item.code}`);
     }
   };
+  
   let columns = [
     {
       title: "Referencia",
@@ -236,17 +238,6 @@ const Encimeras = () => {
       dataIndex: "marca",
       key: "marca",
     },
-    // {
-    //   title: "Ancho",
-    //   dataIndex: "width",
-    //   key: "width",
-    // },
-    // {
-    //   title: "Alto",
-    //   dataIndex: "height",
-    //   key: "height",
-    // },
-    
     {
       title: "Precio",
       dataIndex: "price",

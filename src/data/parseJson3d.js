@@ -1685,12 +1685,7 @@ export const parseJson3D = async (json) => {
                   ...extra,
                 });
               }
-            });
-
-          // Buscar casco para pasarlo directamente
-          // const casco = item.subModels.find((x) =>
-          //   x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
-          // );
+            })
 
           let nameFinal = item.modelName;
           if (String(item.modelName).indexOf("L") > -1) {
@@ -1700,12 +1695,6 @@ export const parseJson3D = async (json) => {
               .substring(0, String(item.modelName).length - 5)
               .replace(/-/g, "");
           }
-          // nameFinal.toUpperCase().includes("LINERO")
-          //   ? (armazonInfo = {
-          //       materialCabinet: item.textureName,
-          //       modelCabinet: item.modelName,
-          //     })
-          //   : (armazonInfo = getInfoCabinet(item.subModels));
           if (parseFloat(totalPrice) >= 0) {
             let description = "";
 

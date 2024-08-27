@@ -32,7 +32,6 @@ const General = ({ data }) => {
             info3: currentUser.info3,
             logo: currentUser.logo,
             coefficient: currentUser.coefficient,
-            iva: currentUser.iva,
             observacion1: currentUser.observacion1,
             observacion2: currentUser.observacion2,
             observacion3: currentUser.observacion3,

@@ -21,8 +21,6 @@ import {
 import "./report.css";
 import Confirmacion_Pedido from "./confirmacion_pedido";
 
-async function buscarNodoPorCodigo(codigoBuscado) {}
-
 const Report = () => {
   const [main, setMain] = useState(null);
   const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
@@ -45,12 +43,11 @@ const Report = () => {
 
   useEffect(() => {
     if (orderId._id) {
-      getOrden();
-      buscarNodoPorCodigo("3FO3XYGTXB12");
+      getOrden()
     }
   }, [orderId]);
   
-    useEffect(() => {
+  useEffect(() => {
       const fetchData = async () => {
         if (orderId._id && tabActivo <= 3) {
           const updatedInfo = fixOrder(data, tabActivo);
@@ -60,7 +57,7 @@ const Report = () => {
         }
       };
       fetchData();
-    }, [tabActivo]);
+  }, [tabActivo]);
   
 
   const tabs = [
@@ -240,16 +237,6 @@ const Report = () => {
             })}
           />
         </Card>
-        {/* <FloatButton
-          icon={<ArrowUp />}
-          className={`${
-            visible ? "opacity-100" : "opacity-0"
-          } transition duration-300 ease-linear`}
-          type="primary"
-          onClick={() => (main.scrollTop = 0)}
-        >
-          Ancla
-        </FloatButton> */}
       </main>
     )
   );
