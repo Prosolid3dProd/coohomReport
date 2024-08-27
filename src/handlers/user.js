@@ -3,8 +3,8 @@ import Cookies from "js-cookie";
 import { CONFIG } from "../data/constants";
 
 // const backendUrl = "http://localhost:2002";
-const backendUrl = "https://octopus-app-dgmcr.ondigitalocean.app";
-// const backendUrl = "https://api.simulhome.com/coohomReport"
+// const backendUrl = "https://octopus-app-dgmcr.ondigitalocean.app";
+const backendUrl = "https://api.simulhome.com/coohomReport"
 const token = "Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH";
 
 axios.defaults.baseURL = backendUrl;
