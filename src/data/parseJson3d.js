@@ -1467,8 +1467,7 @@ export const parseJson3D = async (json) => {
               });
             }
           });
-          
-          
+        
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
             const isCustomCode1001 =

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState} from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import "./../../index.css";
 import { useNavigate } from "react-router-dom";

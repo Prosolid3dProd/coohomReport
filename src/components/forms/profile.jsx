@@ -10,7 +10,6 @@ import {
   Divider,
   Space,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
 import { updateProfile } from "../../handlers/order";
 import { getUsers } from "../../handlers/user";
 

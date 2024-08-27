@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Page,
   Text,
@@ -6,18 +6,7 @@ import {
   Document,
   Image,
   Font,
-  StyleSheet,
-  Svg,
 } from "@react-pdf/renderer";
-import LogoALLER from "../../../assets/ALLER.jpeg";
-import LogoRAEL from "../../../assets/RAEL.jpeg";
-import LogoKUBS from "../../../assets/KUBS.jpeg";
-import LogoCERAPAL from "../../../assets/CERAPAL.jpeg";
-import LogoJ10 from "../../../assets/J10.jpeg";
-import LogoDecor from "../../../assets/DECORMOBILIARIO.jpeg";
-import Sukaldeak from "../../../assets/Sukaldeak.jpeg";
-import Alkain from "../../../assets/Alkain.jpeg";
-import Sukaldatu from "../../../assets/Sukaldatu.jpeg";
 import LogoSola from "../../../assets/sola.png";
 import { CONFIG } from "../../../data/constants";
 import { SolaImagenes } from "./solaImages";

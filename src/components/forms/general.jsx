@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import {
   Button,
   Input,
@@ -20,7 +20,6 @@ import {
   setPrecio,
   getTotales,
   existeTotales,
-  setTotales,
 } from "../../data/localStorage";
 
 const General = ({ getData, data }) => {

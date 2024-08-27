@@ -1,30 +1,21 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FileAddOutlined } from "@ant-design/icons";
 import * as filestack from "filestack-js";
 import "../../../index.css";
 import "./admin.css";
 import {
   Button,
-  Divider,
   Form,
   Input as Input_ant,
   Select,
-  Row,
-  Col,
   message,
   Popconfirm,
   Modal,
-  Typography,
-  Empty,
   Table,
-  Checkbox,
   Space,
-  notification,
 } from "antd";
 import { Header } from "../../content";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { Label, TablaModal } from "./../../content/modals";
-import { archivedOrder } from "../../../handlers/order";
 import {
   createUser,
   getUsers,

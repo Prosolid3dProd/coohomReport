@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import {
   Config,
@@ -16,13 +16,13 @@ import { getLocalToken } from "./data/localStorage";
 
 export const userContext = React.createContext();
 
-const ReDirect = () => {
-  const location = useLocation();
-  if (location && location.pathname === "/")
-    return <Navigate to={`Dashboard/Presupuestos`} replace />;
+// const ReDirect = () => {
+//   const location = useLocation();
+//   if (location && location.pathname === "/")
+//     return <Navigate to={`Dashboard/Presupuestos`} replace />;
 
-  return;
-};
+//   return;
+// };
 
 const App = () => {
   //IMPORTANTE! --> User debe de tomar información de BD
