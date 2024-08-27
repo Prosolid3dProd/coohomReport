@@ -25,7 +25,6 @@ import { Header } from "../../content";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { Label, TablaModal } from "./../../content/modals";
 import { archivedOrder } from "../../../handlers/order";
-import { pruebaFileStack } from "../../../handlers/order";
 import {
   createUser,
   getUsers,
@@ -244,8 +243,6 @@ const Admin = () => {
   const [logoUrl, setLogoUrl] = useState("");
   const [form] = Form.useForm();
 
-  console.log(listaTiendas)
-
   const handleCancel = () => setOpen(false);
 
   const handleResize = () => {
@@ -421,8 +418,7 @@ const Admin = () => {
     const options = {
       onUploadDone: async (file) => {
         const uploadedUrl = file.filesUploaded[0].url;
-        setLogoUrl(uploadedUrl); // Actualiza el estado con la nueva URL del logo
-        console.log("Logo URL después de la carga:", uploadedUrl);
+        setLogoUrl(uploadedUrl);
       },
       onFileUploadFailed: (error) => {
         console.error("Error en la carga del archivo:", error);

@@ -26,7 +26,6 @@ export const createUser = async (params) => {
       ...params,
       token,
     });
-    console.log(data);
     return data;
   } catch (error) {
     handleAxiosError(error);
@@ -39,7 +38,6 @@ export const resetPassword = async (params) => {
     const { data } = await axios.post("/resetPasswordUserCoohom", {
       ...params,
     });
-    console.log(data);
     return data;
   } catch (error) {
     handleAxiosError(error);
@@ -69,7 +67,6 @@ export const getUsers = async (params) => {
       ...params,
       token,
     });
-    // console.log(data);
     return data;
   } catch (error) {
     handleAxiosError(error);

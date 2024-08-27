@@ -162,7 +162,6 @@ export const fetchData = async (setEditado, setData) => {
   try {
     setEditado(true);
     const result = await getComplements();
-    console.log(result);
     const newData = structuredClone(result);
   
     if (Array.isArray(result)) {

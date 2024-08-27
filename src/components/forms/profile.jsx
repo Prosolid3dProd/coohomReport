@@ -25,7 +25,6 @@ const General = ({ data }) => {
         const currentUser = users.find(
           (user) => user.email === data.profile.email
         );
-        // console.log(data)
         if (currentUser) {
           const updatedValues = {
             email: currentUser.email,

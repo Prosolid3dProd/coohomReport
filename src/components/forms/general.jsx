@@ -29,23 +29,23 @@ const General = ({ getData, data }) => {
   const [initialValues, setInitialValues] = useState({
     ...data,
     iva: undefined,
+    coefficient:
+      role === "client"
+        ? data.userId.coefficientVentaTienda
+        : data?.userId?.coefficient,
+        observation: data?.observation?.includes("null") ? "" : data.observation,
     // reference: data?.reference,
     // date: data?.date,
     // customerName: data?.customerName,
     // location: data?.location,
     // phone: data?.phone,
     // total: data?.total,
-    coefficient:
-      role === "client"
-        ? data.userId.coefficientVentaTienda
-        : data?.userId?.coefficient,
     // modelDoor: data?.modelDoor,
     // materialDoor: data?.materialDoor,
     // handle: data?.modelHandle,
     // drawer: data?.modelDrawer + data?.materialDrawer,
     // // drawer: data?.materialDrawer,
     // materialCabinet: data?.materialCabinet,
-    observation: data?.observation?.includes("null") ? "" : data.observation,
     // fecha: String(data?.fecha).split(" ")[0],
     // discountEncimeras: data?.discountEncimeras,
     // discountCabinets: data?.discountCabinets,
@@ -132,8 +132,6 @@ const General = ({ getData, data }) => {
       }
     }
   };
-
-  console.log(data)
   return (
     <Card className="rounded-none bg-gray border border-border">
       <Form
