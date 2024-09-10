@@ -576,7 +576,7 @@ const getInfoCabinet = (submodels) => {
       };
     }*/
   });
-
+  console.log(values);
   return values;
 };
 
@@ -592,7 +592,7 @@ const getInfoDrawer = (submodels) => {
       materialDrawer = item.textureName;
     }
   });
-  
+
   return {
     modelDrawer,
     textureDrawer,
@@ -1431,17 +1431,16 @@ export const parseJson3D = async (json) => {
                 modelDrawer: CONFIG.DRAWERMODEL.LEGRABOX,
               };
             }
-          } 
-          else if (!cajonesInfo) {
+          } else if (!cajonesInfo) {
             cajonesInfo = null;
           }
-          
 
           extra = {
             ...armazonInfo,
             ...puertasInfo,
             ...cajonesInfo,
           };
+
           cajonesInfo?.modelDrawer &&
             cajonesInfo?.modelDrawer !== "undefined" &&
             cajonesInfo?.modelDrawer?.indexOf("Cajon") === -1 &&
@@ -1454,7 +1453,7 @@ export const parseJson3D = async (json) => {
           item.subModels.map((filtroMaterialDrawer) => {
             if (filtroMaterialDrawer.customCode === "1001") {
               filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
-                if (matInteriorDrawer.customCode === "0201" ) {
+                if (matInteriorDrawer.customCode === "0201") {
                   cajonesInfo?.materialDrawer &&
                     cajonesInfo?.materialDrawer !== "undefined" &&
                     cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
@@ -1467,7 +1466,7 @@ export const parseJson3D = async (json) => {
               });
             }
           });
-        
+
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
             const isCustomCode1001 =
@@ -1521,6 +1520,8 @@ export const parseJson3D = async (json) => {
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
+              console.log(filtroArmazon.modelBrandGoodName);
+              console.log(filtroArmazon);
               armazonInfo?.materialCabinet &&
                 armazonInfo?.materialCabinet !== "undefined" &&
                 armazonInfo?.materialCabinet !== null &&
@@ -1530,6 +1531,7 @@ export const parseJson3D = async (json) => {
                 armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Corte") === -1 &&
                 materialCabinetArray.push(armazonInfo?.materialCabinet);
+              console.log(materialCabinetArray);
             }
           });
 
@@ -1685,7 +1687,7 @@ export const parseJson3D = async (json) => {
                   ...extra,
                 });
               }
-            })
+            });
 
           let nameFinal = item.modelName;
           if (String(item.modelName).indexOf("L") > -1) {
@@ -1772,6 +1774,7 @@ export const parseJson3D = async (json) => {
           }
         }
       };
+
       for (const cabinet of cabinets) {
         if (
           String(cabinet.modelProductNumber).toLocaleUpperCase() ===
@@ -1894,7 +1897,6 @@ export const parseJson3D = async (json) => {
     orderJson.cabinets = orderJsonWhitoutZocalos;
 
     return orderJson;
-
   } catch (error) {
     console.log(error);
   }

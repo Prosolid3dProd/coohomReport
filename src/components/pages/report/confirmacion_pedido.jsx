@@ -148,14 +148,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
         ),
       });
   }, [data]);
-
-  // const changeRegletas = (largoRegletas) => {
-  //   data.map((largoReg) => {
-  //     console.log(largoReg);
-  //   });
-  //   console.log(largoRegletas);
-  // };
-
   // Función para calcular la suma total de los precios
   let totalIva = 0;
 
@@ -180,8 +172,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
   };
 
   const calcularTotalIva = (data) => {
-    // Asegúrate de que el porcentaje de IVA se extraiga correctamente
-    let ivaCabinetsPorcentaje = parseFloat(data.ivaCabinets) || 21; // Default to 21% if not specified
+    let ivaCabinetsPorcentaje = parseFloat(data.ivaCabinets) || 21;
     const totalIva = {
       ivaCabinetsPorcentaje: ivaCabinetsPorcentaje,
     };
@@ -217,17 +208,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     ).toFixed(2);
   };
 
-  // const calcularTotal = (sumaTotalSinDescuento, totalIva) => {
-  //   const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
-  //   return parseFloat(
-  //     sumaTotalSinDescuento * (1 + ivaCabinetsPorcentaje / 100)
-  //   ).toFixed(2);
-  // };
-
   const sumaTotal = calcularSumaTotal(data.cabinets);
   totalIva = calcularTotalIva(data);
   totalDescuentos = calcularTotalDescuentos(data);
-  // const sumaTotalSinDescuento = sumaTotal + totalZocalo;
 
   const complementos =
     data.infoZocalos.length > 0 || cabinets.complementos.length > 0
@@ -248,7 +231,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               justifyContent: "space-between",
             }}
           >
-            {/* <View><Image style={{ width: "150px" }} src={data.userId.logo ? data.userId.logo : LogoSola} /></View> */}
             <View>{logoGrande(data.userId?.logo)}</View>
             <Text
               style={{
@@ -261,11 +243,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
             </Text>
           </View>
           <View style={{ fontSize: "8", marginRight: "110" }}>
-            {/* <Text>{data.userId.name}</Text> */}
             <Text>{data.userId?.info1}</Text>
             <Text>{data.userId?.info2}</Text>
             <Text>{data.userId?.info3}</Text>
-            {/* <Text>{data.userId.email}</Text> */}
           </View>
           <View
             style={{
@@ -495,38 +475,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             - Tiradores: {`${item.doors.acabadoTirador}/ `}
                           </Text>
                         )}
-                      {/* {item.drawerMaterialDetails !== undefined &&
-                        item.drawerMaterialDetails.length > 0 && (
-                          <View>
-                            {item.drawerPriceDetails.some((it, index) => {
-                              const acabadoTirador =
-                                item.drawerMaterialDetails[index]
-                                  ?.acabadoTirador;
-                              return (
-                                acabadoTirador !== undefined &&
-                                acabadoTirador.trim() !== ""
-                              );
-                            }) && (
-                              <Text style={{ fontSize: 7 }}>
-                                - Tiradores:
-                                {item.drawerPriceDetails.map((it, index) => {
-                                  const acabadoTirador =
-                                    item.drawerMaterialDetails[index]
-                                      ?.acabadoTirador;
-                                  if (
-                                    acabadoTirador !== undefined &&
-                                    acabadoTirador.trim() !== ""
-                                  ) {
-                                    const acabadoInfo = `${acabadoTirador}-`;
-                                    return `${acabadoInfo}/ `;
-                                  } else {
-                                    return "";
-                                  }
-                                })}
-                              </Text>
-                            )}
-                          </View>
-                        )} */}
                       {item.drawerMaterialDetails !== undefined &&
                         item.drawerMaterialDetails.length > 0 && (
                           <View>
@@ -788,38 +736,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             - Tiradores: {`${item.doors.acabadoTirador}/ `}
                           </Text>
                         )}
-                      {/* {item.drawerMaterialDetails !== undefined &&
-                        item.drawerMaterialDetails.length > 0 && (
-                          <View>
-                            {item.drawerPriceDetails.some((it, index) => {
-                              const acabadoTirador =
-                                item.drawerMaterialDetails[index]
-                                  ?.acabadoTirador;
-                              return (
-                                acabadoTirador !== undefined &&
-                                acabadoTirador.trim() !== ""
-                              );
-                            }) && (
-                              <Text style={{ fontSize: 7 }}>
-                                - Tiradores:
-                                {item.drawerPriceDetails.map((it, index) => {
-                                  const acabadoTirador =
-                                    item.drawerMaterialDetails[index]
-                                      ?.acabadoTirador;
-                                  if (
-                                    acabadoTirador !== undefined &&
-                                    acabadoTirador.trim() !== ""
-                                  ) {
-                                    const acabadoInfo = `${acabadoTirador}-`;
-                                    return `${acabadoInfo}/ `;
-                                  } else {
-                                    return "";
-                                  }
-                                })}
-                              </Text>
-                            )}
-                          </View>
-                        )} */}
                       {item.drawerMaterialDetails !== undefined &&
                         item.drawerMaterialDetails.length > 0 && (
                           <View>
@@ -1224,32 +1140,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text>- Frente: </Text>
                     )}
                     <Text>- Frente: {item.materialRegletaF}</Text>
-
-                    {/* {formatNumber(item.priceDoor) > 0 && (
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                        }}
-                      >
-                        <Text>- Puertas: </Text>
-                        <Text
-                          style={{
-                            fontSize: "8",
-                          }}
-                        >
-                          {formatNumber(item.priceDoor) + " "}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: "8",
-                          }}
-                        >
-                          {item.modelDoor || ""} {item.modelDoor ? "/" : " "}{" "}
-                          {item.materialDoor || ""}
-                        </Text>
-                      </View>
-                    )} */}
                     {formatNumber(item.priceCabinet) >= 0 && (
                       <Text>
                         - Armazón:{" "}
@@ -1845,227 +1735,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       </Text>
                     </View>
                   )}
-
-                  {/* {price && item.typeZocalo === "" ? (
-                    <View style={{ width: "70" }}>
-                      <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
-                      </Text>
-                    </View>
-                  ) : (
-                    <View style={{ width: "70" }}>
-                      <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.priceCabinet).toFixed(2)}
-                      </Text>
-                    </View>
-                  )} */}
                 </View>
               ))}
             </View>
           )}
-
-          {/* {data && data.infoZocalos.length > 0 && (
-            <View>
-              {data.infoZocalos.map((zoc, key) => (
-                <View
-                  key={key}
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    marginTop: "1",
-                  }}
-                  wrap={false}
-                >
-                  <View style={{ width: "50", fontSize: "8" }}>
-                    <Text>{contador++}</Text>{" "}
-                  </View>
-                  <View style={{ height: "100", width: "100", fontSize: "8" }}>
-                    <Text>
-                      <Image
-                        style={{
-                          width: "80",
-                          height: "80",
-                        }}
-                        filter={grayscaleFilter("#fff")}
-                        src={loadImage(zoc.obsBrandGoodId)}
-                      />
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      width: "40",
-                      fontSize: "11",
-                    }}
-                  >
-                    <Text style={{ fontSize: "8" }}>{zoc.quantity || 1}</Text>
-                  </View>
-                  <View style={{ width: "300", fontSize: "8" }}>
-                    <View>
-                      <Text style={{ fontFamily: CONFIG.BOLD }}>
-                        {zoc.reference}
-                      </Text>
-                      <Text style={{ fontFamily: CONFIG.BOLD }}>
-                        {zoc.name}
-                      </Text>
-
-                      <Text style={{ fontSize: "8" }}>
-                        {" L: " +
-                          zoc?.size?.x +
-                          " F: " +
-                          zoc?.size?.y +
-                          " A: " +
-                          zoc?.size?.z}
-                      </Text>
-
-                      {data.infoZocalos.length > 0 && (
-                        <Text>
-                          - Acabado:{" "}
-                          <Text style={{ fontSize: "8" }}>
-                            {zoc.material} / [ {formatNumber(zoc.priceCabinet)} ]
-                          </Text>
-                        </Text>
-                      )}
-                    </View>
-                    {zoc?.observation !== undefined &&
-                      zoc?.observation.length > 0 && (
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontFamily: CONFIG.BOLD,
-                              fontSize: 8, // Asegúrate de que el valor sea numérico y no una cadena
-                            }}
-                          >
-                            Observaciones: {zoc.observation}
-                          </Text>
-                        </View>
-                      )}
-                  </View>
-
-                  {price && (
-                    <View style={{ width: "70" }}>
-                      <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {zoc.material}
-                        {parseFloat(formatNumber(zoc.priceCabinet)).toFixed(2)}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              ))}
-            </View>
-          )} */}
-
-          {/* <View style={{ fontSize: 8 }} key={index}>
-                      {zoc.mediaTira && (
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            marginTop: "10",
-                          }}
-                        >
-                          <View style={{ width: "50", fontSize: "8" }}>
-                            <Text>{contador++}</Text>{" "}
-                          </View>
-                          <View
-                            style={{
-                              height: "100",
-                              width: "100",
-                              fontSize: "8",
-                            }}
-                          >
-                            <Text>
-                              <Image
-                                style={{
-                                  width: "80",
-                                  height: "80",
-                                }}
-                                filter={grayscaleFilter("#fff")}
-                                src={loadImage(zoc.obsBrandGoodId)}
-                              />
-                            </Text>
-                          </View>
-                          <Text style={{ width: "40" }}>{zoc.mediaTira}</Text>
-                          <View style={{ width: "300" }}>
-                            <Text style={{ fontFamily: CONFIG.BOLD }}>
-                              {zoc.referenciaMedia
-                                ? zoc.referenciaMedia
-                                : "Sin referencia"}
-                            </Text>
-                            <Text style={{ fontFamily: CONFIG.BOLD }}>
-                              {zoc.name}
-                            </Text>
-                            <Text style={{ fontSize: "8" }}>
-                              L: {zoc.anchoMaximo} A: {zoc.material}
-                            </Text>
-                            <Text> Ancho Max: {zoc.anchoMaximo / 2}</Text>
-                          </View>
-                          <Text style={{ textAlign: "right", width: "70" }}>
-                            {parseFloat(
-                              zoc.precioMediaTira * zoc.mediaTira
-                            ).toFixed(2)}
-                          </Text>
-                        </View>
-                      )}
-                      {zoc.tira && (
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            marginTop: "10",
-                          }}
-                        >
-                          <View style={{ width: "50", fontSize: "8" }}>
-                            <Text>{contador++}</Text>{" "}
-                          </View>
-                          <View
-                            style={{
-                              height: "100",
-                              width: "100",
-                              fontSize: "8",
-                            }}
-                          >
-                            <Text>
-                              <Image
-                                style={{
-                                  width: "80",
-                                  height: "80",
-                                }}
-                                filter={grayscaleFilter("#fff")}
-                                src={loadImage(zoc.obsBrandGoodId)}
-                              />
-                            </Text>
-                          </View>
-                          <Text style={{ width: "40" }}>{zoc.tira}</Text>
-                          <View style={{ width: "300" }}>
-                            <Text style={{ fontFamily: CONFIG.BOLD }}>
-                              {zoc.referenciaTira
-                                ? zoc.referenciaTira
-                                : "Sin referencia"}
-                            </Text>
-                            <Text style={{ fontFamily: CONFIG.BOLD }}>
-                              {zoc.name}
-                            </Text>
-                            <Text style={{ fontSize: "8" }}>
-                              L: {zoc.anchoMaximo} A: {zoc.material}
-                            </Text>
-                            <Text>Ancho Max: {zoc.anchoMaximo}</Text>
-                          </View>
-                          {price && (
-                            <Text style={{ textAlign: "right", width: "70" }}>
-                              {parseFloat(zoc.precioTira * zoc.tira).toFixed(2)}
-                            </Text>
-                          )}
-                        </View>
-                      )}
-                    </View>
-                  ))}
-                </View>
-              )} */}
         </View>
 
         {cabinets && cabinets?.accesorios.length > 0 && (

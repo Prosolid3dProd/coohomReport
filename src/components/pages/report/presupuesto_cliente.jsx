@@ -248,7 +248,6 @@ const Presupuesto_Cliente = ({
             }}
           >
             <View>{logoGrande(data.userId?.logo)}</View>
-            {/* <View>{logoUrlGrande(data.userId?.name)}</View> */}
             <Text
               style={{
                 color: "#CFCFCF",
@@ -257,11 +256,9 @@ const Presupuesto_Cliente = ({
               }}
             ></Text>
             <View style={{ fontSize: "8", marginRight: "110" }}>
-              {/* <Text>{data.userId.name}</Text> */}
-              <Text>{data.userId.location}</Text>
-              <Text>{data.userId.phone}</Text>
+              <Text>{data.userId.info1}</Text>
+              <Text>{data.userId.info2}</Text>
               <Text>{data.userId.info3}</Text>
-              {/* <Text>{data.userId.email}</Text> */}
             </View>
           </View>
 
@@ -835,53 +832,6 @@ const Presupuesto_Cliente = ({
                 </View>
               ))}
           </View>
-          {/* {data && data.infoZocalos.length > 0 && (
-            <View>
-              {data.infoZocalos.map((zoc, index) => (
-                <View style={{ fontSize: 8 }} key={index}>
-                  {zoc.mediaTira > 0 ? (
-                    <View style={{ display: "flex", flexDirection: "row" }}>
-                      <Text style={{ width: "30" }}>{zoc.mediaTira}</Text>
-                      <Text style={{ width: "100" }}>
-                        {zoc.referenciaMedia
-                          ? zoc.referenciaMedia
-                          : "Sin referencia"}
-                      </Text>
-                      <Text style={{ width: "300" }}>{zoc.name}</Text>
-                      {price && (
-                        <Text style={{ textAlign: "right", width: "100" }}>
-                          {parseFloat(
-                            zoc.precioMediaTira * zoc.mediaTira
-                          ).toFixed(2)}
-                        </Text>
-                      )}
-                    </View>
-                  ) : (
-                    ""
-                  )}
-                  {zoc.tira > 0 ? (
-                    <View style={{ display: "flex", flexDirection: "row" }}>
-                      <Text style={{ width: "30" }}>{zoc.tira}</Text>
-                      <Text style={{ width: "100" }}>
-                        {zoc.referenciaTira
-                          ? zoc.referenciaTira
-                          : "Sin referencia"}
-                      </Text>
-                      <Text style={{ width: "300" }}>{zoc.name}</Text>
-                      {price && (
-                        <Text style={{ textAlign: "right", width: "100" }}>
-                          {parseFloat(zoc.precioTira * zoc.tira).toFixed(2)}
-                        </Text>
-                      )}
-                    </View>
-                  ) : (
-                    ""
-                  )}
-                </View>
-              ))}
-            </View>
-          )} */}
-
           <View
             style={{
               display: "flex",
