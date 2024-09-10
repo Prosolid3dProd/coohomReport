@@ -29,11 +29,11 @@ const General = ({ data }) => {
         if (currentUser) {
           const updatedValues = {
             email: currentUser.email,
-            phone: currentUser.phone,
-            location: currentUser.location,
+            info2: currentUser.info2,
+            info1: currentUser.info1,
+            info3: currentUser.info3,
             logo: currentUser.logo,
             coefficient: currentUser.coefficient,
-            iva: currentUser.iva,
             observacion1: currentUser.observacion1,
             observacion2: currentUser.observacion2,
             observacion3: currentUser.observacion3,
@@ -90,13 +90,13 @@ const General = ({ data }) => {
           </Col>
 
           <Col xs={24} md={8}>
-            <Form.Item label="Télefono" name="phone">
+            <Form.Item label="Info1" name="info1">
               <Input placeholder="" />
             </Form.Item>
           </Col>
 
           <Col xs={24} md={8}>
-            <Form.Item label="Localizacion" name="location">
+            <Form.Item label="Info3" name="info3">
               <Input placeholder="" maxLength="100" />
             </Form.Item>
           </Col>

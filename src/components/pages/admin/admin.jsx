@@ -135,22 +135,20 @@ const ShopsForm = ({ setListaTiendas }) => {
         >
           <Input_ant />
         </Form.Item>
-        <Form.Item
-          name="logo"
-          label="Logo"
-          className="w-full p-4 flex items-center m-0"
-        >
-          <Button type="default" size="large" onClick={handleUpload}>
-            <FileAddOutlined /> Logo
-          </Button>
-          {logoUrl && (
-            <img
-              src={logoUrl + `?${new Date().getTime()}`} // Forzar la recarga de la imagen
-              alt="Logo"
-              style={{ width: 100, height: 100, borderRadius: 8, marginTop: 10 }}
-            />
-          )}
-        </Form.Item>
+        <Form.Item name="logo" label="Logo" className="w-full flex items-center m-0">
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Button type="default" size="large" onClick={handleUpload}>
+                <FileAddOutlined /> Logo
+              </Button>
+              {logoUrl && (
+                <img
+                  src={logoUrl + `?${new Date().getTime()}`} // Forzar la recarga de la imagen
+                  alt="Logo"
+                  style={{ width: 200, height: 100, objectFit: 'contain'}}
+                />
+              )}
+            </div>
+          </Form.Item>
         <Form.Item
           name="nif"
           label="NIF"
@@ -159,14 +157,14 @@ const ShopsForm = ({ setListaTiendas }) => {
           <Input_ant />
         </Form.Item>
         <Form.Item
-          name="location"
+          name="info1"
           label="Info1"
           className="w-full p-4 flex items-center m-0"
         >
           <Input_ant />
         </Form.Item>
         <Form.Item
-          name="phone"
+          name="info2"
           className="w-full p-4 flex items-center m-0"
           label="Info2"
         >
@@ -493,7 +491,7 @@ const Admin = () => {
                 <img
                   src={logoUrl + `?${new Date().getTime()}`} // Forzar la recarga de la imagen
                   alt="Logo"
-                  style={{ width: 150, height: 120, objectFit: 'cover'}}
+                  style={{ width: 150, height: 120, objectFit: 'contain'}}
                 />
               )}
             </div>
@@ -503,14 +501,14 @@ const Admin = () => {
             <Input_ant />
           </Form.Item>
           <Form.Item
-            name="location"
+            name="info1"
             label="Info1"
             rules={[{ message: "Por favor introduce una localización" }]}
           >
             <Input_ant />
           </Form.Item>
           <Form.Item
-            name="phone"
+            name="info2"
             label="Info2"
             rules={[
               {

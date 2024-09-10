@@ -23,8 +23,6 @@ import { ArrowUp } from "../../icons";
 import "./report.css";
 import Confirmacion_Pedido from "./confirmacion_pedido";
 
-async function buscarNodoPorCodigo(codigoBuscado) {}
-
 const Report = () => {
   const [main, setMain] = useState(null);
   const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
@@ -48,7 +46,6 @@ const Report = () => {
   useEffect(() => {
     if (orderId._id) {
       getOrden();
-      buscarNodoPorCodigo("3FO3XYGTXB12");
     }
   }, [orderId]);
   

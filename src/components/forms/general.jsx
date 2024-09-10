@@ -27,33 +27,40 @@ const General = ({ getData, data }) => {
   let role = data?.profile?.role || "";
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({
-    reference: data?.reference,
-    date: data?.date,
-    customerName: data?.customerName,
-    location: data?.location,
-    phone: data?.phone,
-    total: data?.total,
+    ...data,
+    iva: undefined,
     coefficient:
       role === "client"
         ? data.userId.coefficientVentaTienda
         : data?.userId?.coefficient,
-    modelDoor: data?.modelDoor,
-    materialDoor: data?.materialDoor,
-    handle: data?.modelHandle,
-    drawer: data?.modelDrawer + data?.materialDrawer,
-    materialCabinet: data?.materialCabinet,
-    observation: data?.observation?.includes("null") ? "" : data.observation,
-    fecha: String(data?.fecha).split(" ")[0],
-    discountEncimeras: data?.discountEncimeras,
-    discountCabinets: data?.discountCabinets,
-    discountElectrodomesticos: data?.discountElectrodomesticos,
-    discountEquipamientos: data?.discountEquipamientos,
-    ivaEncimeras: data?.ivaEncimeras,
-    ivaCabinets: data?.ivaCabinets,
-    ivaElectrodomesticos: data?.ivaElectrodomesticos,
-    ivaEquipamientos: data?.ivaEquipamientos,
-    semanaEntrega: data?.semanaEntrega,
-    fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
+        observation: data?.observation?.includes("null") ? "" : data.observation,
+    // reference: data?.reference,
+    // date: data?.date,
+    // customerName: data?.customerName,
+    // location: data?.location,
+    // phone: data?.phone,
+    // total: data?.total,
+    // coefficient:
+    //   role === "client"
+    //     ? data.userId.coefficientVentaTienda
+    //     : data?.userId?.coefficient,
+    // modelDoor: data?.modelDoor,
+    // materialDoor: data?.materialDoor,
+    // handle: data?.modelHandle,
+    // drawer: data?.modelDrawer + data?.materialDrawer,
+    // materialCabinet: data?.materialCabinet,
+    // observation: data?.observation?.includes("null") ? "" : data.observation,
+    // fecha: String(data?.fecha).split(" ")[0],
+    // discountEncimeras: data?.discountEncimeras,
+    // discountCabinets: data?.discountCabinets,
+    // discountElectrodomesticos: data?.discountElectrodomesticos,
+    // discountEquipamientos: data?.discountEquipamientos,
+    // ivaEncimeras: data?.ivaEncimeras,
+    // ivaCabinets: data?.ivaCabinets,
+    // ivaElectrodomesticos: data?.ivaElectrodomesticos,
+    // ivaEquipamientos: data?.ivaEquipamientos,
+    // semanaEntrega: data?.semanaEntrega,
+    // fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
   });
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isInputEditable, setIsInputEditable] = useState(role !== "client");
@@ -112,7 +119,7 @@ const General = ({ getData, data }) => {
       const result = await updateOrder({ ...values, _id: data._id });
       if (result) {
         getData(result);
-        setInitialValues(result)
+        setInitialValues(result);
         // setInitialValues((prevValues) => ({
         //   ...prevValues,
         //   coefficient:
@@ -216,7 +223,7 @@ const General = ({ getData, data }) => {
             </p>
           </Divider>
           <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Coeficiente Compra" name="coefficient">
+            <Form.Item label="Coeficiente de Venta" name="coefficient">
               <div style={{ position: "relative" }}>
                 <Input
                   defaultValue={initialValues.coefficient}
@@ -246,7 +253,7 @@ const General = ({ getData, data }) => {
               <Form.Item label="Coeficiente Venta" name="coefficient">
                 <div style={{ position: "relative" }}>
                   <Input
-                    defaultValue={data.userId.coefficientVentaTienda}
+                    defaultValue={data?.userId?.coefficientVentaTienda}
                     readOnly={!isInputEditable}
                     style={!isInputEditable ? { opacity: 0.7 } : {}}
                     disabled={role === "admin" ? true : false}

@@ -561,11 +561,9 @@ const getInfoCabinet = (submodels) => {
 
   submodels.forEach((item) => {
     if (
-      (String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 &&
-        item.customCode === undefined) ||
-      (String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==
-        -1 &&
-        item.customCode === undefined)
+      String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 ||
+      String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==
+        -1
     ) {
       values = {
         materialCabinet: item.textureName,
@@ -580,28 +578,27 @@ const getInfoCabinet = (submodels) => {
       };
     }*/
   });
-
   return values;
 };
 
 const getInfoDrawer = (submodels) => {
-  let values = {
-    modelDrawer: null,
-    textureDrawer: null,
-    materialDrawer: null,
-  };
+  let modelDrawer = null;
+  let textureDrawer = null;
+  let materialDrawer = null;
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DRAWER) {
       //Esto antes se pasaba igualando las variables y luego haciendo un objeto en el return con las 3 variables (cambio)
-      values = {
-        modelDrawer: item.modelBrandGoodName,
-        textureDrawer: item.textureName,
-        materialDrawer: item.textureName,
-      };
+      modelDrawer = item.modelBrandGoodName;
+      textureDrawer = item.textureName;
+      materialDrawer = item.textureName;
     }
   });
-  return values;
+  return {
+    modelDrawer,
+    textureDrawer,
+    materialDrawer,
+  };
 };
 
 const getPerfil = (perf) => {
@@ -828,10 +825,13 @@ const getParameters = (param, tipoMueble) => {
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
 
-    if (itemName === "PVA" || itemName === "PVL") {
+    if (
+      (itemName === "PVA" && parseFloat(item.value) > 0) ||
+      (itemName === "PVL" && parseFloat(item.value) > 0)
+    ) {
       op.push({
-        name: item.displayName,
-        value: parseFloat(item.value),
+        name: item.displayName + ": " + item.value,
+        value: 0,
         description: item.description,
         nameValue:
           item.options.length > 2
@@ -861,7 +861,6 @@ const getParameters = (param, tipoMueble) => {
       });
     }
   });
-
   return op;
 };
 
@@ -1192,7 +1191,12 @@ export const parseJson3D = async (json) => {
           name: item.modelName,
           priceCabinet: getPrice(
             item,
-            "cabinet",
+            // "cabinet",
+            referenceType.type === "A" ||
+              referenceType.type === "B" ||
+              referenceType.type === "M"
+              ? "cabinet"
+              : referenceType.type,
             item.textureName,
             item.modelCostInfo.quotationRate
           ),
@@ -1340,7 +1344,7 @@ export const parseJson3D = async (json) => {
 
             subModels.forEach((model) => {
               if (model.customCode === "202" || model.customCode === "203") {
-                const referencia = model.ignoreParameters
+                const referencia = model?.ignoreParameters
                   .filter(
                     (ref) =>
                       ref.displayName.toLocaleUpperCase() === "REFERENCIA"
@@ -1413,7 +1417,7 @@ export const parseJson3D = async (json) => {
           buscarCajonesYPuertas(item.subModels);
 
           // ----------------------------------------------------
-          if (cajonesInfo.modelDrawer) {
+          if (cajonesInfo && cajonesInfo.modelDrawer) {
             if (referenceType.ref?.indexOf(".BC") !== -1) {
               cajonesInfo = {
                 ...cajonesInfo,
@@ -1425,7 +1429,7 @@ export const parseJson3D = async (json) => {
                 modelDrawer: CONFIG.DRAWERMODEL.LEGRABOX,
               };
             }
-          } else {
+          } else if (!cajonesInfo) {
             cajonesInfo = null;
           }
 
@@ -1445,10 +1449,8 @@ export const parseJson3D = async (json) => {
 
           item.subModels.map((filtroMaterialDrawer) => {
             if (filtroMaterialDrawer.customCode === "1001") {
-              // console.log(filtroMaterialDrawer, "fuera")
               filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
                 if (matInteriorDrawer.customCode === "0201") {
-                  // console.log(matInteriorDrawer, "dentro")
                   cajonesInfo?.materialDrawer &&
                     cajonesInfo?.materialDrawer !== "undefined" &&
                     cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
@@ -1465,7 +1467,6 @@ export const parseJson3D = async (json) => {
 
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
-            // console.log(item)
             const isCustomCode1001 =
               String(filtroModelDoor.customCode).trim() === "1001";
             const isDoorCustomCode =
@@ -1481,7 +1482,6 @@ export const parseJson3D = async (json) => {
                 !puertasInfo?.modelDoor.includes("Sola") &&
                 !puertasInfo?.modelDoor.includes("Corte")
               ) {
-                // console.log(filtroModelDoor)
                 modelDoorArray.push(puertasInfo?.modelDoor);
               }
             }
@@ -1489,12 +1489,10 @@ export const parseJson3D = async (json) => {
           });
 
           item.subModels.map((filtroMaterialDoor) => {
-            // console.log(item)
             if (
               String(filtroMaterialDoor.customCode).trim().substring(0, 2) ===
               CONFIG.CUSTOMCODE.DOOR
             ) {
-              // console.log(filtroMaterialDoor)
               puertasInfo?.materialDoor &&
                 puertasInfo?.materialDoor !== "undefined" &&
                 puertasInfo?.materialDoor?.indexOf("Cajon") === -1 &&
@@ -1517,7 +1515,6 @@ export const parseJson3D = async (json) => {
             modelCabinetArray.push(armazonInfo?.modelCabinet);
 
           item.subModels.map((filtroArmazon) => {
-            // console.log(item)
             if (
               String(filtroArmazon.modelBrandGoodName)
                 .toLocaleUpperCase()
@@ -1906,7 +1903,7 @@ export const parseJson3D = async (json) => {
 
     orderJson.cabinets = orderJsonWhitoutZocalos;
 
-    console.log(orderJson);
+    // console.log(orderJson);
 
     return orderJson;
 
