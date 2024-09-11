@@ -301,7 +301,6 @@ const getFrente = (block) => {
 const getPrice = (parametros, tipo, materialCasco) => {
   const isCabinet = tipo === "cabinet";
   const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
-
   let price = 0;
 
   const findPrice = (items) => {
@@ -1025,6 +1024,14 @@ const getPriceZocalo = (item) => {
   return priceParameter ? parseFloat(priceParameter.value) : undefined;
 };
 
+const getTotalPrice = (item, tipoMueble) => {
+  const priceZocalo = getPriceZocalo(item);
+  const priceParameters = getPriceParameters(item.parameters, tipoMueble);
+
+  const totalPrice = (priceZocalo || 0) + (priceParameters || 0);
+  return totalPrice;
+};
+
 const getReferenceZocalo = (item) => {
   const reference = item.ignoreParameters.find((param) => param.name === "REF");
   return reference ? String(reference.value) : undefined;
@@ -1117,11 +1124,16 @@ export const parseJson3D = async (json) => {
             y: item.size.y,
             z: item.size.z,
           },
-          total: getPriceZocalo(item),
+          total: getTotalPrice(item, referenceType.type),
           priceCabinet: getPriceZocalo(item),
           name: item.modelName,
           obsBrandGoodId: item.obsBrandGoodId,
           quantity: parseInt(item.modelCostInfo.quantity),
+          variants: getParameters(item, referenceType.type),
+          priceVariants: getPriceParameters(
+            item.parameters,
+            referenceType.type
+          ),
         });
         // } else if (item["@type"] == "5") {
         // arrZocalos.push(
@@ -1186,24 +1198,41 @@ export const parseJson3D = async (json) => {
         referenceType = getRef(item, referenceType);
         opening = "";
         contador = contador + 1;
+        let priceCabinet =
+          referenceType.type !== "A" ||
+          referenceType.type !== "B" ||
+          referenceType.type !== "M"
+            ? parseFloat(
+                item.parameters.find(
+                  (item) => String(item.name).toUpperCase() === "PRICE"
+                )?.value
+              )
+            : getPrice(
+                item,
+                "cabinet",
+                item.textureName,
+                item.modelCostInfo.quotationRate
+              );
         let items = {
           id: `id_${contador}`,
           name: item.modelName,
-          priceCabinet: getPrice(
-            item,
-            // "cabinet",
-            referenceType.type === "A" ||
-              referenceType.type === "B" ||
-              referenceType.type === "M"
-              ? "cabinet"
-              : referenceType.type,
-            item.textureName,
-            item.modelCostInfo.quotationRate
-          ),
+          priceCabinet: priceCabinet,
           reference: referenceType.ref,
           tipo: referenceType.type,
           customcode: item.customCode || null,
           campana,
+          // priceCabinet: getPrice(
+          //   item,
+          //   "cabinet",
+          //   // referenceType.type === "A" ||
+          //   //   referenceType.type === "B" ||
+          //   //   referenceType.type === "M"
+          //   //   ? "cabinet"
+          //   //   : referenceType.type,
+          //   item.textureName,
+          //   item.modelCostInfo.quotationRate,
+            
+          // ),
         };
 
         // --------------------------------------------------------------------------------------------------------------------------------------
@@ -1258,7 +1287,6 @@ export const parseJson3D = async (json) => {
         //     model = "No hay modelo";
         //   }
         // }
-
         if (
           String(item.modelProductNumber).toLocaleUpperCase() === "COSTADOS"
         ) {
@@ -1615,14 +1643,16 @@ export const parseJson3D = async (json) => {
           if (getInfoDrawer(item.subModels) !== null) {
             drawer = getInfoDrawer(item.subModels);
           }
-
           let totalPrice =
             parseFloat(items.priceCabinet) +
             parseFloat(getTotalDoors(item.subModels)) +
-            parseFloat(
-              getPriceParameters(item.parameters, referenceType.type)
-            ) +
+            parseFloat(getPriceParameters(item.parameters, referenceType.type)) +
             parseFloat(drawerPrice);
+
+            console.log(item, parseFloat(items.priceCabinet), "priceCabinet",totalPrice)
+            console.log(item, parseFloat(getTotalDoors(item.subModels)), "TotalDoors", totalPrice)
+            console.log(item, parseFloat(getPriceParameters(item.parameters, referenceType.type)), "PriceParameters", totalPrice)
+            console.log(item, parseFloat(drawerPrice), "Drawer", totalPrice)
 
           accesories &&
             accesories.length > 0 &&
@@ -1685,7 +1715,6 @@ export const parseJson3D = async (json) => {
                 });
               }
             });
-
           // Buscar casco para pasarlo directamente
           // const casco = item.subModels.find((x) =>
           //   x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
@@ -1706,6 +1735,7 @@ export const parseJson3D = async (json) => {
           //       modelCabinet: item.modelName,
           //     })
           //   : (armazonInfo = getInfoCabinet(item.subModels));
+          // console.log(item, totalPrice)
           if (parseFloat(totalPrice) >= 0) {
             let description = "";
 
@@ -1771,7 +1801,8 @@ export const parseJson3D = async (json) => {
 
         total =
           parseFloat(total) +
-          parseFloat(getPrice(item, "cabinet")) +
+          // parseFloat(getPrice(item, "cabinet")) +
+          parseFloat(priceCabinet) +
           parseFloat(getTotalDoors(item.subModels)) +
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
       }

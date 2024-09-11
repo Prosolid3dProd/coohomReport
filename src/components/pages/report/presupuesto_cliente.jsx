@@ -10,18 +10,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import { CONFIG } from "../../../data/constants";
-
-import LogoALLER from "../../../assets/ALLER.jpeg";
-import LogoRAEL from "../../../assets/RAEL.jpeg";
-import LogoKUBS from "../../../assets/KUBS.jpeg";
-import LogoCERAPAL from "../../../assets/CERAPAL.jpeg";
-import LogoJ10 from "../../../assets/J10.jpeg";
-import Sukaldeak from "../../../assets/Sukaldeak.jpeg";
-import Alkain from "../../../assets/Alkain.jpeg";
-import Sukaldatu from "../../../assets/Sukaldatu.jpeg";
-import LogoDecor from "../../../assets/DECORMOBILIARIO.jpeg";
 import LogoSola from "../../../assets/sola.png";
-import { data } from "autoprefixer";
 
 Font.register({
   family: "Helvetica-Bold",
@@ -44,7 +33,7 @@ const totales = [];
 
 const convertirFecha = (fecha) => {
   try {
-    const partes = fecha?.split(" ");
+    const partes = fecha?.split(" ") || "";
     const fechaPartes = partes[0]?.split("-") || "";
 
     const año = fechaPartes[0];
