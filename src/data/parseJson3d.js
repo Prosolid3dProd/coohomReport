@@ -317,8 +317,8 @@ const getPrice = (parametros, tipo, materialCasco) => {
   if (tipo !== undefined && !isCabinet) {
     price += tipo >= 210 ? 25 : 15;
   }
-
-  if (isCabinet) {
+  
+  if (tipo === "A" ||tipo === "M" ||tipo === "B" ) {
     if (parametros.textureCustomCode === "C1") {
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
@@ -1198,41 +1198,41 @@ export const parseJson3D = async (json) => {
         referenceType = getRef(item, referenceType);
         opening = "";
         contador = contador + 1;
-        let priceCabinet =
-          referenceType.type !== "A" ||
-          referenceType.type !== "B" ||
-          referenceType.type !== "M"
-            ? parseFloat(
-                item.parameters.find(
-                  (item) => String(item.name).toUpperCase() === "PRICE"
-                )?.value
-              )
-            : getPrice(
-                item,
-                "cabinet",
-                item.textureName,
-                item.modelCostInfo.quotationRate
-              );
+        // let priceCabinet =
+        //   referenceType.type !== "A" ||
+        //   referenceType.type !== "B" ||
+        //   referenceType.type !== "M"
+        //     ? parseFloat(
+        //         item.parameters.find(
+        //           (item) => String(item.name).toUpperCase() === "PRICE"
+        //         )?.value
+        //       )
+        //     : getPrice(
+        //         item,
+        //         "cabinet",
+        //         item.textureName,
+        //         item.modelCostInfo.quotationRate
+        //       );
         let items = {
           id: `id_${contador}`,
           name: item.modelName,
-          priceCabinet: priceCabinet,
+          // priceCabinet: priceCabinet,
           reference: referenceType.ref,
           tipo: referenceType.type,
           customcode: item.customCode || null,
           campana,
-          // priceCabinet: getPrice(
-          //   item,
-          //   "cabinet",
-          //   // referenceType.type === "A" ||
-          //   //   referenceType.type === "B" ||
-          //   //   referenceType.type === "M"
-          //   //   ? "cabinet"
-          //   //   : referenceType.type,
-          //   item.textureName,
-          //   item.modelCostInfo.quotationRate,
+          priceCabinet: getPrice(
+            item,
+            "cabinet",
+            // referenceType.type === "A" ||
+            //   referenceType.type === "B" ||
+            //   referenceType.type === "M"
+            //   ? "cabinet"
+            //   : referenceType.type,
+            item.textureName,
+            item.modelCostInfo.quotationRate,
             
-          // ),
+          ),
         };
 
         // --------------------------------------------------------------------------------------------------------------------------------------
@@ -1801,8 +1801,8 @@ export const parseJson3D = async (json) => {
 
         total =
           parseFloat(total) +
-          // parseFloat(getPrice(item, "cabinet")) +
-          parseFloat(priceCabinet) +
+          parseFloat(getPrice(item, "cabinet")) +
+          // parseFloat(priceCabinet) +
           parseFloat(getTotalDoors(item.subModels)) +
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
       }
