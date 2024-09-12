@@ -43,7 +43,8 @@ const Report = () => {
 
   useEffect(() => {
     if (orderId._id) {
-      getOrden()
+      getOrden();
+      buscarNodoPorCodigo("3FO3XYGTXB12");
     }
   }, [orderId]);
   

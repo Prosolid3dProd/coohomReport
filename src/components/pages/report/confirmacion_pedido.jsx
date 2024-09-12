@@ -243,6 +243,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
             </Text>
           </View>
           <View style={{ fontSize: "8", marginRight: "110" }}>
+            {/* <Text>{data.userId.name}</Text> */}
             <Text>{data.userId?.info1}</Text>
             <Text>{data.userId?.info2}</Text>
             <Text>{data.userId?.info3}</Text>

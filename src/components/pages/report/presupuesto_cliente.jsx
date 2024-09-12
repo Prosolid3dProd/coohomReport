@@ -12,7 +12,6 @@ import {
 import { CONFIG } from "../../../data/constants";
 import LogoSola from "../../../assets/sola.png";
 
-
 Font.register({
   family: "Helvetica-Bold",
   src: "https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap",
@@ -34,7 +33,7 @@ const totales = [];
 
 const convertirFecha = (fecha) => {
   try {
-    const partes = fecha?.split(" ");
+    const partes = fecha?.split(" ") || "";
     const fechaPartes = partes[0]?.split("-") || "";
 
     const año = fechaPartes[0];

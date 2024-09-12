@@ -479,7 +479,7 @@ const Admin = () => {
                 <img
                   src={logoUrl + `?${new Date().getTime()}`} // Forzar la recarga de la imagen
                   alt="Logo"
-                  style={{ width: 150, height: 100, objectFit: 'contain'}}
+                  style={{ width: 150, height: 120, objectFit: 'contain'}}
                 />
               )}
             </div>

@@ -39,12 +39,16 @@ const General = ({ getData, data }) => {
     // location: data?.location,
     // phone: data?.phone,
     // total: data?.total,
+    // coefficient:
+    //   role === "client"
+    //     ? data.userId.coefficientVentaTienda
+    //     : data?.userId?.coefficient,
     // modelDoor: data?.modelDoor,
     // materialDoor: data?.materialDoor,
     // handle: data?.modelHandle,
     // drawer: data?.modelDrawer + data?.materialDrawer,
-    // // drawer: data?.materialDrawer,
     // materialCabinet: data?.materialCabinet,
+    // observation: data?.observation?.includes("null") ? "" : data.observation,
     // fecha: String(data?.fecha).split(" ")[0],
     // discountEncimeras: data?.discountEncimeras,
     // discountCabinets: data?.discountCabinets,
@@ -116,7 +120,7 @@ const General = ({ getData, data }) => {
       const result = await updateOrder({ ...values, _id: data._id });
       if (result) {
         getData(result);
-        setInitialValues(result)
+        setInitialValues(result);
         // setInitialValues((prevValues) => ({
         //   ...prevValues,
         //   coefficient:

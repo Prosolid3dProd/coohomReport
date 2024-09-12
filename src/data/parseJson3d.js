@@ -298,8 +298,10 @@ const getFrente = (block) => {
 const getPrice = (parametros, tipo, materialCasco) => {
   const isCabinet = tipo === "cabinet";
   const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
-
   let price = 0;
+
+  console.log(parametros)
+  console.log("El cabinet: " + isCabinet + "     El tipo: " + tipo)
 
   const findPrice = (items) => {
     return items?.find(
@@ -315,8 +317,9 @@ const getPrice = (parametros, tipo, materialCasco) => {
   if (tipo !== undefined && !isCabinet) {
     price += tipo >= 210 ? 25 : 15;
   }
-
-  if (isCabinet) {
+  
+  if (tipo === "A" ||tipo === "M" ||tipo === "B" ) {
+    console.log("AAAAAAAAAAAAAAAAAAAAA")
     if (parametros.textureCustomCode === "C1") {
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
@@ -557,11 +560,9 @@ const getInfoCabinet = (submodels) => {
 
   submodels.forEach((item) => {
     if (
-      (String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 &&
-        item.customCode === undefined) ||
-      (String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==
-        -1 &&
-        item.customCode === undefined)
+      String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 ||
+      String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==
+        -1
     ) {
       values = {
         materialCabinet: item.textureName,
@@ -576,7 +577,6 @@ const getInfoCabinet = (submodels) => {
       };
     }*/
   });
-  console.log(values);
   return values;
 };
 
@@ -587,12 +587,12 @@ const getInfoDrawer = (submodels) => {
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DRAWER) {
+      //Esto antes se pasaba igualando las variables y luego haciendo un objeto en el return con las 3 variables (cambio)
       modelDrawer = item.modelBrandGoodName;
       textureDrawer = item.textureName;
       materialDrawer = item.textureName;
     }
   });
-
   return {
     modelDrawer,
     textureDrawer,
@@ -830,7 +830,7 @@ const getParameters = (param, tipoMueble) => {
     ) {
       op.push({
         name: item.displayName + ": " + item.value,
-        value: 0, //parseFloat(item.value),
+        value: 0,
         description: item.description,
         nameValue:
           item.options.length > 2
@@ -860,7 +860,6 @@ const getParameters = (param, tipoMueble) => {
       });
     }
   });
-
   return op;
 };
 
@@ -1025,6 +1024,14 @@ const getPriceZocalo = (item) => {
   return priceParameter ? parseFloat(priceParameter.value) : undefined;
 };
 
+const getTotalPrice = (item, tipoMueble) => {
+  const priceZocalo = getPriceZocalo(item);
+  const priceParameters = getPriceParameters(item.parameters, tipoMueble);
+
+  const totalPrice = (priceZocalo || 0) + (priceParameters || 0);
+  return totalPrice;
+};
+
 const getReferenceZocalo = (item) => {
   const reference = item.ignoreParameters.find((param) => param.name === "REF");
   return reference ? String(reference.value) : undefined;
@@ -1117,11 +1124,16 @@ export const parseJson3D = async (json) => {
             y: item.size.y,
             z: item.size.z,
           },
-          total: getPriceZocalo(item),
+          total: getTotalPrice(item, referenceType.type),
           priceCabinet: getPriceZocalo(item),
           name: item.modelName,
           obsBrandGoodId: item.obsBrandGoodId,
           quantity: parseInt(item.modelCostInfo.quantity),
+          variants: getParameters(item, referenceType.type),
+          priceVariants: getPriceParameters(
+            item.parameters,
+            referenceType.type
+          ),
         });
         // } else if (item["@type"] == "5") {
         // arrZocalos.push(
@@ -1186,29 +1198,41 @@ export const parseJson3D = async (json) => {
         referenceType = getRef(item, referenceType);
         opening = "";
         contador = contador + 1;
-        let priceCabinet =
-          referenceType.type !== "A" &&
-          referenceType.type !== "B" &&
-          referenceType.type !== "M"
-            ? parseFloat(
-                item.parameters.find(
-                  (item) => String(item.name).toUpperCase() === "PRICE"
-                )?.value
-              )
-            : getPrice(
-                item,
-                "cabinet",
-                item.textureName,
-                item.modelCostInfo.quotationRate
-              );
+        // let priceCabinet =
+        //   referenceType.type !== "A" ||
+        //   referenceType.type !== "B" ||
+        //   referenceType.type !== "M"
+        //     ? parseFloat(
+        //         item.parameters.find(
+        //           (item) => String(item.name).toUpperCase() === "PRICE"
+        //         )?.value
+        //       )
+        //     : getPrice(
+        //         item,
+        //         "cabinet",
+        //         item.textureName,
+        //         item.modelCostInfo.quotationRate
+        //       );
         let items = {
           id: `id_${contador}`,
           name: item.modelName,
-          priceCabinet: priceCabinet,
+          // priceCabinet: priceCabinet,
           reference: referenceType.ref,
           tipo: referenceType.type,
           customcode: item.customCode || null,
           campana,
+          priceCabinet: getPrice(
+            item,
+            "cabinet",
+            // referenceType.type === "A" ||
+            //   referenceType.type === "B" ||
+            //   referenceType.type === "M"
+            //   ? "cabinet"
+            //   : referenceType.type,
+            item.textureName,
+            item.modelCostInfo.quotationRate,
+            
+          ),
         };
 
         // --------------------------------------------------------------------------------------------------------------------------------------
@@ -1263,7 +1287,6 @@ export const parseJson3D = async (json) => {
         //     model = "No hay modelo";
         //   }
         // }
-
         if (
           String(item.modelProductNumber).toLocaleUpperCase() === "COSTADOS"
         ) {
@@ -1618,14 +1641,16 @@ export const parseJson3D = async (json) => {
           if (getInfoDrawer(item.subModels) !== null) {
             drawer = getInfoDrawer(item.subModels);
           }
-
           let totalPrice =
             parseFloat(items.priceCabinet) +
             parseFloat(getTotalDoors(item.subModels)) +
-            parseFloat(
-              getPriceParameters(item.parameters, referenceType.type)
-            ) +
+            parseFloat(getPriceParameters(item.parameters, referenceType.type)) +
             parseFloat(drawerPrice);
+
+            console.log(item, parseFloat(items.priceCabinet), "priceCabinet",totalPrice)
+            console.log(item, parseFloat(getTotalDoors(item.subModels)), "TotalDoors", totalPrice)
+            console.log(item, parseFloat(getPriceParameters(item.parameters, referenceType.type)), "PriceParameters", totalPrice)
+            console.log(item, parseFloat(drawerPrice), "Drawer", totalPrice)
 
           accesories &&
             accesories.length > 0 &&
@@ -1688,6 +1713,11 @@ export const parseJson3D = async (json) => {
                 });
               }
             });
+          // Buscar casco para pasarlo directamente
+          // const casco = item.subModels.find((x) =>
+          //   x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
+          // );
+          // console.log(casco, "CASCO");
 
           let nameFinal = item.modelName;
           if (String(item.modelName).indexOf("L") > -1) {
@@ -1697,6 +1727,13 @@ export const parseJson3D = async (json) => {
               .substring(0, String(item.modelName).length - 5)
               .replace(/-/g, "");
           }
+          // nameFinal.toUpperCase().includes("LINERO")
+          //   ? (armazonInfo = {
+          //       materialCabinet: item.textureName,
+          //       modelCabinet: item.modelName,
+          //     })
+          //   : (armazonInfo = getInfoCabinet(item.subModels));
+          // console.log(item, totalPrice)
           if (parseFloat(totalPrice) >= 0) {
             let description = "";
 
@@ -1762,8 +1799,8 @@ export const parseJson3D = async (json) => {
         }
         total =
           parseFloat(total) +
-          //parseFloat(getPrice(item, "cabinet")) +
-          parseFloat(priceCabinet) +
+          parseFloat(getPrice(item, "cabinet")) +
+          // parseFloat(priceCabinet) +
           parseFloat(getTotalDoors(item.subModels)) +
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
       }
@@ -1895,6 +1932,8 @@ export const parseJson3D = async (json) => {
     );
 
     orderJson.cabinets = orderJsonWhitoutZocalos;
+
+    // console.log(orderJson);
 
     return orderJson;
   } catch (error) {

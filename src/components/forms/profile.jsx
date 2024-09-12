@@ -89,7 +89,7 @@ const General = ({ data }) => {
 
           <Col xs={24} md={8}>
             <Form.Item label="Info1" name="info1">
-              <Input placeholder="" maxLength="100" />
+              <Input placeholder="" />
             </Form.Item>
           </Col>
 
