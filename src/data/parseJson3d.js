@@ -303,7 +303,8 @@ const getPrice = (parametros, tipo, materialCasco) => {
   const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
   let price = 0;
 
-  console.log(tipo)
+  console.log(parametros)
+  console.log("El cabinet: " + isCabinet + "     El tipo: " + tipo)
 
   const findPrice = (items) => {
     return items?.find(
@@ -321,6 +322,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
   }
   
   if (tipo === "A" ||tipo === "M" ||tipo === "B" ) {
+    console.log("AAAAAAAAAAAAAAAAAAAAA")
     if (parametros.textureCustomCode === "C1") {
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
