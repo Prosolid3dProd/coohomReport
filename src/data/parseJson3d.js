@@ -297,29 +297,46 @@ const getFrente = (block) => {
 
 const getPrice = (parametros, tipo, materialCasco) => {
   const isCabinet = tipo === "cabinet";
-  const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
+  // const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
   let price = 0;
 
-  console.log(parametros)
-  console.log("El cabinet: " + isCabinet + "     El tipo: " + tipo)
+  // console.log(parametros);
 
   const findPrice = (items) => {
-    return items?.find(
-      (item) => String(item.name).toUpperCase() === cogerParametro
-    )?.value;
+    let name = items?.some(
+      (item) => String(item.name).toUpperCase() === "PTOTAL"
+    )
+      ? "PTOTAL"
+      : "PRICE";
+    return items?.find((item) => String(item.name).toUpperCase() === name)
+      ?.value;
   };
+
+  // const b = parametros.parameters?.some(
+  //   (item) => String(item.name).toUpperCase() === "PTOTAL"
+  // )
+  //   ? "PTOTAL"
+  //   : "PRICE";
+
+  // const a = parametros.ignoreParameters?.some(
+  //   (item) => String(item.name).toUpperCase() === "PTOTAL"
+  // )
+  //   ? "PTOTAL"
+  //   : "PRICE";
+
+  // console.log(a);
+  // console.log(b);
 
   const priceFromParameters = findPrice(parametros.parameters);
   const priceFromIgnoreParameters = findPrice(parametros.ignoreParameters);
 
+  // console.log(priceFromIgnoreParameters);
   price = parseFloat(priceFromParameters || priceFromIgnoreParameters || 0);
+  // if (tipo !== undefined && !isCabinet) {
+  //   price += tipo >= 210 ? 25 : 15;
+  // }
 
-  if (tipo !== undefined && !isCabinet) {
-    price += tipo >= 210 ? 25 : 15;
-  }
-  
-  if (tipo === "A" ||tipo === "M" ||tipo === "B" ) {
-    console.log("AAAAAAAAAAAAAAAAAAAAA")
+  if (isCabinet) {
     if (parametros.textureCustomCode === "C1") {
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
@@ -354,6 +371,14 @@ const getPrice = (parametros, tipo, materialCasco) => {
       price += price * 0.1;
     }
   }
+  // console.log(
+  //   "El cabinet: " +
+  //     isCabinet +
+  //     "        El tipo: " +
+  //     tipo +
+  //     "        El precio: " +
+  //     price
+  // );
   return price;
 };
 
@@ -1223,15 +1248,14 @@ export const parseJson3D = async (json) => {
           campana,
           priceCabinet: getPrice(
             item,
-            "cabinet",
-            // referenceType.type === "A" ||
-            //   referenceType.type === "B" ||
-            //   referenceType.type === "M"
-            //   ? "cabinet"
-            //   : referenceType.type,
+            // "cabinet",
+            referenceType.type === "A" ||
+              referenceType.type === "B" ||
+              referenceType.type === "M"
+              ? "cabinet"
+              : referenceType.type,
             item.textureName,
-            item.modelCostInfo.quotationRate,
-            
+            item.modelCostInfo.quotationRate
           ),
         };
 
@@ -1543,8 +1567,6 @@ export const parseJson3D = async (json) => {
                 .toLocaleUpperCase()
                 .indexOf("CASCO") !== -1
             ) {
-              console.log(filtroArmazon.modelBrandGoodName);
-              console.log(filtroArmazon);
               armazonInfo?.materialCabinet &&
                 armazonInfo?.materialCabinet !== "undefined" &&
                 armazonInfo?.materialCabinet !== null &&
@@ -1554,7 +1576,6 @@ export const parseJson3D = async (json) => {
                 armazonInfo?.materialCabinet?.indexOf("Mural") === -1 &&
                 armazonInfo?.materialCabinet?.indexOf("Corte") === -1 &&
                 materialCabinetArray.push(armazonInfo?.materialCabinet);
-              console.log(materialCabinetArray);
             }
           });
 
@@ -1644,13 +1665,30 @@ export const parseJson3D = async (json) => {
           let totalPrice =
             parseFloat(items.priceCabinet) +
             parseFloat(getTotalDoors(item.subModels)) +
-            parseFloat(getPriceParameters(item.parameters, referenceType.type)) +
+            parseFloat(
+              getPriceParameters(item.parameters, referenceType.type)
+            ) +
             parseFloat(drawerPrice);
 
-            console.log(item, parseFloat(items.priceCabinet), "priceCabinet",totalPrice)
-            console.log(item, parseFloat(getTotalDoors(item.subModels)), "TotalDoors", totalPrice)
-            console.log(item, parseFloat(getPriceParameters(item.parameters, referenceType.type)), "PriceParameters", totalPrice)
-            console.log(item, parseFloat(drawerPrice), "Drawer", totalPrice)
+          // console.log(
+          //   item,
+          //   parseFloat(items.priceCabinet),
+          //   "priceCabinet",
+          //   totalPrice
+          // );
+          // console.log(
+          //   item,
+          //   parseFloat(getTotalDoors(item.subModels)),
+          //   "TotalDoors",
+          //   totalPrice
+          // );
+          // console.log(
+          //   item,
+          //   parseFloat(getPriceParameters(item.parameters, referenceType.type)),
+          //   "PriceParameters",
+          //   totalPrice
+          // );
+          // console.log(item, parseFloat(drawerPrice), "Drawer", totalPrice);
 
           accesories &&
             accesories.length > 0 &&
@@ -1799,7 +1837,16 @@ export const parseJson3D = async (json) => {
         }
         total =
           parseFloat(total) +
-          parseFloat(getPrice(item, "cabinet")) +
+          parseFloat(
+            getPrice(
+              item,
+              referenceType.type === "A" ||
+                referenceType.type === "B" ||
+                referenceType.type === "M"
+                ? "cabinet"
+                : referenceType.type
+            )
+          ) +
           // parseFloat(priceCabinet) +
           parseFloat(getTotalDoors(item.subModels)) +
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
