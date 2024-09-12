@@ -44,7 +44,6 @@ const Report = () => {
   useEffect(() => {
     if (orderId._id) {
       getOrden();
-      buscarNodoPorCodigo("3FO3XYGTXB12");
     }
   }, [orderId]);
   

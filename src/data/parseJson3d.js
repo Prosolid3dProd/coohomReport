@@ -312,26 +312,12 @@ const getPrice = (parametros, tipo, materialCasco) => {
       ?.value;
   };
 
-  // const b = parametros.parameters?.some(
-  //   (item) => String(item.name).toUpperCase() === "PTOTAL"
-  // )
-  //   ? "PTOTAL"
-  //   : "PRICE";
-
-  // const a = parametros.ignoreParameters?.some(
-  //   (item) => String(item.name).toUpperCase() === "PTOTAL"
-  // )
-  //   ? "PTOTAL"
-  //   : "PRICE";
-
-  // console.log(a);
-  // console.log(b);
-
   const priceFromParameters = findPrice(parametros.parameters);
   const priceFromIgnoreParameters = findPrice(parametros.ignoreParameters);
 
-  // console.log(priceFromIgnoreParameters);
   price = parseFloat(priceFromParameters || priceFromIgnoreParameters || 0);
+
+  // console.log(priceFromIgnoreParameters);
   // if (tipo !== undefined && !isCabinet) {
   //   price += tipo >= 210 ? 25 : 15;
   // }
