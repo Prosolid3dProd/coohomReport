@@ -303,6 +303,8 @@ const getPrice = (parametros, tipo, materialCasco) => {
   const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
   let price = 0;
 
+  console.log(tipo)
+
   const findPrice = (items) => {
     return items?.find(
       (item) => String(item.name).toUpperCase() === cogerParametro
