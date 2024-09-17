@@ -1709,6 +1709,25 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         </Text>
                       }
                     </View>
+                    {formatNumber(item.priceVariants) > 0 && (
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
+                          {" "}
+                          <Text>Variantes: </Text>
+                          {item.variants.map((it) => (
+                            <Text>
+                              {" "}
+                              {it.name}: {it.nameValue || it.description}{" "}
+                              {it.name === "PVA" ? it.value : ""}{" "}
+                              {it.mcv ? "/" + it.mcv : ""}
+                            </Text>
+                          ))}
+                        </View>
+                      )}
                     {item?.observation !== undefined &&
                       item?.observation.length > 0 && (
                         <View
