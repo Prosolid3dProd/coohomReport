@@ -598,7 +598,6 @@ const getInfoDrawer = (submodels) => {
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DRAWER) {
-      //Esto antes se pasaba igualando las variables y luego haciendo un objeto en el return con las 3 variables (cambio)
       modelDrawer = item.modelBrandGoodName;
       textureDrawer = item.textureName;
       materialDrawer = item.textureName;
@@ -1621,7 +1620,6 @@ export const parseJson3D = async (json) => {
               item.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO
             ) {
               frente = getFrente(item);
-
               const perfil = getPerfil(frente.datos.subModels);
               drawerMaterialDetails.push({
                 tipo: frente.tipo,
@@ -1655,26 +1653,6 @@ export const parseJson3D = async (json) => {
               getPriceParameters(item.parameters, referenceType.type)
             ) +
             parseFloat(drawerPrice);
-
-          // console.log(
-          //   item,
-          //   parseFloat(items.priceCabinet),
-          //   "priceCabinet",
-          //   totalPrice
-          // );
-          // console.log(
-          //   item,
-          //   parseFloat(getTotalDoors(item.subModels)),
-          //   "TotalDoors",
-          //   totalPrice
-          // );
-          // console.log(
-          //   item,
-          //   parseFloat(getPriceParameters(item.parameters, referenceType.type)),
-          //   "PriceParameters",
-          //   totalPrice
-          // );
-          // console.log(item, parseFloat(drawerPrice), "Drawer", totalPrice);
 
           accesories &&
             accesories.length > 0 &&
