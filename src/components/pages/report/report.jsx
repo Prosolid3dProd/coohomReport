@@ -46,19 +46,18 @@ const Report = () => {
       getOrden();
     }
   }, [orderId]);
-  
+
   useEffect(() => {
-      const fetchData = async () => {
-        if (orderId._id && tabActivo <= 3) {
-          const updatedInfo = fixOrder(data, tabActivo);
-          const profile = await getProfile();
-          setData({ ...updatedInfo, profile });
-          getOrders({ ...updatedInfo, profile });
-        }
-      };
-      fetchData();
+    const fetchData = async () => {
+      if (orderId._id && tabActivo <= 3) {
+        const updatedInfo = fixOrder(data, tabActivo);
+        const profile = await getProfile();
+        setData({ ...updatedInfo, profile });
+        getOrders({ ...updatedInfo, profile });
+      }
+    };
+    fetchData();
   }, [tabActivo]);
-  
 
   const tabs = [
     {
@@ -75,7 +74,7 @@ const Report = () => {
       ),
     },
     {
-      "Presupuesto": (
+      Presupuesto: (
         <div className="alturaPreview">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
@@ -123,7 +122,7 @@ const Report = () => {
       ),
     },
     {
-      "Complementos": (
+      Complementos: (
         <div className="alturaPreview">
           <Product getData={setData} />
         </div>

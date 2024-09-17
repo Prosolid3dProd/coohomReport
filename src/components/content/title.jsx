@@ -57,8 +57,9 @@ const Actions = ({
     setLoading(true);
     try {
       const newData = await parseJson3D(json);
+  
       const existingIndex = data.findIndex((item) => item.orderCode === newData.orderCode);
-
+  
       if (existingIndex !== -1) {
         const upData = await createOrder(newData);
         setData((prevData) => {
@@ -79,6 +80,7 @@ const Actions = ({
     }
     setLoading(false);
   };
+  
 
   const handleChange = async (info) => {
     setLoading(true);
@@ -93,9 +95,9 @@ const Actions = ({
 
   const props1 = {
     name: "sampleFile",
-    // action: "http://localhost:2002/cargarNuevoXlsxSola",
-    action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
-    // action:"https://api.simulhome.com/coohomReport/cargarNuevoXlsxSola",
+    // action: "http://localhost:2004/cargarNuevoXlsxSola",
+    // action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
+    action:"https://api.simulhome.com/coohomReport/cargarNuevoXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",
@@ -105,9 +107,9 @@ const Actions = ({
 
   const props2 = {
     name: "sampleFile",
-    // action: "http://localhost:2002/cargarNuevoXlsxSola",
-    action: "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
-    // action:"https://api.simulhome.com/coohomReport/eliminarComplementsXlsxSola",
+    // action: "http://localhost:2004/cargarNuevoXlsxSola",
+    // action: "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
+    action:"https://api.simulhome.com/coohomReport/eliminarComplementsXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",

@@ -4,8 +4,8 @@ import Cookies from "js-cookie";
 import { CONFIG } from "../data/constants";
 
 const Settings = {
-  // BACKEND_URL: "http://localhost:2002",
-  BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
+  BACKEND_URL: "http://localhost:2004",
+  // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
   // BACKEND_URL: "https://api.simulhome.com/coohomReport",
   ENDPOINT: "reportCoohom",
   TOKEN: "Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH",
@@ -30,6 +30,7 @@ export const axiosToken = axios.create({
 });
 
 export const createOrder = async (params) => {
+
   try {
     const data = await _AXIOS_.post(
       `${CONFIG.API.BACKEND_URL}/${CONFIG.API.ENDPOINT}`,
@@ -39,6 +40,7 @@ export const createOrder = async (params) => {
       }
     );
     console.log(data.data.result, "createOrder");
+
     return data.data;
   } catch (error) {
     console.log(error);
@@ -350,7 +352,6 @@ export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
       coefficient = order?.userId?.coefficient;
     } else if (tab === 2 || tab === 3) {
       coefficient = order?.userId?.coefficientVentaTienda;
-      
     }
   }
 
