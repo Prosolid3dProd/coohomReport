@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Page,
-  Text,
-  View,
-  Document,
-  Image,
-  Font,
-} from "@react-pdf/renderer";
+import { Page, Text, View, Document, Image, Font } from "@react-pdf/renderer";
 import LogoSola from "../../../assets/sola.png";
 import { CONFIG } from "../../../data/constants";
 import { SolaImagenes } from "./solaImages";
@@ -551,8 +544,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {it.name}: {it.nameValue || it.description}{" "}
-                              {it.name === "PVA" ? it.value : ""}{" "}
+                              {it.name}:{" "}
+                              {it.value || it.nameValue || it.description}{" "}
+                              {it.name === "PVA" || it.name === "PVL"
+                                ? it.description
+                                : ""}{" "}
                               {it.mcv ? "/" + it.mcv : ""}
                             </Text>
                           ))}
@@ -794,8 +790,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           {item.variants.map((it) => (
                             <Text>
                               {" "}
-                              {it.name}: {it.nameValue || it.description}{" "}
-                              {it.name === "PVA" ? it.value : ""}{" "}
+                              {it.name}:{" "}
+                              {it.value || it.nameValue || it.description}{" "}
+                              {it.name === "PVA" || it.name === "PVL"
+                                ? it.description
+                                : ""}{" "}
                               {it.mcv ? "/" + it.mcv : ""}
                             </Text>
                           ))}
@@ -997,8 +996,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {it.name}: {it.nameValue || it.description}{" "}
-                            {it.name === "PVA" ? it.value : ""}{" "}
+                            {it.name}:{" "}
+                            {it.value || it.nameValue || it.description}{" "}
+                            {it.name === "PVA" || it.name === "PVL"
+                              ? it.description
+                              : ""}{" "}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1163,8 +1165,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {it.name}: {it.nameValue || it.description}{" "}
-                            {it.name === "PVA" ? it.value : ""}{" "}
+                            {it.name}:{" "}
+                            {it.value || it.nameValue || it.description}{" "}
+                            {it.name === "PVA" || it.name === "PVL"
+                              ? it.description
+                              : ""}{" "}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1373,8 +1378,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {it.name}: {it.nameValue || it.description}{" "}
-                            {it.name === "PVA" ? it.value : ""}{" "}
+                            {it.name}:{" "}
+                            {it.value || it.nameValue || it.description}{" "}
+                            {it.name === "PVA" || it.name === "PVL"
+                              ? it.description
+                              : ""}{" "}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1561,8 +1569,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         {item.variants.map((it) => (
                           <Text>
                             {" "}
-                            {it.name}: {it.nameValue || it.description}{" "}
-                            {it.name === "PVA" ? it.value : ""}{" "}
+                            {it.name}:{" "}
+                            {it.value || it.nameValue || it.description}{" "}
+                            {it.name === "PVA" || it.name === "PVL"
+                              ? it.description
+                              : ""}{" "}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1710,24 +1721,27 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       }
                     </View>
                     {formatNumber(item.priceVariants) > 0 && (
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
-                          {" "}
-                          <Text>Variantes: </Text>
-                          {item.variants.map((it) => (
-                            <Text>
-                              {" "}
-                              {it.name}: {it.nameValue || it.description}{" "}
-                              {it.name === "PVA" ? it.value : ""}{" "}
-                              {it.mcv ? "/" + it.mcv : ""}
-                            </Text>
-                          ))}
-                        </View>
-                      )}
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                        }}
+                      >
+                        {" "}
+                        <Text>Variantes: </Text>
+                        {item.variants.map((it) => (
+                          <Text>
+                            {" "}
+                            {it.name}:{" "}
+                            {it.value || it.nameValue || it.description}{" "}
+                            {it.name === "PVA" || it.name === "PVL"
+                              ? it.description
+                              : ""}{" "}
+                            {it.mcv ? "/" + it.mcv : ""}
+                          </Text>
+                        ))}
+                      </View>
+                    )}
                     {item?.observation !== undefined &&
                       item?.observation.length > 0 && (
                         <View
@@ -1864,8 +1878,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       {item.variants.map((it) => (
                         <Text>
                           {" "}
-                          {it.name}: {it.nameValue || it.description}{" "}
-                          {it.name === "PVA" ? it.value : ""}{" "}
+                          {it.name}:{" "}
+                          {it.value || it.nameValue || it.description}{" "}
+                          {it.name === "PVA" || it.name === "PVL"
+                            ? it.description
+                            : ""}{" "}
                           {it.mcv ? "/" + it.mcv : ""}
                         </Text>
                       ))}

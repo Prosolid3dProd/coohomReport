@@ -127,7 +127,6 @@ const General = ({ getData, data }) => {
         //       ? values.userId.coefficientVentaTienda
         //       : data?.userId?.coefficient,
         // }));
-        console.log(values);
         setLocalOrder(result);
         message.success("Se ha actualizado correctamente");
         setTimeout(() => {
