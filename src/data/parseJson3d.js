@@ -300,7 +300,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
   // const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
   let price = 0;
 
-  // console.log(parametros);
+  console.log(parametros);
 
   const findPrice = (items) => {
     let name = items?.some(
@@ -308,19 +308,19 @@ const getPrice = (parametros, tipo, materialCasco) => {
     )
       ? "PTOTAL"
       : "PRICE";
+      console.log(name)
     return items?.find((item) => String(item.name).toUpperCase() === name)
       ?.value;
   };
 
-  const priceFromParameters = findPrice(parametros.parameters);
-  const priceFromIgnoreParameters = findPrice(parametros.ignoreParameters);
+  const arrParameters = parametros.parameters.concat(parametros.ignoreParameters);
 
-  price = parseFloat(priceFromParameters || priceFromIgnoreParameters || 0);
+  // const priceFromParameters = findPrice(parametros.parameters);
+  // const priceFromIgnoreParameters = findPrice(parametros.ignoreParameters);
 
-  // console.log(priceFromIgnoreParameters);
-  // if (tipo !== undefined && !isCabinet) {
-  //   price += tipo >= 210 ? 25 : 15;
-  // }
+  price = parseFloat(findPrice(arrParameters));
+
+  // price = parseFloat(arrParameters || 0);
 
   if (isCabinet) {
     if (parametros.textureCustomCode === "C1") {
@@ -357,6 +357,8 @@ const getPrice = (parametros, tipo, materialCasco) => {
       price += price * 0.1;
     }
   }
+
+  console.log(price)
   // console.log(
   //   "El cabinet: " +
   //     isCabinet +
@@ -831,13 +833,14 @@ const getParameters = (param, tipoMueble) => {
     ...(isMuebleTipoA ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
   ];
 
-
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
 
     if (
-      (itemName === "PVA" && parseFloat(item.value) > 0) &&
-      (itemName === "PVL" && parseFloat(item.value) > 0)
+      itemName === "PVA" &&
+      parseFloat(item.value) > 0 &&
+      itemName === "PVL" &&
+      parseFloat(item.value) > 0
     ) {
       op.push({
         name: item.displayName + ": " + item.value,
@@ -1483,23 +1486,23 @@ export const parseJson3D = async (json) => {
             cajonesInfo?.modelDrawer?.indexOf("Corte") === -1 &&
             modelDrawerArray.push(cajonesInfo?.modelDrawer);
 
-            item.subModels.map((filtroMaterialDrawer) => {
-              if (filtroMaterialDrawer.customCode === "1001") {
-                // console.log(filtroMaterialDrawer)
-                filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
-                  if (matInteriorDrawer.customCode === "0201" ) {
-                    cajonesInfo?.materialDrawer &&
-                      cajonesInfo?.materialDrawer !== "undefined" &&
-                      cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
-                      cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
-                      cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
-                      cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
-                      cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
-                      materialDrawerArray.push(cajonesInfo?.materialDrawer);
-                  }
-                });
-              }
-            });
+          item.subModels.map((filtroMaterialDrawer) => {
+            if (filtroMaterialDrawer.customCode === "1001") {
+              // console.log(filtroMaterialDrawer)
+              filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
+                if (matInteriorDrawer.customCode === "0201") {
+                  cajonesInfo?.materialDrawer &&
+                    cajonesInfo?.materialDrawer !== "undefined" &&
+                    cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Gaveta") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Sola") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
+                    cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
+                    materialDrawerArray.push(cajonesInfo?.materialDrawer);
+                }
+              });
+            }
+          });
 
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
