@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { General, Product, Profile } from "./../../index";
-import { Tabs, FloatButton, Card, Button, Space } from "antd";
+import { Tabs, Card, Button, Space } from "antd";
 import {
   getOrders,
   getLocalOrder,
@@ -9,17 +9,15 @@ import {
   fixOrder,
   getProfile,
 } from "../../../handlers/order";
-import { Header, Muebles } from "../../content";
 import { PDFViewer } from "@react-pdf/renderer";
 import LogoERP from "../../../assets/logoERP.png";
-import { Presupuesto_Cliente, Presupuesto_Fabrica } from "./index";
+import { Presupuesto_Cliente } from "./index";
 import {
   existePrecio,
   existeTotales,
   getPrecio,
   getTotales,
 } from "../../../data/localStorage";
-import { ArrowUp } from "../../icons";
 import "./report.css";
 import Confirmacion_Pedido from "./confirmacion_pedido";
 
@@ -49,7 +47,7 @@ const Report = () => {
     }
   }, [orderId]);
   
-    useEffect(() => {
+  useEffect(() => {
       const fetchData = async () => {
         if (orderId._id && tabActivo <= 3) {
           const updatedInfo = fixOrder(data, tabActivo);
@@ -59,7 +57,7 @@ const Report = () => {
         }
       };
       fetchData();
-    }, [tabActivo]);
+  }, [tabActivo]);
   
 
   const tabs = [
@@ -239,16 +237,6 @@ const Report = () => {
             })}
           />
         </Card>
-        {/* <FloatButton
-          icon={<ArrowUp />}
-          className={`${
-            visible ? "opacity-100" : "opacity-0"
-          } transition duration-300 ease-linear`}
-          type="primary"
-          onClick={() => (main.scrollTop = 0)}
-        >
-          Ancla
-        </FloatButton> */}
       </main>
     )
   );

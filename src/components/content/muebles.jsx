@@ -14,22 +14,12 @@ import React, { useEffect, useState } from "react";
 import {
   getLocalOrder,
   getOrderById,
-  getOrders,
   updateCabinetsOrder,
 } from "../../handlers/order";
-import { PopUpDelete } from "../utils/btnTabla";
-import { Label } from "./modals";
 import { Header } from "./index";
 import {
-  columnasTabla as crearColumnas,
   editarVariante,
-  eliminarMueble,
   eliminarVariante,
-  getCab,
-  obtenerMuebleIndex,
-  omitirColumnas,
-  tablaExpansible,
-  agregarMueble,
 } from "./logic/index";
 
 // const createRows = (

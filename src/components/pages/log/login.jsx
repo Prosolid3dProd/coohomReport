@@ -35,7 +35,6 @@ const Login = () => {
       email: values.email,
       password: values.password,
     });
-    console.log(result)
     const { ok, message } = result;
 
     if (!ok) return onFailed(message);

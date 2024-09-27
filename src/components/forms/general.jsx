@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import {
   Button,
   Input,
@@ -20,7 +20,6 @@ import {
   setPrecio,
   getTotales,
   existeTotales,
-  setTotales,
 } from "../../data/localStorage";
 
 const General = ({ getData, data }) => {
@@ -62,6 +61,7 @@ const General = ({ getData, data }) => {
     // semanaEntrega: data?.semanaEntrega,
     // fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
   });
+  
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isInputEditable, setIsInputEditable] = useState(role !== "client");
   const [password, setPassword] = useState("");
@@ -78,6 +78,7 @@ const General = ({ getData, data }) => {
     Encimeras: existeTotales(getTotales("Encimeras")),
     Equipamiento: existeTotales(getTotales("Equipamiento")),
     Electrodomesticos: existeTotales(getTotales("Electrodomesticos")),
+
   });
 
   const handlePrecioChange = (key) => {
@@ -127,6 +128,7 @@ const General = ({ getData, data }) => {
         //       ? values.userId.coefficientVentaTienda
         //       : data?.userId?.coefficient,
         // }));
+        console.log(values)
         setLocalOrder(result);
         message.success("Se ha actualizado correctamente");
         setTimeout(() => {
@@ -135,7 +137,6 @@ const General = ({ getData, data }) => {
       }
     }
   };
-
   return (
     <Card className="rounded-none bg-gray border border-border">
       <Form

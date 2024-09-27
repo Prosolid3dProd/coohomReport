@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Page, Text, View, Document, Image, Font } from "@react-pdf/renderer";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  Image,
+  Font,
+} from "@react-pdf/renderer";
 import LogoSola from "../../../assets/sola.png";
 import { CONFIG } from "../../../data/constants";
 import { SolaImagenes } from "./solaImages";
@@ -1742,8 +1749,98 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         ))}
                       </View>
                     )}
-                    {item?.observation !== undefined &&
-                      item?.observation.length > 0 && (
+                  </View>
+
+                  {price && (
+                    <View style={{ width: "70" }}>
+                      <Text style={{ fontSize: "8", textAlign: "right" }}>
+                        {parseFloat(item.priceTotal).toFixed(2)}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* {price && item.typeZocalo === "" ? (
+                    <View style={{ width: "70" }}>
+                      <Text style={{ fontSize: "8", textAlign: "right" }}>
+                        {parseFloat(item.priceTotal).toFixed(2)}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={{ width: "70" }}>
+                      <Text style={{ fontSize: "8", textAlign: "right" }}>
+                        {parseFloat(item.priceCabinet).toFixed(2)}
+                      </Text>
+                    </View>
+                  )} */}
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* {data && data.infoZocalos.length > 0 && (
+            <View>
+              {data.infoZocalos.map((zoc, key) => (
+                <View
+                  key={key}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginTop: "1",
+                  }}
+                  wrap={false}
+                >
+                  <View style={{ width: "50", fontSize: "8" }}>
+                    <Text>{contador++}</Text>{" "}
+                  </View>
+                  <View style={{ height: "100", width: "100", fontSize: "8" }}>
+                    <Text>
+                      <Image
+                        style={{
+                          width: "80",
+                          height: "80",
+                        }}
+                        filter={grayscaleFilter("#fff")}
+                        src={loadImage(zoc.obsBrandGoodId)}
+                      />
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: "40",
+                      fontSize: "11",
+                    }}
+                  >
+                    <Text style={{ fontSize: "8" }}>{zoc.quantity || 1}</Text>
+                  </View>
+                  <View style={{ width: "300", fontSize: "8" }}>
+                    <View>
+                      <Text style={{ fontFamily: CONFIG.BOLD }}>
+                        {zoc.reference}
+                      </Text>
+                      <Text style={{ fontFamily: CONFIG.BOLD }}>
+                        {zoc.name}
+                      </Text>
+
+                      <Text style={{ fontSize: "8" }}>
+                        {" L: " +
+                          zoc?.size?.x +
+                          " F: " +
+                          zoc?.size?.y +
+                          " A: " +
+                          zoc?.size?.z}
+                      </Text>
+
+                      {data.infoZocalos.length > 0 && (
+                        <Text>
+                          - Acabado:{" "}
+                          <Text style={{ fontSize: "8" }}>
+                            {zoc.material} / [ {formatNumber(zoc.priceCabinet)} ]
+                          </Text>
+                        </Text>
+                      )}
+                    </View>
+                    {zoc?.observation !== undefined &&
+                      zoc?.observation.length > 0 && (
                         <View
                           style={{
                             display: "flex",
@@ -1756,7 +1853,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                               fontSize: 8, // Asegúrate de que el valor sea numérico y no una cadena
                             }}
                           >
-                            Observaciones: {item.observation}
+                            Observaciones: {zoc.observation}
                           </Text>
                         </View>
                       )}
@@ -1765,14 +1862,123 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {zoc.material}
+                        {parseFloat(formatNumber(zoc.priceCabinet)).toFixed(2)}
                       </Text>
                     </View>
                   )}
                 </View>
               ))}
             </View>
-          )}
+          )} */}
+
+          {/* <View style={{ fontSize: 8 }} key={index}>
+                      {zoc.mediaTira && (
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            marginTop: "10",
+                          }}
+                        >
+                          <View style={{ width: "50", fontSize: "8" }}>
+                            <Text>{contador++}</Text>{" "}
+                          </View>
+                          <View
+                            style={{
+                              height: "100",
+                              width: "100",
+                              fontSize: "8",
+                            }}
+                          >
+                            <Text>
+                              <Image
+                                style={{
+                                  width: "80",
+                                  height: "80",
+                                }}
+                                filter={grayscaleFilter("#fff")}
+                                src={loadImage(zoc.obsBrandGoodId)}
+                              />
+                            </Text>
+                          </View>
+                          <Text style={{ width: "40" }}>{zoc.mediaTira}</Text>
+                          <View style={{ width: "300" }}>
+                            <Text style={{ fontFamily: CONFIG.BOLD }}>
+                              {zoc.referenciaMedia
+                                ? zoc.referenciaMedia
+                                : "Sin referencia"}
+                            </Text>
+                            <Text style={{ fontFamily: CONFIG.BOLD }}>
+                              {zoc.name}
+                            </Text>
+                            <Text style={{ fontSize: "8" }}>
+                              L: {zoc.anchoMaximo} A: {zoc.material}
+                            </Text>
+                            <Text> Ancho Max: {zoc.anchoMaximo / 2}</Text>
+                          </View>
+                          <Text style={{ textAlign: "right", width: "70" }}>
+                            {parseFloat(
+                              zoc.precioMediaTira * zoc.mediaTira
+                            ).toFixed(2)}
+                          </Text>
+                        </View>
+                      )}
+                      {zoc.tira && (
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            marginTop: "10",
+                          }}
+                        >
+                          <View style={{ width: "50", fontSize: "8" }}>
+                            <Text>{contador++}</Text>{" "}
+                          </View>
+                          <View
+                            style={{
+                              height: "100",
+                              width: "100",
+                              fontSize: "8",
+                            }}
+                          >
+                            <Text>
+                              <Image
+                                style={{
+                                  width: "80",
+                                  height: "80",
+                                }}
+                                filter={grayscaleFilter("#fff")}
+                                src={loadImage(zoc.obsBrandGoodId)}
+                              />
+                            </Text>
+                          </View>
+                          <Text style={{ width: "40" }}>{zoc.tira}</Text>
+                          <View style={{ width: "300" }}>
+                            <Text style={{ fontFamily: CONFIG.BOLD }}>
+                              {zoc.referenciaTira
+                                ? zoc.referenciaTira
+                                : "Sin referencia"}
+                            </Text>
+                            <Text style={{ fontFamily: CONFIG.BOLD }}>
+                              {zoc.name}
+                            </Text>
+                            <Text style={{ fontSize: "8" }}>
+                              L: {zoc.anchoMaximo} A: {zoc.material}
+                            </Text>
+                            <Text>Ancho Max: {zoc.anchoMaximo}</Text>
+                          </View>
+                          {price && (
+                            <Text style={{ textAlign: "right", width: "70" }}>
+                              {parseFloat(zoc.precioTira * zoc.tira).toFixed(2)}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              )} */}
         </View>
 
         {cabinets && cabinets?.accesorios.length > 0 && (

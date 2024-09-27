@@ -10,7 +10,6 @@ import {
   Divider,
   Space,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
 import { updateProfile } from "../../handlers/order";
 import { getUsers } from "../../handlers/user";
 
@@ -25,7 +24,6 @@ const General = ({ data }) => {
         const currentUser = users.find(
           (user) => user.email === data.profile.email
         );
-        // console.log(data)
         if (currentUser) {
           const updatedValues = {
             email: currentUser.email,
@@ -91,6 +89,12 @@ const General = ({ data }) => {
 
           <Col xs={24} md={8}>
             <Form.Item label="Info1" name="info1">
+              <Input placeholder="" />
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} md={8}>
+            <Form.Item label="Info2" name="info2">
               <Input placeholder="" />
             </Form.Item>
           </Col>

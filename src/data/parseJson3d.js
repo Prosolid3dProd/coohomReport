@@ -269,8 +269,6 @@ const getFrente = (block) => {
     return { datos: block, tipo: "frente" };
   }
 
-  // console.log(block, "TODOS LOS CAJONES");
-
   const findFrente = (subModels) => {
     if (!subModels) return undefined;
 
@@ -291,7 +289,6 @@ const getFrente = (block) => {
 
   const frente = findFrente(block.subModels);
   if (frente) {
-    // console.log(frente, "FRENTE");
     return { datos: frente, tipo: "cajon" };
   }
 
@@ -303,7 +300,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
   // const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
   let price = 0;
 
-  console.log(parametros);
+  // console.log(parametros);
 
   const findPrice = (items) => {
     let name = items?.some(
@@ -311,7 +308,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
     )
       ? "PTOTAL"
       : "PRICE";
-      console.log(name)
     return items?.find((item) => String(item.name).toUpperCase() === name)
       ?.value;
   };
@@ -324,6 +320,11 @@ const getPrice = (parametros, tipo, materialCasco) => {
   price = parseFloat(findPrice(arrParameters));
 
   // price = parseFloat(arrParameters || 0);
+
+  // console.log(priceFromIgnoreParameters);
+  // if (tipo !== undefined && !isCabinet) {
+  //   price += tipo >= 210 ? 25 : 15;
+  // }
 
   if (isCabinet) {
     if (parametros.textureCustomCode === "C1") {
@@ -360,8 +361,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
       price += price * 0.1;
     }
   }
-
-  console.log(price)
   // console.log(
   //   "El cabinet: " +
   //     isCabinet +
@@ -603,7 +602,6 @@ const getInfoDrawer = (submodels) => {
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DRAWER) {
-      //Esto antes se pasaba igualando las variables y luego haciendo un objeto en el return con las 3 variables (cambio)
       modelDrawer = item.modelBrandGoodName;
       textureDrawer = item.textureName;
       materialDrawer = item.textureName;
@@ -1239,15 +1237,14 @@ export const parseJson3D = async (json) => {
           campana,
           priceCabinet: getPrice(
             item,
-            "cabinet",
-            // referenceType.type === "A" ||
-            //   referenceType.type === "B" ||
-            //   referenceType.type === "M"
-            //   ? "cabinet"
-            //   : referenceType.type,
+            // "cabinet",
+            referenceType.type === "A" ||
+              referenceType.type === "B" ||
+              referenceType.type === "M"
+              ? "cabinet"
+              : referenceType.type,
             item.textureName,
-            item.modelCostInfo.quotationRate,
-            
+            item.modelCostInfo.quotationRate
           ),
         };
 
@@ -1417,7 +1414,6 @@ export const parseJson3D = async (json) => {
                     z: model.size.z,
                   },
                 });
-                // console.log(model, "perfiles");
               }
               // Búsqueda recursiva en submodelos anidados
               if (model.subModels) {
@@ -1436,13 +1432,11 @@ export const parseJson3D = async (json) => {
                     modelName: model.modelName,
                     materialDrawer: model.textureName,
                   };
-                  // console.log(model, "cajones");
                 } else if (model.customCode === "0301") {
                   puertasInfo = {
                     modelDoor: model.modelProductNumber,
                     materialDoor: model.textureName,
                   };
-                  // console.log(model, "puertas");
                 }
 
                 // Buscar tiradores en submodelos del nivel actual
@@ -1482,6 +1476,7 @@ export const parseJson3D = async (json) => {
             ...puertasInfo,
             ...cajonesInfo,
           };
+
           cajonesInfo?.modelDrawer &&
             cajonesInfo?.modelDrawer !== "undefined" &&
             cajonesInfo?.modelDrawer?.indexOf("Cajon") === -1 &&
@@ -1507,7 +1502,6 @@ export const parseJson3D = async (json) => {
               });
             }
           });
-          // console.log(materialDrawerArray);
 
           //Puertas y puertas dentro de gavetas
           item.subModels.map((filtroModelDoor) => {
@@ -1529,7 +1523,6 @@ export const parseJson3D = async (json) => {
                 modelDoorArray.push(puertasInfo?.modelDoor);
               }
             }
-            // console.log(modelDoorArray);
           });
 
           item.subModels.map((filtroMaterialDoor) => {
@@ -1546,7 +1539,6 @@ export const parseJson3D = async (json) => {
                 puertasInfo?.materialDoor?.indexOf("Corte") === -1 &&
                 materialDoorArray.push(puertasInfo?.materialDoor);
             }
-            // console.log(materialDoorArray)
           });
 
           armazonInfo?.modelCabinet &&
@@ -1632,7 +1624,6 @@ export const parseJson3D = async (json) => {
               item.customCode === CONFIG.CUSTOMCODE.FRENTE_FIJO
             ) {
               frente = getFrente(item);
-
               const perfil = getPerfil(frente.datos.subModels);
               drawerMaterialDetails.push({
                 tipo: frente.tipo,
@@ -1662,13 +1653,10 @@ export const parseJson3D = async (json) => {
           let totalPrice =
             parseFloat(items.priceCabinet) +
             parseFloat(getTotalDoors(item.subModels)) +
-            parseFloat(getPriceParameters(item.parameters, referenceType.type)) +
+            parseFloat(
+              getPriceParameters(item.parameters, referenceType.type)
+            ) +
             parseFloat(drawerPrice);
-
-            console.log(item, parseFloat(items.priceCabinet), "priceCabinet",totalPrice)
-            console.log(item, parseFloat(getTotalDoors(item.subModels)), "TotalDoors", totalPrice)
-            console.log(item, parseFloat(getPriceParameters(item.parameters, referenceType.type)), "PriceParameters", totalPrice)
-            console.log(item, parseFloat(drawerPrice), "Drawer", totalPrice)
 
           accesories &&
             accesories.length > 0 &&
@@ -1769,6 +1757,7 @@ export const parseJson3D = async (json) => {
               "COMPLEMENTOS"
             )
               isComplement = true;
+
             cabinets.push({
               ...items,
               obsBrandGoodId: item.obsBrandGoodId,
@@ -1814,17 +1803,18 @@ export const parseJson3D = async (json) => {
             });
           }
         }
-
         total =
           parseFloat(total) +
-          parseFloat(getPrice(
-            item,
-            referenceType.type === "A" ||
-              referenceType.type === "B" ||
-              referenceType.type === "M"
-              ? "cabinet"
-              : referenceType.type
-          )) +
+          parseFloat(
+            getPrice(
+              item,
+              referenceType.type === "A" ||
+                referenceType.type === "B" ||
+                referenceType.type === "M"
+                ? "cabinet"
+                : referenceType.type
+            )
+          ) +
           // parseFloat(priceCabinet) +
           parseFloat(getTotalDoors(item.subModels)) +
           parseFloat(getPriceParameters(item.parameters, referenceType.type));
@@ -1836,6 +1826,7 @@ export const parseJson3D = async (json) => {
           }
         }
       };
+
       for (const cabinet of cabinets) {
         if (
           String(cabinet.modelProductNumber).toLocaleUpperCase() ===
@@ -1960,21 +1951,6 @@ export const parseJson3D = async (json) => {
     // console.log(orderJson);
 
     return orderJson;
-
-    // const res = await createOrder(orderJson);
-    // const { result, message: messageResult } = res;
-
-    // if (result && result._id) {
-    //   message.success(messageResult);
-
-    //   setTimeout(() => {
-    //     window.location.reload();
-    //   }, 2000);
-
-    //   return result;
-    // } else {
-    //   return null;
-    // }
   } catch (error) {
     console.log(error);
   }
