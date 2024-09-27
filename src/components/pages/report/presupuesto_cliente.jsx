@@ -1304,7 +1304,7 @@ const Presupuesto_Cliente = ({
               }}
               id="observaciones"
             >
-              {data.observation}
+              {data?.observation?.includes("null") ? "" : data.observation}
             </Text>
           </View>
           <View style={styles.container}>
