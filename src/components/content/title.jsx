@@ -8,7 +8,7 @@ import { breakPointMD, breakpoint, typeOfText as type } from "./logic/btnLogic";
 import { UploadOutlined } from "@ant-design/icons";
 import { fetchData } from "../pages/Encimeras/encimeras";
 import { parseJson3D } from "../../data";
-import { createOrder, updateOrder } from "../../handlers/order";
+import { createOrder } from "../../handlers/order";
 import { procesarArchivoXLSX } from "../content/logic/obtenerArchivoJson";
 
 /**
@@ -53,7 +53,41 @@ const Actions = ({
     }
   };
 
-  //const result = await updateOrder({ ...values, _id: data._id });
+  //Esto deberia de ser asi, pero no actualiza el elemento desde el back y no se por que
+  // const handleChangeJSON = async (json) => {
+  //   setLoading(true);
+  //   try {
+  //     const newData = await parseJson3D(json);
+  
+  //     const existingIndex = data.findIndex((item) => item.orderCode === newData.orderCode);
+  
+  //     if (existingIndex !== -1) {
+  //       const existingItem = data[existingIndex];
+  //       const result = await updateOrder({ ...newData, _id: existingItem._id });
+  
+  //       console.log(result)
+  //       if (result) {
+  //         setData((prevData) => {
+  //           const updatedData = prevData.map((item, index) =>
+  //             index === existingIndex ? result : item
+  //           );
+  //           return updatedData;
+  //         });
+  //         message.success(result.projectName + " actualizado correctamente");
+  //       } else {
+  //         message.error("Error al actualizar el pedido");
+  //       }
+  //     } else {
+  //       const order = await createOrder(newData);
+  //       setData((prevData) => [order.result, ...prevData]);
+  //       message.success(order.result.projectName + " agregado correctamente");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating data", error);
+  //     message.error("Error al actualizar los datos");
+  //   }
+  //   setLoading(false);
+  // };
 
   const handleChangeJSON = async (json) => {
     setLoading(true);
@@ -63,21 +97,14 @@ const Actions = ({
       const existingIndex = data.findIndex((item) => item.orderCode === newData.orderCode);
   
       if (existingIndex !== -1) {
-        const existingItem = data[existingIndex];
-        const result = await updateOrder({ ...newData, _id: existingItem._id });
-  
-        console.log(result)
-        if (result) {
-          setData((prevData) => {
-            const updatedData = prevData.map((item, index) =>
-              index === existingIndex ? result : item
-            );
-            return updatedData;
-          });
-          message.success(result.projectName + " actualizado correctamente");
-        } else {
-          message.error("Error al actualizar el pedido");
-        }
+        const upData = await createOrder(newData);
+        setData((prevData) => {
+          const updatedData = prevData.map((item, index) =>
+            index === existingIndex ? upData.result : item
+          );
+          return updatedData;
+        });
+        message.success(upData.result.projectName + " actualizado correctamente");
       } else {
         const order = await createOrder(newData);
         setData((prevData) => [order.result, ...prevData]);
@@ -89,6 +116,7 @@ const Actions = ({
     }
     setLoading(false);
   };
+  
 
   const handleChange = async (info) => {
     setLoading(true);
@@ -105,7 +133,7 @@ const Actions = ({
     name: "sampleFile",
     // action: "http://localhost:2004/cargarNuevoXlsxSola",
     // action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
-    action: "https://api.simulhome.com/coohomReport/cargarNuevoXlsxSola",
+    action:"https://api.simulhome.com/coohomReport/cargarNuevoXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",
@@ -117,8 +145,7 @@ const Actions = ({
     name: "sampleFile",
     // action: "http://localhost:2004/cargarNuevoXlsxSola",
     // action: "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
-    action:
-      "https://api.simulhome.com/coohomReport/eliminarComplementsXlsxSola",
+    action:"https://api.simulhome.com/coohomReport/eliminarComplementsXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",
