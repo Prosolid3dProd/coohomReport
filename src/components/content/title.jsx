@@ -53,22 +53,31 @@ const Actions = ({
     }
   };
 
+  //const result = await updateOrder({ ...values, _id: data._id });
+
   const handleChangeJSON = async (json) => {
     setLoading(true);
     try {
       const newData = await parseJson3D(json);
-  
-      const existingIndex = data.findIndex((item) => item.orderCode === newData.orderCode);
-  
+
+      const existingIndex = data.findIndex((item) => item._id === newData._id);
+
       if (existingIndex !== -1) {
-        const upData = await createOrder(newData);
-        setData((prevData) => {
-          const updatedData = prevData.map((item, index) =>
-            index === existingIndex ? upData.result : item
-          );
-          return updatedData;
-        });
-        message.success(upData.result.projectName + " actualizado correctamente");
+        const existingItem = data[existingIndex];
+        console.log(existingItem)
+        const result = await updateOrder({ ...newData, _id: existingItem._id });
+
+        if (result) {
+          setData((prevData) => {
+            const updatedData = prevData.map((item, index) =>
+              index === existingIndex ? result : item
+            );
+            return updatedData;
+          });
+          message.success(result.projectName + " actualizado correctamente");
+        } else {
+          message.error("Error al actualizar el pedido");
+        }
       } else {
         const order = await createOrder(newData);
         setData((prevData) => [order.result, ...prevData]);
@@ -80,7 +89,6 @@ const Actions = ({
     }
     setLoading(false);
   };
-  
 
   const handleChange = async (info) => {
     setLoading(true);
@@ -97,7 +105,7 @@ const Actions = ({
     name: "sampleFile",
     // action: "http://localhost:2004/cargarNuevoXlsxSola",
     // action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
-    action:"https://api.simulhome.com/coohomReport/cargarNuevoXlsxSola",
+    action: "https://api.simulhome.com/coohomReport/cargarNuevoXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",
@@ -109,7 +117,8 @@ const Actions = ({
     name: "sampleFile",
     // action: "http://localhost:2004/cargarNuevoXlsxSola",
     // action: "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
-    action:"https://api.simulhome.com/coohomReport/eliminarComplementsXlsxSola",
+    action:
+      "https://api.simulhome.com/coohomReport/eliminarComplementsXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",

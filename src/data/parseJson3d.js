@@ -300,21 +300,20 @@ const getPrice = (parametros, tipo, materialCasco) => {
   // const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
   let price = 0;
 
-  console.log(parametros);
-
   const findPrice = (items) => {
     let name = items?.some(
       (item) => item?.name && String(item.name).toUpperCase() === "PTOTAL"
     )
       ? "PTOTAL"
       : "PRICE";
-      console.log(name)
-      return items?.find(
-        (item) => item?.name && String(item.name).toUpperCase() === name
-      )?.value;
-    };
+    return items?.find(
+      (item) => item?.name && String(item.name).toUpperCase() === name
+    )?.value;
+  };
 
-  const arrParameters = parametros.parameters.concat(parametros.ignoreParameters);
+  const arrParameters = parametros.parameters.concat(
+    parametros.ignoreParameters
+  );
 
   // const priceFromParameters = findPrice(parametros.parameters);
   // const priceFromIgnoreParameters = findPrice(parametros.ignoreParameters);
@@ -358,8 +357,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
       price += price * 0.1;
     }
   }
-
-  console.log(price)
   // console.log(
   //   "El cabinet: " +
   //     isCabinet +

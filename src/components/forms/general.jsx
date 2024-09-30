@@ -113,7 +113,6 @@ const General = ({ getData, data }) => {
     setIsOpenModal(false);
     setPassword("");
   };
-
   const onFinish = async (values) => {
     if (data._id) {
       const result = await updateOrder({ ...values, _id: data._id });
