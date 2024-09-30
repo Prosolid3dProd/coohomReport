@@ -995,6 +995,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       >
                         {" "}
                         <Text>Variantes: </Text>
+                        {console.log(item.variants)}
                         {item.variants.map((it) => (
                           <Text>
                             {" "}
@@ -2153,6 +2154,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               marginTop: 20,
               marginBottom: 20,
             }}
+            wrap={false}
           >
             <View
               style={{
