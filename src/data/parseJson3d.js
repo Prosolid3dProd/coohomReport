@@ -788,92 +788,76 @@ const getTotalDoors = (submodels) => {
 // };
 
 const getParameters = (param, tipoMueble) => {
-  let op = [];
+  const op = [];
+  
   const casco = param.subModels.find((x) =>
-    x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
+    x.modelBrandGoodName?.toUpperCase().includes("CASCO")
   );
 
   if (casco) {
     const mcv = casco.subModels.find((x) => {
-      const upperCaseModelName = x.modelName?.toLocaleUpperCase();
-      return upperCaseModelName &&
-        (upperCaseModelName.includes("VISTO IZQ") ||
-          upperCaseModelName.includes("VISTO DER") ||
-          upperCaseModelName.includes("AMBOS"))
-        ? x.textureName
-        : undefined;
+      const upperCaseModelName = x.modelName?.toUpperCase();
+      return upperCaseModelName && 
+        (upperCaseModelName.includes("VISTO IZQ") || 
+         upperCaseModelName.includes("VISTO DER") || 
+         upperCaseModelName.includes("AMBOS")) 
+         ? x.textureName 
+         : undefined;
     });
 
-    const cv = casco.parameters.find((x) =>
-      x.name === "CV" && x.value > 0 ? x.value : undefined
-    );
-
+    const cv = casco.parameters.find((x) => x.name === "CV" && x.value > 0);
+    
     if (cv) {
       op.push({
         name: cv.displayName || null,
         value: parseFloat(cv.value) || null,
         description: cv.description || null,
-        nameValue:
-          cv.optionValues?.[cv.options?.indexOf(cv.value)]?.name || null,
+        nameValue: cv.optionValues?.[cv.options?.indexOf(cv.value)]?.name || null,
         mcv: mcv?.textureName || null,
       });
     }
   }
 
-  const isMuebleTipoB = tipoMueble === "B";
-  const isMuebleTipoA = tipoMueble === "A";
-
   const excludedNames = [
-    "ELEC",
-    "CVI",
-    "CPI",
-    ...(isMuebleTipoB ? ["ME", "MPF2P", "PE"] : []),
-    ...(isMuebleTipoA ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
+    "ELEC", "CVI", "CPI",
+    ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
+    ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : [])
   ];
 
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
+    const itemValue = parseFloat(item.value);
 
-    if (
-      itemName === "PVA" &&
-      parseFloat(item.value) > 0 &&
-      itemName === "PVL" &&
-      parseFloat(item.value) > 0
-    ) {
+    if ((itemName === "PVA" || itemName === "PVL") && itemValue > 0) {
       op.push({
-        name: item.displayName + ": " + item.value,
+        name: `${item.displayName} ${item.value}`,
         value: 0,
         description: item.description,
-        nameValue:
-          item.options.length > 2
-            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
-            : undefined,
+        nameValue: item.options.length > 2 ? item.optionValues?.[item.options?.indexOf(item.value)]?.name : undefined,
       });
+      return;
     }
 
     if (excludedNames.includes(itemName)) return;
 
-    if (itemName === "FSK" && item.value < 0) {
-      op.push({
-        name: item.displayName,
-        value: parseFloat(item.value),
-        description: item.description,
-        nameValue: item.optionValues?.[item.options?.indexOf(item.value)]?.name,
-      });
-    } else if (parseFloat(item.value) > 0 && item.description) {
-      op.push({
-        name: item.displayName,
-        value: parseFloat(item.value),
-        description: item.description,
-        nameValue:
-          item.options.length > 2
-            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
-            : undefined,
-      });
+    if ((itemName === "FSK" && itemValue < 0) || (itemValue > 0 && item.description)) {
+      const paramObject = createParameterObject(item);
+      if (paramObject) {
+        op.push(paramObject);
+      }
     }
   });
+
   return op;
 };
+
+const createParameterObject = (item) => ({
+  name: item.displayName,
+  value: parseFloat(item.value),
+  description: item.description,
+  nameValue: item.options.length > 2 ? item.optionValues?.[item.options?.indexOf(item.value)]?.name : undefined,
+});
+
 
 // const getPriceParameters = (param, tipoMueble) => {
 //   let precioVariant = 0;
