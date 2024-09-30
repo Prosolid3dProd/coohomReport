@@ -545,10 +545,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             <Text>
                               {" "}
                               {it.name}:{" "}
-                              {it.value || it.nameValue || it.description}{" "}
-                              {it.name === "PVA" || it.name === "PVL"
-                                ? it.description
-                                : ""}{" "}
+                              {it.name === "PVA" ||
+                              it.name === "PVL" ||
+                              String(it.name).toUpperCase() === "ANCHO PUERTA"
+                                ? it.value
+                                : it.nameValue || it.description}{" "}
                               {it.mcv ? "/" + it.mcv : ""}
                             </Text>
                           ))}
@@ -791,10 +792,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             <Text>
                               {" "}
                               {it.name}:{" "}
-                              {it.value || it.nameValue || it.description}{" "}
-                              {it.name === "PVA" || it.name === "PVL"
-                                ? it.description
-                                : ""}{" "}
+                              {it.name === "PVA" ||
+                              it.name === "PVL" ||
+                              String(it.name).toUpperCase() === "ANCHO PUERTA"
+                                ? it.value
+                                : it.nameValue || it.description}{" "}
                               {it.mcv ? "/" + it.mcv : ""}
                             </Text>
                           ))}
@@ -997,10 +999,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           <Text>
                             {" "}
                             {it.name}:{" "}
-                            {it.value || it.nameValue || it.description}{" "}
-                            {it.name === "PVA" || it.name === "PVL"
-                              ? it.description
-                              : ""}{" "}
+                            {it.name === "PVA" ||
+                            it.name === "PVL" ||
+                            String(it.name).toUpperCase() === "ANCHO PUERTA"
+                              ? it.value
+                              : it.nameValue || it.description}{" "}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1166,10 +1169,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           <Text>
                             {" "}
                             {it.name}:{" "}
-                            {it.value || it.nameValue || it.description}{" "}
-                            {it.name === "PVA" || it.name === "PVL"
-                              ? it.description
-                              : ""}{" "}
+                            {it.name === "PVA" ||
+                            it.name === "PVL" ||
+                            String(it.name).toUpperCase() === "ANCHO PUERTA"
+                              ? it.value
+                              : it.nameValue || it.description}{" "}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1379,10 +1383,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           <Text>
                             {" "}
                             {it.name}:{" "}
-                            {it.value || it.nameValue || it.description}{" "}
-                            {it.name === "PVA" || it.name === "PVL"
-                              ? it.description
-                              : ""}{" "}
+                            {it.name === "PVA" ||
+                            it.name === "PVL" ||
+                            String(it.name).toUpperCase() === "ANCHO PUERTA"
+                              ? it.value
+                              : it.nameValue || it.description}{" "}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1570,10 +1575,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           <Text>
                             {" "}
                             {it.name}:{" "}
-                            {it.value || it.nameValue || it.description}{" "}
-                            {it.name === "PVA" || it.name === "PVL"
-                              ? it.description
-                              : ""}{" "}
+                            {it.name === "PVA" ||
+                            it.name === "PVL" ||
+                            String(it.name).toUpperCase() === "ANCHO PUERTA"
+                              ? it.value
+                              : it.nameValue || it.description}{" "}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1733,10 +1739,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           <Text>
                             {" "}
                             {it.name}:{" "}
-                            {it.value || it.nameValue || it.description}{" "}
-                            {it.name === "PVA" || it.name === "PVL"
-                              ? it.description
-                              : ""}{" "}
+                            {it.name === "PVA" ||
+                            it.name === "PVL" ||
+                            String(it.name).toUpperCase() === "ANCHO PUERTA"
+                              ? it.value
+                              : it.nameValue || it.description}{" "}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1879,10 +1886,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         <Text>
                           {" "}
                           {it.name}:{" "}
-                          {it.value || it.nameValue || it.description}{" "}
-                          {it.name === "PVA" || it.name === "PVL"
-                            ? it.description
-                            : ""}{" "}
+                          {it.name === "PVA" ||
+                          it.name === "PVL" ||
+                          String(it.name).toUpperCase() === "ANCHO PUERTA"
+                            ? it.value
+                            : it.nameValue || it.description}{" "}
                           {it.mcv ? "/" + it.mcv : ""}
                         </Text>
                       ))}
