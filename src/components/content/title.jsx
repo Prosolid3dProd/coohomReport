@@ -8,7 +8,7 @@ import { breakPointMD, breakpoint, typeOfText as type } from "./logic/btnLogic";
 import { UploadOutlined } from "@ant-design/icons";
 import { fetchData } from "../pages/Encimeras/encimeras";
 import { parseJson3D } from "../../data";
-import { createOrder } from "../../handlers/order";
+import { createOrder, updateOrder } from "../../handlers/order";
 import { procesarArchivoXLSX } from "../content/logic/obtenerArchivoJson";
 
 /**
@@ -59,14 +59,14 @@ const Actions = ({
     setLoading(true);
     try {
       const newData = await parseJson3D(json);
-
-      const existingIndex = data.findIndex((item) => item._id === newData._id);
-
+  
+      const existingIndex = data.findIndex((item) => item.orderCode === newData.orderCode);
+  
       if (existingIndex !== -1) {
         const existingItem = data[existingIndex];
-        console.log(existingItem)
         const result = await updateOrder({ ...newData, _id: existingItem._id });
-
+  
+        console.log(result)
         if (result) {
           setData((prevData) => {
             const updatedData = prevData.map((item, index) =>
