@@ -304,14 +304,15 @@ const getPrice = (parametros, tipo, materialCasco) => {
 
   const findPrice = (items) => {
     let name = items?.some(
-      (item) => String(item.name).toUpperCase() === "PTOTAL"
+      (item) => item?.name && String(item.name).toUpperCase() === "PTOTAL"
     )
       ? "PTOTAL"
       : "PRICE";
       console.log(name)
-    return items?.find((item) => String(item.name).toUpperCase() === name)
-      ?.value;
-  };
+      return items?.find(
+        (item) => item?.name && String(item.name).toUpperCase() === name
+      )?.value;
+    };
 
   const arrParameters = parametros.parameters.concat(parametros.ignoreParameters);
 
