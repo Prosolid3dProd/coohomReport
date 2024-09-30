@@ -826,11 +826,11 @@ const getParameters = (param, tipoMueble) => {
 
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
-    const itemValue = parseFloat(item.value);
+    const itemValue = parseFloat(item.value) > 0 ? parseFloat(item.value) : "";
 
-    if ((itemName === "PVA" || itemName === "PVL") && itemValue > 0) {
+    if ((itemName === "PVA" || itemName === "PVL") ) {
       op.push({
-        name: `${item.displayName} ${item.value}`,
+        name: `${item.displayName} ${itemValue}`,
         value: 0,
         description: item.description,
         nameValue: item.options.length > 2 ? item.optionValues?.[item.options?.indexOf(item.value)]?.name : undefined,
