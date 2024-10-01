@@ -413,8 +413,11 @@ const getRef = (parametros, reference) => {
     parametros.modelProductNumber
   )?.toUpperCase();
 
+  console.log(parametros, modelNameUpper)
   if (modelNameUpper.includes("FORRADO")) {
     reference.type = "F";
+  } else if (modelProductNumberUpper === CONFIG.MODELNAME.DECORATIVOS.NAME) {
+    reference.type = CONFIG.MODELNAME.DECORATIVOS.CODE;
   } else if (modelNameUpper.includes("M.")) {
     reference.type = "M";
     // } else if (modelNameUpper.includes("MURAL")) {
@@ -427,8 +430,6 @@ const getRef = (parametros, reference) => {
     reference.type = CONFIG.MODELNAME.ACCESORIOS.CODE;
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.COMPLEMENTOS.NAME) {
     reference.type = CONFIG.MODELNAME.COMPLEMENTOS.CODE;
-  } else if (modelProductNumberUpper === CONFIG.MODELNAME.DECORATIVOS.NAME) {
-    reference.type = CONFIG.MODELNAME.DECORATIVOS.CODE;
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.COSTADOS.NAME) {
     reference.type = CONFIG.MODELNAME.COSTADOS.CODE;
   } else if (parametros.modelProductNumber === "脚线") {
@@ -827,13 +828,17 @@ const getParameters = (param, tipoMueble) => {
   param.subModels.map((puertas) => {
     if (puertas.customCode === "0301") {
       puertas.parameters.map((variante) => {
-        if ((variante.name === "PVA" || variante.name === "PVL") && variante.value > 0) {
+        if (
+          (variante.name === "PVA" || variante.name === "PVL") &&
+          variante.value > 0
+        ) {
           op.push({
             name: variante.displayName || null,
             value: parseFloat(variante.value) || null,
             description: variante.description || null,
             nameValue:
-              variante.optionValues?.[variante.options?.indexOf(variante.value)]?.name || null,
+              variante.optionValues?.[variante.options?.indexOf(variante.value)]
+                ?.name || null,
           });
         }
       });
@@ -995,12 +1000,13 @@ const getCalculoFondo = (item) => {
   // } else
 
   if (
-    String(item.modelProductNumber).toUpperCase() !== "ACCESORIOS" &&
-    String(item.modelProductNumber).toUpperCase() !== "REGLETAS"
+    String(item.modelProductNumber).toUpperCase() === "BAJOS" &&
+    String(item.modelProductNumber).toUpperCase() === "ALTOS" &&
+    String(item.modelProductNumber).toUpperCase() === "MURALES"
   ) {
-    size.y = item.boxSize.y + fondoPuerta;
-  } else {
     size.y = item.boxSize.y;
+  } else {
+    size.y = item.boxSize.y + fondoPuerta;
   }
 
   size.x = item.boxSize.x;
