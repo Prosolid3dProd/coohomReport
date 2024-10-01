@@ -315,9 +315,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
     parametros.ignoreParameters
   );
 
-  // const priceFromParameters = findPrice(parametros.parameters);
-  // const priceFromIgnoreParameters = findPrice(parametros.ignoreParameters);
-
   price = parseFloat(findPrice(arrParameters));
 
   // price = parseFloat(arrParameters || 0);
@@ -789,7 +786,7 @@ const getTotalDoors = (submodels) => {
 
 const getParameters = (param, tipoMueble) => {
   const op = [];
-  
+
   const casco = param.subModels.find((x) =>
     x.modelBrandGoodName?.toUpperCase().includes("CASCO")
   );
@@ -797,50 +794,75 @@ const getParameters = (param, tipoMueble) => {
   if (casco) {
     const mcv = casco.subModels.find((x) => {
       const upperCaseModelName = x.modelName?.toUpperCase();
-      return upperCaseModelName && 
-        (upperCaseModelName.includes("VISTO IZQ") || 
-         upperCaseModelName.includes("VISTO DER") || 
-         upperCaseModelName.includes("AMBOS")) 
-         ? x.textureName 
-         : undefined;
+      return upperCaseModelName &&
+        (upperCaseModelName.includes("VISTO IZQ") ||
+          upperCaseModelName.includes("VISTO DER") ||
+          upperCaseModelName.includes("AMBOS"))
+        ? x.textureName
+        : undefined;
     });
 
     const cv = casco.parameters.find((x) => x.name === "CV" && x.value > 0);
-    
+
     if (cv) {
       op.push({
         name: cv.displayName || null,
         value: parseFloat(cv.value) || null,
         description: cv.description || null,
-        nameValue: cv.optionValues?.[cv.options?.indexOf(cv.value)]?.name || null,
+        nameValue:
+          cv.optionValues?.[cv.options?.indexOf(cv.value)]?.name || null,
         mcv: mcv?.textureName || null,
       });
     }
   }
 
   const excludedNames = [
-    "ELEC", "CVI", "CPI",
+    "ELEC",
+    "CVI",
+    "CPI",
     ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
-    ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : [])
+    ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
   ];
+
+  param.subModels.map((puertas) => {
+    if (puertas.customCode === "0301") {
+      puertas.parameters.map((variante) => {
+        if ((variante.name === "PVA" || variante.name === "PVL") && variante.value > 0) {
+          op.push({
+            name: variante.displayName || null,
+            value: parseFloat(variante.value) || null,
+            description: variante.description || null,
+            nameValue:
+              variante.optionValues?.[variante.options?.indexOf(variante.value)]?.name || null,
+          });
+        }
+      });
+    }
+  });
 
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
-    const itemValue = parseFloat(item.value) > 0 ? parseFloat(item.value) : "";
+    const itemValue = parseFloat(item.value);
 
-    if ((itemName === "PVA" || itemName === "PVL") ) {
+    if ((itemName === "PVA" || itemName === "PVL") && itemValue) {
       op.push({
-        name: `${item.displayName} ${itemValue}`,
-        value: 0,
+        name: item.displayName,
+        value: item.value,
         description: item.description,
-        nameValue: item.options.length > 2 ? item.optionValues?.[item.options?.indexOf(item.value)]?.name : undefined,
+        nameValue:
+          item.options.length > 2
+            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+            : undefined,
       });
       return;
     }
 
     if (excludedNames.includes(itemName)) return;
 
-    if ((itemName === "FSK" && itemValue < 0) || (itemValue > 0 && item.description)) {
+    if (
+      (itemName === "FSK" && itemValue < 0) ||
+      (itemValue > 0 && item.description)
+    ) {
       const paramObject = createParameterObject(item);
       if (paramObject) {
         op.push(paramObject);
@@ -855,9 +877,11 @@ const createParameterObject = (item) => ({
   name: item.displayName,
   value: parseFloat(item.value),
   description: item.description,
-  nameValue: item.options.length > 2 ? item.optionValues?.[item.options?.indexOf(item.value)]?.name : undefined,
+  nameValue:
+    item.options.length > 2
+      ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+      : undefined,
 });
-
 
 // const getPriceParameters = (param, tipoMueble) => {
 //   let precioVariant = 0;
