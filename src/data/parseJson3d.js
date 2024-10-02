@@ -996,18 +996,20 @@ const getCalculoFondo = (item) => {
   //   item.boxSize.y >= 700
   // ) {
   //   size.y = item.boxSize.y + 4;
-  // } else
-  // console.log(item)
+  // } elses
   if (
-    item.prodCatId === 696 ||
-    item.prodCatId === 721 ||
-    item.prodCatId === 719
+    (item.prodCatId === 721 || item.prodCatId === 719 || item.prodCatId === 696) &&
+    String(item.modelProductNumber).toUpperCase() !== "DECORATIVOS"
   ) {
+    console.log(item);
     size.y = item.boxSize.y + fondoPuerta;
   } else {
     size.y = item.boxSize.y;
   }
-
+  
+  size.x = item.boxSize.x;
+  size.z = item.boxSize.z;
+  
   size.x = item.boxSize.x;
   size.z = item.boxSize.z;
 
