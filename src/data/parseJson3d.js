@@ -413,7 +413,6 @@ const getRef = (parametros, reference) => {
     parametros.modelProductNumber
   )?.toUpperCase();
 
-  console.log(parametros, modelNameUpper)
   if (modelNameUpper.includes("FORRADO")) {
     reference.type = "F";
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.DECORATIVOS.NAME) {
@@ -998,12 +997,13 @@ const getCalculoFondo = (item) => {
   // ) {
   //   size.y = item.boxSize.y + 4;
   // } else
-
+  console.log(item)
   if (
-    String(item.modelProductNumber).toUpperCase() === "BAJOS" &&
-    String(item.modelProductNumber).toUpperCase() === "ALTOS" &&
-    String(item.modelProductNumber).toUpperCase() === "MURALES"
+    String(item.prodCatId).toUpperCase() === 696 &&
+    String(item.prodCatId).toUpperCase() === 721 &&
+    String(item.prodCatId).toUpperCase() === 719
   ) {
+    console.log(item)
     size.y = item.boxSize.y + fondoPuerta;
   } else {
     size.y = item.boxSize.y;
