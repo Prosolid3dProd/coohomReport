@@ -1303,7 +1303,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     </Text>
                     <Text style={{ fontFamily: CONFIG.BOLD }}>{item.name}</Text>
                     <Text style={{ fontSize: "8" }}>
-                      L: {item.size?.x} F: {item.size?.y} A: {item.size?.z}
+                      L: {item.size?.x} F: {item.size?.y + 20} A: {item.size?.z}
                     </Text>
                     {item.opening && (
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
