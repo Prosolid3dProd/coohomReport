@@ -1004,9 +1004,9 @@ const getCalculoFondo = (item) => {
     String(item.modelProductNumber).toUpperCase() === "ALTOS" &&
     String(item.modelProductNumber).toUpperCase() === "MURALES"
   ) {
-    size.y = item.boxSize.y;
-  } else {
     size.y = item.boxSize.y + fondoPuerta;
+  } else {
+    size.y = item.boxSize.y;
   }
 
   size.x = item.boxSize.x;
