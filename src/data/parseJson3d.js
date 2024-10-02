@@ -997,13 +997,12 @@ const getCalculoFondo = (item) => {
   // ) {
   //   size.y = item.boxSize.y + 4;
   // } else
-  console.log(item)
+  // console.log(item)
   if (
-    String(item.prodCatId).toUpperCase() === 696 &&
-    String(item.prodCatId).toUpperCase() === 721 &&
-    String(item.prodCatId).toUpperCase() === 719
+    item.prodCatId === 696 ||
+    item.prodCatId === 721 ||
+    item.prodCatId === 719
   ) {
-    console.log(item)
     size.y = item.boxSize.y + fondoPuerta;
   } else {
     size.y = item.boxSize.y;
