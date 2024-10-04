@@ -297,30 +297,37 @@ const getFrente = (block) => {
 
 const getPrice = (parametros, tipo, materialCasco) => {
   const isCabinet = tipo === "cabinet";
-  // const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
   let price = 0;
 
   const findPrice = (items) => {
-    let name = items?.some(
+    // Determina el nombre a buscar: 'PTOTAL' o 'PRICE'
+    const name = items.some(
       (item) => item?.name && String(item.name).toUpperCase() === "PTOTAL"
     )
       ? "PTOTAL"
       : "PRICE";
-    return items?.find(
-      (item) => item?.name && String(item.name).toUpperCase() === name
-    )?.value;
+
+    // Filtra todos los valores coincidentes con el nombre seleccionado y convierte a número
+    const prices = items
+      .filter((item) => item?.name && String(item.name).toUpperCase() === name)
+      .map((item) => parseFloat(item.value))
+      .filter((value) => !isNaN(value)); // Elimina valores no numéricos
+
+    // Si hay varios precios, suma todos, de lo contrario devuelve 0 o el valor único
+    return prices.length > 0 ? prices.reduce((acc, curr) => acc + curr, 0) : 0;
   };
 
+  // Concatenar parámetros e ignorados
   const arrParameters = parametros.parameters.concat(
     parametros.ignoreParameters
   );
 
-  price = parseFloat(findPrice(arrParameters));
-
-  // price = parseFloat(arrParameters || 0);
+  // Calcula el precio base
+  price = findPrice(arrParameters);
 
   if (isCabinet) {
     if (parametros.textureCustomCode === "C1") {
+      // No hay incremento de precio
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
         materialCasco === "171-EUCALIPTO" ||
@@ -354,16 +361,10 @@ const getPrice = (parametros, tipo, materialCasco) => {
       price += price * 0.1;
     }
   }
-  // console.log(
-  //   "El cabinet: " +
-  //     isCabinet +
-  //     "        El tipo: " +
-  //     tipo +
-  //     "        El precio: " +
-  //     price
-  // );
+
   return price;
 };
+
 
 const getRef = (parametros, reference) => {
   // Inicialización de referencia
@@ -998,7 +999,9 @@ const getCalculoFondo = (item) => {
   //   size.y = item.boxSize.y + 4;
   // } elses
   if (
-    (item.prodCatId === 721 || item.prodCatId === 719 || item.prodCatId === 696) &&
+    (item.prodCatId === 721 ||
+      item.prodCatId === 719 ||
+      item.prodCatId === 696) &&
     String(item.modelProductNumber).toUpperCase() !== "DECORATIVOS"
   ) {
     console.log(item);
@@ -1006,10 +1009,10 @@ const getCalculoFondo = (item) => {
   } else {
     size.y = item.boxSize.y;
   }
-  
+
   size.x = item.boxSize.x;
   size.z = item.boxSize.z;
-  
+
   size.x = item.boxSize.x;
   size.z = item.boxSize.z;
 
@@ -1260,7 +1263,6 @@ export const parseJson3D = async (json) => {
             item.modelCostInfo.quotationRate
           ),
         };
-
         // --------------------------------------------------------------------------------------------------------------------------------------
 
         // if (
@@ -1671,7 +1673,6 @@ export const parseJson3D = async (json) => {
               getPriceParameters(item.parameters, referenceType.type)
             ) +
             parseFloat(drawerPrice);
-
           accesories &&
             accesories.length > 0 &&
             accesories.forEach((itemx) => {
@@ -1754,6 +1755,7 @@ export const parseJson3D = async (json) => {
           //     })
           //   : (armazonInfo = getInfoCabinet(item.subModels));
           // console.log(item, totalPrice)
+          console.log(items, totalPrice)
           if (parseFloat(totalPrice) >= 0) {
             let description = "";
 
@@ -1771,7 +1773,6 @@ export const parseJson3D = async (json) => {
               "COMPLEMENTOS"
             )
               isComplement = true;
-
             cabinets.push({
               ...items,
               obsBrandGoodId: item.obsBrandGoodId,

@@ -199,7 +199,6 @@ const Encimeras = () => {
   const onDelete = async (item) => {
     setEditado(true);
     try {
-      console;
       const result = await deleteComplements(item);
       if (result) {
         setData((prevValues) =>
