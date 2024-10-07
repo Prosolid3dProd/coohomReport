@@ -1557,8 +1557,34 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     )}
                     {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
-                        - Acabado:{" "}
-                        <Text style={{ fontSize: "8" }}>{item.material}</Text>
+                        {item.materialCabinetMP && (
+                          <>
+                            - Armazon:{" "}
+                            <Text style={{ fontSize: "8" }}>
+                              {item.materialCabinetMP}
+                            </Text>
+                            {"\n"}
+                          </>
+                        )}
+                        {item.materialCabinetAcab && (
+                          <>
+                            - Acabado:{" "}
+                            <Text style={{ fontSize: "8" }}>
+                              {item.materialCabinetAcab}
+                            </Text>
+                            {"\n"}
+                          </>
+                        )}
+                        {!item.materialCabinetMP &&
+                          !item.materialCabinetAcab &&
+                          item.material && (
+                            <>
+                              - Acabado:{" "}
+                              <Text style={{ fontSize: "8" }}>
+                                {item.material}
+                              </Text>
+                            </>
+                          )}
                       </Text>
                     )}
 
