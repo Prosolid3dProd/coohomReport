@@ -297,39 +297,37 @@ const getFrente = (block) => {
 
 const getPrice = (parametros, tipo, materialCasco) => {
   const isCabinet = tipo === "cabinet";
-  // const cogerParametro = isCabinet ? CONFIG.PRICE : "PTOTAL";
   let price = 0;
 
-  // console.log(parametros);
-
   const findPrice = (items) => {
-    let name = items?.some(
+    // Determina el nombre a buscar: 'PTOTAL' o 'PRICE'
+    const name = items.some(
       (item) => item?.name && String(item.name).toUpperCase() === "PTOTAL"
     )
       ? "PTOTAL"
       : "PRICE";
-      console.log(name)
-      return items?.find(
-        (item) => item?.name && String(item.name).toUpperCase() === name
-      )?.value;
-    };
 
-  const arrParameters = parametros.parameters.concat(parametros.ignoreParameters);
+    // Filtra todos los valores coincidentes con el nombre seleccionado y convierte a número
+    const prices = items
+      .filter((item) => item?.name && String(item.name).toUpperCase() === name)
+      .map((item) => parseFloat(item.value))
+      .filter((value) => !isNaN(value)); // Elimina valores no numéricos
 
-  // const priceFromParameters = findPrice(parametros.parameters);
-  // const priceFromIgnoreParameters = findPrice(parametros.ignoreParameters);
+    // Si hay varios precios, suma todos, de lo contrario devuelve 0 o el valor único
+    return prices.length > 0 ? prices.reduce((acc, curr) => acc + curr, 0) : 0;
+  };
 
-  price = parseFloat(findPrice(arrParameters));
+  // Concatenar parámetros e ignorados
+  const arrParameters = parametros.parameters.concat(
+    parametros.ignoreParameters
+  );
 
-  // price = parseFloat(arrParameters || 0);
-
-  // console.log(priceFromIgnoreParameters);
-  // if (tipo !== undefined && !isCabinet) {
-  //   price += tipo >= 210 ? 25 : 15;
-  // }
+  // Calcula el precio base
+  price = findPrice(arrParameters);
 
   if (isCabinet) {
     if (parametros.textureCustomCode === "C1") {
+      // No hay incremento de precio
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
         materialCasco === "171-EUCALIPTO" ||
@@ -363,14 +361,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
       price += price * 0.1;
     }
   }
-  // console.log(
-  //   "El cabinet: " +
-  //     isCabinet +
-  //     "        El tipo: " +
-  //     tipo +
-  //     "        El precio: " +
-  //     price
-  // );
+
   return price;
 };
 
