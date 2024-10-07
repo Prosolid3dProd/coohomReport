@@ -831,6 +831,54 @@ const Presupuesto_Cliente = ({
                 </View>
               ))}
           </View>
+          {cabinets &&
+              cabinets.decorativos.map((item) => (
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginTop: "1",
+                  }}
+                >
+                  <View style={{ height: "10", width: "30", fontSize: "8" }}>
+                    <Text>1</Text>{" "}
+                  </View>
+                  <View
+                    style={{
+                      height: "10",
+                      width: "100",
+                      fontSize: "8",
+                    }}
+                  >
+                    <Text>{item.reference}</Text>
+                  </View>
+                  <View
+                    style={{
+                      height: "10",
+                      width: "300",
+                      fontSize: "8",
+                    }}
+                  >
+                    <Text> {item.name}</Text>
+                  </View>
+
+                  <View
+                    View
+                    style={{
+                      height: "10",
+                      width: "100",
+                      fontSize: "8",
+                      textAlign: "right",
+                    }}
+                  >
+                    {price && (
+                      <Text style={{ textAlign: "right" }}>
+                        {parseFloat(item.priceTotal).toFixed(2)}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              ))}
           <View
             style={{
               display: "flex",
