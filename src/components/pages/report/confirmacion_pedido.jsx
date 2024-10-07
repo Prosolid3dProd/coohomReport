@@ -1601,9 +1601,13 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           <Text>
                             {" "}
                             {it.name}:{" "}
-                            {it.name === "PVA" ||
-                            it.name === "PVL" ||
-                            String(it.name).toUpperCase() === "ANCHO PUERTA"
+                            {String(it.name).toUpperCase() === "PVA" ||
+                            String(it.name).toUpperCase()=== "PVL" ||
+                            String(it.name).toUpperCase() === "ANCHO PUERTA"||
+                            String(it.name).toUpperCase() === "VUELO IZQUIERDO"||
+                            String(it.name).toUpperCase() === "VUELO DERECHO"||
+                            String(it.name).toUpperCase() === "MATERIAL PERFIL"||
+                            String(it.name).toUpperCase() === "VUELO"
                               ? it.value
                               : it.nameValue || it.description}{" "}
                             {it.mcv ? "/" + it.mcv : ""}

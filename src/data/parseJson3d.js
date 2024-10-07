@@ -840,7 +840,7 @@ const createParameterObject = (item, mcv = null) => ({
     item.options?.length > 2
       ? item.optionValues?.[item.options.indexOf(item.value)]?.name
       : undefined,
-  mcv,
+  mcv
 });
 const findTexture = (casco) =>
   casco.subModels?.find((x) => {
