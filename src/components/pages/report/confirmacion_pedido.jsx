@@ -1595,24 +1595,46 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        {" "}
                         <Text>Variantes: </Text>
-                        {item.variants.map((it) => (
-                          <Text>
-                            {" "}
-                            {it.name}:{" "}
-                            {String(it.name).toUpperCase() === "PVA" ||
-                            String(it.name).toUpperCase()=== "PVL" ||
-                            String(it.name).toUpperCase() === "ANCHO PUERTA"||
-                            String(it.name).toUpperCase() === "VUELO IZQUIERDO"||
-                            String(it.name).toUpperCase() === "VUELO DERECHO"||
-                            String(it.name).toUpperCase() === "MATERIAL PERFIL"||
-                            String(it.name).toUpperCase() === "VUELO"
-                              ? it.value
-                              : it.nameValue || it.description}{" "}
-                            {it.mcv ? "/" + it.mcv : ""}
-                          </Text>
-                        ))}
+                        {item.variants
+                          .sort((a, b) => {
+                            const order = [
+                              "PVA",
+                              "PVL",
+                              "ANCHO PUERTA",
+                              "MATERIAL PERFIL",
+                              "PIES",
+                              "VUELO IZQUIERDO",
+                              "VUELO DERECHO",
+                            ];
+                            const indexA = order.indexOf(
+                              String(a.name).toUpperCase()
+                            );
+                            const indexB = order.indexOf(
+                              String(b.name).toUpperCase()
+                            );
+                            return (
+                              (indexA !== -1 ? indexA : order.length) -
+                              (indexB !== -1 ? indexB : order.length)
+                            );
+                          })
+                          .map((it) => (
+                            <Text key={it.name}>
+                              {it.name}:{" "}
+                              {[
+                                "PVA",
+                                "PVL",
+                                "ANCHO PUERTA",
+                                "MATERIAL PERFIL",
+                                "PIES",
+                                "VUELO IZQUIERDO",
+                                "VUELO DERECHO",
+                              ].includes(String(it.name).toUpperCase())
+                                ? it.value
+                                : it.nameValue || it.description}{" "}
+                              {it.mcv ? "/" + it.mcv : ""}
+                            </Text>
+                          ))}
                       </View>
                     )}
 

@@ -471,44 +471,6 @@ const getDoors = (submodels) => {
   return values;
 };
 
-//----------------------------------------------------------------
-// const getInfoDoor = (submodels) => {
-//   console.log(submodels);
-//   let values = {
-//     materialDoor: null,
-//     modelDoor: null,
-//   };
-
-//   submodels.forEach((item) => {
-//     if (
-//       String(item.customCode).trim().substring(0, 2) ===
-//       CONFIG.CUSTOMCODE.DRAWER
-//     ) {
-//       item.subModels.forEach((item2) => {
-//         if (
-//           String(item2.customCode).trim().substring(0, 2) ===
-//           CONFIG.CUSTOMCODE.DOOR
-//         ) {
-//           values = {
-//             materialDoor: String(item2.textureName),
-//             modelDoor: String(item2.modelProductNumber),
-//             handler: getInfoHandler(item.subModels),
-//           };
-//         }
-//       });
-//     }
-//     if (
-//       String(item.customCode).trim().substring(0, 2) === CONFIG.CUSTOMCODE.DOOR
-//     ) {
-//       values = {
-//         materialDoor: String(item.textureName),
-//         modelDoor: String(item.modelProductNumber),
-//         handler: getInfoHandler(item.subModels),
-//       };
-//     }
-//   });
-//   return values;
-// };
 const getInfoDoor = (submodels) => {
   let values = {
     materialDoor: null,
@@ -540,7 +502,6 @@ const getInfoDoor = (submodels) => {
   });
   return values;
 };
-//----------------------------------------------------------------
 
 const getInfoHandler = (submodels) => {
   let handler = "";
@@ -674,113 +635,6 @@ const getTotalDoors = (submodels) => {
   return parseFloat(total);
 };
 
-// const getParameters = (param, tipoMueble) => {
-//   let op = [];
-
-//   const casco = param.subModels.find((x) =>
-
-//     x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
-
-//   );
-
-//   if (casco !== undefined) {
-//     const mcv = casco.subModels.find((x) => {
-//       const upperCaseModelName = x.modelName?.toLocaleUpperCase();
-
-//       if (upperCaseModelName) {
-//         if (
-//           upperCaseModelName.includes("VISTO IZQ") ||
-//           upperCaseModelName.includes("VISTO DER") ||
-//           upperCaseModelName.includes("AMBOS")||
-//           upperCaseModelName.includes("TODOS ACABADOS")
-
-//         ) {
-//           return x.textureName;
-//         }
-//       }
-//     });
-//     const cv = casco.parameters.find((x) =>
-//       x.name == "CV" && x.value > 0 ? x.value : undefined
-//     );
-//     if (cv !== undefined) {
-//       op.push({
-//         name: cv.displayName || null,
-//         value: parseFloat(cv.value) || null,
-//         description: cv.description || null,
-//         nameValue: cv.optionValues[cv.options?.indexOf(cv.value)].name || null,
-//         mcv: mcv&&mcv!==undefined?mcv.textureName : null,
-//       });
-//     }
-//   }
-//   param.parameters.forEach((item) => {
-//     //para quitar las variante que vienen activas por defecto
-//     let bool = true;
-//     if (
-//       // String(item.name) === "CIZ" ||
-//       String(item.name) === "ELEC" ||
-//       String(item.name) === "CVI" ||
-//       String(item.name) === "CPI" ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "B" &&
-//         String(item.name) === "ME") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "B" &&
-//         String(item.name) === "MPF2P") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "B" &&
-//         String(item.name) === "PE") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "ME") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "MPF2P") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "PE") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "MTCEC") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "UM")
-//       /* String(item.name) == "ME" ||
-//       String(item.name) === "MPF2P" ||
-//       String(item.name) === "PE" ||
-//       String(item.name) === "MTCEC" ||
-//       String(item.name) === "UM" ||
-//       */
-//     ) {
-//       bool = false;
-//     }
-//     if (item.name == "FSK" && item.value < 0) {
-//       op.push({
-//         name: item.displayName,
-//         value: parseFloat(item.value),
-//         description: item.description,
-//         nameValue: item.optionValues[item.options?.indexOf(item.value)].name,
-//       });
-//     } else if (
-//       parseFloat(item.value) > 0 &&
-//       item.description !== null &&
-//       item.description !== "" &&
-//       bool
-//     ) {
-//       let nameValue;
-//       if (item.options.length > 2) {
-//         nameValue = item.optionValues[item.options?.indexOf(item.value)].name;
-//       }
-//       op.push({
-//         name: item.displayName,
-//         value: parseFloat(item.value),
-//         description: item.description,
-//         nameValue,
-//       });
-//     }
-//   });
-//   return op;
-// };
-
 const getParameters = (param, tipoMueble) => {
   const op = [];
   const excludedNames = getExcludedNames(tipoMueble);
@@ -801,6 +655,9 @@ const getParameters = (param, tipoMueble) => {
     }
   }
 
+  const vueloParam = param.parameters.find((item) => item.name === "Vuelo");
+  const vueloValue = vueloParam ? parseInt(vueloParam.value) : 0;
+
   param.subModels
     .filter((puertas) => puertas.customCode === "0301")
     .forEach((puertas) => {
@@ -812,7 +669,8 @@ const getParameters = (param, tipoMueble) => {
     });
 
   param.parameters.forEach((item) => {
-    if (isSpecialCustomCode(param.customCode, item)) {
+    if (isSpecialCustomCode(param.customCode, item, vueloValue)) {
+      console.log(item);
       op.push(createParameterObject(item));
       return;
     }
@@ -854,70 +712,21 @@ const findTexture = (casco) =>
   });
 const isRelevantVariant = (variante) =>
   (variante.name === "PVA" || variante.name === "PVL") && variante.value > 0;
-const isSpecialCustomCode = (customCode, item) =>
-  customCode === "9876" &&
-  ["pies", "VIZQ", "VDER", "MPM", "vuelo"].includes(item.name) &&
-  parseFloat(item.value) > 0;
-
-// const getPriceParameters = (param, tipoMueble) => {
-//   let precioVariant = 0;
-//   param.forEach((item) => {
-//     //borrar
-//     let bool = true;
-
-//     if (
-//       // String(item.name) === "CIZ" ||
-//       String(item.name) === "ELEC" ||
-//       String(item.name) === "CVI" ||
-//       String(item.name) === "CPI" ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "B" &&
-//         String(item.name) === "ME") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "B" &&
-//         String(item.name) === "MPF2P") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "B" &&
-//         String(item.name) === "PE") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "ME") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "MPF2P") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "PE") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "MTCEC") ||
-//       (tipoMueble != undefined &&
-//         String(tipoMueble) == "A" &&
-//         String(item.name) === "UM")
-//       /* String(item.name) == "ME" ||
-//       String(item.name) === "MPF2P" ||
-//       String(item.name) === "PE" ||
-//       String(item.name) === "MTCEC" ||
-//       String(item.name) === "UM" ||
-//       */
-//     ) {
-//       bool = false;
-//     }
-
-//     if (
-//       parseFloat(item.value) > 0 &&
-//       item.description !== null &&
-//       item.description !== "" &&
-//       bool
-//     ) {
-//       precioVariant += parseFloat(item.value);
-//     }
-
-//     //borrar
-//   });
-//   return parseFloat(precioVariant).toFixed(2);
-// };
-
+const isSpecialCustomCode = (customCode, item, vueloValue) => {
+  if (customCode !== "9876" || parseFloat(item.value) <= 0) {
+    return false;
+  }
+  if (item.name === "VIZQ") {
+    return vueloValue === 1 || vueloValue === 3;
+  }
+  if (item.name === "VDER") {
+    return vueloValue === 2 || vueloValue === 3;
+  }
+  if (item.name === "Vuelo") {
+    return false;
+  }
+  return ["pies", "MPM"].includes(item.name);
+};
 const getPriceParameters = (param, tipoMueble) => {
   let precioVariant = 0;
   const excludedNames = [
@@ -1008,11 +817,9 @@ const getCalculoFondo = (item) => {
 };
 
 const removeDuplicates = (array) => {
-  // Se mapea cada elemento del array a mayúsculas y luego se filtran los elementos únicos
   return array
     .map((element) => element.toUpperCase())
     .filter((element, index, self) => {
-      // Se devuelve true solo para el primer índice de cada elemento único
       return self.indexOf(element) === index;
     });
 };
@@ -1083,7 +890,7 @@ export const parseJson3D = async (json) => {
       let materialAccesorios = "";
       let campana;
       let modelProductNumber = item.modelProductNumber;
-      //Si es campana integrada tenemos que sacar unas variables del mueble
+
       if (item.customCode == "8000") {
         let wCampana = 0;
         let mueble = 0;
@@ -1233,58 +1040,7 @@ export const parseJson3D = async (json) => {
             item.modelCostInfo.quotationRate
           ),
         };
-        // --------------------------------------------------------------------------------------------------------------------------------------
-
-        // if (
-        //   item.modelProductNumber !== undefined ||
-        //   item.modelProductNumber !== 0
-        // ) {
-        //   item.subModels.map(it => {
-        //     if (
-        //       it.modelProductNumber !== undefined ||
-        //       it.modelProductNumber !== 0
-        //     ) {
-        //       model = it.modelProductNumber;
-        //       console.log(it.modelProductNumber);
-        //     } else {
-        //       model = "No hay modelo";
-        //     }
-        //   });
-        //   if (
-        //     tipos.includes(String(item.modelProductNumber).toLocaleUpperCase())
-        //   ) {
-        //   } else {
-        //     model = item.modelProductNumber;
-        //   }
-        // } else {
-        //   item.subModels.map(it => {
-        //     if (
-        //       it.modelProductNumber !== undefined ||
-        //       it.modelProductNumber !== 0
-        //     ) {
-        //       model = it.modelProductNumber;
-        //       console.log(it.modelProductNumber);
-        //     } else {
-        //       model = "No hay modelo";
-        //     }
-        //   });
-        // }
-
-        // if (item.modelProductNumber !== undefined && item.modelProductNumber !== 0 && !tipos.includes(String(item.modelProductNumber).toLocaleUpperCase())) {
-        //   model = item.modelProductNumber;
-        // } else {
-        //   item.subModels.some(it => {
-        //     if (it.modelProductNumber !== undefined && it.modelProductNumber !== 0 && !tipos.includes(String(it.modelProductNumber).toLocaleUpperCase())) {
-        //       model = it.modelProductNumber;
-        //       return true;
-        //     }
-        //     return false;
-        //   });
-
-        //   if (model === undefined) {
-        //     model = "No hay modelo";
-        //   }
-        // }
+    
         if (
           String(item.modelProductNumber).toLocaleUpperCase() === "COSTADOS"
         ) {
@@ -1328,16 +1084,6 @@ export const parseJson3D = async (json) => {
                 opening = CONFIG.DOOROPENING.DERECHA;
               }
             }
-            // if (
-            //   item3.simpleName === "LD" &&
-            //   (referenceType.type === CONFIG.MODELNAME.BAJOS.CODE ||
-            //     referenceType.type === CONFIG.MODELNAME.MURALES.CODE) ||
-            //   arrZocalos.length > 0
-            // ) {
-            //   if (zocalo === 0) {
-            //     zocalo = arrZocalos[0].height;
-            //   }
-            // }
           });
 
           if (item.customCode === CONFIG.CUSTOMCODE.BALDAS_DECORATIVAS) {
@@ -1353,7 +1099,7 @@ export const parseJson3D = async (json) => {
 
           cajonesInfo = getInfoDrawer(item.subModels);
           cabinet = armazonInfo;
-          // -------------------------------------------------------
+
           item.subModels.forEach((submodel) => {
             if (
               String(submodel.customCode).substring(0, 2) ===
@@ -1438,11 +1184,8 @@ export const parseJson3D = async (json) => {
               }
             });
           }
-
-          // Llamada a la función con el item principal
           buscarCajonesYPuertas(item.subModels);
 
-          // ----------------------------------------------------
           if (cajonesInfo && cajonesInfo.modelDrawer) {
             if (referenceType.ref?.indexOf(".BC") !== -1) {
               cajonesInfo = {
@@ -1476,7 +1219,6 @@ export const parseJson3D = async (json) => {
 
           item.subModels.map((filtroMaterialDrawer) => {
             if (filtroMaterialDrawer.customCode === "1001") {
-              // console.log(filtroMaterialDrawer)
               filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
                 if (matInteriorDrawer.customCode === "0201") {
                   cajonesInfo?.materialDrawer &&
@@ -1657,8 +1399,6 @@ export const parseJson3D = async (json) => {
                   obsBrandGoodId2 = itemModels.obsBrandGoodId;
                 }
               });
-
-              //A las esterillas se le agrega el ancho de la cajonera
               referenceTemp = itemx.reference;
 
               const sizeX = parseFloat(item.size?.x);
@@ -1691,14 +1431,12 @@ export const parseJson3D = async (json) => {
                   priceDoor: parseFloat(getTotalDoors(item.subModels)),
                   total:
                     parseFloat(itemx.price) * parseFloat(itemx.quantity || 1),
-                  size: item.boxSize, // { width: 0, height: 0, depth: 0 },
+                  size: item.boxSize,
                   variants: getParameters(item),
                   priceVariants: 0,
                   priceDrawers: 0,
                   drawerPriceDetails,
                   drawerMaterialDetails,
-                  //description: description ,
-                  // material: getInfoArmazon(item.subModels) || null,
                   material: item.textureName,
                   variants: [],
                   designerName: json.partnerOrder?.designerName || "",
@@ -1707,27 +1445,13 @@ export const parseJson3D = async (json) => {
                 });
               }
             });
-          // Buscar casco para pasarlo directamente
-          // const casco = item.subModels.find((x) =>
-          //   x.modelBrandGoodName?.toLocaleUpperCase().includes("CASCO")
-          // );
-          // console.log(casco, "CASCO");
 
           let nameFinal = item.modelName;
           if (String(item.modelName).indexOf("L") > -1) {
-            //quitar los ultimos 4 digitos y eliminar los guiones
-
             nameFinal = String(item.modelName)
               .substring(0, String(item.modelName).length - 5)
               .replace(/-/g, "");
           }
-          // nameFinal.toUpperCase().includes("LINERO")
-          //   ? (armazonInfo = {
-          //       materialCabinet: item.textureName,
-          //       modelCabinet: item.modelName,
-          //     })
-          //   : (armazonInfo = getInfoCabinet(item.subModels));
-          // console.log(item, totalPrice)
           if (parseFloat(totalPrice) >= 0) {
             let description = "";
 
@@ -1757,14 +1481,14 @@ export const parseJson3D = async (json) => {
               zocalo: zocalo,
               priceDoor: parseInt(getTotalDoors(item.subModels)),
               total: parseFloat(totalPrice),
-              size: getCalculoFondo(item), // { width: 0, height: 0, depth: 0 },
+              size: getCalculoFondo(item),
               variants: getParameters(item, referenceType.type),
               priceVariants: getPriceParameters(
                 item.parameters,
                 referenceType.type
               ),
               priceDrawers: isCajonExist
-                ? parseFloat(drawerPrice) //.toFixed(0)
+                ? parseFloat(drawerPrice)
                 : "",
               drawerPriceDetails,
               drawerMaterialDetails,
@@ -1933,8 +1657,6 @@ export const parseJson3D = async (json) => {
     );
 
     orderJson.cabinets = orderJsonWhitoutZocalos;
-
-    // console.log(orderJson);
 
     return orderJson;
   } catch (error) {
