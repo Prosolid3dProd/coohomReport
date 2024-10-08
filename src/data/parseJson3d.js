@@ -535,10 +535,10 @@ const getInfoCabinet = (submodels) => {
     });
   } else if (typeof submodels === "object" && submodels !== null) {
     submodels.parameters.forEach((item) => {
-      if (item.name === "MP" && item.value) {
+      if (item.name === "ACABP" && item.value) {
         values.materialCabinetMP = item.value;
       }
-      if (item.name === "Acab" && item.value) {
+      if (item.name === "ACABB" && item.value) {
         values.materialCabinetAcab = item.value;
       }
     });
