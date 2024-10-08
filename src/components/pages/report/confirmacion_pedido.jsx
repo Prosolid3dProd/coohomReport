@@ -1602,7 +1602,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                               "PVA",
                               "PVL",
                               "ANCHO PUERTA",
-                              "MATERIAL PERFIL",
+                              "ACABADO PERFIL",
                               "PIES",
                               "VUELO IZQUIERDO",
                               "VUELO DERECHO",
