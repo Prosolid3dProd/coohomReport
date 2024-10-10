@@ -741,7 +741,7 @@ const getParameters = (param, tipoMueble) => {
     // Manejar PVA y PVL, asegurando que solo se agreguen una vez
     if (itemName === "PVA" && parseFloat(item.value) > 0) {
       op.push({
-        name: item.displayName + ": " + item.value,
+        name: item.displayName + item.value,
         value: parseFloat(item.value),
         description: item.description,
         nameValue:
@@ -754,7 +754,7 @@ const getParameters = (param, tipoMueble) => {
 
     if (itemName === "PVL" && parseFloat(item.value) > 0) {
       op.push({
-        name: item.displayName + ": " + item.value,
+        name: item.displayName + item.value,
         value: parseFloat(item.value),
         description: item.description,
         nameValue:
