@@ -553,6 +553,7 @@ const getInfoDrawer = (submodels) => {
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DRAWER) {
+      console.log(item, "getInfoDrawer drawer")
       modelDrawer = item.modelBrandGoodName;
       textureDrawer = item.textureName;
       materialDrawer = item.textureName;
@@ -636,9 +637,9 @@ const getTotalDoors = (submodels) => {
 };
 
 const getParameters = (param, tipoMueble) => {
-  const op = [];
-  const excludedNames = getExcludedNames(tipoMueble);
+  let op = [];
 
+  // Identificar el casco principal si es customCode 9876 o tiene el modelo CASCO
   const casco =
     param.customCode === "9876"
       ? param
@@ -646,87 +647,134 @@ const getParameters = (param, tipoMueble) => {
           x.modelBrandGoodName?.toUpperCase().includes("CASCO")
         );
 
+  // Procesar textura del casco
   if (casco) {
-    const mcv = findTexture(casco);
-    const cv = casco.parameters?.find((x) => x.name === "CV" && x.value > 0);
+    const mcv = casco.subModels.find((x) => {
+      const upperCaseModelName = x.modelName?.toLocaleUpperCase();
+      return upperCaseModelName &&
+        (upperCaseModelName.includes("VISTO IZQ") ||
+          upperCaseModelName.includes("VISTO DER") ||
+          upperCaseModelName.includes("AMBOS"))
+        ? x.textureName
+        : undefined;
+    });
+
+    const cv = casco.parameters.find((x) =>
+      x.name === "CV" && x.value > 0 ? x.value : undefined
+    );
 
     if (cv) {
-      op.push(createParameterObject(cv, mcv?.textureName));
+      op.push({
+        name: cv.displayName || null,
+        value: parseFloat(cv.value) || null,
+        description: cv.description || null,
+        nameValue:
+          cv.optionValues?.[cv.options?.indexOf(cv.value)]?.name || null,
+        mcv: mcv?.textureName || null,
+      });
     }
   }
 
+  const isMuebleTipoB = tipoMueble === "B";
+  const isMuebleTipoA = tipoMueble === "A";
+
+  const excludedNames = [
+    "ELEC",
+    "CVI",
+    "CPI",
+    ...(isMuebleTipoB ? ["ME", "MPF2P", "PE"] : []),
+    ...(isMuebleTipoA ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
+  ];
+
+  // Obtener el valor de "Vuelo" para manejar VIZQ, VDER
   const vueloParam = param.parameters.find((item) => item.name === "Vuelo");
   const vueloValue = vueloParam ? parseInt(vueloParam.value) : 0;
 
-  param.subModels
-    .filter((puertas) => puertas.customCode === "0301")
-    .forEach((puertas) => {
-      puertas.parameters
-        .filter((variante) => isRelevantVariant(variante))
-        .forEach((variante) => {
-          op.push(createParameterObject(variante));
-        });
-    });
+  // Lógica para manejar los vuelos según el valor de "Vuelo"
+  if (param.customCode === "9876") {
+    if (vueloValue === 1 || vueloValue === 3) {
+      op.push({
+        name: "VIZQ",
+        value: vueloValue,
+        description: "Vuelo Izquierda",
+      });
+    }
+    if (vueloValue === 2 || vueloValue === 3) {
+      op.push({
+        name: "VDER",
+        value: vueloValue,
+        description: "Vuelo Derecha",
+      });
+    }
+  }
 
+  // Procesar parámetros como PVA, PVL y pies
   param.parameters.forEach((item) => {
-    if (isSpecialCustomCode(param.customCode, item, vueloValue)) {
-      console.log(item);
-      op.push(createParameterObject(item));
-      return;
+    const itemName = String(item.name);
+
+    // Excluir los nombres de la lista excludedNames
+    if (excludedNames.includes(itemName)) return;
+
+    // Manejar PVA y PVL, asegurando que solo se agreguen una vez
+    if (itemName === "PVA" && parseFloat(item.value) > 0) {
+      op.push({
+        name: item.displayName + ": " + item.value,
+        value: parseFloat(item.value),
+        description: item.description,
+        nameValue:
+          item.options.length > 2
+            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+            : undefined,
+      });
+      return; // Asegurarse de que no siga procesando este ítem
     }
 
-    if (isRelevantVariant(item) && !excludedNames.includes(item.name)) {
-      op.push(createParameterObject(item));
+    if (itemName === "PVL" && parseFloat(item.value) > 0) {
+      op.push({
+        name: item.displayName + item.value,
+        value: parseFloat(item.value),
+        description: item.description,
+        nameValue:
+          item.options.length > 2
+            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+            : undefined,
+      });
+      return; // Asegurarse de que no siga procesando este ítem
+    }
+
+    // Manejar los pies
+    if (itemName === "pies" && parseFloat(item.value) > 0) {
+      op.push({
+        name: "Pies",
+        value: parseFloat(item.value),
+        description: item.description || "Número de pies",
+      });
+    }
+
+    // Lógica para manejar FSK y otros valores
+    if (itemName === "FSK" && item.value < 0) {
+      op.push({
+        name: item.displayName,
+        value: parseFloat(item.value),
+        description: item.description,
+        nameValue: item.optionValues?.[item.options?.indexOf(item.value)]?.name,
+      });
+    } else if (parseFloat(item.value) > 0 && item.description) {
+      op.push({
+        name: item.displayName,
+        value: parseFloat(item.value),
+        description: item.description,
+        nameValue:
+          item.options.length > 2
+            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+            : undefined,
+      });
     }
   });
 
   return op;
 };
 
-const getExcludedNames = (tipoMueble) => [
-  "ELEC",
-  "CVI",
-  "CPI",
-  ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
-  ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
-];
-const createParameterObject = (item, mcv = null) => ({
-  name: item.displayName,
-  value: parseFloat(item.value),
-  description: item.description,
-  nameValue:
-    item.options?.length > 2
-      ? item.optionValues?.[item.options.indexOf(item.value)]?.name
-      : undefined,
-  mcv
-});
-const findTexture = (casco) =>
-  casco.subModels?.find((x) => {
-    const upperCaseModelName = x.modelName?.toUpperCase();
-    return (
-      upperCaseModelName &&
-      (upperCaseModelName.includes("VISTO IZQ") ||
-        upperCaseModelName.includes("VISTO DER") ||
-        upperCaseModelName.includes("AMBOS"))
-    );
-  });
-const isRelevantVariant = (variante) =>
-  (variante.name === "PVA" || variante.name === "PVL") && variante.value > 0;
-const isSpecialCustomCode = (customCode, item, vueloValue) => {
-  if (customCode !== "9876" || parseFloat(item.value) <= 0) {
-    return false;
-  }
-  if (item.name === "VIZQ") {
-    return vueloValue === 1 || vueloValue === 3;
-  }
-  if (item.name === "VDER") {
-    return vueloValue === 2 || vueloValue === 3;
-  }
-  if (item.name === "Vuelo") {
-    return false;
-  }
-  return ["pies", "MPM"].includes(item.name);
-};
 const getPriceParameters = (param, tipoMueble) => {
   let precioVariant = 0;
   const excludedNames = [
@@ -779,9 +827,10 @@ const getCalculoFondo = (item) => {
   //   size.y = item.boxSize.y + 4;
   // } elses
   if (
-    (item.prodCatId === 721 ||
-      item.prodCatId === 719 ||
-      item.prodCatId === 696) &&
+    (String(item.modelProductNumber).toUpperCase() === "INTEGRACIONES" ||
+      item.prodCatId === 721 || //Altos
+      item.prodCatId === 719 || //Murales
+      item.prodCatId === 696) && //Bajos
     String(item.modelProductNumber).toUpperCase() !== "DECORATIVOS"
   ) {
     size.y = item.boxSize.y + fondoPuerta;
@@ -1040,7 +1089,7 @@ export const parseJson3D = async (json) => {
             item.modelCostInfo.quotationRate
           ),
         };
-    
+
         if (
           String(item.modelProductNumber).toLocaleUpperCase() === "COSTADOS"
         ) {
@@ -1165,6 +1214,7 @@ export const parseJson3D = async (json) => {
                   cajonesInfo = {
                     modelName: model.modelName,
                     materialDrawer: model.textureName,
+                    modelDrawer: model.modelBrandGoodName
                   };
                 } else if (model.customCode === "0301") {
                   puertasInfo = {
@@ -1186,13 +1236,17 @@ export const parseJson3D = async (json) => {
           }
           buscarCajonesYPuertas(item.subModels);
 
+          console.log(cajonesInfo,referenceType.ref, "FUERA")
           if (cajonesInfo && cajonesInfo.modelDrawer) {
+            console.log(cajonesInfo,referenceType.ref, "DENTRO DEL PRIMER IF")
             if (referenceType.ref?.indexOf(".BC") !== -1) {
+              console.log(cajonesInfo, "DENTRO ANTARO")
               cajonesInfo = {
                 ...cajonesInfo,
                 modelDrawer: CONFIG.DRAWERMODEL.ANTARO,
               };
             } else {
+              console.log(cajonesInfo, "DENTRO LEGRABOX")
               cajonesInfo = {
                 ...cajonesInfo,
                 modelDrawer: CONFIG.DRAWERMODEL.LEGRABOX,
@@ -1487,9 +1541,7 @@ export const parseJson3D = async (json) => {
                 item.parameters,
                 referenceType.type
               ),
-              priceDrawers: isCajonExist
-                ? parseFloat(drawerPrice)
-                : "",
+              priceDrawers: isCajonExist ? parseFloat(drawerPrice) : "",
               drawerPriceDetails,
               drawerMaterialDetails,
               tiradores,
