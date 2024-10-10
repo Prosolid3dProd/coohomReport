@@ -534,8 +534,6 @@ const getInfoCabinet = (submodels) => {
       }
     });
   } else if (typeof submodels === "object" && submodels !== null) {
-    // console.log("AAAAAAAAAAAAAAA")
-    // console.log(submodels)
     submodels.parameters.forEach((item) => {
       if (item.name === "ACABP" && item.value) {
         values.materialCabinetMP = item.value;
@@ -546,7 +544,6 @@ const getInfoCabinet = (submodels) => {
     });
   }
 
-  // console.log(values)
   return values;
 };
 
@@ -711,12 +708,16 @@ const getParameters = (param, tipoMueble) => {
     }
   }
 
-  // Procesar submodelos con customCode "0301" (puertas)
+  // Procesar solo las variantes PVA y PVL de puertas con customCode "0301"
   param.subModels
     .filter((puertas) => puertas.customCode === "0301")
     .forEach((puertas) => {
       puertas.parameters
-        .filter((variante) => parseFloat(variante.value) > 0)
+        .filter(
+          (variante) =>
+            (variante.name === "PVA" || variante.name === "PVL") &&
+            parseFloat(variante.value) > 0
+        )
         .forEach((variante) => {
           op.push({
             name: variante.displayName,
@@ -724,15 +725,13 @@ const getParameters = (param, tipoMueble) => {
             description: variante.description,
             nameValue:
               variante.options?.length > 2
-                ? variante.optionValues?.[
-                    variante.options?.indexOf(variante.value)
-                  ]?.name
+                ? variante.optionValues?.[variante.options?.indexOf(variante.value)]?.name
                 : undefined,
           });
         });
     });
 
-  // Procesar parámetros como PVA, PVL y pies
+  // Procesar parámetros como PVA, PVL y pies en el nivel principal
   param.parameters.forEach((item) => {
     const itemName = String(item.name);
 
@@ -755,7 +754,7 @@ const getParameters = (param, tipoMueble) => {
 
     if (itemName === "PVL" && parseFloat(item.value) > 0) {
       op.push({
-        name: item.displayName + item.value,
+        name: item.displayName + ": " + item.value,
         value: parseFloat(item.value),
         description: item.description,
         nameValue:
@@ -798,6 +797,7 @@ const getParameters = (param, tipoMueble) => {
 
   return op;
 };
+
 
 const getPriceParameters = (param, tipoMueble) => {
   let precioVariant = 0;
