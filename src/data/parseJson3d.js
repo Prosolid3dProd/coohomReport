@@ -523,7 +523,6 @@ const getInfoCabinet = (submodels) => {
     materialCabinetAcab: null,
   };
 
-  console.log(submodels)
   if (Array.isArray(submodels)) {
     submodels.forEach((item) => {
       if (
@@ -735,18 +734,25 @@ const getVuelo = (param) => {
 };
 
 const chooseVuelo = (op, vueloValue) => {
-  if (vueloValue === 1 || vueloValue === 3) {
+  if (vueloValue === 1) {
     op.push({
-      name: "VIZQ",
+      name: "Vuelo",
       value: vueloValue,
       description: "Vuelo Izquierda",
     });
   }
-  if (vueloValue === 2 || vueloValue === 3) {
+  if (vueloValue === 2) {
     op.push({
-      name: "VDER",
+      name: "Vuelo",
       value: vueloValue,
       description: "Vuelo Derecha",
+    });
+  }
+  if (vueloValue === 3) {
+    op.push({
+      name: "Vuelo",
+      value: vueloValue,
+      description: "Ambos",
     });
   }
 };
@@ -805,24 +811,11 @@ const getCalculoFondo = (item) => {
     y: 0,
     z: 0,
   };
-
-  // if (
-  //   String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
-  //   item.boxSize.y >= 150 &&
-  //   item.boxSize.y < 700
-  // ) {
-  //   size.y = item.boxSize.y + 2;
-  // } else if (
-  //   String(item.modelProductNumber).toUpperCase() === "COSTADOS" &&
-  //   item.boxSize.y >= 700
-  // ) {
-  //   size.y = item.boxSize.y + 4;
-  // } elses
   if (
     (String(item.modelProductNumber).toUpperCase() === "INTEGRACIONES" ||
-      item.prodCatId === 721 || //Altos
-      item.prodCatId === 719 || //Murales
-      item.prodCatId === 696) && //Bajos
+      item.prodCatId === 721 ||
+      item.prodCatId === 719 ||
+      item.prodCatId === 696) &&
     String(item.modelProductNumber).toUpperCase() !== "DECORATIVOS"
   ) {
     size.y = item.boxSize.y + fondoPuerta;
@@ -835,25 +828,6 @@ const getCalculoFondo = (item) => {
 
   size.x = item.boxSize.x;
   size.z = item.boxSize.z;
-
-  /* item.subModels.forEach((item) => {
-      if (String(item.customCode).substring(0, 2) === config.customCode.drawer) {
-        item.subModels?.forEach((item) => {
-          if (item && item.subModels && item.subModels.length > 0) {
-            if (
-              String(item.customCode).substring(0, 2) === config.customCode.door
-            ) {
-              fondoPuerta = item.boxSize.y;
-            }
-          }
-        });
-      } else if (
-        String(item.customCode).substring(0, 2) === config.customCode.door
-      ) 
-        fondoPuerta = item.boxSize.y;
-      }
-    });*/
-
   return size;
 };
 

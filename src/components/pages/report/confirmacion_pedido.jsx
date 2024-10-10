@@ -141,7 +141,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
         ),
       });
   }, [data]);
-  // Función para calcular la suma total de los precios
   let totalIva = 0;
 
   const calcularSumaTotal = (productos) => {
@@ -1603,8 +1602,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                               "PVL",
                               "ANCHO PUERTA",
                               "PIES",
-                              "VUELO IZQUIERDO",
-                              "VUELO DERECHO",
+                              "VUELO IZQUIERDA",
+                              "VUELO DERECHA",
                             ];
                             const indexA = order.indexOf(
                               String(a.name).toUpperCase()
@@ -1625,8 +1624,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                                 "PVL",
                                 "ANCHO PUERTA",
                                 "PIES",
-                                "VUELO IZQUIERDO",
-                                "VUELO DERECHO",
+                                "VUELO IZQUIERDA",
+                                "VUELO DERECHA",
                               ].includes(String(it.name).toUpperCase())
                                 ? it.value
                                 : it.nameValue || it.description}{" "}
