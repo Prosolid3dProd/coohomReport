@@ -373,17 +373,17 @@ const getRef = (parametros, reference) => {
     } else if (upperValue.startsWith(CONFIG.MODELNAME.FORRADO.CODE)) {
       reference.type = CONFIG.MODELNAME.FORRADO.CODE;
     } else if (["RA", "RB", "RM"].includes(trimmedValue.substring(0, 2))) {
-      reference.type = "R";
+      reference.type = CONFIG.MODELNAME.REGLETAS.CODE;
     } else if (trimmedValue.startsWith("AF")) {
-      reference.type = "A";
+      reference.type = CONFIG.MODELNAME.ALTOS.CODE;
     } else if (["BF", "BP", "BH"].includes(trimmedValue.substring(0, 2))) {
-      reference.type = "B";
+      reference.type = CONFIG.MODELNAME.BAJOS.CODE;
     } else if (trimmedValue.startsWith("BD25")) {
-      reference.type = "T";
+      reference.type = CONFIG.MODELNAME.COMPLEMENTOS.CODE;
     } else if (trimmedValue.startsWith("MF")) {
-      reference.type = "M";
+      reference.type = CONFIG.MODELNAME.MURALES.CODE;
     } else if (trimmedValue.startsWith("B")) {
-      reference.type = "B";
+      reference.type = CONFIG.MODELNAME.BAJOS.CODE;
     } else {
       reference.type = trimmedValue.substring(0, 1);
     }
@@ -534,6 +534,8 @@ const getInfoCabinet = (submodels) => {
       }
     });
   } else if (typeof submodels === "object" && submodels !== null) {
+    // console.log("AAAAAAAAAAAAAAA")
+    // console.log(submodels)
     submodels.parameters.forEach((item) => {
       if (item.name === "ACABP" && item.value) {
         values.materialCabinetMP = item.value;
@@ -543,6 +545,8 @@ const getInfoCabinet = (submodels) => {
       }
     });
   }
+
+  // console.log(values)
   return values;
 };
 
@@ -553,7 +557,6 @@ const getInfoDrawer = (submodels) => {
 
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DRAWER) {
-      console.log(item, "getInfoDrawer drawer")
       modelDrawer = item.modelBrandGoodName;
       textureDrawer = item.textureName;
       materialDrawer = item.textureName;
@@ -707,6 +710,27 @@ const getParameters = (param, tipoMueble) => {
       });
     }
   }
+
+  // Procesar submodelos con customCode "0301" (puertas)
+  param.subModels
+    .filter((puertas) => puertas.customCode === "0301")
+    .forEach((puertas) => {
+      puertas.parameters
+        .filter((variante) => parseFloat(variante.value) > 0)
+        .forEach((variante) => {
+          op.push({
+            name: variante.displayName,
+            value: parseFloat(variante.value),
+            description: variante.description,
+            nameValue:
+              variante.options?.length > 2
+                ? variante.optionValues?.[
+                    variante.options?.indexOf(variante.value)
+                  ]?.name
+                : undefined,
+          });
+        });
+    });
 
   // Procesar parámetros como PVA, PVL y pies
   param.parameters.forEach((item) => {
@@ -1214,7 +1238,7 @@ export const parseJson3D = async (json) => {
                   cajonesInfo = {
                     modelName: model.modelName,
                     materialDrawer: model.textureName,
-                    modelDrawer: model.modelBrandGoodName
+                    modelDrawer: model.modelBrandGoodName,
                   };
                 } else if (model.customCode === "0301") {
                   puertasInfo = {
@@ -1236,17 +1260,13 @@ export const parseJson3D = async (json) => {
           }
           buscarCajonesYPuertas(item.subModels);
 
-          console.log(cajonesInfo,referenceType.ref, "FUERA")
           if (cajonesInfo && cajonesInfo.modelDrawer) {
-            console.log(cajonesInfo,referenceType.ref, "DENTRO DEL PRIMER IF")
             if (referenceType.ref?.indexOf(".BC") !== -1) {
-              console.log(cajonesInfo, "DENTRO ANTARO")
               cajonesInfo = {
                 ...cajonesInfo,
                 modelDrawer: CONFIG.DRAWERMODEL.ANTARO,
               };
             } else {
-              console.log(cajonesInfo, "DENTRO LEGRABOX")
               cajonesInfo = {
                 ...cajonesInfo,
                 modelDrawer: CONFIG.DRAWERMODEL.LEGRABOX,
@@ -1661,7 +1681,7 @@ export const parseJson3D = async (json) => {
       if (filtro.tipo === "O") {
         filtro.size.y = filtro.size.y - 20;
       }
-      if (String(filtro.modelProductNumber).toUpperCase() === "REGLETAS") {
+      if (filtro.name.toLocaleUpperCase().includes("REGLETA")) {
         filtro.size.x = 150;
       }
     });
