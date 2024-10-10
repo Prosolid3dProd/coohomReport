@@ -523,6 +523,7 @@ const getInfoCabinet = (submodels) => {
     materialCabinetAcab: null,
   };
 
+  console.log(submodels)
   if (Array.isArray(submodels)) {
     submodels.forEach((item) => {
       if (
@@ -639,76 +640,118 @@ const getTotalDoors = (submodels) => {
 const getParameters = (param, tipoMueble) => {
   let op = [];
 
-  // Identificar el casco principal si es customCode 9876 o tiene el modelo CASCO
-  const casco =
-    param.customCode === "9876"
-      ? param
-      : param.subModels.find((x) =>
-          x.modelBrandGoodName?.toUpperCase().includes("CASCO")
-        );
+  const excludedNames = getExcludedNames(tipoMueble);
 
-  // Procesar textura del casco
+  const casco = getCasco(param);
+
   if (casco) {
-    const mcv = casco.subModels.find((x) => {
-      const upperCaseModelName = x.modelName?.toLocaleUpperCase();
-      return upperCaseModelName &&
-        (upperCaseModelName.includes("VISTO IZQ") ||
-          upperCaseModelName.includes("VISTO DER") ||
-          upperCaseModelName.includes("AMBOS"))
-        ? x.textureName
-        : undefined;
-    });
-
-    const cv = casco.parameters.find((x) =>
-      x.name === "CV" && x.value > 0 ? x.value : undefined
-    );
-
+    const mcv = findTexture(casco);
+    const cv = findParameter(casco, "CV", 0);
     if (cv) {
-      op.push({
-        name: cv.displayName || null,
-        value: parseFloat(cv.value) || null,
-        description: cv.description || null,
-        nameValue:
-          cv.optionValues?.[cv.options?.indexOf(cv.value)]?.name || null,
-        mcv: mcv?.textureName || null,
-      });
+      op.push(createPushObject(cv, mcv?.textureName));
     }
   }
 
-  const isMuebleTipoB = tipoMueble === "B";
-  const isMuebleTipoA = tipoMueble === "A";
-
-  const excludedNames = [
-    "ELEC",
-    "CVI",
-    "CPI",
-    ...(isMuebleTipoB ? ["ME", "MPF2P", "PE"] : []),
-    ...(isMuebleTipoA ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
-  ];
-
-  // Obtener el valor de "Vuelo" para manejar VIZQ, VDER
-  const vueloParam = param.parameters.find((item) => item.name === "Vuelo");
-  const vueloValue = vueloParam ? parseInt(vueloParam.value) : 0;
-
-  // Lógica para manejar los vuelos según el valor de "Vuelo"
+  const vueloValue = getVuelo(param);
   if (param.customCode === "9876") {
-    if (vueloValue === 1 || vueloValue === 3) {
-      op.push({
-        name: "VIZQ",
-        value: vueloValue,
-        description: "Vuelo Izquierda",
-      });
-    }
-    if (vueloValue === 2 || vueloValue === 3) {
-      op.push({
-        name: "VDER",
-        value: vueloValue,
-        description: "Vuelo Derecha",
-      });
-    }
+    chooseVuelo(op, vueloValue);
   }
+  getDoorParameters(param, op);
 
-  // Procesar solo las variantes PVA y PVL de puertas con customCode "0301"
+  param.parameters.forEach((item) => {
+    if (excludedNames.includes(item.name)) return;
+
+    if (["PVA", "PVL"].includes(item.name) && parseFloat(item.value) > 0) {
+      op.push(createPushObject(item));
+      return;
+    }
+
+    if (item.name === "pies" && parseFloat(item.value) > 0) {
+      op.push({
+        name: "Pies",
+        value: parseFloat(item.value),
+        description: item.description || "Número de pies",
+      });
+    }
+
+    if (item.name === "FSK" && item.value < 0) {
+      op.push(createPushObject(item));
+    } else if (parseFloat(item.value) > 0 && item.description) {
+      op.push(createPushObject(item));
+    }
+  });
+
+  return op;
+};
+
+const getExcludedNames = (tipoMueble) => [
+  "ELEC",
+  "CVI",
+  "CPI",
+  ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
+  ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
+];
+
+const getCasco = (param) => {
+  return param.customCode === "9876"
+    ? param
+    : param.subModels.find((x) =>
+        x.modelBrandGoodName?.toUpperCase().includes("CASCO")
+      );
+};
+
+const findTexture = (casco) => {
+  return casco.subModels.find((x) => {
+    const upperCaseModelName = x.modelName?.toLocaleUpperCase();
+    return (
+      upperCaseModelName &&
+      (upperCaseModelName.includes("VISTO IZQ") ||
+        upperCaseModelName.includes("VISTO DER") ||
+        upperCaseModelName.includes("AMBOS"))
+    );
+  });
+};
+
+const findParameter = (model, paramName, minValue = 0) => {
+  return model.parameters.find(
+    (x) => x.name === paramName && parseFloat(x.value) > minValue
+  );
+};
+
+const createPushObject = (item, mcv = null) => ({
+  name: item.displayName || item.name,
+  value: parseFloat(item.value),
+  description: item.description || null,
+  nameValue:
+    item.options?.length > 2
+      ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
+      : undefined,
+  mcv,
+});
+
+const getVuelo = (param) => {
+  const vueloParam = param.parameters.find((item) => item.name === "Vuelo");
+  return vueloParam ? parseInt(vueloParam.value) : 0;
+};
+
+const chooseVuelo = (op, vueloValue) => {
+  if (vueloValue === 1 || vueloValue === 3) {
+    op.push({
+      name: "VIZQ",
+      value: vueloValue,
+      description: "Vuelo Izquierda",
+    });
+  }
+  if (vueloValue === 2 || vueloValue === 3) {
+    op.push({
+      name: "VDER",
+      value: vueloValue,
+      description: "Vuelo Derecha",
+    });
+  }
+};
+
+const getDoorParameters = (param, op) => {
   param.subModels
     .filter((puertas) => puertas.customCode === "0301")
     .forEach((puertas) => {
@@ -719,85 +762,10 @@ const getParameters = (param, tipoMueble) => {
             parseFloat(variante.value) > 0
         )
         .forEach((variante) => {
-          op.push({
-            name: variante.displayName,
-            value: parseFloat(variante.value),
-            description: variante.description,
-            nameValue:
-              variante.options?.length > 2
-                ? variante.optionValues?.[variante.options?.indexOf(variante.value)]?.name
-                : undefined,
-          });
+          op.push(createPushObject(variante));
         });
     });
-
-  // Procesar parámetros como PVA, PVL y pies en el nivel principal
-  param.parameters.forEach((item) => {
-    const itemName = String(item.name);
-
-    // Excluir los nombres de la lista excludedNames
-    if (excludedNames.includes(itemName)) return;
-
-    // Manejar PVA y PVL, asegurando que solo se agreguen una vez
-    if (itemName === "PVA" && parseFloat(item.value) > 0) {
-      op.push({
-        name: item.displayName + item.value,
-        value: parseFloat(item.value),
-        description: item.description,
-        nameValue:
-          item.options.length > 2
-            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
-            : undefined,
-      });
-      return; // Asegurarse de que no siga procesando este ítem
-    }
-
-    if (itemName === "PVL" && parseFloat(item.value) > 0) {
-      op.push({
-        name: item.displayName + item.value,
-        value: parseFloat(item.value),
-        description: item.description,
-        nameValue:
-          item.options.length > 2
-            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
-            : undefined,
-      });
-      return; // Asegurarse de que no siga procesando este ítem
-    }
-
-    // Manejar los pies
-    if (itemName === "pies" && parseFloat(item.value) > 0) {
-      op.push({
-        name: "Pies",
-        value: parseFloat(item.value),
-        description: item.description || "Número de pies",
-      });
-    }
-
-    // Lógica para manejar FSK y otros valores
-    if (itemName === "FSK" && item.value < 0) {
-      op.push({
-        name: item.displayName,
-        value: parseFloat(item.value),
-        description: item.description,
-        nameValue: item.optionValues?.[item.options?.indexOf(item.value)]?.name,
-      });
-    } else if (parseFloat(item.value) > 0 && item.description) {
-      op.push({
-        name: item.displayName,
-        value: parseFloat(item.value),
-        description: item.description,
-        nameValue:
-          item.options.length > 2
-            ? item.optionValues?.[item.options?.indexOf(item.value)]?.name
-            : undefined,
-      });
-    }
-  });
-
-  return op;
 };
-
 
 const getPriceParameters = (param, tipoMueble) => {
   let precioVariant = 0;
