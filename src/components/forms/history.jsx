@@ -62,7 +62,6 @@ const History = () => {
         message.error(`Error al eliminar el pedido ${item.orderCode}`);
       }
     } catch (e) {
-      console.log(e);
       message.error(`Error al eliminar el pedido ${item.orderCode}`);
     }
   };
