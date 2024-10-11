@@ -370,7 +370,9 @@ const getRef = (parametros, reference) => {
     const upperValue = trimmedValue.toLocaleUpperCase();
     if (upperValue.includes(CONFIG.MODELNAME.SOBREENCIMERAS.CODE)) {
       reference.type = CONFIG.MODELNAME.MURALES.CODE;
-    } else if (upperValue.startsWith(CONFIG.MODELNAME.FORRADO.CODE)) {
+    } else if (upperValue.startsWith("MURAL")) {
+      reference.type = CONFIG.MODELNAME.MURALES.CODE;
+    } else if (upperValue.startsWith(CONFIG.MODELNAME.MURALES.CODE)) {
       reference.type = CONFIG.MODELNAME.FORRADO.CODE;
     } else if (["RA", "RB", "RM"].includes(trimmedValue.substring(0, 2))) {
       reference.type = CONFIG.MODELNAME.REGLETAS.CODE;
@@ -477,13 +479,11 @@ const getInfoDoor = (submodels) => {
     modelDoor: null,
     handler: null,
   };
-
   const updateValues = (item) => {
     values.materialDoor = String(item.textureName);
     values.modelDoor = String(item.modelProductNumber);
     values.handler = getInfoHandler(item.subModels);
   };
-
   submodels.forEach((item) => {
     const customCode = String(item.customCode).trim().substring(0, 2);
 
