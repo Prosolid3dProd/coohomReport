@@ -640,8 +640,8 @@ const getParameters = (param, tipoMueble) => {
   let op = [];
 
   const excludedNames = getExcludedNames(tipoMueble);
-
   const casco = getCasco(param);
+  const vueloValue = getVuelo(param);
 
   if (casco) {
     const mcv = findTexture(casco);
@@ -651,10 +651,13 @@ const getParameters = (param, tipoMueble) => {
     }
   }
 
-  const vueloValue = getVuelo(param);
-  if (param.customCode === "9876") {
-    chooseVuelo(op, vueloValue);
-  }
+  param.parameters.forEach((item) => {
+    if (chooseVuelo(param.customCode, item, vueloValue)) {
+      op.push(createPushObject(item));
+      return;
+    }
+  });
+
   getDoorParameters(param, op);
 
   param.parameters.forEach((item) => {
@@ -679,7 +682,6 @@ const getParameters = (param, tipoMueble) => {
       op.push(createPushObject(item));
     }
   });
-
   return op;
 };
 
@@ -733,30 +735,21 @@ const getVuelo = (param) => {
   return vueloParam ? parseInt(vueloParam.value) : 0;
 };
 
-const chooseVuelo = (op, vueloValue) => {
-  if (vueloValue === 1) {
-    op.push({
-      name: "Vuelo",
-      value: vueloValue,
-      description: "Vuelo Izquierda",
-    });
+const chooseVuelo = (customCode, item, vueloValue) => {
+  if (customCode !== "9876" || parseFloat(item.value) <= 0) {
+    return false;
   }
-  if (vueloValue === 2) {
-    op.push({
-      name: "Vuelo",
-      value: vueloValue,
-      description: "Vuelo Derecha",
-    });
+  if (item.name === "VIZQ" && (vueloValue === 1 || vueloValue === 3)) {
+    return true;
   }
-  if (vueloValue === 3) {
-    op.push({
-      name: "Vuelo",
-      value: vueloValue,
-      description: "Ambos",
-    });
+  if (item.name === "VDER" && (vueloValue === 2 || vueloValue === 3)) {
+    return true;
   }
+  if (item.name === "Vuelo") {
+    return false;
+  }
+  return false;
 };
-
 const getDoorParameters = (param, op) => {
   param.subModels
     .filter((puertas) => puertas.customCode === "0301")

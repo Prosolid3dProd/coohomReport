@@ -1602,8 +1602,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                               "PVL",
                               "ANCHO PUERTA",
                               "PIES",
-                              "VUELO IZQUIERDA",
-                              "VUELO DERECHA",
+                              "VUELO IZQUIERDO",
+                              "VUELO DERECHO",
                             ];
                             const indexA = order.indexOf(
                               String(a.name).toUpperCase()
@@ -1624,8 +1624,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                                 "PVL",
                                 "ANCHO PUERTA",
                                 "PIES",
-                                "VUELO IZQUIERDA",
-                                "VUELO DERECHA",
+                                "VUELO IZQUIERDO",
+                                "VUELO DERECHO",
                               ].includes(String(it.name).toUpperCase())
                                 ? it.value
                                 : it.nameValue || it.description}{" "}
