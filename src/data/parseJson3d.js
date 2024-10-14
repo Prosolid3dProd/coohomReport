@@ -370,8 +370,6 @@ const getRef = (parametros, reference) => {
     const upperValue = trimmedValue.toLocaleUpperCase();
     if (upperValue.includes(CONFIG.MODELNAME.SOBREENCIMERAS.CODE)) {
       reference.type = CONFIG.MODELNAME.MURALES.CODE;
-    } else if (upperValue.startsWith("MURAL")) {
-      reference.type = CONFIG.MODELNAME.MURALES.CODE;
     } else if (upperValue.startsWith(CONFIG.MODELNAME.MURALES.CODE)) {
       reference.type = CONFIG.MODELNAME.MURALES.CODE;
     } else if (["RA", "RB", "RM"].includes(trimmedValue.substring(0, 2))) {
@@ -415,8 +413,8 @@ const getRef = (parametros, reference) => {
     reference.type = CONFIG.MODELNAME.DECORATIVOS.CODE;
   } else if (modelNameUpper.includes("M.")) {
     reference.type = "M";
-    // } else if (modelNameUpper.includes("MURAL")) {
-    //   reference.type = "M";
+  } else if (modelNameUpper.startsWith("MURAL")) {
+    reference.type = CONFIG.MODELNAME.MURALES.CODE;
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.INTEGRACIONES.NAME) {
     reference.type = CONFIG.MODELNAME.INTEGRACIONES.CODE;
   } else if (modelProductNumberUpper === CONFIG.MODELNAME.REGLETAS.NAME) {
