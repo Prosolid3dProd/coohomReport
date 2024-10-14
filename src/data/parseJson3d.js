@@ -373,7 +373,7 @@ const getRef = (parametros, reference) => {
     } else if (upperValue.startsWith("MURAL")) {
       reference.type = CONFIG.MODELNAME.MURALES.CODE;
     } else if (upperValue.startsWith(CONFIG.MODELNAME.MURALES.CODE)) {
-      reference.type = CONFIG.MODELNAME.FORRADO.CODE;
+      reference.type = CONFIG.MODELNAME.MURALES.CODE;
     } else if (["RA", "RB", "RM"].includes(trimmedValue.substring(0, 2))) {
       reference.type = CONFIG.MODELNAME.REGLETAS.CODE;
     } else if (trimmedValue.startsWith("AF")) {

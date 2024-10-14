@@ -39,7 +39,7 @@ export const createOrder = async (params) => {
         token: Settings.TOKEN,
       }
     );
-    // console.log(data.data.result, "createOrder");
+    console.log(data.data.result, "createOrder");
 
     return data.data;
   } catch (error) {
