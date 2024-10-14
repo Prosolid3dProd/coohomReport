@@ -46,7 +46,7 @@ const General = ({ getData, data }) => {
     // modelDoor: data?.modelDoor,
     // materialDoor: data?.materialDoor,
     // handle: data?.modelHandle,
-    // drawer: data?.modelDrawer + data?.materialDrawer,
+    drawer: data?.modelDrawer + data?.materialDrawer,
     // materialCabinet: data?.materialCabinet,
     // observation: data?.observation?.includes("null") ? "" : data.observation,
     // fecha: String(data?.fecha).split(" ")[0],
