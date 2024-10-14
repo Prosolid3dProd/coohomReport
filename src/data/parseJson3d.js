@@ -360,7 +360,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
 };
 
 const getRef = (parametros, reference) => {
-  // Inicialización de referencia
 
   reference.ref = parametros.obsBrandGoodId;
   reference.type = "C";

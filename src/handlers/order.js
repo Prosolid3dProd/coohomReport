@@ -163,10 +163,9 @@ export const getOrderById = async (params) => {
       ...params,
       token: Settings.TOKEN,
     });
-    //OrderErp es lo que me devuelve reporthomById si se quieren añadir campos supongo que habra que añadirlos al crear el reporte, (reportCoohom (post, put))
     localStorage.setItem("orderErp", JSON.stringify(data.data));
 
-    // console.log(data.data, "getOrderById");
+    console.log(data.data, "getOrderById");
     return data.data;
   } catch (error) {
     console.log(error);
