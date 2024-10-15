@@ -300,21 +300,21 @@ const getPrice = (parametros, tipo, materialCasco) => {
   let price = 0;
 
   const findPrice = (items) => {
-    const name = items.some(
+    const name = items?.some(
       (item) => item?.name && String(item.name).toUpperCase() === "PTOTAL"
     )
       ? "PTOTAL"
       : "PRICE";
 
     const prices = items
-      .filter((item) => item?.name && String(item.name).toUpperCase() === name)
+      ?.filter((item) => item?.name && String(item.name).toUpperCase() === name)
       .map((item) => parseFloat(item.value))
       .filter((value) => !isNaN(value));
 
-    return prices.length > 0 ? prices.reduce((acc, curr) => acc + curr, 0) : 0;
+    return prices?.length > 0 ? prices.reduce((acc, curr) => acc + curr, 0) : 0;
   };
 
-  const arrParameters = parametros.parameters.concat(
+  const arrParameters = parametros?.parameters?.concat(
     parametros.ignoreParameters
   );
 
