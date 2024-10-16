@@ -360,7 +360,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
 };
 
 const getRef = (parametros, reference) => {
-
   reference.ref = parametros.obsBrandGoodId;
   reference.type = "C";
 
@@ -778,19 +777,22 @@ const getPriceParameters = (param, tipoMueble) => {
 
     if (excludedNames.includes(itemName)) return;
 
-    if (itemName === "PVA" || itemName === "PVL") {
-      precioVariant += 15;
-    }
+    if (parseFloat(item.value) > 0) {
+      if (itemName === "PVA" || itemName === "PVL") {
+        precioVariant += 15;
+      }
 
-    if (itemName === "AP" || itemName === "INTV") return;
+      if (itemName === "AP" || itemName === "INTV") return;
 
-    const itemValue =
-      itemName === "PVA" || itemName === "PVL" ? 15 : parseFloat(item.value);
+      const itemValue =
+        itemName === "PVA" || itemName === "PVL" ? 15 : parseFloat(item.value);
 
-    if (itemValue > 0 && item.description) {
-      precioVariant += itemValue;
+      if (itemValue > 0 && item.description) {
+        precioVariant += itemValue;
+      }
     }
   });
+  console.log(precioVariant);
   return parseFloat(precioVariant);
 };
 
