@@ -1204,7 +1204,6 @@ export const parseJson3D = async (json) => {
                 modelDrawer: CONFIG.DRAWERMODEL.ANTARO,
               };
             } else {
-              console.log(cajonesInfo);
               cajonesInfo = {
                 ...cajonesInfo,
                 modelDrawer: CONFIG.DRAWERMODEL.LEGRABOX,

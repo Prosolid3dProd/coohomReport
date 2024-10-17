@@ -174,6 +174,23 @@ const Report = () => {
     }
   }, [main]);
 
+  document.addEventListener("DOMContentLoaded", function () {
+    const tabs = document.querySelectorAll('.ant-tabs-tab');
+  
+    if (tabs.length >= 2) {
+        tabs[0].style.backgroundColor = 'rgba(26, 122, 248, 0.1)';
+        tabs[0].style.padding = '0 10px';
+        tabs[0].style.color = 'black';
+        tabs[0].style.fontWeight = 'bold';
+  
+        tabs[1].style.backgroundColor = 'rgba(26, 122, 248, 0.1)'; 
+        tabs[1].style.padding = '0 10px';
+        tabs[1].style.color = 'black';
+        tabs[1].style.fontWeight = 'bold';
+    }
+  });
+  
+
   return (
     data &&
     data._id && (
