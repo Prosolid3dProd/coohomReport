@@ -792,7 +792,6 @@ const getPriceParameters = (param, tipoMueble) => {
       }
     }
   });
-  console.log(precioVariant);
   return parseFloat(precioVariant);
 };
 
@@ -1169,11 +1168,15 @@ export const parseJson3D = async (json) => {
             subModels.forEach((model) => {
               if (model.customCode === "1001" || model.customCode === "0301") {
                 if (model.customCode === "1001") {
-                  cajonesInfo = {
-                    modelName: model.modelName,
-                    materialDrawer: model.textureName,
-                    modelDrawer: model.modelBrandGoodName,
-                  };
+                  model.subModels.map((mo) => {
+                    if (mo.customCode === "0201" && mo.modelBrandGoodName === "Base Cajon") {
+                      cajonesInfo = {
+                        modelName: mo.modelName,
+                        materialDrawer: mo.textureName,
+                        modelDrawer: mo.modelBrandGoodName,
+                      };
+                    }
+                  });
                 } else if (model.customCode === "0301") {
                   puertasInfo = {
                     modelDoor: model.modelProductNumber,
@@ -1201,6 +1204,7 @@ export const parseJson3D = async (json) => {
                 modelDrawer: CONFIG.DRAWERMODEL.ANTARO,
               };
             } else {
+              console.log(cajonesInfo);
               cajonesInfo = {
                 ...cajonesInfo,
                 modelDrawer: CONFIG.DRAWERMODEL.LEGRABOX,
@@ -1229,6 +1233,7 @@ export const parseJson3D = async (json) => {
             if (filtroMaterialDrawer.customCode === "1001") {
               filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
                 if (matInteriorDrawer.customCode === "0201") {
+                  // console.log(matInteriorDrawer, "interior");
                   cajonesInfo?.materialDrawer &&
                     cajonesInfo?.materialDrawer !== "undefined" &&
                     cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
@@ -1237,6 +1242,7 @@ export const parseJson3D = async (json) => {
                     cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
                     cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
                     materialDrawerArray.push(cajonesInfo?.materialDrawer);
+                  // console.log(materialDrawerArray, "array");
                 }
               });
             }
@@ -1598,7 +1604,11 @@ export const parseJson3D = async (json) => {
     arrZocalos.filter((zoc) => {
       zoc.typeZocalo = "library";
       zoc.id = `id_${contador++}`;
-      cabinets.push(zoc);
+      let zocNuevo = {
+        id: zoc.id,
+        ...zoc,
+      };
+      cabinets.push(zocNuevo);
     });
 
     modelHandlerArray.map((tirador) => {
