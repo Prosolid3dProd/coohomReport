@@ -1232,7 +1232,6 @@ export const parseJson3D = async (json) => {
             if (filtroMaterialDrawer.customCode === "1001") {
               filtroMaterialDrawer.subModels.map((matInteriorDrawer) => {
                 if (matInteriorDrawer.customCode === "0201") {
-                  // console.log(matInteriorDrawer, "interior");
                   cajonesInfo?.materialDrawer &&
                     cajonesInfo?.materialDrawer !== "undefined" &&
                     cajonesInfo?.materialDrawer?.indexOf("Cajon") === -1 &&
@@ -1241,7 +1240,6 @@ export const parseJson3D = async (json) => {
                     cajonesInfo?.materialDrawer?.indexOf("Mural") === -1 &&
                     cajonesInfo?.materialDrawer?.indexOf("Corte") === -1 &&
                     materialDrawerArray.push(cajonesInfo?.materialDrawer);
-                  // console.log(materialDrawerArray, "array");
                 }
               });
             }

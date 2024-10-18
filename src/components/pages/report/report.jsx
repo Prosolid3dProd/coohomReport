@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { General, Product, Profile } from "./../../index";
 import { Tabs, Card, Button, Space } from "antd";
+import { PDFViewer } from "@react-pdf/renderer";
+import Confirmacion_Pedido from "./confirmacion_pedido";
+import { Presupuesto_Cliente } from "./index";
+import LogoERP from "../../../assets/logoERP.png";
 import {
   getOrders,
   getLocalOrder,
   getOrderById,
   fixOrder,
   getProfile,
-} from "../../../handlers/order";
-import { PDFViewer } from "@react-pdf/renderer";
-import LogoERP from "../../../assets/logoERP.png";
-import { Presupuesto_Cliente } from "./index";
+} from "../../../handlers/order"; // Aquí se importa el resto de funciones necesarias
 import {
   existePrecio,
   existeTotales,
@@ -19,7 +20,6 @@ import {
   getTotales,
 } from "../../../data/localStorage";
 import "./report.css";
-import Confirmacion_Pedido from "./confirmacion_pedido";
 
 const Report = () => {
   const [main, setMain] = useState(null);
@@ -39,24 +39,40 @@ const Report = () => {
 
   useEffect(() => {
     setMain(document.getElementById("main"));
-  }, [window.location]);
+  }, []);
 
   useEffect(() => {
     if (orderId._id) {
-      getOrden();
+      getOrden(); // Llamamos a getOrden cuando el orderId está definido
     }
   }, [orderId]);
 
   useEffect(() => {
     const fetchData = async () => {
       if (orderId._id && tabActivo <= 3) {
-        const updatedInfo = fixOrder(data, tabActivo);
-        const profile = await getProfile();
+        const updatedInfo = fixOrder(data, tabActivo); // Uso de fixOrder
+        const profile = await getProfile(); // Uso de getProfile
         setData({ ...updatedInfo, profile });
-        getOrders({ ...updatedInfo, profile });
+        getOrders({ ...updatedInfo, profile }); // Uso de getOrders
       }
     };
     fetchData();
+  }, [tabActivo]);
+
+  // Actualización del DOM para los estilos de tabs
+  useEffect(() => {
+    const tabs = document.querySelectorAll('.ant-tabs-tab');
+    if (tabs.length >= 2) {
+      tabs[0].style.backgroundColor = 'rgba(26, 122, 248, 0.1)';
+      tabs[0].style.padding = '0 10px';
+      tabs[0].style.color = 'black';
+      tabs[0].style.fontWeight = 'bold';
+
+      tabs[1].style.backgroundColor = 'rgba(26, 122, 248, 0.1)'; 
+      tabs[1].style.padding = '0 10px';
+      tabs[1].style.color = 'black';
+      tabs[1].style.fontWeight = 'bold';
+    }
   }, [tabActivo]);
 
   const tabs = [
@@ -74,7 +90,7 @@ const Report = () => {
       ),
     },
     {
-      Presupuesto: (
+      "Presupuesto": (
         <div className="alturaPreview">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
@@ -122,7 +138,7 @@ const Report = () => {
       ),
     },
     {
-      Complementos: (
+      "Complementos": (
         <div className="alturaPreview">
           <Product getData={setData} />
         </div>
@@ -138,18 +154,18 @@ const Report = () => {
   ];
 
   const handleTabChange = (key) => {
-    setTabActivo(parseInt(key));
+    setTabActivo(parseInt(key)); // Cambia la tab activa
   };
 
   const getOrden = async () => {
     try {
-      const result = await getOrderById({ _id: orderId._id });
+      const result = await getOrderById({ _id: orderId._id }); // Uso de getOrderById
       if (result) {
-        const info = fixOrder(result);
-        const profile = await getProfile();
+        const info = fixOrder(result); // Llamada a fixOrder
+        const profile = await getProfile(); // Llamada a getProfile
 
         setData({ ...info, profile });
-        getOrders({ ...info, profile });
+        getOrders({ ...info, profile }); // Llamada a getOrders
         return info;
       } else {
         return null;
@@ -174,23 +190,6 @@ const Report = () => {
     }
   }, [main]);
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const tabs = document.querySelectorAll('.ant-tabs-tab');
-  
-    if (tabs.length >= 2) {
-        tabs[0].style.backgroundColor = 'rgba(26, 122, 248, 0.1)';
-        tabs[0].style.padding = '0 10px';
-        tabs[0].style.color = 'black';
-        tabs[0].style.fontWeight = 'bold';
-  
-        tabs[1].style.backgroundColor = 'rgba(26, 122, 248, 0.1)'; 
-        tabs[1].style.padding = '0 10px';
-        tabs[1].style.color = 'black';
-        tabs[1].style.fontWeight = 'bold';
-    }
-  });
-  
-
   return (
     data &&
     data._id && (
@@ -200,7 +199,6 @@ const Report = () => {
             className="border border-border bg-gray py-4"
             style={{ padding: 20 }}
           >
-            <a href="#ancla" className="hidden" />
             <h1 className="text-sv p-2 inline">
               Ordén{" "}
               <NavLink
