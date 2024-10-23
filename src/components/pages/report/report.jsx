@@ -12,7 +12,7 @@ import {
   getOrderById,
   fixOrder,
   getProfile,
-} from "../../../handlers/order"; // Aquí se importa el resto de funciones necesarias
+} from "../../../handlers/order";
 import {
   existePrecio,
   existeTotales,
@@ -43,23 +43,22 @@ const Report = () => {
 
   useEffect(() => {
     if (orderId._id) {
-      getOrden(); // Llamamos a getOrden cuando el orderId está definido
+      getOrden();
     }
   }, [orderId]);
 
   useEffect(() => {
     const fetchData = async () => {
       if (orderId._id && tabActivo <= 3) {
-        const updatedInfo = fixOrder(data, tabActivo); // Uso de fixOrder
-        const profile = await getProfile(); // Uso de getProfile
+        const updatedInfo = fixOrder(data, tabActivo);
+        const profile = await getProfile();
         setData({ ...updatedInfo, profile });
-        getOrders({ ...updatedInfo, profile }); // Uso de getOrders
+        getOrders({ ...updatedInfo, profile });
       }
     };
     fetchData();
   }, [tabActivo]);
 
-  // Actualización del DOM para los estilos de tabs
   useEffect(() => {
     const tabs = document.querySelectorAll('.ant-tabs-tab');
     if (tabs.length >= 2) {
@@ -154,18 +153,18 @@ const Report = () => {
   ];
 
   const handleTabChange = (key) => {
-    setTabActivo(parseInt(key)); // Cambia la tab activa
+    setTabActivo(parseInt(key));
   };
 
   const getOrden = async () => {
     try {
-      const result = await getOrderById({ _id: orderId._id }); // Uso de getOrderById
+      const result = await getOrderById({ _id: orderId._id });
       if (result) {
-        const info = fixOrder(result); // Llamada a fixOrder
-        const profile = await getProfile(); // Llamada a getProfile
+        const info = fixOrder(result);
+        const profile = await getProfile();
 
         setData({ ...info, profile });
-        getOrders({ ...info, profile }); // Llamada a getOrders
+        getOrders({ ...info, profile });
         return info;
       } else {
         return null;

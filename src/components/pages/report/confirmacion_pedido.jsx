@@ -1646,7 +1646,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           <Text
                             style={{
                               fontFamily: CONFIG.BOLD,
-                              fontSize: 8, // Asegúrate de que el valor sea numérico y no una cadena
+                              fontSize: 8,
                             }}
                           >
                             Observaciones: {item.observation}

@@ -613,7 +613,6 @@ const getTotalDoors = (submodels) => {
   submodels.forEach((item) => {
     if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DOOR) {
       let perfil;
-      //ESE TIPO DE PUERTAS LLEVAN UN PERFIL Y HAY QUE SUMARLE EL PRECIO DE ESTE A LA PUERTA
       if (
         String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("PURA") !==
           -1 ||
@@ -762,7 +761,7 @@ const getDoorParameters = (param, op) => {
     });
 };
 
-const getPriceParameters = (param, tipoMueble) => {
+const getPriceParameters = (param, ignoreParam, tipoMueble) => {
   let precioVariant = 0;
   const excludedNames = [
     "ELEC",
@@ -771,8 +770,9 @@ const getPriceParameters = (param, tipoMueble) => {
     ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
     ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
   ];
+  const allParameters = [...(param || []), ...(ignoreParam || [])];
 
-  param.forEach((item) => {
+  allParameters.forEach((item) => {
     const itemName = String(item.name);
 
     if (excludedNames.includes(itemName)) return;
@@ -786,6 +786,13 @@ const getPriceParameters = (param, tipoMueble) => {
 
       const itemValue =
         itemName === "PVA" || itemName === "PVL" ? 15 : parseFloat(item.value);
+
+      const valueINCD = itemName === "INCD" ? parseFloat(item.value) : 0;
+
+      if (itemName === "INCD") {
+        precioVariant += valueINCD;
+        return;
+      }
 
       if (itemValue > 0 && item.description) {
         precioVariant += itemValue;
@@ -839,7 +846,11 @@ const getPriceZocalo = (item) => {
 
 const getTotalPrice = (item, tipoMueble) => {
   const priceZocalo = getPriceZocalo(item);
-  const priceParameters = getPriceParameters(item.parameters, tipoMueble);
+  const priceParameters = getPriceParameters(
+    item.parameters,
+    item.ignoreParameters,
+    tipoMueble
+  );
 
   const totalPrice = (priceZocalo || 0) + (priceParameters || 0);
   return totalPrice;
@@ -945,6 +956,7 @@ export const parseJson3D = async (json) => {
           variants: getParameters(item, referenceType.type),
           priceVariants: getPriceParameters(
             item.parameters,
+            item.ignoreParameters,
             referenceType.type
           ),
         });
@@ -1065,9 +1077,7 @@ export const parseJson3D = async (json) => {
           materialRegleta = item.textureName;
 
           String(item.modelName).toLocaleUpperCase().indexOf("INGLETADA") !== -1
-            ? (materialRegletaF =
-                item.subModels[0]
-                  .textureName) /*(materialRegletaF = item.subModels[0].subModels[0].textureName)*/
+            ? (materialRegletaF = item.subModels[0].textureName)
             : (materialRegletaF = item.subModels[0].textureName);
         }
 
@@ -1169,7 +1179,10 @@ export const parseJson3D = async (json) => {
               if (model.customCode === "1001" || model.customCode === "0301") {
                 if (model.customCode === "1001") {
                   model.subModels.map((mo) => {
-                    if (mo.customCode === "0201" && mo.modelBrandGoodName === "Base Cajon") {
+                    if (
+                      mo.customCode === "0201" &&
+                      mo.modelBrandGoodName === "Base Cajon"
+                    ) {
                       cajonesInfo = {
                         modelName: mo.modelName,
                         materialDrawer: mo.textureName,
@@ -1183,7 +1196,6 @@ export const parseJson3D = async (json) => {
                     materialDoor: model.textureName,
                   };
                 }
-
                 // Buscar tiradores en submodelos del nivel actual
                 buscarTiradores(model.subModels);
 
@@ -1396,7 +1408,11 @@ export const parseJson3D = async (json) => {
             parseFloat(items.priceCabinet) +
             parseFloat(getTotalDoors(item.subModels)) +
             parseFloat(
-              getPriceParameters(item.parameters, referenceType.type)
+              getPriceParameters(
+                item.parameters,
+                item.ignoreParameters,
+                referenceType.type
+              )
             ) +
             parseFloat(drawerPrice);
           accesories &&
@@ -1496,6 +1512,7 @@ export const parseJson3D = async (json) => {
               variants: getParameters(item, referenceType.type),
               priceVariants: getPriceParameters(
                 item.parameters,
+                item.ignoreParameters,
                 referenceType.type
               ),
               priceDrawers: isCajonExist ? parseFloat(drawerPrice) : "",
@@ -1536,7 +1553,13 @@ export const parseJson3D = async (json) => {
           ) +
           // parseFloat(priceCabinet) +
           parseFloat(getTotalDoors(item.subModels)) +
-          parseFloat(getPriceParameters(item.parameters, referenceType.type));
+          parseFloat(
+            getPriceParameters(
+              item.parameters,
+              item.ignoreParameters,
+              referenceType.type
+            )
+          );
       }
       const referenceTiradores = (item) => {
         for (const reference of item.ignoreParameters) {
@@ -1566,12 +1589,15 @@ export const parseJson3D = async (json) => {
       item.subModels
         .filter((element) => String(element.modelTypeId) === "1")
         .map((element) => {
+          // console.log(element)
           if (
             String(element.customCode).trim().substring(0, 2) ===
             CONFIG.CUSTOMCODE.DOOR
           ) {
+            // console.log(element, "FUERA")
             element.subModels?.map((el) => {
               if (String(el.customCode).trim() === "1101") {
+                // console.log(element, "DENTRO")
                 modelHandlerArray.push({
                   material: el.textureName,
                   total: parseFloat(el.modelCostInfo.unitCost),
