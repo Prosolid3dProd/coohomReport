@@ -1589,15 +1589,12 @@ export const parseJson3D = async (json) => {
       item.subModels
         .filter((element) => String(element.modelTypeId) === "1")
         .map((element) => {
-          // console.log(element)
           if (
             String(element.customCode).trim().substring(0, 2) ===
             CONFIG.CUSTOMCODE.DOOR
           ) {
-            // console.log(element, "FUERA")
             element.subModels?.map((el) => {
               if (String(el.customCode).trim() === "1101") {
-                // console.log(element, "DENTRO")
                 modelHandlerArray.push({
                   material: el.textureName,
                   total: parseFloat(el.modelCostInfo.unitCost),
