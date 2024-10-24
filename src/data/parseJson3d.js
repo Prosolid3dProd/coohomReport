@@ -1404,8 +1404,11 @@ export const parseJson3D = async (json) => {
           if (getInfoDrawer(item.subModels) !== null) {
             drawer = getInfoDrawer(item.subModels);
           }
+          const cantidad = item.parameters.find((c) => c.name === "Cantidad");
           let totalPrice =
-            parseFloat(items.priceCabinet) +
+            parseFloat(
+              parseFloat(items.priceCabinet) * parseFloat(cantidad?.value || 1)
+            ) +
             parseFloat(getTotalDoors(item.subModels)) +
             parseFloat(
               getPriceParameters(
@@ -1415,6 +1418,8 @@ export const parseJson3D = async (json) => {
               )
             ) +
             parseFloat(drawerPrice);
+          // console.log(item);
+          console.log(totalPrice, "TOTAL");
           accesories &&
             accesories.length > 0 &&
             accesories.forEach((itemx) => {
@@ -1489,8 +1494,6 @@ export const parseJson3D = async (json) => {
             });
 
             doors.push(getDoors(item.subModels));
-            const cantidad = item.parameters.find((c) => c.name === "Cantidad");
-            const precio = item.parameters.find((p) => p.name === "price");
             let isComplement = false;
             if (
               String(item.modelProductNumber).toLocaleUpperCase() ===
@@ -1570,7 +1573,6 @@ export const parseJson3D = async (json) => {
           }
         }
       };
-
 
       // const cantidad = item.parameters.find((c) => c.name === "Cantidad");
       // const precio = item.parameters.find((p) => p.name === "price");
