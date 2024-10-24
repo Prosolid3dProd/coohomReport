@@ -445,7 +445,6 @@ const getDoors = (submodels) => {
     if (customCode === CONFIG.CUSTOMCODE.DOOR) {
       let perfil = null;
 
-      // Verificar si el tipo de puerta requiere un perfil
       const needsPerfil = ["PURA", "GP", "MONTEA"].some((keyword) =>
         String(item.modelBrandGoodName).toLocaleUpperCase().includes(keyword)
       );
@@ -555,6 +554,7 @@ const getInfoDrawer = (submodels) => {
       materialDrawer = item.textureName;
     }
   });
+
   return {
     modelDrawer,
     textureDrawer,
@@ -1489,7 +1489,8 @@ export const parseJson3D = async (json) => {
             });
 
             doors.push(getDoors(item.subModels));
-
+            const cantidad = item.parameters.find((c) => c.name === "Cantidad");
+            const precio = item.parameters.find((p) => p.name === "price");
             let isComplement = false;
             if (
               String(item.modelProductNumber).toLocaleUpperCase() ===
@@ -1498,6 +1499,7 @@ export const parseJson3D = async (json) => {
               isComplement = true;
             cabinets.push({
               ...items,
+              quantity: cantidad ? parseFloat(cantidad.value) : 1,
               obsBrandGoodId: item.obsBrandGoodId,
               description,
               name: String(nameFinal).replace("-", ""),
@@ -1507,7 +1509,7 @@ export const parseJson3D = async (json) => {
               modelDrawer: modeloDrawer,
               zocalo: zocalo,
               priceDoor: parseInt(getTotalDoors(item.subModels)),
-              total: parseFloat(totalPrice),
+              total: precio ? parseFloat(precio.value) : totalPrice,
               size: getCalculoFondo(item),
               variants: getParameters(item, referenceType.type),
               priceVariants: getPriceParameters(
@@ -1569,32 +1571,39 @@ export const parseJson3D = async (json) => {
         }
       };
 
-      for (const cabinet of cabinets) {
-        if (
-          String(cabinet.modelProductNumber).toLocaleUpperCase() ===
-            "COMPLEMENTOS" ||
-          String(cabinet.modelProductNumber).toLocaleUpperCase() ===
-            "ACCESORIOS"
-        ) {
-          const cantidad = item.parameters.find((c) => c.name === "Cantidad");
-          const precio = item.parameters.find((p) => p.name === "price");
-          if (cantidad && cabinet.quantity === undefined) {
-            cabinet.quantity = parseFloat(cantidad.value);
-          }
-          if (precio && cabinet.total === undefined) {
-            cabinet.total = parseFloat(precio.value);
-          }
-        }
-      }
+
+      // const cantidad = item.parameters.find((c) => c.name === "Cantidad");
+      // const precio = item.parameters.find((p) => p.name === "price");
+      // for (const cabinet of cabinets) {
+      //   if (
+      //     String(cabinet.modelProductNumber).toLocaleUpperCase() ===
+      //       "COMPLEMENTOS" ||
+      //     String(cabinet.modelProductNumber).toLocaleUpperCase() ===
+      //       "ACCESORIOS"
+      //   ) {
+      //     console.log(cabinet, "CABINET");
+      //     if (cantidad && cabinet.quantity === undefined) {
+      //       console.log(cantidad, "CANTIDAD");
+      //       cabinet.quantity = parseFloat(cantidad.value);
+      //     }
+      //     if (precio && cabinet.total === undefined) {
+      //       cabinet.total = parseFloat(precio.value);
+      //     }
+      //   }
+      // }
+
       item.subModels
         .filter((element) => String(element.modelTypeId) === "1")
         .map((element) => {
+          // console.log(element)
           if (
             String(element.customCode).trim().substring(0, 2) ===
             CONFIG.CUSTOMCODE.DOOR
           ) {
+            // console.log(element, "FUERA")
             element.subModels?.map((el) => {
               if (String(el.customCode).trim() === "1101") {
+                // console.log(element, "DENTRO")
                 modelHandlerArray.push({
                   material: el.textureName,
                   total: parseFloat(el.modelCostInfo.unitCost),
