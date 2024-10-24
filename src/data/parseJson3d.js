@@ -1509,7 +1509,7 @@ export const parseJson3D = async (json) => {
               modelDrawer: modeloDrawer,
               zocalo: zocalo,
               priceDoor: parseInt(getTotalDoors(item.subModels)),
-              total: precio ? parseFloat(precio.value) : totalPrice,
+              total: totalPrice,
               size: getCalculoFondo(item),
               variants: getParameters(item, referenceType.type),
               priceVariants: getPriceParameters(
