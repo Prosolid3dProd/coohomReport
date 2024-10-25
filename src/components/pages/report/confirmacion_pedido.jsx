@@ -720,9 +720,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             {/* {formatNumber(item.priceDoor)} */}
                           </Text>
                           {` ${
-                            item.doors.name.toLocaleUpperCase() +
+                            item?.doors?.name?.toLocaleUpperCase() +
                             "-" +
-                            item.doors.material
+                            item?.doors?.material
                           } / `}
                         </Text>
                       )}
