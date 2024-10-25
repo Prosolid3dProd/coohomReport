@@ -319,7 +319,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
   );
 
   price = findPrice(arrParameters);
-
   if (isCabinet) {
     if (parametros.textureCustomCode === "C1") {
     } else if (parametros.textureCustomCode === "PLAM") {
@@ -355,7 +354,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
       price += price * 0.1;
     }
   }
-
   return price;
 };
 
@@ -1405,10 +1403,9 @@ export const parseJson3D = async (json) => {
             drawer = getInfoDrawer(item.subModels);
           }
           const cantidad = item.parameters.find((c) => c.name === "Cantidad");
+          // console.log(items, items.priceCabinet)
           let totalPrice =
-            parseFloat(
-              parseFloat(items.priceCabinet) * parseFloat(cantidad?.value || 1)
-            ) +
+            parseFloat(items.priceCabinet) +
             parseFloat(getTotalDoors(item.subModels)) +
             parseFloat(
               getPriceParameters(
@@ -1419,7 +1416,7 @@ export const parseJson3D = async (json) => {
             ) +
             parseFloat(drawerPrice);
           // console.log(item);
-          console.log(totalPrice, "TOTAL");
+          // console.log(totalPrice, "TOTAL");
           accesories &&
             accesories.length > 0 &&
             accesories.forEach((itemx) => {
