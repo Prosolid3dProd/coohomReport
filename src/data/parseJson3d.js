@@ -1020,7 +1020,7 @@ export const parseJson3D = async (json) => {
       } else {
         referenceType = getRef(item, referenceType);
         opening = "";
-        contador = contador + 1;
+        // contador = contador + 1;
         // let priceCabinet =
         //   referenceType.type !== "A" ||
         //   referenceType.type !== "B" ||
@@ -1320,23 +1320,118 @@ export const parseJson3D = async (json) => {
             }
           });
 
+          // console.log(item, "MUEBLE");
+          // const accesories = item.subModels
+          //   .filter(
+          //     (element) =>
+          //       String(element.modelTypeId) === "4"
+          //   )
+          //   .map((element) => {
+          //     console.log(element, "SUBMODELS")
+          //       return {
+          //         id: `id_${contador}_${contador2++}`,
+          //         name: element.modelBrandGoodName,
+          //         obsBrandGoodId2: element.obsBrandGoodId,
+          //         obsBrandGoodId: element.obsBrandGoodId,
+          //         reference: element.customCode,
+          //         width: item.boxSize.x,
+          //         height: element.boxSize.z,
+          //         depth: item.boxSize.y,
+          //         variants: [],
+          //         price: element.modelCostInfo.unitCost,
+          //         quantity: element.modelCostInfo.quantity || 1,
+          //       };
+          //   });
+
+          const referenceTiradores = (item) => {
+            for (const reference of item.ignoreParameters) {
+              if (reference.name === "REF") {
+                return String(reference.value);
+              }
+            }
+          };
+
           const accesories = item.subModels
-            .filter((element) => String(element.modelTypeId) === "4")
+            .filter(
+              (element) =>
+                String(element.modelTypeId) === "4" ||
+                String(element.customCode) === "1001" ||
+                String(element.customCode) === "0301"
+            )
             .map((element) => {
-              return {
-                id: `id_${contador}_${contador2++}`,
-                name: element.modelBrandGoodName,
-                obsBrandGoodId2: element.obsBrandGoodId,
-                obsBrandGoodId: element.obsBrandGoodId,
-                reference: element.customCode,
-                width: item.boxSize.x,
-                height: element.boxSize.z,
-                depth: item.boxSize.y,
-                variants: [],
-                price: element.modelCostInfo.unitCost,
-                quantity: element.modelCostInfo.quantity || 1,
-              };
-            });
+              if (String(element.modelTypeId) === "4") {
+                return {
+                  id: `id_${contador}`,
+                  name: element.modelBrandGoodName,
+                  obsBrandGoodId2: element.obsBrandGoodId,
+                  obsBrandGoodId: element.obsBrandGoodId,
+                  reference: element.customCode,
+                  width: item.boxSize.x,
+                  height: element.boxSize.z,
+                  depth: item.boxSize.y,
+                  variants: [],
+                  price: element.modelCostInfo.unitCost,
+                  quantity: element.modelCostInfo.quantity || 1,
+                };
+              } else if (String(element.customCode) === "1001") {
+                const subModel0301 = element.subModels.find(
+                  (subEl) => String(subEl.customCode) === "0301"
+                );
+                if (subModel0301) {
+                  const subModel1101 = subModel0301.subModels.find(
+                    (el) => String(el.customCode) === "1101"
+                  );
+                  if (subModel1101) {
+                    return {
+                      id: `id_${contador}`,
+                      material: subModel1101.textureName,
+                      total: parseFloat(subModel1101.modelCostInfo.unitCost),
+                      priceCabinet: parseFloat(
+                        subModel1101.modelCostInfo.unitCost
+                      ),
+                      tipo: "C",
+                      reference: referenceTiradores(subModel1101) || null,
+                      customCode: null,
+                      size: {
+                        x: subModel1101.size.x,
+                        y: subModel1101.size.y,
+                        z: subModel1101.size.z,
+                      },
+                      name: subModel1101.modelName,
+                      obsBrandGoodId: subModel1101.obsBrandGoodId,
+                      tirador: true,
+                    };
+                  }
+                }
+              } else if (String(element.customCode) === "0301") {
+                const subModel1101 = element.subModels.find(
+                  (el) => String(el.customCode) === "1101"
+                );
+                if (subModel1101) {
+                  return {
+                    id: `id_${contador}`,
+                    material: subModel1101.textureName,
+                    total: parseFloat(subModel1101.modelCostInfo.unitCost),
+                    priceCabinet: parseFloat(
+                      subModel1101.modelCostInfo.unitCost
+                    ),
+                    tipo: "C",
+                    reference: referenceTiradores(subModel1101) || null,
+                    customCode: null,
+                    size: {
+                      x: subModel1101.size.x,
+                      y: subModel1101.size.y,
+                      z: subModel1101.size.z,
+                    },
+                    name: subModel1101.modelName,
+                    obsBrandGoodId: subModel1101.obsBrandGoodId,
+                    tirador: true,
+                  };
+                }
+              }
+            })
+            .filter(Boolean);
+
           let drawerPrice = 0;
           let drawerPriceDetails = [];
           let drawerMaterialDetails = [];
@@ -1403,7 +1498,6 @@ export const parseJson3D = async (json) => {
             drawer = getInfoDrawer(item.subModels);
           }
           const cantidad = item.parameters.find((c) => c.name === "Cantidad");
-          // console.log(items, items.priceCabinet)
           let totalPrice =
             parseFloat(items.priceCabinet) +
             parseFloat(getTotalDoors(item.subModels)) +
@@ -1415,8 +1509,7 @@ export const parseJson3D = async (json) => {
               )
             ) +
             parseFloat(drawerPrice);
-          // console.log(item);
-          // console.log(totalPrice, "TOTAL");
+
           accesories &&
             accesories.length > 0 &&
             accesories.forEach((itemx) => {
@@ -1447,9 +1540,13 @@ export const parseJson3D = async (json) => {
                   }L`;
                 }
               }
-              if (`${itemx.reference}${item.size?.x || ""}`) {
+
+              if (
+                `${itemx.reference}${item.size?.x || ""}` &&
+                itemx.tirador !== true
+              ) {
                 cabinets.push({
-                  id: itemx.id,
+                  id: `id_${contador}`,
                   description: description2,
                   obsBrandGoodId2,
                   obsBrandGoodId: itemx.obsBrandGoodId,
@@ -1473,6 +1570,46 @@ export const parseJson3D = async (json) => {
                   ...extra,
                 });
               }
+
+              if (itemx.tirador === true) {
+                modelHandlerArray.push({
+                  // id: `id_${contador}`,
+                  material: itemx.material,
+                  total: parseFloat(itemx.total),
+                  priceCabinet: parseFloat(itemx.priceCabinet),
+                  tipo: "C",
+                  reference: itemx.reference || null,
+                  customCode: null,
+                  size: {
+                    x: itemx.size.x,
+                    y: itemx.size.y,
+                    z: itemx.size.z,
+                  },
+                  name: itemx.name,
+                  obsBrandGoodId: itemx.obsBrandGoodId,
+                  tirador: itemx.tirador,
+                });
+                cabinets.push({
+                  id: `id_${contador}`,
+                  material: itemx.material,
+                  total: parseFloat(itemx.total),
+                  priceCabinet: parseFloat(itemx.priceCabinet),
+                  tipo: "C",
+                  reference: itemx.reference || null,
+                  customCode: null,
+                  size: {
+                    x: itemx.size.x,
+                    y: itemx.size.y,
+                    z: itemx.size.z,
+                  },
+                  name: itemx.name,
+                  obsBrandGoodId: itemx.obsBrandGoodId,
+                  tirador: itemx.tirador,
+                });
+              }
+              modelHandlerArray.forEach((handler) => {
+                tiradoresCabecera.push(handler.name);
+              });
             });
 
           let nameFinal = item.modelName;
@@ -1563,13 +1700,6 @@ export const parseJson3D = async (json) => {
             )
           );
       }
-      const referenceTiradores = (item) => {
-        for (const reference of item.ignoreParameters) {
-          if (reference.name === "REF") {
-            return String(reference.value);
-          }
-        }
-      };
 
       // const cantidad = item.parameters.find((c) => c.name === "Cantidad");
       // const precio = item.parameters.find((p) => p.name === "price");
@@ -1591,47 +1721,43 @@ export const parseJson3D = async (json) => {
       //   }
       // }
 
-      item.subModels
-        .filter((element) => String(element.modelTypeId) === "1")
-        .map((element) => {
-          // console.log(element)
-          if (
-            String(element.customCode).trim().substring(0, 2) ===
-            CONFIG.CUSTOMCODE.DOOR
-          ) {
-            // console.log(element, "FUERA")
-            element.subModels?.map((el) => {
-              if (String(el.customCode).trim() === "1101") {
-                // console.log(element, "DENTRO")
-                modelHandlerArray.push({
-                  material: el.textureName,
-                  total: parseFloat(el.modelCostInfo.unitCost),
-                  priceCabinet: parseFloat(el.modelCostInfo.unitCost),
-                  tipo: "C",
-                  material: el.textureName,
-                  reference: referenceTiradores(el) || null,
-                  customCode: null,
-                  size: {
-                    x: el.size.x,
-                    y: el.size.y,
-                    z: el.size.z,
-                  },
-                  name: el.modelName,
-                  obsBrandGoodId: el.obsBrandGoodId,
-                });
-              }
-            });
-          }
-        });
-      modelHandlerArray.forEach((handler) => {
-        tiradoresCabecera.push(handler.name);
-      });
+      // item.subModels
+      //   .filter((element) => String(element.modelTypeId) === "1")
+      //   .map((element) => {
+      //     console.log(element)
+      //     if (
+      //       String(element.customCode).trim().substring(0, 2) ===
+      //       CONFIG.CUSTOMCODE.DOOR
+      //     ) {
+      //       // console.log(element, "FUERA")
+      //       element.subModels?.map((el) => {
+      //         if (String(el.customCode).trim() === "1101") {
+      //           // console.log(element, "DENTRO")
+      //           modelHandlerArray.push({
+      //             material: el.textureName,
+      //             total: parseFloat(el.modelCostInfo.unitCost),
+      //             priceCabinet: parseFloat(el.modelCostInfo.unitCost),
+      //             tipo: "C",
+      //             material: el.textureName,
+      //             reference: referenceTiradores(el) || null,
+      //             customCode: null,
+      //             size: {
+      //               x: el.size.x,
+      //               y: el.size.y,
+      //               z: el.size.z,
+      //             },
+      //             name: el.modelName,
+      //             obsBrandGoodId: el.obsBrandGoodId,
+      //           });
+      //         }
+      //       });
+      //     }
+      //   });
     });
 
-    contador = contador + 1;
+    // contador = contador + 1;
     arrZocalos.filter((zoc) => {
       zoc.typeZocalo = "library";
-      zoc.id = `id_${contador++}`;
       let zocNuevo = {
         id: zoc.id,
         ...zoc,
@@ -1639,24 +1765,50 @@ export const parseJson3D = async (json) => {
       cabinets.push(zocNuevo);
     });
 
-    modelHandlerArray.map((tirador) => {
-      tirador.id = `id_${contador++}`;
-      cabinets.push(tirador);
-    });
+    // modelHandlerArray.map((tirador) => {
+    //   tirador.id = `id_${contador++}`;
+    //   cabinets.push(tirador);
+    // });
 
     if (modelDrawer) {
       drawerTemp = modelDrawer[0].modelDrawer;
       drawerTexture = modelDrawer[0].textureDrawer;
     }
 
-    cabinets.map((filtro) => {
-      if (filtro.tipo === "O") {
-        filtro.size.y = filtro.size.y - 20;
+    const conteo = cabinets.reduce((contador, item) => {
+      const id = item.obsBrandGoodId;
+      if (item.tirador === true) {
+        contador[id] = (contador[id] || 0) + 1;
       }
-      if (filtro.name.toLocaleUpperCase().includes("REGLETA")) {
-        filtro.size.x = 150;
+      return contador;
+    }, {});
+
+    const cabinetsUnicos = cabinets.reduce((resultado, item) => {
+      const id = item.obsBrandGoodId;
+
+      if (item.tipo === "O") {
+        item.size.y -= 20;
       }
-    });
+      if (item.name.toLocaleUpperCase().includes("REGLETA")) {
+        item.size.x = 150;
+      }
+
+      if (item.tirador === true && conteo[id] > 1) {
+        if (!resultado.some((cab) => cab.obsBrandGoodId === id)) {
+          resultado.push({
+            ...item,
+            total: item.priceCabinet * conteo[id],
+            quantity: conteo[id],
+          });
+        }
+      } else {
+        resultado.push(item);
+      }
+      return resultado;
+    }, []);
+
+    cabinets.length = 0;
+    cabinets.push(...cabinetsUnicos);
 
     const orderJson = {
       ...(json.partnerOrder || null),
@@ -1701,6 +1853,10 @@ export const parseJson3D = async (json) => {
     );
 
     orderJson.cabinets = orderJsonWhitoutZocalos;
+
+    orderJson.cabinets.map((el) => {
+      el.id = `id_${contador++}`;
+    });
 
     return orderJson;
   } catch (error) {
