@@ -1785,10 +1785,10 @@ export const parseJson3D = async (json) => {
 
     const cabinetsUnicos = cabinets.reduce((resultado, item) => {
       const id = item.obsBrandGoodId;
-
-      if (item.tipo === "O") {
-        item.size.y -= 20;
-      }
+      console.log(item);
+      /*if (item.tipo === "O") {
+        //item.size.y -= 20;
+      }*/
       if (item.name.toLocaleUpperCase().includes("REGLETA")) {
         item.size.x = 150;
       }
