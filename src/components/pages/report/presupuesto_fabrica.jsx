@@ -851,7 +851,7 @@ const Presupuesto_Fabrica = ({ data, price }) => {
                             fontSize: "8",
                           }}
                         >
-                          {formatNumber(item.priceDoor) + " "}
+                          {/*formatNumber(item.priceDoor) + " "*/}
                         </Text>
                         <Text
                           style={{

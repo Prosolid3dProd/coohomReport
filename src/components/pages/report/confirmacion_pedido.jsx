@@ -963,7 +963,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             fontSize: "8",
                           }}
                         >
-                          {formatNumber(item.priceDoor) + " "}
+                          {/*formatNumber(item.priceDoor) + " "*/}
                         </Text>
                         <Text
                           style={{
