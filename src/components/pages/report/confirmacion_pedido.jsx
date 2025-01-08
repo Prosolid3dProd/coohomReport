@@ -339,13 +339,11 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
         {cabinets && cabinets?.bajos.length > 0 && (
           <View style={{ margintop: "10" }}>
             <View wrap={false}>
-              <View>
+              <View wrap={false}>
                 <Text style={{ fontSize: "14", marginLeft: "32" }}>
                   MUEBLES BAJOS
                 </Text>
               </View>
-            </View>
-            <View>
               <View
                 style={{
                   display: "flex",
@@ -376,214 +374,203 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   </View>
                 )}
               </View>
-              {cabinets?.bajos.map((item, key) => (
+            </View>
+            {cabinets?.bajos.map((item, key) => (
+              <View
+                key={key}
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  marginTop: "1",
+                  marginBottom: "5",
+                }}
+                wrap={false}
+              >
+                <View style={{ width: "50", fontSize: "8" }}>
+                  <Text>{contador++}</Text>{" "}
+                </View>
+                <View style={{ height: "100", width: "100", fontSize: "8" }}>
+                  <Text>
+                    <Image
+                      style={{
+                        width: "80",
+                        height: "80",
+                      }}
+                      filter={grayscaleFilter("#fff")}
+                      src={loadImage(
+                        item.obsBrandGoodId || item.obsBrandGoodId2
+                      )}
+                    />
+                  </Text>
+                </View>
                 <View
-                  key={key}
                   style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    marginTop: "1",
-                    marginBottom: "5",
+                    width: "40",
+                    fontSize: "11",
                   }}
-                  wrap={false}
                 >
-                  <View style={{ width: "50", fontSize: "8" }}>
-                    <Text>{contador++}</Text>{" "}
-                  </View>
-                  <View style={{ height: "100", width: "100", fontSize: "8" }}>
-                    <Text>
-                      <Image
+                  <Text style={{ fontSize: "8" }}>{item.quantity || 1}</Text>
+                </View>
+                <View style={{ width: "300", fontSize: "8", marginBottom: 10 }}>
+                  <View>
+                    <Text style={{ fontFamily: CONFIG.BOLD }}>
+                      {item.reference}
+                    </Text>
+                    <Text style={{ fontFamily: CONFIG.BOLD }}>{item.name}</Text>
+                    <Text style={{ fontSize: "8" }}>
+                      L: {item.size?.x} F: {item.size?.y} A: {item.size?.z}
+                    </Text>
+                    {item.opening && (
+                      <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
+                    )}
+
+                    {formatNumber(item.priceDrawers) > 0 && (
+                      <Text>
+                        - Frente:{" "}
+                        {item.drawerMaterialDetails.length > 0 &&
+                          item.drawerPriceDetails.length > 0 && (
+                            <View>
+                              <Text style={{ fontSize: 7 }}>
+                                {item.drawerPriceDetails.map((it, index) => {
+                                  const materialDetail =
+                                    item.drawerMaterialDetails[index];
+                                  if (!materialDetail || it === 0) {
+                                    return null;
+                                  }
+
+                                  const modelo = materialDetail.modelo || "";
+                                  const acabado = materialDetail.Acabado || "";
+
+                                  const modeloInfo = modelo ? `${modelo}-` : "";
+
+                                  return `${modeloInfo}${acabado}/ `;
+                                })}
+                              </Text>
+                            </View>
+                          )}
+                      </Text>
+                    )}
+
+                    {item.doors !== undefined &&
+                      item.doors.acabadoTirador !== undefined &&
+                      item.doors.acabadoTirador !== "" && (
+                        <Text>
+                          - Tiradores: {`${item.doors.acabadoTirador}/ `}
+                        </Text>
+                      )}
+                    {item.drawerMaterialDetails !== undefined &&
+                      item.drawerMaterialDetails.length > 0 && (
+                        <View>
+                          {item.drawerMaterialDetails.some((materialDetail) => {
+                            const acabadoTirador =
+                              materialDetail?.acabadoTirador;
+                            return (
+                              acabadoTirador !== undefined &&
+                              acabadoTirador.trim() !== ""
+                            );
+                          }) && (
+                            <Text>
+                              - Tiradores:
+                              {item.drawerMaterialDetails.map(
+                                (materialDetail, index) => {
+                                  const acabadoTirador =
+                                    materialDetail?.acabadoTirador;
+                                  if (
+                                    acabadoTirador !== undefined &&
+                                    acabadoTirador.trim() !== ""
+                                  ) {
+                                    const acabadoInfo = `${acabadoTirador}`;
+                                    return `${acabadoInfo} / `;
+                                  } else {
+                                    return "";
+                                  }
+                                }
+                              )}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+
+                    {formatNumber(item.priceDoor) > 0 && (
+                      <Text>
+                        - Puertas:{" "}
+                        <Text
+                          style={{
+                            fontFamily: CONFIG.BOLD,
+                            fontSize: "8",
+                          }}
+                        >
+                          {/* {formatNumber(item.priceDoor)} */}
+                        </Text>
+                        {`${
+                          item.doors.name?.toLocaleUpperCase() +
+                          "-" +
+                          item.doors.material
+                        }`}
+                      </Text>
+                    )}
+
+                    {formatNumber(item.priceCabinet) > 0 && (
+                      <Text>
+                        - Armazón:{" "}
+                        <Text style={{ fontSize: "8" }}>
+                          {item.material || item.materialCabinet}
+                          {/* / [{" "}{formatNumber(item.priceCabinet)}] */}
+                        </Text>
+                      </Text>
+                    )}
+                    {formatNumber(item.priceVariants) > 0 && (
+                      <View
                         style={{
-                          width: "80",
-                          height: "80",
+                          display: "flex",
+                          flexDirection: "column",
                         }}
-                        filter={grayscaleFilter("#fff")}
-                        src={loadImage(
-                          item.obsBrandGoodId || item.obsBrandGoodId2
-                        )}
-                      />
+                      >
+                        {" "}
+                        <Text>Variantes: </Text>
+                        {item.variants.map((it) => (
+                          <Text>
+                            {" "}
+                            {it.name}:{" "}
+                            {it.name === "PVA" ||
+                            it.name === "PVL" ||
+                            String(it.name).toUpperCase() === "ANCHO PUERTA"
+                              ? it.value
+                              : it.nameValue || it.description}{" "}
+                            {it.mcv ? "/" + it.mcv : ""}
+                          </Text>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                  {item?.observation !== undefined &&
+                    item?.observation.length > 0 && (
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: CONFIG.BOLD,
+                            fontSize: 8, // Asegúrate de que el valor sea numérico y no una cadena
+                          }}
+                        >
+                          Observaciones: {item.observation}
+                        </Text>
+                      </View>
+                    )}
+                </View>
+                {price && (
+                  <View style={{ width: "70" }}>
+                    <Text style={{ fontSize: "8", textAlign: "right" }}>
+                      {parseFloat(item.priceTotal).toFixed(2)}
                     </Text>
                   </View>
-                  <View
-                    style={{
-                      width: "40",
-                      fontSize: "11",
-                    }}
-                  >
-                    <Text style={{ fontSize: "8" }}>{item.quantity || 1}</Text>
-                  </View>
-                  <View
-                    style={{ width: "300", fontSize: "8", marginBottom: 10 }}
-                  >
-                    <View>
-                      <Text style={{ fontFamily: CONFIG.BOLD }}>
-                        {item.reference}
-                      </Text>
-                      <Text style={{ fontFamily: CONFIG.BOLD }}>
-                        {item.name}
-                      </Text>
-                      <Text style={{ fontSize: "8" }}>
-                        L: {item.size?.x} F: {item.size?.y} A: {item.size?.z}
-                      </Text>
-                      {item.opening && (
-                        <Text style={{ fontSize: "8" }}>
-                          M: {item?.opening}
-                        </Text>
-                      )}
-
-                      {formatNumber(item.priceDrawers) > 0 && (
-                        <Text>
-                          - Frente:{" "}
-                          {item.drawerMaterialDetails.length > 0 &&
-                            item.drawerPriceDetails.length > 0 && (
-                              <View>
-                                <Text style={{ fontSize: 7 }}>
-                                  {item.drawerPriceDetails.map((it, index) => {
-                                    const materialDetail =
-                                      item.drawerMaterialDetails[index];
-                                    if (!materialDetail || it === 0) {
-                                      return null;
-                                    }
-
-                                    const modelo = materialDetail.modelo || "";
-                                    const acabado =
-                                      materialDetail.Acabado || "";
-
-                                    const modeloInfo = modelo
-                                      ? `${modelo}-`
-                                      : "";
-
-                                    return `${modeloInfo}${acabado}/ `;
-                                  })}
-                                </Text>
-                              </View>
-                            )}
-                        </Text>
-                      )}
-
-                      {item.doors !== undefined &&
-                        item.doors.acabadoTirador !== undefined &&
-                        item.doors.acabadoTirador !== "" && (
-                          <Text>
-                            - Tiradores: {`${item.doors.acabadoTirador}/ `}
-                          </Text>
-                        )}
-                      {item.drawerMaterialDetails !== undefined &&
-                        item.drawerMaterialDetails.length > 0 && (
-                          <View>
-                            {item.drawerMaterialDetails.some(
-                              (materialDetail) => {
-                                const acabadoTirador =
-                                  materialDetail?.acabadoTirador;
-                                return (
-                                  acabadoTirador !== undefined &&
-                                  acabadoTirador.trim() !== ""
-                                );
-                              }
-                            ) && (
-                              <Text>
-                                - Tiradores:
-                                {item.drawerMaterialDetails.map(
-                                  (materialDetail, index) => {
-                                    const acabadoTirador =
-                                      materialDetail?.acabadoTirador;
-                                    if (
-                                      acabadoTirador !== undefined &&
-                                      acabadoTirador.trim() !== ""
-                                    ) {
-                                      const acabadoInfo = `${acabadoTirador}`;
-                                      return `${acabadoInfo} / `;
-                                    } else {
-                                      return "";
-                                    }
-                                  }
-                                )}
-                              </Text>
-                            )}
-                          </View>
-                        )}
-
-                      {formatNumber(item.priceDoor) > 0 && (
-                        <Text>
-                          - Puertas:{" "}
-                          <Text
-                            style={{
-                              fontFamily: CONFIG.BOLD,
-                              fontSize: "8",
-                            }}
-                          >
-                            {/* {formatNumber(item.priceDoor)} */}
-                          </Text>
-                          {`${
-                            item.doors.name?.toLocaleUpperCase() +
-                            "-" +
-                            item.doors.material
-                          }`}
-                        </Text>
-                      )}
-
-                      {formatNumber(item.priceCabinet) > 0 && (
-                        <Text>
-                          - Armazón:{" "}
-                          <Text style={{ fontSize: "8" }}>
-                            {item.material || item.materialCabinet}
-                            {/* / [{" "}{formatNumber(item.priceCabinet)}] */}
-                          </Text>
-                        </Text>
-                      )}
-                      {formatNumber(item.priceVariants) > 0 && (
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
-                          {" "}
-                          <Text>Variantes: </Text>
-                          {item.variants.map((it) => (
-                            <Text>
-                              {" "}
-                              {it.name}:{" "}
-                              {it.name === "PVA" ||
-                              it.name === "PVL" ||
-                              String(it.name).toUpperCase() === "ANCHO PUERTA"
-                                ? it.value
-                                : it.nameValue || it.description}{" "}
-                              {it.mcv ? "/" + it.mcv : ""}
-                            </Text>
-                          ))}
-                        </View>
-                      )}
-                    </View>
-                    {item?.observation !== undefined &&
-                      item?.observation.length > 0 && (
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontFamily: CONFIG.BOLD,
-                              fontSize: 8, // Asegúrate de que el valor sea numérico y no una cadena
-                            }}
-                          >
-                            Observaciones: {item.observation}
-                          </Text>
-                        </View>
-                      )}
-                  </View>
-                  {price && (
-                    <View style={{ width: "70" }}>
-                      <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              ))}
-            </View>
+                )}
+              </View>
+            ))}
           </View>
         )}
         <View style={{ marginTop: 10 }}>
@@ -1135,7 +1122,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       L:{" "}
                       {item.name.toLocaleUpperCase().includes("REGLETA")
                         ? 150
-                        : item.size.x} {" "}
+                        : item.size.x}{" "}
                       F: {item.size?.y} A: {item.size?.z}
                     </Text>
                     {item.opening && (
