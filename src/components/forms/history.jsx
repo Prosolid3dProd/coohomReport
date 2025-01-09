@@ -250,6 +250,9 @@ const History = () => {
           data={data}
           input={true}
           getFilter={getFilterComplements}
+          addFile={(e) => {
+            return e;
+          }}
         />
       </div>
       <article className="border-none rounded-none relative overflow-x-hidden">
