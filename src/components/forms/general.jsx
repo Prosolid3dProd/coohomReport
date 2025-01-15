@@ -61,7 +61,6 @@ const General = ({ getData, data }) => {
     // semanaEntrega: data?.semanaEntrega,
     // fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
   });
-  console.log(initialValues, "INITIALVALUES")
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isInputEditable, setIsInputEditable] = useState(role !== "client");

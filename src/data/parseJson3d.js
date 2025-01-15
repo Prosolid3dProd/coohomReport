@@ -1404,7 +1404,7 @@ export const parseJson3D = async (json) => {
                   }
                 }
               } else if (String(element.customCode) === "0301") {
-                const subModel1101 = element.subModels.find(
+                const subModel1101 = element.subModels?.find(
                   (el) => String(el.customCode) === "1101"
                 );
                 if (subModel1101) {
