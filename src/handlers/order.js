@@ -5,8 +5,8 @@ import { CONFIG } from "../data/constants";
 
 const Settings = {
   // BACKEND_URL: "http://localhost:2004",
-  BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
-  // BACKEND_URL: "https://api.simulhome.com/coohomReport",
+  // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
+  BACKEND_URL: "https://api.simulhome.com/coohomReport",
   ENDPOINT: "reportCoohom",
   TOKEN: "Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH",
 };
@@ -185,9 +185,25 @@ export const getProfile = async (params) => {
   }
 };
 
-export const updateOrderDetails = async (params) => {
+export const CreateOrderDetails = async (params) => {
   try {
     const data = await _AXIOS_.post(
+      `${CONFIG.API.BACKEND_URL}/reporthomDetails`,
+      {
+        ...params,
+        token: Settings.TOKEN,
+      }
+    );
+    return data.data;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+export const updateOrderDetails = async (params) => {
+  try {
+    const data = await _AXIOS_.put(
       `${CONFIG.API.BACKEND_URL}/reporthomDetails`,
       {
         ...params,

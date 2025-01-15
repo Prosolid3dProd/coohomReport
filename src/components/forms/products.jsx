@@ -16,6 +16,7 @@ import {
   Typography,
 } from "antd";
 import {
+  CreateOrderDetails,
   updateOrderDetails,
   handleArchivedOrderDetails,
   getLocalOrder,
@@ -26,14 +27,17 @@ import EncimerasModal from "../pages/Encimeras/encimerasModal";
 const Product = ({ getData }) => {
   // Hooks de estado para gestionar datos y formularios
   const [form] = Form.useForm();
-  const [data, setData] = useState(getLocalOrder()); // Carga inicial de datos locales
+  const [formValues] = Form.useForm();
+  const [data, setData] = useState(getLocalOrder());
   const [type, setType] = useState(null);
   const [encimera, setEncimera] = useState(null);
   const [isUpdate, setUpdate] = useState(null);
   const [open, setOpen] = useState(false);
-  const [cantidad, setCantidad] = useState(0);
+  const [modal2Open, setModal2Open] = useState(false);
   const [total, setTotal] = useState(0);
   const [unidad, setUnidad] = useState(0);
+  const [cantidad, setCantidad] = useState(0);
+
 
   // Actualiza los campos del formulario cuando se selecciona una encimera
   useEffect(() => {
@@ -60,6 +64,22 @@ const Product = ({ getData }) => {
     setTotal(newTotal);
   }, [cantidad, unidad]);
 
+  const onFinishw = async (values) => {
+    try {
+      const updatedDetails = { ...values };
+      const result = await updateOrderDetails({ details: updatedDetails, isUpdate, _id: data._id });
+      if (result) {
+        getData(result);
+        setLocalOrder(result);
+        message.success("Actualización exitosa");
+        setModal2Open(false);
+        setTimeout(() => location.reload(), 1000);
+      }
+    } catch (error) {
+      console.error("Error al actualizar detalles:", error);
+    }
+  };
+
   // Maneja el envío del formulario
   const onFinish = async (values) => {
     try {
@@ -85,7 +105,7 @@ const Product = ({ getData }) => {
         total: parseFloat(values.qty) * parseFloat(parsedUnidadValue),
       };
 
-      const result = await updateOrderDetails({
+      const result = await CreateOrderDetails({
         details: updatedDetails,
         isUpdate,
         _id: data._id,
@@ -148,9 +168,68 @@ const Product = ({ getData }) => {
       key: "_id",
       width: 135,
       render: (text, record) => (
-        <Typography.Link onClick={() => archivedComplementDetails(record)}>
-          Eliminar
-        </Typography.Link>
+        <>
+          <Typography.Link onClick={() => archivedComplementDetails(record)}>
+            Eliminar
+          </Typography.Link>
+          <Divider type="right" />
+          <Typography.Link
+            onClick={() => {
+              formValues.setFieldsValue(record);
+              setModal2Open(true);
+            }}
+          >
+            Editar
+          </Typography.Link>
+
+          <>
+            <Modal
+              title="Editar Complemento"
+              centered
+              open={modal2Open}
+              onCancel={() => setModal2Open(false)}
+              footer={null}
+            >
+              <Form layout="vertical" onFinish={onFinishw} form={formValues}>
+                <Form.Item label="Codigo" name="referencia">
+                  <Input/>
+                </Form.Item>
+                <Form.Item label="Descripcion" name="descripcion">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Marca" name="marca">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Tipo" name="type">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Grosor" name="grosor">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Cantidad" name="qty">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Descuento" name="discount">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Total" name="total">
+                  <Input />
+                </Form.Item>
+                <Form.Item>
+                  <Button type="primary" htmlType="submit" onClick={() => setModal2Open(false)}>
+                    Guardar
+                  </Button>
+                  <Button
+                    onClick={() => setModal2Open(false)}
+                    style={{ marginLeft: 8 }}
+                  >
+                    Cancelar
+                  </Button>
+                </Form.Item>
+              </Form>
+            </Modal>
+          </>
+        </>
       ),
     },
   ];

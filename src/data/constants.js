@@ -5,8 +5,8 @@ export const CONFIG = {
   },
   API: {
     // BACKEND_URL: "http://localhost:2004",
-    BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
-    // BACKEND_URL: "https://api.simulhome.com/coohomReport",
+    // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
+    BACKEND_URL: "https://api.simulhome.com/coohomReport",
     ENDPOINT: "reportCoohom",
     TOKEN: JSON.parse(localStorage.getItem("token"))?.token || null, //"Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH" ,
   },
