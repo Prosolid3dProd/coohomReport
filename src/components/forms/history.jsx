@@ -132,7 +132,7 @@ const History = () => {
         setData(originalData); // Restablece los datos originales.
       } else {
         const filteredData = originalData.filter((order) =>
-          order.designerName?.toLowerCase().includes(searchTerm)
+          order.customerName?.toLowerCase().includes(searchTerm)
         );
         if (filteredData.length > 0) {
           setData(filteredData); // Actualiza con los datos filtrados.

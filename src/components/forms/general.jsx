@@ -162,7 +162,7 @@ const General = ({ getData, data }) => {
           </Col>
           <Col xs={24} sm={24} md={4}>
             <Form.Item label="Semana de Entrega" name="semanaEntrega">
-              <Input placeholder="" type="date" />
+              <Input placeholder="" />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={5}>

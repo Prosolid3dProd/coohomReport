@@ -173,7 +173,7 @@ const Product = ({ getData }) => {
             Eliminar
           </Typography.Link>
           <Divider type="right" />
-          <Typography.Link
+          {/* <Typography.Link
             onClick={() => {
               formValues.setFieldsValue(record);
               setModal2Open(true);
@@ -228,7 +228,7 @@ const Product = ({ getData }) => {
                 </Form.Item>
               </Form>
             </Modal>
-          </>
+          </> */}
         </>
       ),
     },

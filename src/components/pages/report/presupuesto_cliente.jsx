@@ -246,6 +246,7 @@ const Presupuesto_Cliente = ({
               marginBottom: "18",
             }}
           >
+            {console.log(data)}
             <View>{logoGrande(data.userId?.logo)}</View>
             <Text
               style={{
@@ -743,7 +744,7 @@ const Presupuesto_Cliente = ({
                   }}
                 >
                   <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                    <Text>1</Text>{" "}
+                    <Text>{item.quantity}</Text>{" "}
                   </View>
                   <View
                     style={{
@@ -775,7 +776,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {parseFloat(item.priceTotal * item.quantity).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -792,7 +793,7 @@ const Presupuesto_Cliente = ({
                   }}
                 >
                   <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                    <Text>1</Text>{" "}
+                    <Text>{item.quantity}</Text>{" "}
                   </View>
                   <View
                     style={{
@@ -824,7 +825,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {parseFloat(item.priceTotal * item.quantity).toFixed(2)}
                       </Text>
                     )}
                   </View>
