@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 import { CONFIG } from "../data/constants";
 
 const Settings = {
-  // BACKEND_URL: "http://localhost:2004",
+  // BACKEND_URL: "http://localhost:3007",
   // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
   BACKEND_URL: "https://api.simulhome.com/coohomReport",
   ENDPOINT: "reportCoohom",
@@ -165,7 +165,7 @@ export const getOrderById = async (params) => {
     });
     localStorage.setItem("orderErp", JSON.stringify(data.data));
 
-    // console.log(data.data, "getOrderById");
+    console.log(data.data, "getOrderById");
     return data.data;
   } catch (error) {
     console.log(error);

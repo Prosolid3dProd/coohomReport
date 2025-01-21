@@ -4,7 +4,7 @@ export const CONFIG = {
     ADMIN: "E567890KMNGYCTDR6TYUJ067T8NIHUGVTFT67T87Y9HOJG",
   },
   API: {
-    // BACKEND_URL: "http://localhost:2004",
+    // BACKEND_URL: "http://localhost:3007",
     // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
     BACKEND_URL: "https://api.simulhome.com/coohomReport",
     ENDPOINT: "reportCoohom",

@@ -1132,7 +1132,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text>- Frente: </Text>
                     )}
                     <Text>- Frente: {item.materialRegletaF}</Text>
-                    {formatNumber(item.priceCabinet) >= 0 && (
+                    {formatNumber(item.priceCabinet) >= 0 &&  !item.name.includes("Puerta") && !item.name.includes("Frente") && (
                       <Text>
                         - Armazón:{" "}
                         <Text style={{ fontSize: "8" }}>

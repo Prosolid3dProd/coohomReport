@@ -67,7 +67,7 @@ export const getUsers = async (params) => {
       ...params,
       token,
     });
-    console.log(data)
+    // console.log(data)
     return data;
   } catch (error) {
     handleAxiosError(error);

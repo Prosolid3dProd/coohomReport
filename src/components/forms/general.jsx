@@ -224,7 +224,7 @@ const General = ({ getData, data }) => {
             <Form.Item label="Coeficiente de Venta" name="coefficient">
               <div style={{ position: "relative" }}>
                 <Input
-                  defaultValue={initialValues.coefficient}
+                  defaultValue={data.coefficient}
                   readOnly={!isInputEditable}
                   style={!isInputEditable ? { opacity: 0.7 } : {}}
                   disabled={role === "admin" ? true : false}
