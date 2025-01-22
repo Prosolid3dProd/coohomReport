@@ -203,9 +203,23 @@ export const fetchData = async (setLoading, setData) => {
 const Encimeras = () => {
   const [data, setData] = useState([]);
   const [editado, setEditado] = useState(false);
+  const [pageSize, setPageSize] = useState(5);
   useEffect(() => {
     fetchData(setEditado, setData);
   }, []);
+
+  const handleResize = () => {
+      const windowHeight = window.innerHeight;
+      const newRowHeight = 88;
+      const newPageSize = Math.floor((windowHeight - 200) / newRowHeight);
+      setPageSize(newPageSize);
+    };
+  
+    useEffect(() => {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
   const getFilterComplements = async (params) => {
     setEditado(true);
@@ -295,7 +309,7 @@ const Encimeras = () => {
   ];
 
   return (
-    <main className="flex flex-col overflow-y-scroll px-4">
+    <main className="flex flex-col px-4">
       <Header
         name={"Biblioteca"}
         input={true}
@@ -306,10 +320,10 @@ const Encimeras = () => {
         setData={setData}
       />
       <Table
-        className="border border-t-0 border-border mx-3 relative overflow-x-hidden"
+        className="border border-t-0 border-border mx-3 relative"
         loading={editado}
         dataSource={data}
-        scroll={{ x: true }}
+        pagination={{pageSize}}
         searchable
         columns={columns}
       />

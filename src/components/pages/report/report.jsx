@@ -77,7 +77,7 @@ const Report = () => {
   const tabs = [
     {
       "Confirmación de Pedido": (
-        <div className="alturaPreview">
+        <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
               price={priceP}
@@ -90,7 +90,7 @@ const Report = () => {
     },
     {
       "Presupuesto": (
-        <div className="alturaPreview">
+        <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
               price={priceP}
@@ -103,7 +103,7 @@ const Report = () => {
     },
     {
       "Presupuesto Venta Detallado": (
-        <div className="alturaPreview">
+        <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
               price={priceP}
@@ -116,7 +116,7 @@ const Report = () => {
     },
     {
       "Presupuesto Venta Simplificado": (
-        <div className="alturaPreview">
+        <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Presupuesto_Cliente
               totalEncimeras={total_Encimeras}
@@ -240,7 +240,6 @@ const Report = () => {
             onChange={handleTabChange}
             activeKey={tabActivo.toString()}
             centered
-            className="overflow-scroll"
             items={tabs.map((tabItem, i) => {
               return {
                 label: `${Object.keys(tabItem)}`,

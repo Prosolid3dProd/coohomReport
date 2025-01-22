@@ -38,7 +38,7 @@ const Encimeras = ({ title, setEncimera }) => {
     // Calcula dinámicamente la altura disponible para la tabla.
     const updateTableHeight = () => {
       const windowHeight = window.innerHeight; // Altura total de la ventana.
-      const headerHeight = 150; // Estimación de altura del encabezado y filtros.
+      const headerHeight = 450; // Estimación de altura del encabezado y filtros.
       setTableHeight(windowHeight - headerHeight); // Ajusta la altura restante.
     };
 
@@ -181,7 +181,7 @@ const Encimeras = ({ title, setEncimera }) => {
         columns={columns}
         rowKey="code"
         loading={loading}
-        pagination={false} // Desactiva la paginación para mostrar solo filas visibles.
+        // pagination={false} // Desactiva la paginación para mostrar solo filas visibles.
         scroll={{
           y: tableHeight, // Ajusta la altura de la tabla dinámicamente.
         }}

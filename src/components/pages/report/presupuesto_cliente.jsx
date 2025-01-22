@@ -246,7 +246,7 @@ const Presupuesto_Cliente = ({
               marginBottom: "18",
             }}
           >
-            {console.log(data)}
+            {/* {console.log(data)} */}
             <View>{logoGrande(data.userId?.logo)}</View>
             <Text
               style={{
@@ -1049,7 +1049,7 @@ const Presupuesto_Cliente = ({
                   data.details &&
                   filterData(data.details, "Encimera").map((item) => {
                     const iva = calcularIva(item.total, data.discountEncimeras);
-                    console.log(item)
+                    // console.log(item)
                     // const totalConIva =
                     //   parseFloat(item.total) + parseFloat(iva);
                     return (
@@ -1074,7 +1074,7 @@ const Presupuesto_Cliente = ({
                           <Text>{item.descripcion}</Text>
                         </View>
                         <View style={{ width: "30" }}>
-                          <Text>{item.discount + "%"}</Text>
+                          <Text>{item.discount || 0 + "%"}</Text>
                         </View>
                         <View style={{ width: "100", textAlign: "right" }}>
                           <Text>{parseFloat(item.total).toFixed(2)}</Text>
@@ -1197,7 +1197,7 @@ const Presupuesto_Cliente = ({
                             <Text>{item.descripcion}</Text>
                           </View>
                           <View style={{ width: "30" }}>
-                          <Text>{item.discount + "%"}</Text>
+                          <Text>{item.discount || 0 + "%"}</Text>
                         </View>
                           <View style={{ width: "120", textAlign: "right" }}>
                             <Text>{parseFloat(item.total).toFixed(2)}</Text>
@@ -1328,7 +1328,7 @@ const Presupuesto_Cliente = ({
                           <Text>{item.descripcion}</Text>
                         </View>
                         <View style={{ width: "30" }}>
-                          <Text>{item.discount + "%"}</Text>
+                          <Text>{item.discount || 0 + "%"}</Text>
                         </View>
                         <View style={{ width: "100", textAlign: "right" }}>
                           <Text>{parseFloat(item.total).toFixed(2)}</Text>

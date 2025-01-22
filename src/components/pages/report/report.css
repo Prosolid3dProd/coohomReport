@@ -1,5 +1,10 @@
 .alturaPreview {
     height: calc(100vh - 235px);
+    overflow-y:scroll;
+}
+
+.alturaPreview-presu {
+    height: calc(100vh - 235px);
 }
 
 :where(.css-dev-only-do-not-override-pr0fja).ant-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn/{

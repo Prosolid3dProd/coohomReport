@@ -1,5 +1,4 @@
-// Archivo Product.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Button,
   Input,
@@ -25,129 +24,154 @@ import {
 import EncimerasModal from "../pages/Encimeras/encimerasModal";
 
 const Product = ({ getData }) => {
-  // Hooks de estado para gestionar datos y formularios
   const [form] = Form.useForm();
-  const [formValues] = Form.useForm();
-  const [data, setData] = useState(getLocalOrder());
-  const [type, setType] = useState(null);
-  const [encimera, setEncimera] = useState(null);
-  const [isUpdate, setUpdate] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [modal2Open, setModal2Open] = useState(false);
-  const [total, setTotal] = useState(0);
-  const [unidad, setUnidad] = useState(0);
-  const [cantidad, setCantidad] = useState(0);
+  const [editForm] = Form.useForm();
+  const [state, setState] = useState({
+    data: getLocalOrder(),
+    type: null,
+    encimera: null,
+    isUpdate: null,
+    modals: {
+      isModalOpen: false,
+      isEditModalOpen: false,
+    },
+  });
 
+  // Manejo de estados relacionados con los formularios y cálculos
+  const [formValues, setFormValues] = useState({
+    cantidad: 0,
+    unidad: 0,
+    total: 0,
+  });
 
-  // Actualiza los campos del formulario cuando se selecciona una encimera
-  useEffect(() => {
-    if (encimera) {
-      const fields = {
-        descripcion: encimera?.name,
-        marca: encimera?.type,
-        unidad: parseFloat(encimera?.price).toFixed(2),
-        referencia: encimera?.code,
-        qty: 1,
-      };
-      form.setFieldsValue(fields);
-      setUpdate(null);
-      setOpen(false);
-    }
-  }, [encimera, form]);
-
-  // Calcula el total dinámicamente cuando cambian cantidad o unidad
-  useEffect(() => {
-    const newTotal =
-      isNaN(cantidad) || isNaN(unidad)
-        ? 0
-        : parseFloat(cantidad) * parseFloat(unidad);
-    setTotal(newTotal);
-  }, [cantidad, unidad]);
-
-  const onFinishw = async (values) => {
-    try {
-      const updatedDetails = { ...values };
-      const result = await updateOrderDetails({ details: updatedDetails, isUpdate, _id: data._id });
-      if (result) {
-        getData(result);
-        setLocalOrder(result);
-        message.success("Actualización exitosa");
-        setModal2Open(false);
-        setTimeout(() => location.reload(), 1000);
-      }
-    } catch (error) {
-      console.error("Error al actualizar detalles:", error);
-    }
+  // Actualiza el estado de modales
+  const updateModals = (modals) => {
+    setState((prev) => ({ ...prev, modals: { ...prev.modals, ...modals } }));
   };
 
-  // Maneja el envío del formulario
+  // Dentro de tu componente
+  const setType = (type) => {
+    setState((prev) => ({ ...prev, type }));
+  };
+
+  // Maneja los campos de encimera seleccionada
+  useEffect(() => {
+    if (state.encimera) {
+      form.setFieldsValue({
+        descripcion: state.encimera?.name,
+        marca: state.encimera?.type,
+        unidad: parseFloat(state.encimera?.price).toFixed(2),
+        referencia: state.encimera?.code,
+        qty: 1,
+      });
+      setState((prev) => ({ ...prev, isUpdate: null }));
+      updateModals({ isModalOpen: false });
+    }
+  }, [state.encimera, form]);
+
+  // Calcula el total dinámicamente
+  useEffect(() => {
+    const { cantidad, unidad } = formValues;
+    const total = !isNaN(cantidad) && !isNaN(unidad) ? cantidad * unidad : 0;
+    setFormValues((prev) => ({ ...prev, total }));
+  }, [formValues.cantidad, formValues.unidad]);
+
+  const updateLocalOrderData = useCallback(
+    (updatedDetails) => {
+      const updatedData = {
+        ...state.data,
+        details: state.data.details.map((detail) =>
+          detail.referencia === updatedDetails.referencia
+            ? updatedDetails
+            : detail
+        ),
+      };
+      setState((prev) => ({ ...prev, data: updatedData }));
+      setLocalOrder(updatedData);
+      getData(updatedData);
+    },
+    [state.data, getData]
+  );
+
   const onFinish = async (values) => {
     try {
-      const unidadValue = values.unidad !== undefined ? values.unidad : 0;
-      const parsedUnidadValue = parseFloat(unidadValue).toFixed(2);
-      setUnidad(parsedUnidadValue);
+      const parsedUnidad = parseFloat(values.unidad || 0).toFixed(2);
 
       if (!values.type) {
         message.error("Por favor seleccione un TIPO DE COMPONENTE");
         return;
       }
 
-      if (!data?._id) return;
+      if (!state.data?._id) return;
 
       const updatedDetails = {
         ...values,
-        unidad:
-          values.discount !== undefined
-            ? parseFloat(parsedUnidadValue) -
-              (parseFloat(values.discount) / 100) *
-                parseFloat(parsedUnidadValue)
-            : parseFloat(parsedUnidadValue),
-        total: parseFloat(values.qty) * parseFloat(parsedUnidadValue),
+        unidad: values.discount
+          ? parseFloat(parsedUnidad) - (values.discount / 100) * parsedUnidad
+          : parseFloat(parsedUnidad),
+        total: parseFloat(values.qty) * parseFloat(parsedUnidad),
       };
 
       const result = await CreateOrderDetails({
         details: updatedDetails,
-        isUpdate,
-        _id: data._id,
+        isUpdate: state.isUpdate,
+        _id: state.data._id,
       });
 
       if (result) {
-        const existingDetail = result.details.find(
-          (detail) => detail.referencia === values.referencia
-        );
-        if (existingDetail) {
-          existingDetail.qty += parseFloat(values.qty);
-        } else {
-          result.details.push(updatedDetails);
-        }
-
-        getData(result);
-        setLocalOrder(result);
+        const updatedData = {
+          ...state.data,
+          details: result.details,
+        };
+        setState((prev) => ({ ...prev, data: updatedData }));
+        setLocalOrder(updatedData);
+        getData(updatedData);
         message.success("Se ha actualizado correctamente");
-        setTimeout(() => location.reload(), 1000);
       }
     } catch (error) {
       console.error("Error al guardar los detalles:", error);
     }
   };
 
-  // Elimina un complemento de los detalles
+  const onEditFinish = async (values) => {
+    try {
+      const result = await updateOrderDetails({
+        details: values,
+        isUpdate: state.isUpdate,
+        _id: state.data._id,
+      });
+      if (result) {
+        updateLocalOrderData(values);
+        message.success("Actualización exitosa");
+        updateModals({ isEditModalOpen: false });
+      }
+    } catch (error) {
+      console.error("Error al actualizar detalles:", error);
+    }
+  };
+
   const archivedComplementDetails = async (details) => {
     try {
       const result = await handleArchivedOrderDetails({
-        _id: data._id,
+        _id: state.data._id,
         details,
       });
       if (result) {
+        const updatedDetails = state.data.details.filter(
+          (detail) => detail.referencia !== details.referencia
+        );
+        const updatedData = { ...state.data, details: updatedDetails };
+
+        setState((prev) => ({ ...prev, data: updatedData }));
+        setLocalOrder(updatedData);
+        getData(updatedData);
         message.success("Se ha eliminado el complemento");
-        setTimeout(() => location.reload(), 200);
       }
     } catch (error) {
       console.error("Error al archivar detalles:", error);
     }
   };
 
-  // Configuración de las columnas para la tabla
   const columns = [
     { title: "Codigo", dataIndex: "referencia", key: "referencia" },
     { title: "Descripción", dataIndex: "descripcion", key: "descripcion" },
@@ -164,71 +188,21 @@ const Product = ({ getData }) => {
     },
     {
       title: "Acciones",
-      dataIndex: "_id",
-      key: "_id",
-      width: 135,
-      render: (text, record) => (
+      key: "actions",
+      render: (_, record) => (
         <>
           <Typography.Link onClick={() => archivedComplementDetails(record)}>
             Eliminar
           </Typography.Link>
-          <Divider type="right" />
-          {/* <Typography.Link
+          <Divider type="vertical" />
+          <Typography.Link
             onClick={() => {
-              formValues.setFieldsValue(record);
-              setModal2Open(true);
+              editForm.setFieldsValue(record);
+              updateModals({ isEditModalOpen: true });
             }}
           >
             Editar
           </Typography.Link>
-
-          <>
-            <Modal
-              title="Editar Complemento"
-              centered
-              open={modal2Open}
-              onCancel={() => setModal2Open(false)}
-              footer={null}
-            >
-              <Form layout="vertical" onFinish={onFinishw} form={formValues}>
-                <Form.Item label="Codigo" name="referencia">
-                  <Input/>
-                </Form.Item>
-                <Form.Item label="Descripcion" name="descripcion">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Marca" name="marca">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Tipo" name="type">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Grosor" name="grosor">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Cantidad" name="qty">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Descuento" name="discount">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Total" name="total">
-                  <Input />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit" onClick={() => setModal2Open(false)}>
-                    Guardar
-                  </Button>
-                  <Button
-                    onClick={() => setModal2Open(false)}
-                    style={{ marginLeft: 8 }}
-                  >
-                    Cancelar
-                  </Button>
-                </Form.Item>
-              </Form>
-            </Modal>
-          </> */}
         </>
       ),
     },
@@ -237,13 +211,9 @@ const Product = ({ getData }) => {
   return (
     <Card className="rounded-none bg-gray border border-border">
       <Form layout="vertical" form={form} onFinish={onFinish}>
-        <Row>
-          <Col xs={24}>
-            <Divider orientation="left">
-              <b>Agregar Componentes</b>
-            </Divider>
-          </Col>
-        </Row>
+        <Divider orientation="left">
+          <b>Agregar Componentes</b>
+        </Divider>
         <Row gutter={16}>
           <Col xs={24} md={8}>
             <Form.Item label="Tipo de componente" name="type">
@@ -264,7 +234,7 @@ const Product = ({ getData }) => {
                 { required: true, message: "Por favor complete este campo" },
               ]}
             >
-              <Input placeholder={`Descripción ${type}`} />
+              <Input placeholder={`Descripción ${state.type || ""}`} />
             </Form.Item>
           </Col>
           <Col xs={24} md={8}>
@@ -275,27 +245,27 @@ const Product = ({ getData }) => {
                 { required: true, message: "Por favor complete este campo" },
               ]}
             >
-              <Input maxLength="60" />
+              <Input maxLength={60} />
             </Form.Item>
           </Col>
           <Col xs={24} md={4}>
             <Form.Item label="Cantidad" name="qty">
               <Input
                 type="number"
-                min="0"
+                min={0}
                 onChange={(e) => setCantidad(e.target.value || 0)}
               />
             </Form.Item>
           </Col>
           <Col xs={24} md={6}>
             <Form.Item label="Marca" name="marca">
-              <Input maxLength="60" />
+              <Input maxLength={60} />
             </Form.Item>
           </Col>
-          {type === "Encimera" && (
+          {state.type === "Encimera" && (
             <Col xs={24} md={4}>
               <Form.Item label="Grosor" name="grosor">
-                <Input maxLength="60" />
+                <Input maxLength={60} />
               </Form.Item>
             </Col>
           )}
@@ -311,66 +281,89 @@ const Product = ({ getData }) => {
           </Col>
           <Col xs={24} md={4}>
             <Form.Item label="Descuento(%)" name="discount">
-              <Input type="number" defaultValue="0" />
+              <Input type="number" defaultValue={0} />
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col xs={24}>
             <Space>
-              <Button
-                htmlType="submit"
-                type="primary"
-                style={{
-                  height: 50,
-                  width: 150,
-                  marginTop: 30,
-                  background: "#1a7af8",
-                  color: "#fff",
-                }}
-              >
+              <Button type="primary" htmlType="submit">
                 Guardar
               </Button>
               <Button
                 type="link"
-                onClick={() => setOpen(true)}
-                style={{ height: 50, width: 150, marginTop: 30 }}
+                onClick={() => updateModals({ isModalOpen: true })}
               >
-                Buscar mas elementos
+                Buscar más elementos
               </Button>
             </Space>
           </Col>
         </Row>
       </Form>
       <Divider />
-      {/* Tabla para mostrar los detalles del pedido */}
       <Table
-        dataSource={data?.details || []}
+        dataSource={state.data?.details || []}
         columns={columns}
         rowKey="referencia"
-        scroll={{ x: "100%" }}
       />
-      {/* Modal para buscar y seleccionar encimeras */}
       <Modal
-        title="Seleccionar Encimera"
-        open={open}
-        onCancel={() => setOpen(false)}
-        footer={null}
-        centered
+        title="Seleccionar Complemento"
+        open={state.modals.isModalOpen}
         width={1000}
-        bodyStyle={{
-          padding: "0", // Elimina márgenes internos para más espacio útil.
-          maxHeight: "calc(100vh - 100px)", // Ajusta la altura según la pantalla.
-          overflow: "hidden", // Elimina scroll adicional en el modal.
-        }}
-        afterOpenChange={(visible) => {
-          document.body.style.overflow = visible ? "hidden" : ""; // Controla el scroll del body.
-        }}
+        onCancel={() => updateModals({ isModalOpen: false })}
+        footer={null}
       >
         <EncimerasModal
-          setEncimera={setEncimera}
-          title="Encimeras Disponibles"
+        title={"Complementos"}
+          setEncimera={(encimera) =>
+            setState((prev) => ({ ...prev, encimera }))
+          }
         />
+      </Modal>
+      <Modal
+        title="Editar Complemento"
+        open={state.modals.isEditModalOpen}
+        onCancel={() => updateModals({ isEditModalOpen: false })}
+        footer={null}
+      >
+        <Form layout="horizontal" form={editForm} onFinish={onEditFinish}>
+          <Form.Item label="Codigo" name="referencia">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Descripcion" name="descripcion">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Marca" name="marca">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Tipo" name="type">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Grosor" name="grosor">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Cantidad" name="qty">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Descuento" name="discount">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Total" name="total">
+            <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Guardar
+            </Button>
+            <Button
+              onClick={() => setIsEditModalOpen(false)}
+              style={{ marginLeft: 8 }}
+            >
+              Cancelar
+            </Button>
+          </Form.Item>
+        </Form>
       </Modal>
     </Card>
   );

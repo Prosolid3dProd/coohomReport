@@ -108,7 +108,7 @@ const History = () => {
   useEffect(() => {
     const handleResize = () => {
       const windowHeight = window.innerHeight; // Altura de la ventana.
-      const newRowHeight = 108; // Altura aproximada de una fila.
+      const newRowHeight = 100; // Altura aproximada de una fila.
       const newPageSize = Math.floor((windowHeight - 200) / newRowHeight); // Calcula cuántas filas caben.
       setPageSize(newPageSize); // Actualiza el tamaño de la página.
     };
@@ -240,7 +240,7 @@ const History = () => {
   ];
 
   return (
-    <div className="flex flex-col overflow-y-scroll">
+    <div className="flex flex-col ">
       <div className="px-4">
         <Header
           actions={true}

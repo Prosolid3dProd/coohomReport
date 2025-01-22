@@ -88,7 +88,7 @@ const ShopsForm = ({ setListaTiendas }) => {
   };
 
   return (
-    <div style={{ height: "400px", overflowY: "scroll" }}>
+    <div style={{ height: "75vh", overflowY: "scroll" }}>
       <Form
         name="basic"
         labelCol={{ span: 8 }}
@@ -420,7 +420,7 @@ const Admin = () => {
   };
 
   return (
-    <main className="overflow-y-scroll px-4 flex gap-4 flex-col">
+    <main className="px-4 flex gap-4 flex-col">
       <Header actions={false} name={"Tiendas"} />
       <section className="grid grid-cols-[500px_1fr]">
         <ShopsForm setListaTiendas={setListaTiendas} />
@@ -441,8 +441,8 @@ const Admin = () => {
         okButtonProps={{
           style: { backgroundColor: "blue", borderColor: "blue" },
         }}
-        maskStyle={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
-        bodyStyle={{ maxHeight: "70vh", overflowY: "auto" }}
+        styles={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
+        mask={{ maxHeight: "70vh", overflowY: "auto" }}
       >
         <Form form={form} layout="vertical" name="userForm">
           <Form.Item
