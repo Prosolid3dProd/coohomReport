@@ -776,7 +776,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal * item.quantity).toFixed(2)}
+                        {parseFloat(item.priceTotal).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -825,7 +825,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal * item.quantity).toFixed(2)}
+                        {parseFloat(item.priceTotal).toFixed(2)}
                       </Text>
                     )}
                   </View>
