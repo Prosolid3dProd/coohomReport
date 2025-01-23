@@ -14,7 +14,7 @@
     "@uidotdev/usehooks": "^2.1.1",
     "antd": "^5.8.2",
     "axios": "^1.4.0",
-    "caniuse-lite": "",
+    "caniuse-lite": "^1.0.30001692",
     "file-saver": "^2.0.5",
     "filestack-js": "^3.32.3",
     "js-cookie": "^3.0.5",

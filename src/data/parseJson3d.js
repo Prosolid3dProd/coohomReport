@@ -680,7 +680,7 @@ const getParameters = (param, tipoMueble) => {
 
 const getExcludedNames = (tipoMueble) => [
   "ELEC",
-  "CVI",
+  // "CVI",
   "CPI",
   ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
   ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
@@ -941,6 +941,7 @@ export const parseJson3D = async (json) => {
           material: item.textureName,
           reference: getReferenceZocalo(item),
           customCode: item.textureCustomCode,
+          observation:item.remark,
           size: {
             x: item.size.x,
             y: item.size.y,
@@ -1404,7 +1405,7 @@ export const parseJson3D = async (json) => {
                   }
                 }
               } else if (String(element.customCode) === "0301") {
-                const subModel1101 = element.subModels.find(
+                const subModel1101 = element.subModels?.find(
                   (el) => String(el.customCode) === "1101"
                 );
                 if (subModel1101) {

@@ -157,22 +157,48 @@ import { exportarArchivo } from "../../content/logic/obtenerArchivoJson";
 //   );
 // };
 
-export const fetchData = async (setEditado, setData) => {
-  try {
-    setEditado(true);
-    const result = await getComplements();
-    const newData = structuredClone(result);
+// export const fetchData = async (setEditado, setData) => {
+//   try {
+//     setEditado(true);
+//     const result = await getComplements();
+//     const newData = structuredClone(result);
   
-    if (Array.isArray(result)) {
-      const filteredData = newData.filter((el) => el.name);
-      setData(filteredData);
+//     if (Array.isArray(result)) {
+//       const filteredData = newData.filter((el) => el.name);
+//       setData(filteredData);
+//     }
+//   } catch (error) {
+//     console.error("Error fetching orders:", error);
+//   } finally {
+//     setEditado(false);
+//   }
+// };
+
+export const fetchData = async (setLoading, setData) => {
+  try {
+    setLoading(true); // Indicar que está cargando
+    const result = await getComplements();
+
+    // Validación del resultado
+    if (!Array.isArray(result) || result.length === 0) {
+      console.warn("No data received or data is not in array format.");
+      setData([]); // Setear un array vacío en caso de error
+      return;
     }
+
+    // Clonación y filtrado seguro
+    const newData = JSON.parse(JSON.stringify(result));
+    const filteredData = newData.filter((el) => el.name); // Filtrar solo con nombre definido
+
+    setData(filteredData);
   } catch (error) {
     console.error("Error fetching orders:", error);
+    setData([]); // Limpiar los datos en caso de error
   } finally {
-    setEditado(false);
+    setLoading(false); // Finalizar la carga
   }
 };
+
 
 const Encimeras = () => {
   const [data, setData] = useState([]);
