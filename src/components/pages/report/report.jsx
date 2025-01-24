@@ -4,6 +4,7 @@ import { General, Product, Profile } from "./../../index";
 import { Tabs, Card, Button, Space } from "antd";
 import { PDFViewer } from "@react-pdf/renderer";
 import Confirmacion_Pedido from "./confirmacion_pedido";
+import Confirmacion_Pedido_Venta from "./confirmacion_pedido_venta";
 import { Presupuesto_Cliente } from "./index";
 import LogoERP from "../../../assets/logoERP.png";
 import {
@@ -73,7 +74,7 @@ const Report = () => {
       tabs[1].style.fontWeight = 'bold';
     }
   }, [tabActivo]);
-
+console.log(data)
   const tabs = [
     {
       "Confirmación de Pedido": (
@@ -105,7 +106,7 @@ const Report = () => {
       "Presupuesto Venta Detallado": (
         <div className="alturaPreview">
           <PDFViewer className="h-full w-full">
-            <Confirmacion_Pedido
+            <Confirmacion_Pedido_Venta
               price={priceP}
               data={data}
               title="Presupuesto Venta"

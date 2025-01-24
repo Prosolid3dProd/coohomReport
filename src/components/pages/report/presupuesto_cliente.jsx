@@ -531,7 +531,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -580,7 +580,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -629,7 +629,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -678,7 +678,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -727,7 +727,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -776,7 +776,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -825,7 +825,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -874,7 +874,7 @@ const Presupuesto_Cliente = ({
                   >
                     {price && (
                       <Text style={{ textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
                   </View>
