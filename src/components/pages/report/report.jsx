@@ -223,7 +223,7 @@ const Report = () => {
                 const enlace = document.createElement("a");
                 enlace.href = url;
                 enlace.download = `${
-                  JSON.parse(localStorage.getItem("orderErp")).storeName + JSON.parse(localStorage.getItem("orderErp")).customerName
+                  JSON.parse(localStorage.getItem("orderErp")).storeName + " " + JSON.parse(localStorage.getItem("orderErp")).customerName
                 }.json`;
                 document.body.appendChild(enlace);
                 enlace.click();
