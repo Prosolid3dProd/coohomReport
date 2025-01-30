@@ -319,11 +319,11 @@ const getPrice = (parametros, tipo, materialCasco) => {
   );
 
   const intv = arrParameters?.some(
-    param => param?.displayName.toLocaleUpperCase() === "INTV" && parseFloat(param?.value)> 0
+    param => param?.displayName.toLocaleUpperCase() === "INTV" && parseFloat(param?.value) > 0
   );
-  
+
   price = findPrice(arrParameters);
-  if (isCabinet &&intv) {
+  if (isCabinet) {
     if (parametros.textureCustomCode === "C1") {
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
@@ -332,28 +332,32 @@ const getPrice = (parametros, tipo, materialCasco) => {
         materialCasco === "169-NOGAL NATURAL"
       ) {
         price += price * 0.1;
-      } else {
+      } else if (intv) {
         price += price * 0.25;
       }
-    } else if (
-      parametros.textureCustomCode === "ESTB" ||
-      parametros.textureCustomCode === "ESTF" ||
-      parametros.textureCustomCode === "ESTM"
-    ) {
-      price += price * 0.4;
-    } else if (
-      parametros.textureCustomCode === "NP300" ||
-      parametros.textureCustomCode === "NP200" ||
-      parametros.textureCustomCode === "P200L"
-    ) {
-      price += price * 0.6;
-    } else if (
-      parametros.textureCustomCode === "LACAM" ||
-      parametros.textureCustomCode === "LACAB"
-    ) {
-      price += price * 0.6;
-    } else if (parametros.textureCustomCode === "PANT") {
-      price += price * 0.35;
+    }
+    if (intv) {
+      if (
+        parametros.textureCustomCode === "ESTB" ||
+        parametros.textureCustomCode === "ESTF" ||
+        parametros.textureCustomCode === "ESTM"
+      ) {
+        price += price * 0.4;
+      } else if (
+        parametros.textureCustomCode === "NP300" ||
+        parametros.textureCustomCode === "NP200" ||
+        parametros.textureCustomCode === "P200L"
+      ) {
+        price += price * 0.6;
+      } else if (
+        parametros.textureCustomCode === "LACAM" ||
+        parametros.textureCustomCode === "LACAB"
+      ) {
+        price += price * 0.6;
+      } else if (parametros.textureCustomCode === "PANT") {
+        price += price * 0.35;
+      }
+
     } else {
       price += price * 0.1;
     }
@@ -525,7 +529,7 @@ const getInfoCabinet = (submodels) => {
       if (
         String(item.modelName).toLocaleUpperCase().indexOf("CASCO") !== -1 ||
         String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("CASCO") !==
-          -1
+        -1
       ) {
         values.materialCabinet = item.textureName;
       }
@@ -617,9 +621,9 @@ const getTotalDoors = (submodels) => {
       let perfil;
       if (
         String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("PURA") !==
-          -1 ||
+        -1 ||
         String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("GP") !==
-          -1 ||
+        -1 ||
         String(item.modelBrandGoodName)
           .toLocaleUpperCase()
           .indexOf("MONTEA") !== -1
@@ -694,8 +698,8 @@ const getCasco = (param) => {
   return param.customCode === "9876"
     ? param
     : param.subModels.find((x) =>
-        x.modelBrandGoodName?.toUpperCase().includes("CASCO")
-      );
+      x.modelBrandGoodName?.toUpperCase().includes("CASCO")
+    );
 };
 
 const findTexture = (casco) => {
@@ -945,7 +949,7 @@ export const parseJson3D = async (json) => {
           material: item.textureName,
           reference: getReferenceZocalo(item),
           customCode: item.textureCustomCode,
-          observation:item.remark,
+          observation: item.remark,
           size: {
             x: item.size.x,
             y: item.size.y,
@@ -1122,7 +1126,7 @@ export const parseJson3D = async (json) => {
           item.subModels.forEach((submodel) => {
             if (
               String(submodel.customCode).substring(0, 2) ===
-                CONFIG.CUSTOMCODE.DOOR ||
+              CONFIG.CUSTOMCODE.DOOR ||
               String(submodel.customCode) === "1001"
             ) {
               String(submodel.customCode) === "1001"
@@ -1465,7 +1469,7 @@ export const parseJson3D = async (json) => {
 
                   drawerPriceDetails.push(
                     parseFloat(getPrice(frente.datos, drawerSizeZ)) +
-                      parseFloat(perfil.price)
+                    parseFloat(perfil.price)
                   );
                   isCajonExist = true;
                 }
@@ -1492,7 +1496,7 @@ export const parseJson3D = async (json) => {
 
               drawerPriceDetails.push(
                 parseFloat(getPrice(frente.datos, drawerSizeZ)) +
-                  parseFloat(perfil.price)
+                parseFloat(perfil.price)
               );
 
               isCajonExist = true;
@@ -1533,16 +1537,14 @@ export const parseJson3D = async (json) => {
               if (!isNaN(sizeX)) {
                 if (itemx.reference?.indexOf("EGCL") > -1) {
                   const roundedValue = Math.ceil(sizeX / 100);
-                  referenceTemp = `${itemx.reference}${
-                    roundedValue * 10 || ""
-                  }`;
+                  referenceTemp = `${itemx.reference}${roundedValue * 10 || ""
+                    }`;
                 }
 
                 if (itemx.reference?.indexOf("CPL") > -1) {
                   const roundedValue = Math.floor(sizeX / 100);
-                  referenceTemp = `${itemx.reference}${
-                    roundedValue * 10 || ""
-                  }L`;
+                  referenceTemp = `${itemx.reference}${roundedValue * 10 || ""
+                    }L`;
                 }
               }
 
