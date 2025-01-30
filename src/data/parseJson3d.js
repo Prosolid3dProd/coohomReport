@@ -318,12 +318,13 @@ const getPrice = (parametros, tipo, materialCasco) => {
     parametros.ignoreParameters
   );
 
-  const intv = arrParameters?.some(
-    param => param?.displayName.toLocaleUpperCase() === "INTV" && parseFloat(param?.value) > 0
-  );
+
 
   price = findPrice(arrParameters);
   if (isCabinet) {
+    const intv = arrParameters?.some(
+      param => param?.displayName?.toLocaleUpperCase() === "INTV" && parseFloat(param?.value) > 0
+    );
     if (parametros.textureCustomCode === "C1") {
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
