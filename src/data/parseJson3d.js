@@ -358,9 +358,9 @@ const getPrice = (parametros, tipo, materialCasco) => {
         price += price * 0.35;
       }
 
-    } else {
+    } /*else {
       price += price * 0.1;
-    }
+    }*/
   }
   return price;
 };
