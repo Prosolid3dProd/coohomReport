@@ -26,7 +26,10 @@ const Report = () => {
   const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
   const [orderId, setOrderId] = useState(getLocalOrder());
   const [visible, setBtnVisible] = useState(false);
-  const [tabActivo, setTabActivo] = useState(0);
+  const [tabActivo, setTabActivo] = useState(
+    localStorage.getItem("activeTab") ? parseInt(localStorage.getItem("activeTab")) : 0
+  );
+  
 
   const priceC = existePrecio(getPrecio("C"));
   const priceF = existePrecio(getPrecio("F"));
@@ -154,7 +157,9 @@ const Report = () => {
 
   const handleTabChange = (key) => {
     setTabActivo(parseInt(key));
+    localStorage.setItem("activeTab", key);
   };
+  
 
   const getOrden = async () => {
     try {

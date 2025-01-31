@@ -1074,7 +1074,7 @@ const Presupuesto_Cliente = ({
                           <Text>{item.descripcion}</Text>
                         </View>
                         <View style={{ width: "30" }}>
-                          <Text>{item.discount || 0 + "%"}</Text>
+                          <Text>{item.discount || 0}%</Text>
                         </View>
                         <View style={{ width: "100", textAlign: "right" }}>
                           <Text>{parseFloat(item.total).toFixed(2)}</Text>
@@ -1152,13 +1152,13 @@ const Presupuesto_Cliente = ({
                             >
                               <Text>Referencia</Text>
                             </View>
-                            <View style={{ width: "280" }}>
+                            <View style={{ width: "300" }}>
                               <Text>Descripción</Text>
                             </View>
                             <View style={{ width: "30" }}>
                             <Text>Desc(%)</Text>
                           </View>
-                            <View style={{ width: "120", textAlign: "right" }}>
+                            <View style={{ width: "100", textAlign: "right" }}>
                               <Text>Total</Text>
                             </View>
                           </View>
@@ -1193,13 +1193,13 @@ const Presupuesto_Cliente = ({
                           >
                             <Text>{item.referencia}</Text>
                           </View>
-                          <View style={{ width: "280" }}>
+                          <View style={{ width: "300" }}>
                             <Text>{item.descripcion}</Text>
                           </View>
                           <View style={{ width: "30" }}>
-                          <Text>{item.discount || 0 + "%"}</Text>
+                          <Text>{item.discount || 0}%</Text>
                         </View>
-                          <View style={{ width: "120", textAlign: "right" }}>
+                          <View style={{ width: "100", textAlign: "right" }}>
                             <Text>{parseFloat(item.total).toFixed(2)}</Text>
                           </View>
                         </View>
@@ -1328,7 +1328,7 @@ const Presupuesto_Cliente = ({
                           <Text>{item.descripcion}</Text>
                         </View>
                         <View style={{ width: "30" }}>
-                          <Text>{item.discount || 0 + "%"}</Text>
+                          <Text>{item.discount || 0}%</Text>
                         </View>
                         <View style={{ width: "100", textAlign: "right" }}>
                           <Text>{parseFloat(item.total).toFixed(2)}</Text>
