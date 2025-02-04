@@ -6,6 +6,7 @@ import { PDFViewer } from "@react-pdf/renderer";
 import Confirmacion_Pedido from "./confirmacion_pedido";
 import { Presupuesto_Cliente } from "./index";
 import LogoERP from "../../../assets/logoERP.png";
+import Confirmacion_Pedido_Venta from "./confirmacion_pedido_venta";
 import {
   getOrders,
   getLocalOrder,
@@ -108,7 +109,7 @@ const Report = () => {
       "Presupuesto Venta Detallado": (
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
-            <Confirmacion_Pedido
+            <Confirmacion_Pedido_Venta
               price={priceP}
               data={data}
               title="Presupuesto Venta"

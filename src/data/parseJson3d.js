@@ -317,9 +317,12 @@ const getPrice = (parametros, tipo, materialCasco) => {
   const arrParameters = parametros?.parameters?.concat(
     parametros.ignoreParameters
   );
-
+  
   price = findPrice(arrParameters);
   if (isCabinet) {
+    const intv = arrParameters?.some(
+      param => param?.displayName?.toLocaleUpperCase() === "INTV" && parseFloat(param?.value) > 0
+    );
     if (parametros.textureCustomCode === "C1") {
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
@@ -328,31 +331,35 @@ const getPrice = (parametros, tipo, materialCasco) => {
         materialCasco === "169-NOGAL NATURAL"
       ) {
         price += price * 0.1;
-      } else {
+      } else if (intv) {
         price += price * 0.25;
       }
-    } else if (
-      parametros.textureCustomCode === "ESTB" ||
-      parametros.textureCustomCode === "ESTF" ||
-      parametros.textureCustomCode === "ESTM"
-    ) {
-      price += price * 0.4;
-    } else if (
-      parametros.textureCustomCode === "NP300" ||
-      parametros.textureCustomCode === "NP200" ||
-      parametros.textureCustomCode === "P200L"
-    ) {
-      price += price * 0.6;
-    } else if (
-      parametros.textureCustomCode === "LACAM" ||
-      parametros.textureCustomCode === "LACAB"
-    ) {
-      price += price * 0.6;
-    } else if (parametros.textureCustomCode === "PANT") {
-      price += price * 0.35;
-    } else {
-      price += price * 0.1;
     }
+    if (intv) {
+      if (
+        parametros.textureCustomCode === "ESTB" ||
+        parametros.textureCustomCode === "ESTF" ||
+        parametros.textureCustomCode === "ESTM"
+      ) {
+        price += price * 0.4;
+      } else if (
+        parametros.textureCustomCode === "NP300" ||
+        parametros.textureCustomCode === "NP200" ||
+        parametros.textureCustomCode === "P200L"
+      ) {
+        price += price * 0.6;
+      } else if (
+        parametros.textureCustomCode === "LACAM" ||
+        parametros.textureCustomCode === "LACAB"
+      ) {
+        price += price * 0.6;
+      } else if (parametros.textureCustomCode === "PANT") {
+        price += price * 0.35;
+      }
+
+    } /*else {
+      price += price * 0.1;
+    }*/
   }
   return price;
 };
