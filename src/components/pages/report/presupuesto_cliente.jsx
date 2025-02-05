@@ -535,7 +535,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
+                          parseFloat(item.total) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -587,7 +587,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
+                          parseFloat(item.total) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -639,7 +639,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
+                          parseFloat(item.total) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -691,7 +691,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
+                          parseFloat(item.total) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -743,7 +743,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
+                          parseFloat(item.total) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -795,7 +795,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
+                          parseFloat(item.total) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -847,7 +847,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
+                          parseFloat(item.total) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -899,7 +899,7 @@ const Presupuesto_Cliente = ({
                     <Text style={{ textAlign: "right" }}>
                       {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                       {(
-                        parseFloat(item.priceTotal) * parseFloat(data.coefficient)
+                        parseFloat(item.total) * parseFloat(data.coefficient)
                       ).toFixed(2)}
                     </Text>
                   )}
@@ -958,32 +958,33 @@ const Presupuesto_Cliente = ({
                   textAlign: "right",
                 }}
               >
-                <Text>{parseFloat(data.importe * data.coefficient).toFixed(2)}</Text>
+                {console.log(data)}
+                <Text>{parseFloat(data.importe).toFixed(2)}</Text>
               </View>
               {data?.discountCabinets && data?.discountCabinets != 0 && (
                 <View style={{ textAlign: "right", paddingLeft: "12" }}>
                   <View style={{ marginTop: "1", textAlign: "right" }}>
                     <Text>
-                      {parseFloat(calcularDescuento(data.importe, data.discountCabinets) * data.coefficient).toFixed(2)}
+                      {parseFloatcalcularDescuento(data.importe, data.discountCabinets)}
                     </Text>
                   </View>
                   <View style={{ marginTop: "1", textAlign: "right" }}>
                     <Text>
-                      {parseFloat(calcularImporteDescuento(
+                      {parseFloatcalcularImporteDescuento(
                         data.importe,
                         data.discountCabinets
-                      )* data.coefficient).toFixed(2)}
+                      )}
                     </Text>
                   </View>
                 </View>
               )}
               <View>
                 <Text>
-                  {parseFloat(calcularIvaCabinets(
+                  {calcularIvaCabinets(
                     data.importe,
                     data.discountCabinets,
                     data.ivaCabinets == "0" ? 21 : data.ivaCabinets
-                  ) * data.coefficient).toFixed(2)}
+                  )}
                 </Text>
               </View>
               <View
@@ -994,11 +995,11 @@ const Presupuesto_Cliente = ({
                 }}
               >
                 <Text>
-                  {parseFloat(calcularTotalDescuentoIvaCabinets(
+                  {calcularTotalDescuentoIvaCabinets(
                     data.importe,
                     data.discountCabinets,
                     data.ivaCabinets == "0" ? 21 : data.ivaCabinets
-                  ) * data.coefficient)}
+                  )}
                 </Text>
               </View>
             </View>
