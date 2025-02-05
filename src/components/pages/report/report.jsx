@@ -27,9 +27,10 @@ const Report = () => {
   const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
   const [orderId, setOrderId] = useState(getLocalOrder());
   const [visible, setBtnVisible] = useState(false);
-  const [tabActivo, setTabActivo] = useState(
-    localStorage.getItem("activeTab") ? parseInt(localStorage.getItem("activeTab")) : 0
-  );
+  // const [tabActivo, setTabActivo] = useState(
+  //   localStorage.getItem("activeTab") ? parseInt(localStorage.getItem("activeTab")) : 0
+  // );
+  const [tabActivo, setTabActivo] = useState(0);
   
 
   const priceC = existePrecio(getPrecio("C"));
@@ -47,9 +48,23 @@ const Report = () => {
 
   useEffect(() => {
     if (orderId._id) {
-      getOrden();
+      getOrden().then((info) => {
+        if (info && JSON.stringify(info) !== JSON.stringify(data)) {
+          setData(info);
+        }
+      });
     }
   }, [orderId]);
+  
+
+  useEffect(() => {
+    if (data) {
+      const storedData = JSON.parse(localStorage.getItem("order")) || {};
+      if (JSON.stringify(storedData) !== JSON.stringify(data)) {
+        localStorage.setItem("order", JSON.stringify(data));
+      }
+    }
+  }, [data]);
 
   useEffect(() => {
     const fetchData = async () => {

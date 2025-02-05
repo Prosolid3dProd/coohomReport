@@ -104,7 +104,7 @@ const Presupuesto_Cliente = ({
   const calcularTotalDescuento = (imp, descuento, iva) => {
     const importe = parseFloat(calcularImporteDescuento(imp, descuento));
     const ivaCalculado = parseFloat(calcularIva(imp, descuento, iva));
-    const total = importe + ivaCalculado;
+    const total = (importe + ivaCalculado);
     return total.toFixed(2);
   };
 
@@ -121,9 +121,9 @@ const Presupuesto_Cliente = ({
     return parseFloat(total).toFixed(2);
   };
 
-  const Total2 = ({ descuento, importe, seccion, iva, coeficiente }) => {
+  const Total2 = ({ descuento, importe, seccion, iva}) => {
     const sumaImportes = parseFloat(
-      calcularTotal(importe, seccion) * coeficiente
+      calcularTotal(importe, seccion)
     );
     const ivaPorcentaje = parseFloat(iva || 21);
     return (
@@ -148,7 +148,7 @@ const Presupuesto_Cliente = ({
             </>
           )}
           <View>
-            <Text>I.V.A. ({ivaPorcentaje ? "21" : ivaPorcentaje}%)</Text>
+            <Text>I.V.A. ({ivaPorcentaje}%)</Text>
           </View>
           <View style={{ marginTop: 2 }}>
             <Text>
@@ -535,7 +535,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
+                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -587,7 +587,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
+                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -639,7 +639,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
+                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -691,7 +691,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
+                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -743,7 +743,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
+                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -795,7 +795,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
+                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -847,7 +847,7 @@ const Presupuesto_Cliente = ({
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                         {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
+                          parseFloat(item.priceTotal) * parseFloat(data.coefficient)
                         ).toFixed(2)}
                       </Text>
                     )}
@@ -899,7 +899,7 @@ const Presupuesto_Cliente = ({
                     <Text style={{ textAlign: "right" }}>
                       {/* {parseFloat(item.priceTotal).toFixed(2)} */}
                       {(
-                        parseFloat(item.total) * parseFloat(data.coefficient)
+                        parseFloat(item.priceTotal) * parseFloat(data.coefficient)
                       ).toFixed(2)}
                     </Text>
                   )}
@@ -958,32 +958,32 @@ const Presupuesto_Cliente = ({
                   textAlign: "right",
                 }}
               >
-                <Text>{parseFloat(data.importe).toFixed(2)}</Text>
+                <Text>{parseFloat(data.importe * data.coefficient).toFixed(2)}</Text>
               </View>
               {data?.discountCabinets && data?.discountCabinets != 0 && (
                 <View style={{ textAlign: "right", paddingLeft: "12" }}>
                   <View style={{ marginTop: "1", textAlign: "right" }}>
                     <Text>
-                      {calcularDescuento(data.importe, data.discountCabinets)}
+                      {parseFloat(calcularDescuento(data.importe, data.discountCabinets) * data.coefficient).toFixed(2)}
                     </Text>
                   </View>
                   <View style={{ marginTop: "1", textAlign: "right" }}>
                     <Text>
-                      {calcularImporteDescuento(
+                      {parseFloat(calcularImporteDescuento(
                         data.importe,
                         data.discountCabinets
-                      )}
+                      )* data.coefficient).toFixed(2)}
                     </Text>
                   </View>
                 </View>
               )}
               <View>
                 <Text>
-                  {calcularIvaCabinets(
+                  {parseFloat(calcularIvaCabinets(
                     data.importe,
                     data.discountCabinets,
                     data.ivaCabinets == "0" ? 21 : data.ivaCabinets
-                  )}
+                  ) * data.coefficient).toFixed(2)}
                 </Text>
               </View>
               <View
@@ -994,11 +994,11 @@ const Presupuesto_Cliente = ({
                 }}
               >
                 <Text>
-                  {calcularTotalDescuentoIvaCabinets(
+                  {parseFloat(calcularTotalDescuentoIvaCabinets(
                     data.importe,
                     data.discountCabinets,
                     data.ivaCabinets == "0" ? 21 : data.ivaCabinets
-                  )}
+                  ) * data.coefficient)}
                 </Text>
               </View>
             </View>
@@ -1113,7 +1113,6 @@ const Presupuesto_Cliente = ({
                 totalEncimeras &&
                 filterData(data.details, "Encimera") !== "" && (
                   <Total2
-                    coeficiente={data.coefficient}
                     descuento={data.discountEncimeras}
                     importe={data.details}
                     seccion={"Encimera"}
@@ -1247,7 +1246,6 @@ const Presupuesto_Cliente = ({
                   totalEquipamiento &&
                   filterData(data.details, "Equipamiento") !== "" && (
                     <Total2
-                      coeficiente={data.coefficient}
                       descuento={data.discountEquipamientos}
                       importe={data.details}
                       seccion={"Equipamiento"}
@@ -1369,7 +1367,6 @@ const Presupuesto_Cliente = ({
                 totalElectrodomesticos &&
                 filterData(data.details, "Electrodomestico") !== "" && (
                   <Total2
-                    coeficiente={data.coefficient}
                     descuento={data.discountElectrodomesticos}
                     importe={data.details}
                     seccion={"Electrodomestico"}

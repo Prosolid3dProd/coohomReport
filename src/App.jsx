@@ -27,7 +27,6 @@ export const userContext = React.createContext();
 const App = () => {
   //IMPORTANTE! --> User debe de tomar información de BD
   const [users, setUsers] = useState(getLocalToken());
-  console.log(users)
 
   return (
     <>
