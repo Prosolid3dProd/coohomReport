@@ -65,7 +65,7 @@ const Presupuesto_Cliente = ({
     costados: [],
     accesorios: [],
   });
-
+  let sumPrice=0
   const logoGrande = (url) => {
     if (!url || url === "") {
       return <Image style={{ width: "100px" }} src={LogoSola} />;
@@ -222,7 +222,7 @@ const Presupuesto_Cliente = ({
         ),
       });
   }, [data]);
-
+  
   return (
     <Document title="Presupuesto COOHOM" pageMode="fullScreen">
       <Page
@@ -534,9 +534,11 @@ const Presupuesto_Cliente = ({
                         {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
+                     {sumPrice+=parseFloat(item.total)*parseFloat(data.coefficient)}
                   </View>
                 </View>
               ))}
+             
 
             {cabinets &&
               cabinets.murales.map((item) => (
@@ -583,6 +585,7 @@ const Presupuesto_Cliente = ({
                         {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
+                    {sumPrice+=parseFloat(item.total)*parseFloat(data.coefficient)}
                   </View>
                 </View>
               ))}
@@ -632,6 +635,7 @@ const Presupuesto_Cliente = ({
                         {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
+                    {sumPrice+=parseFloat(item.total)*parseFloat(data.coefficient)}
                   </View>
                 </View>
               ))}
@@ -681,6 +685,7 @@ const Presupuesto_Cliente = ({
                         {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
+                    {sumPrice+=parseFloat(item.total)*parseFloat(data.coefficient)}
                   </View>
                 </View>
               ))}
@@ -730,6 +735,7 @@ const Presupuesto_Cliente = ({
                         {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
+                    {sumPrice+=parseFloat(item.total)*parseFloat(data.coefficient)}
                   </View>
                 </View>
               ))}
@@ -779,6 +785,7 @@ const Presupuesto_Cliente = ({
                         {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
+                    {sumPrice+=parseFloat(item.total)*parseFloat(data.coefficient)}
                   </View>
                 </View>
               ))}
@@ -828,6 +835,7 @@ const Presupuesto_Cliente = ({
                         {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
+                    {sumPrice+=parseFloat(item.total)*parseFloat(data.coefficient)}
                   </View>
                 </View>
               ))}
@@ -877,6 +885,7 @@ const Presupuesto_Cliente = ({
                         {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     )}
+                  {sumPrice+=parseFloat(item.total)*parseFloat(data.coefficient)}
                   </View>
                 </View>
               ))}
@@ -932,7 +941,7 @@ const Presupuesto_Cliente = ({
                   textAlign: "right",
                 }}
               >
-                <Text>{parseFloat(data.importe).toFixed(2)}</Text>
+                <Text>{parseFloat(sumPrice).toFixed(2)}</Text>
               </View>
               {data?.discountCabinets && data?.discountCabinets != 0 && (
                 <View style={{ textAlign: "right", paddingLeft: "12" }}>
@@ -954,7 +963,7 @@ const Presupuesto_Cliente = ({
               <View>
                 <Text>
                   {calcularIvaCabinets(
-                    data.importe,
+                    sumPrice,
                     data.discountCabinets,
                     data.ivaCabinets == "0" ? 21 : data.ivaCabinets
                   )}
@@ -969,7 +978,7 @@ const Presupuesto_Cliente = ({
               >
                 <Text>
                   {calcularTotalDescuentoIvaCabinets(
-                    data.importe,
+                    sumPrice,
                     data.discountCabinets,
                     data.ivaCabinets == "0" ? 21 : data.ivaCabinets
                   )}
