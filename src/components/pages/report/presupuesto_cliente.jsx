@@ -55,6 +55,7 @@ const Presupuesto_Cliente = ({
   totalEquipamiento,
   totalElectrodomesticos,
 }) => {
+  console.log(price, "PRICE");
   const [cabinets, setCabinets] = useState({
     decorativos: [],
     altos: [],
@@ -958,7 +959,7 @@ const Presupuesto_Cliente = ({
                   textAlign: "right",
                 }}
               >
-                {console.log(data)}
+                {console.log(data,"ARRIBA IMPORTE")}
                 <Text>{parseFloat(data.importe).toFixed(2)}</Text>
               </View>
               {data?.discountCabinets && data?.discountCabinets != 0 && (
@@ -970,7 +971,7 @@ const Presupuesto_Cliente = ({
                   </View>
                   <View style={{ marginTop: "1", textAlign: "right" }}>
                     <Text>
-                      {parseFloatcalcularImporteDescuento(
+                      {calcularImporteDescuento(
                         data.importe,
                         data.discountCabinets
                       )}

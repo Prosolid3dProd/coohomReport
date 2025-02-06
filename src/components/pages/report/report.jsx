@@ -25,6 +25,7 @@ import "./report.css";
 const Report = () => {
   const [main, setMain] = useState(null);
   const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
+  console.log(data);
   const [orderId, setOrderId] = useState(getLocalOrder());
   const [visible, setBtnVisible] = useState(false);
   // const [tabActivo, setTabActivo] = useState(
@@ -58,12 +59,7 @@ const Report = () => {
   
 
   useEffect(() => {
-    if (data) {
-      const storedData = JSON.parse(localStorage.getItem("order")) || {};
-      if (JSON.stringify(storedData) !== JSON.stringify(data)) {
         localStorage.setItem("order", JSON.stringify(data));
-      }
-    }
   }, [data]);
 
   useEffect(() => {
