@@ -69,7 +69,6 @@ const OrderList = () => {
               {item.phone}
             </Col>
             <Col xs={24} sm={24} md={6}>
-              {" "}
               {item.createdAt}
             </Col>
           </Row>

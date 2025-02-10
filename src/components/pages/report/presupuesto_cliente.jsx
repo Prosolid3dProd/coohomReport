@@ -280,11 +280,11 @@ const Presupuesto_Cliente = ({
                 flexDirection: "column",
               }}
             >
-              <Text style={{ fontFamily: CONFIG.BOLD }}>Fecha:</Text>{" "}
-              <Text style={{ fontFamily: CONFIG.BOLD }}>Cliente:</Text>{" "}
-              <Text style={{ fontFamily: CONFIG.BOLD }}>Referencia:</Text>{" "}
-              <Text style={{ fontFamily: CONFIG.BOLD }}>Localidad:</Text>{" "}
-              <Text style={{ fontFamily: CONFIG.BOLD }}>Telefono:</Text>{" "}
+              <Text style={{ fontFamily: CONFIG.BOLD }}>Fecha:</Text>
+              <Text style={{ fontFamily: CONFIG.BOLD }}>Cliente:</Text>
+              <Text style={{ fontFamily: CONFIG.BOLD }}>Referencia:</Text>
+              <Text style={{ fontFamily: CONFIG.BOLD }}>Localidad:</Text>
+              <Text style={{ fontFamily: CONFIG.BOLD }}>Telefono:</Text>
             </View>
             <View
               style={{
@@ -503,7 +503,7 @@ const Presupuesto_Cliente = ({
                   }}
                 >
                   <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                    <Text>1</Text>{" "}
+                    <Text>1</Text>
                   </View>
                   <View
                     style={{
@@ -556,7 +556,7 @@ const Presupuesto_Cliente = ({
                   }}
                 >
                   <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                    <Text>1</Text>{" "}
+                    <Text>1</Text>
                   </View>
                   <View
                     style={{
@@ -609,7 +609,7 @@ const Presupuesto_Cliente = ({
                   }}
                 >
                   <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                    <Text>1</Text>{" "}
+                    <Text>1</Text>
                   </View>
                   <View
                     style={{
@@ -662,7 +662,7 @@ const Presupuesto_Cliente = ({
                   }}
                 >
                   <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                    <Text>1</Text>{" "}
+                    <Text>1</Text>
                   </View>
                   <View
                     style={{
@@ -715,7 +715,7 @@ const Presupuesto_Cliente = ({
                   }}
                 >
                   <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                    <Text>1</Text>{" "}
+                    <Text>1</Text>
                   </View>
                   <View
                     style={{
@@ -768,7 +768,7 @@ const Presupuesto_Cliente = ({
                   }}
                 >
                   <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                    <Text>{item.quantity}</Text>{" "}
+                    <Text>{item.quantity}</Text>
                   </View>
                   <View
                     style={{
@@ -821,7 +821,7 @@ const Presupuesto_Cliente = ({
                   }}
                 >
                   <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                    <Text>{item.quantity}</Text>{" "}
+                    <Text>{item.quantity}</Text>
                   </View>
                   <View
                     style={{
@@ -874,7 +874,7 @@ const Presupuesto_Cliente = ({
                 }}
               >
                 <View style={{ height: "10", width: "30", fontSize: "8" }}>
-                  <Text>1</Text>{" "}
+                  <Text>1</Text>
                 </View>
                 <View
                   style={{
@@ -1098,7 +1098,7 @@ const Presupuesto_Cliente = ({
                         }}
                       >
                         <View style={{ width: "30" }}>
-                          <Text>{item.qty}</Text>{" "}
+                          <Text>{item.qty}</Text>
                         </View>
                         <View style={{ width: "40" }}>
                           <Text>{item.grosor}</Text>
@@ -1220,7 +1220,7 @@ const Presupuesto_Cliente = ({
                           }}
                         >
                           <View style={{ width: "30" }}>
-                            <Text>{item.qty}</Text>{" "}
+                            <Text>{item.qty}</Text>
                           </View>
                           <View
                             style={{
@@ -1325,7 +1325,7 @@ const Presupuesto_Cliente = ({
                             <Text>Desc(%)</Text>
                           </View>
                           <View style={{ width: "100", textAlign: "right" }}>
-                            <Text>Total</Text>{" "}
+                            <Text>Total</Text>
                           </View>
                         </View>
                       </View>
@@ -1348,7 +1348,7 @@ const Presupuesto_Cliente = ({
                         }}
                       >
                         <View style={{ width: "30" }}>
-                          <Text>{item.qty}</Text>{" "}
+                          <Text>{item.qty}</Text>
                         </View>
                         <View
                           style={{

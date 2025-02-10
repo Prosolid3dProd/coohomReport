@@ -127,7 +127,7 @@ const General = ({ data }) => {
 
           <Col xs={24}>
             <Divider orientation="left">
-              <b className="uppercase">Observaciones</b>{" "}
+              <b className="uppercase">Observaciones</b>
               <span className="italic text-slate-400">(%)</span>
             </Divider>
           </Col>

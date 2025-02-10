@@ -346,13 +346,13 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
               >
                 <Text style={{ fontFamily: CONFIG.BOLD }}>
                   Confirmación nº:
-                </Text>{" "}
-                <Text style={{ fontFamily: CONFIG.BOLD }}>Creado:</Text>{" "}
+                </Text>
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Creado:</Text>
                 <Text style={{ fontFamily: CONFIG.BOLD }}>
                   Envío mercancía:
                 </Text>
-                <Text style={{ fontFamily: CONFIG.BOLD }}>Referencia:</Text>{" "}
-                <Text style={{ fontFamily: CONFIG.BOLD }}>Cliente:</Text>{" "}
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Referencia:</Text>
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Cliente:</Text>
               </View>
               <View
                 style={{
@@ -385,12 +385,12 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   flexDirection: "column",
                 }}
               >
-                <Text style={{ fontFamily: CONFIG.BOLD }}>Modelo:</Text>{" "}
-                <Text style={{ fontFamily: CONFIG.BOLD }}>Acabado:</Text>{" "}
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Modelo:</Text>
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Acabado:</Text>
                 <Text style={{ fontFamily: CONFIG.BOLD }}>Armazón:</Text>
-                <Text style={{ fontFamily: CONFIG.BOLD }}>Zócalo:</Text>{" "}
-                <Text style={{ fontFamily: CONFIG.BOLD }}>Tirador:</Text>{" "}
-                <Text style={{ fontFamily: CONFIG.BOLD }}>Cajón:</Text>{" "}
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Zócalo:</Text>
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Tirador:</Text>
+                <Text style={{ fontFamily: CONFIG.BOLD }}>Cajón:</Text>
               </View>
               <View
                 style={{
@@ -468,7 +468,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 wrap={false}
               >
                 <View style={{ width: "50", fontSize: "8" }}>
-                  <Text>{contador++}</Text>{" "}
+                  <Text>{contador++}</Text>
                 </View>
                 <View style={{ height: "100", width: "100", fontSize: "8" }}>
                   <Text>
@@ -507,7 +507,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
                     {formatNumber(item.priceDrawers) > 0 && (
                       <Text>
-                        - Frente:{" "}
+                        - Frente:
                         {item.drawerMaterialDetails.length > 0 &&
                           item.drawerPriceDetails.length > 0 && (
                             <View>
@@ -574,7 +574,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
                     {formatNumber(item.priceDoor) > 0 && (
                       <Text>
-                        - Puertas:{" "}
+                        - Puertas:
                         <Text
                           style={{
                             fontFamily: CONFIG.BOLD,
@@ -593,10 +593,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
                     {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
-                        - Armazón:{" "}
+                        - Armazón:
                         <Text style={{ fontSize: "8" }}>
                           {item.material || item.materialCabinet}
-                          {/* / [{" "}{formatNumber(item.priceCabinet)}] */}
+                          {/* / [{formatNumber(item.priceCabinet)}] */}
                         </Text>
                       </Text>
                     )}
@@ -607,17 +607,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        {" "}
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {" "}
-                            {it.name}:{" "}
+                            
+                            {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
                             String(it.name).toUpperCase() === "ANCHO PUERTA"
                               ? it.value
-                              : it.nameValue || it.description}{" "}
+                              : it.nameValue || it.description}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -713,7 +713,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       fontSize: "8",
                     }}
                   >
-                    <Text>{contador++}</Text>{" "}
+                    <Text>{contador++}</Text>
                   </View>
                   <View style={{ height: "100", width: "100", fontSize: "8" }}>
                     <Text>
@@ -760,7 +760,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       )}
                       {formatNumber(item.priceDrawers) > 0 && (
                         <Text>
-                          - Frente:{" "}
+                          - Frente:
                           {item.drawerMaterialDetails.length > 0 &&
                             item.drawerPriceDetails.length > 0 && (
                               <View>
@@ -780,7 +780,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       )}
                       {formatNumber(item.priceDoor) > 0 && (
                         <Text>
-                          - Puertas:{" "}
+                          - Puertas:
                           <Text
                             style={{
                               fontFamily: CONFIG.BOLD,
@@ -840,10 +840,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
                       {formatNumber(item.priceCabinet) > -1 && (
                         <Text>
-                          - Armazón:{" "}
+                          - Armazón:
                           <Text style={{ fontSize: "8" }}>
                             {item.material || item.materialCabinet}
-                            {/* / [{" "}{formatNumber(item.priceCabinet)} ] */}
+                            {/* / [{formatNumber(item.priceCabinet)} ] */}
                           </Text>
                         </Text>
                       )}
@@ -855,17 +855,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             flexDirection: "column",
                           }}
                         >
-                          {" "}
+                          
                           <Text>Variantes: </Text>
                           {item.variants.map((it) => (
                             <Text>
-                              {" "}
-                              {it.name}:{" "}
+                              
+                              {it.name}:
                               {it.name === "PVA" ||
                               it.name === "PVL" ||
                               String(it.name).toUpperCase() === "ANCHO PUERTA"
                                 ? it.value
-                                : it.nameValue || it.description}{" "}
+                                : it.nameValue || it.description}
                               {it.mcv ? "/" + it.mcv : ""}
                             </Text>
                           ))}
@@ -962,7 +962,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     fontSize: "8",
                   }}
                 >
-                  <Text>{contador++}</Text>{" "}
+                  <Text>{contador++}</Text>
                 </View>
                 <View style={{ height: "100", width: "100", fontSize: "8" }}>
                   <Text>
@@ -1041,17 +1041,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             fontSize: "8",
                           }}
                         >
-                          {item.modelDoor || ""} {item.modelDoor ? "/" : " "}{" "}
+                          {item.modelDoor || ""} {item.modelDoor ? "/" : " "}
                           {item.materialDoor || ""}
                         </Text>
                       </View>
                     )}
                     {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
-                        - Armazón:{" "}
+                        - Armazón:
                         <Text style={{ fontSize: "8" }}>
                           {item.material || item.materialCabinet}
-                          {/* / [{" "}{formatNumber(item.priceCabinet)} ] */}
+                          {/* / [{formatNumber(item.priceCabinet)} ] */}
                         </Text>
                       </Text>
                     )}
@@ -1063,17 +1063,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        {" "}
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {" "}
-                            {it.name}:{" "}
+                            
+                            {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
                             String(it.name).toUpperCase() === "ANCHO PUERTA"
                               ? it.value
-                              : it.nameValue || it.description}{" "}
+                              : it.nameValue || it.description}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1169,7 +1169,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     fontSize: "8",
                   }}
                 >
-                  <Text>{contador++}</Text>{" "}
+                  <Text>{contador++}</Text>
                 </View>
                 <View style={{ height: "100", width: "100", fontSize: "8" }}>
                   <Text>
@@ -1205,10 +1205,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     </Text>
                     <Text style={{ fontFamily: CONFIG.BOLD }}>{item.name}</Text>
                     <Text style={{ fontSize: "8" }}>
-                      L:{" "}
+                      L:
                       {item.name.toLocaleUpperCase().includes("REGLETA")
                         ? 150
-                        : item.size.x}{" "}
+                        : item.size.x}
                       F: {item.size?.y} A: {item.size?.z}
                     </Text>
                     {item.opening && (
@@ -1220,10 +1220,10 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     <Text>- Frente: {item.materialRegletaF}</Text>
                     {formatNumber(item.priceCabinet) >= 0 &&  !item.name.includes("Puerta") && !item.name.includes("Frente") && (
                       <Text>
-                        - Armazón:{" "}
+                        - Armazón:
                         <Text style={{ fontSize: "8" }}>
                           {item.materialRegleta}
-                          {/* / [{" "}{formatNumber(item.priceCabinet)} ] */}
+                          {/* / [{formatNumber(item.priceCabinet)} ] */}
                         </Text>
                       </Text>
                     )}
@@ -1235,17 +1235,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        {" "}
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {" "}
-                            {it.name}:{" "}
+                            
+                            {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
                             String(it.name).toUpperCase() === "ANCHO PUERTA"
                               ? it.value
-                              : it.nameValue || it.description}{" "}
+                              : it.nameValue || it.description}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1340,7 +1340,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     fontSize: "8",
                   }}
                 >
-                  <Text>{contador++}</Text>{" "}
+                  <Text>{contador++}</Text>
                 </View>
                 <View style={{ height: "100", width: "100", fontSize: "8" }}>
                   <Text>
@@ -1401,7 +1401,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             fontSize: "8",
                           }}
                         >
-                          {item.modelDoor || ""} {item.modelDoor ? "/" : " "}{" "}
+                          {item.modelDoor || ""} {item.modelDoor ? "/" : " "}
                           {item.materialDoor || ""}
                         </Text>
                       </View>
@@ -1429,14 +1429,14 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             fontSize: "8",
                           }}
                         >
-                          {item.modelDoor || ""} {item.modelDoor ? "/" : " "}{" "}
+                          {item.modelDoor || ""} {item.modelDoor ? "/" : " "}
                           {item.materialDoor || ""}
                         </Text>
                       </View>
                     )}
                     {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
-                        - Acabado:{" "}
+                        - Acabado:
                         <Text style={{ fontSize: "8" }}>
                           {item.materialCostado || "No hay acabado"}
                         </Text>
@@ -1450,17 +1450,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        {" "}
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {" "}
-                            {it.name}:{" "}
+                            
+                            {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
                             String(it.name).toUpperCase() === "ANCHO PUERTA"
                               ? it.value
-                              : it.nameValue || it.description}{" "}
+                              : it.nameValue || it.description}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1556,7 +1556,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     fontSize: "8",
                   }}
                 >
-                  <Text>{contador++}</Text>{" "}
+                  <Text>{contador++}</Text>
                 </View>
                 <View style={{ height: "100", width: "100", fontSize: "8" }}>
                   <Text>
@@ -1624,7 +1624,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             fontSize: "8",
                           }}
                         >
-                          {item.modelDoor || ""} {item.modelDoor ? "/" : " "}{" "}
+                          {item.modelDoor || ""} {item.modelDoor ? "/" : " "}
                           {item.materialDoor || ""}
                         </Text>
                       </View>
@@ -1633,7 +1633,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text>
                         {item.materialCabinetMP && (
                           <>
-                            - Armazon:{" "}
+                            - Armazon:
                             <Text style={{ fontSize: "8" }}>
                               {item.materialCabinetMP}
                             </Text>
@@ -1642,7 +1642,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         )}
                         {item.materialCabinetAcab && (
                           <>
-                            - Acabado:{" "}
+                            - Acabado:
                             <Text style={{ fontSize: "8" }}>
                               {item.materialCabinetAcab}
                             </Text>
@@ -1653,7 +1653,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           !item.materialCabinetAcab &&
                           item.material && (
                             <>
-                              - Acabado:{" "}
+                              - Acabado:
                               <Text style={{ fontSize: "8" }}>
                                 {item.material}
                               </Text>
@@ -1693,7 +1693,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           })
                           .map((it) => (
                             <Text key={it.name}>
-                              {it.name}:{" "}
+                              {it.name}:
                               {[
                                 "PVA",
                                 "PVL",
@@ -1703,7 +1703,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                                 "VUELO DERECHO",
                               ].includes(String(it.name).toUpperCase())
                                 ? it.value
-                                : it.nameValue || it.description}{" "}
+                                : it.nameValue || it.description}
                               {it.mcv ? "/" + it.mcv : ""}
                             </Text>
                           ))}
@@ -1802,7 +1802,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   wrap={false}
                 >
                   <View style={{ width: "50", fontSize: "8" }}>
-                    <Text>{contador++}</Text>{" "}
+                    <Text>{contador++}</Text>
                   </View>
                   <View style={{ height: "100", width: "100", fontSize: "8" }}>
                     <Text>
@@ -1844,7 +1844,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       )}
                       {
                         <Text>
-                          - Acabado:{" "}
+                          - Acabado:
                           <Text style={{ fontSize: "8" }}>
                             {verificarVariable(item.material)}
                           </Text>
@@ -1858,17 +1858,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        {" "}
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {" "}
-                            {it.name}:{" "}
+                            
+                            {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
                             String(it.name).toUpperCase() === "ANCHO PUERTA"
                               ? it.value
-                              : it.nameValue || it.description}{" "}
+                              : it.nameValue || it.description}
                             {it.mcv ? "/" + it.mcv : ""}
                           </Text>
                         ))}
@@ -1956,7 +1956,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 wrap={false}
               >
                 <View style={{ width: "50", fontSize: "8" }}>
-                  <Text>{contador++}</Text>{" "}
+                  <Text>{contador++}</Text>
                 </View>
                 <View style={{ height: "100", width: "100", fontSize: "8" }}>
                   <Text>
@@ -1991,7 +1991,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                     </Text>
                     {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
-                        - Acabado:{" "}
+                        - Acabado:
                         <Text style={{ fontSize: "8" }}>{item.material}</Text>
                       </Text>
                     )}
@@ -2006,17 +2006,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         flexDirection: "column",
                       }}
                     >
-                      {" "}
+                      
                       <Text>Variantes: </Text>
                       {item.variants.map((it) => (
                         <Text>
-                          {" "}
-                          {it.name}:{" "}
+                          
+                          {it.name}:
                           {it.name === "PVA" ||
                           it.name === "PVL" ||
                           String(it.name).toUpperCase() === "ANCHO PUERTA"
                             ? it.value
-                            : it.nameValue || it.description}{" "}
+                            : it.nameValue || it.description}
                           {it.mcv ? "/" + it.mcv : ""}
                         </Text>
                       ))}

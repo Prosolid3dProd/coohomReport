@@ -25,69 +25,48 @@ import "./report.css";
 const Report = () => {
   const [main, setMain] = useState(null);
   const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
-  console.log(data);
   const [orderId, setOrderId] = useState(getLocalOrder());
   const [visible, setBtnVisible] = useState(false);
-  // const [tabActivo, setTabActivo] = useState(
-  //   localStorage.getItem("activeTab") ? parseInt(localStorage.getItem("activeTab")) : 0
-  // );
   const [tabActivo, setTabActivo] = useState(0);
-  
+  const [profile, setProfile] = useState(null);
 
   const priceC = existePrecio(getPrecio("C"));
-  const priceF = existePrecio(getPrecio("F"));
   const priceP = existePrecio(getPrecio("P"));
   const total_Encimeras = existeTotales(getTotales("Encimeras"));
   const total_Equipamiento = existeTotales(getTotales("Equipamiento"));
-  const total_Electrodomesticos = existeTotales(
-    getTotales("Electrodomesticos")
-  );
+  const total_Electrodomesticos = existeTotales(getTotales("Electrodomesticos"));
 
-  useEffect(() => {
-    setMain(document.getElementById("main"));
-  }, []);
-
-  useEffect(() => {
-    if (orderId._id) {
-      getOrden().then((info) => {
-        if (info && JSON.stringify(info) !== JSON.stringify(data)) {
-          setData(info);
-        }
-      });
-    }
-  }, [orderId]);
-  
-
-  useEffect(() => {
-        localStorage.setItem("order", JSON.stringify(data));
-  }, [data]);
-
+  // useEffect que se ejecuta solo una vez cuando se monta el componente o cuando cambia el `orderId`
   useEffect(() => {
     const fetchData = async () => {
-      if (orderId._id && tabActivo <= 3) {
-        const updatedInfo = fixOrder(data, tabActivo);
-        const profile = await getProfile();
-        setData({ ...updatedInfo, profile });
-        getOrders({ ...updatedInfo, profile });
+      if (orderId._id) {
+        try {
+          const result = await getOrderById({ _id: orderId._id });
+          const profileData = await getProfile();
+          const updatedInfo = fixOrder(result);
+          setProfile(profileData);
+          setData({ ...updatedInfo, profile: profileData });
+          getOrders({ ...updatedInfo, profile: profileData });
+        } catch (error) {
+          console.error(error);
+        }
       }
     };
     fetchData();
-  }, [tabActivo]);
+  }, [orderId]); // Solo ejecutará cuando el `orderId` cambie
 
+  // useEffect que maneja el cambio de tabs. No realiza actualizaciones innecesarias.
   useEffect(() => {
-    const tabs = document.querySelectorAll('.ant-tabs-tab');
-    if (tabs.length >= 2) {
-      tabs[0].style.backgroundColor = 'rgba(26, 122, 248, 0.1)';
-      tabs[0].style.padding = '0 10px';
-      tabs[0].style.color = 'black';
-      tabs[0].style.fontWeight = 'bold';
-
-      tabs[1].style.backgroundColor = 'rgba(26, 122, 248, 0.1)'; 
-      tabs[1].style.padding = '0 10px';
-      tabs[1].style.color = 'black';
-      tabs[1].style.fontWeight = 'bold';
+    // Solo realiza la actualización de datos si el tabActivo cambia y no si `data` o `profile` no han cambiado
+    if (tabActivo <= 3 && orderId._id && data) {
+      const updatedInfo = fixOrder(data, tabActivo);
+      const fetchProfile = async () => {
+        const profileData = await getProfile();
+        setProfile(profileData);
+      };
+      fetchProfile();
     }
-  }, [tabActivo]);
+  }, [tabActivo, data, orderId]); // Este efecto se ejecutará solo cuando `tabActivo` cambie, no por cambios de `data` innecesarios
 
   const tabs = [
     {
@@ -171,25 +150,6 @@ const Report = () => {
     setTabActivo(parseInt(key));
     localStorage.setItem("activeTab", key);
   };
-  
-
-  const getOrden = async () => {
-    try {
-      const result = await getOrderById({ _id: orderId._id });
-      if (result) {
-        const info = fixOrder(result);
-        const profile = await getProfile();
-
-        setData({ ...info, profile });
-        getOrders({ ...info, profile });
-        return info;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   useEffect(() => {
     if (main) {
@@ -216,7 +176,7 @@ const Report = () => {
             style={{ padding: 20 }}
           >
             <h1 className="text-sv p-2 inline">
-              Ordén{" "}
+              Ordén
               <NavLink
                 to="/Dashboard/Presupuestos"
                 className="italic font-bold hover:underline hover:text-blue"

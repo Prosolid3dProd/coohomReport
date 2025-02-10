@@ -16,7 +16,7 @@ const Header = () => (
     <Icono />
     <h1 style={{ color: "#000" }}>
       <b> {JSON.parse(localStorage.getItem("token")).user?.name}</b>
-    </h1>{" "}
+    </h1>
     &nbsp; &nbsp; &nbsp;
     <Typography.Link href="https://coohom-report.vercel.app/Login">
       Cerrar Sesión

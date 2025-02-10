@@ -433,7 +433,7 @@ const Muebles = () => {
                   }}
                 >
                   Editar
-                </Typography.Link>{" "}
+                </Typography.Link>
                 &nbsp;&nbsp; | &nbsp;&nbsp;
                 <Popconfirm
                   okType="default"

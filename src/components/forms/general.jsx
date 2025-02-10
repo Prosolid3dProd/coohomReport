@@ -45,7 +45,7 @@ const General = ({ getData, data }) => {
     //     : data?.userId?.coefficient,
     // modelDoor: data?.modelDoor,
     // materialDoor: data?.materialDoor,
-    // handle: data?.modelHandle,
+    modelHandler: data?.modelHandler,
     drawer: data?.modelDrawer + data?.materialDrawer,
     // materialCabinet: data?.materialCabinet,
     // observation: data?.observation?.includes("null") ? "" : data.observation,
@@ -127,10 +127,12 @@ const General = ({ getData, data }) => {
         //       : data?.userId?.coefficient,
         // }));
         setLocalOrder(result);
+        localStorage.setItem("order", JSON.stringify(result));
         message.success("Se ha actualizado correctamente");
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
+        console.log("result", result);
+        // setTimeout(() => {
+        //   location.reload();
+        // }, 1000);
       }
     }
   };
@@ -196,7 +198,7 @@ const General = ({ getData, data }) => {
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={5}>
-            <Form.Item label="Tirador" name="handle">
+            <Form.Item label="Tirador" name="modelHandler">
               <Input placeholder="" maxLength="200" />
             </Form.Item>
           </Col>

@@ -317,11 +317,13 @@ const getPrice = (parametros, tipo, materialCasco) => {
   const arrParameters = parametros?.parameters?.concat(
     parametros.ignoreParameters
   );
-  
+
   price = findPrice(arrParameters);
   if (isCabinet) {
     const intv = arrParameters?.some(
-      param => param?.displayName?.toLocaleUpperCase() === "INTV" && parseFloat(param?.value) > 0
+      (param) =>
+        param?.displayName?.toLocaleUpperCase() === "INTV" &&
+        parseFloat(param?.value) > 0
     );
     if (parametros.textureCustomCode === "C1") {
     } else if (parametros.textureCustomCode === "PLAM") {
@@ -356,7 +358,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
       } else if (parametros.textureCustomCode === "PANT") {
         price += price * 0.35;
       }
-
     } /*else {
       price += price * 0.1;
     }*/
@@ -614,25 +615,27 @@ const getPerfil = (perf) => {
 
 const getTotalDoors = (submodels) => {
   let total = 0;
-
-  submodels.forEach((item) => {
-    if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DOOR) {
-      let perfil;
-      if (
-        String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("PURA") !==
-          -1 ||
-        String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("GP") !==
-          -1 ||
-        String(item.modelBrandGoodName)
-          .toLocaleUpperCase()
-          .indexOf("MONTEA") !== -1
-      ) {
-        perfil = getPerfil(item.subModels);
+  if (!submodels) {
+    submodels.forEach((item) => {
+      if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DOOR) {
+        let perfil;
+        if (
+          String(item.modelBrandGoodName)
+            .toLocaleUpperCase()
+            .indexOf("PURA") !== -1 ||
+          String(item.modelBrandGoodName).toLocaleUpperCase().indexOf("GP") !==
+            -1 ||
+          String(item.modelBrandGoodName)
+            .toLocaleUpperCase()
+            .indexOf("MONTEA") !== -1
+        ) {
+          perfil = getPerfil(item.subModels);
+        }
+        total =
+          parseFloat(getPrice(item)) + total + parseFloat(perfil?.price || 0);
       }
-      total =
-        parseFloat(getPrice(item)) + total + parseFloat(perfil?.price || 0);
-    }
-  });
+    });
+  }
   return parseFloat(total);
 };
 
@@ -948,7 +951,7 @@ export const parseJson3D = async (json) => {
           material: item.textureName,
           reference: getReferenceZocalo(item),
           customCode: item.textureCustomCode,
-          observation:item.remark,
+          observation: item.remark,
           size: {
             x: item.size.x,
             y: item.size.y,
@@ -1508,7 +1511,7 @@ export const parseJson3D = async (json) => {
           const cantidad = item.parameters.find((c) => c.name === "Cantidad");
           let totalPrice =
             parseFloat(items.priceCabinet) +
-            parseFloat(getTotalDoors(item.subModels)) +
+            parseFloat(getTotalDoors(item?.subModels)) +
             parseFloat(
               getPriceParameters(
                 item.parameters,
@@ -1562,7 +1565,7 @@ export const parseJson3D = async (json) => {
                   tipo: CONFIG.MODELNAME.ACCESORIOS.CODE,
                   reference: referenceTemp,
                   doors: 0,
-                  priceDoor: parseFloat(getTotalDoors(item.subModels)),
+                  priceDoor: parseFloat(getTotalDoors(item?.subModels)),
                   total:
                     parseFloat(itemx.price) * parseFloat(itemx.quantity || 1),
                   size: item.boxSize,
@@ -1653,7 +1656,7 @@ export const parseJson3D = async (json) => {
               opening,
               modelDrawer: modeloDrawer,
               zocalo: zocalo,
-              priceDoor: parseInt(getTotalDoors(item.subModels)),
+              priceDoor: parseInt(getTotalDoors(item?.subModels)),
               total: totalPrice,
               size: getCalculoFondo(item),
               variants: getParameters(item, referenceType.type),
@@ -1699,7 +1702,7 @@ export const parseJson3D = async (json) => {
             )
           ) +
           // parseFloat(priceCabinet) +
-          parseFloat(getTotalDoors(item.subModels)) +
+          parseFloat(getTotalDoors(item?.subModels)) +
           parseFloat(
             getPriceParameters(
               item.parameters,
