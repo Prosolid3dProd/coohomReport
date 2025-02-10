@@ -59,7 +59,7 @@ const Report = () => {
   useEffect(() => {
     // Solo realiza la actualización de datos si el tabActivo cambia y no si `data` o `profile` no han cambiado
     if (tabActivo <= 3 && orderId._id && data) {
-      const updatedInfo = fixOrder(data, tabActivo);
+      // const updatedInfo = fixOrder(data, tabActivo);
       const fetchProfile = async () => {
         const profileData = await getProfile();
         setProfile(profileData);
@@ -70,20 +70,24 @@ const Report = () => {
 
   const tabs = [
     {
-      "Confirmación de Pedido": (
+      key: "0",
+      label: "Confirmación de Pedido",
+      component: (
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
               price={priceP}
               data={data}
-              title="Confirmacion de Pedido"
+              title="Confirmación de Pedido"
             />
           </PDFViewer>
         </div>
       ),
     },
     {
-      "Presupuesto": (
+      key: "1",
+      label: "Presupuesto",
+      component: (
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
@@ -96,7 +100,9 @@ const Report = () => {
       ),
     },
     {
-      "Presupuesto Venta Detallado": (
+      key: "2",
+      label: "Presupuesto Venta Detallado",
+      component: (
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido_Venta
@@ -109,7 +115,9 @@ const Report = () => {
       ),
     },
     {
-      "Presupuesto Venta Simplificado": (
+      key: "3",
+      label: "Presupuesto Venta Simplificado",
+      component: (
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Presupuesto_Cliente
@@ -124,27 +132,34 @@ const Report = () => {
       ),
     },
     {
-      "Información General": (
+      key: "4",
+      label: "Información General",
+      component: (
         <div className="alturaPreview">
           <General getData={setData} data={data} />
         </div>
       ),
     },
     {
-      "Complementos": (
+      key: "5",
+      label: "Complementos",
+      component: (
         <div className="alturaPreview">
           <Product getData={setData} />
         </div>
       ),
     },
     {
-      "Mi Perfil": (
+      key: "6",
+      label: "Mi Perfil",
+      component: (
         <div className="alturaPreview">
           <Profile getData={setData} data={data} />
         </div>
       ),
     },
   ];
+  
 
   const handleTabChange = (key) => {
     setTabActivo(parseInt(key));
@@ -217,11 +232,12 @@ const Report = () => {
             onChange={handleTabChange}
             activeKey={tabActivo.toString()}
             centered
-            items={tabs.map((tabItem, i) => {
+            defaultActiveKey="0"
+            items={tabs.map(({ key, label, component }) => {
               return {
-                label: `${Object.keys(tabItem)}`,
-                key: i.toString(),
-                children: Object.values(tabItem),
+                label,
+                key,
+                children: component,
               };
             })}
           />

@@ -180,7 +180,7 @@ const Perfil = () => {
                             </>
                         }
                     />
-                    <Section text={<NavLink to={'/Login'} className={'text-blue'}><span className='flex flex-row justify-start gap-2 items-center self-start '>Exit<Exit className='bg-blue/25 rounded-full h-[30px] w-[30px] p-1'/></span></NavLink>} />
+                    <Section text={<NavLink to={'/Login'} className={'text-blue'}><span className='flex flex-row justify-start gap-2 items-center self-start '>Exit<Exit className='bg-blue-600/25 rounded-full h-[30px] w-[30px] p-1'/></span></NavLink>} />
                 </>
             }
         />

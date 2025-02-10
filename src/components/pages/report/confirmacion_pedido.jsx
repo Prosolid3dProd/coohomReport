@@ -217,7 +217,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
   const [ivaCalculado, setIvaCalculado] = useState(0);
 
   useEffect(() => {
-    console.log("Data actualizada en Confirmacion_Pedido", data);
     if (!data || !data.cabinets || data.cabinets.length === 0) return; 
 
     const calcularSumaTotal = (productos) => {
@@ -694,9 +693,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   )}
                 </View>
               </View>
-              {cabinets.murales.map((item, key) => (
+              {cabinets.murales.map((item) => (
                 <View
-                  key={key}
+                  key={item.obsBrandGoodId}
                   style={{
                     display: "flex",
                     flexDirection: "row",

@@ -5,7 +5,7 @@ import { Typography } from "antd";
 const Icono = () => (
   <NavLink
     to={`/Dashboard/Presupuestos`}
-    className="flex justify-center items-center mr-3 w-[30px] h-[30px] text-[18px] rounded-md bg-blue font-semibold transition ease-out duration-350 dark:colorbotonDark"
+    className="flex justify-center items-center mr-3 w-[30px] h-[30px] text-[18px] rounded-md bg-blue-600 font-semibold transition ease-out duration-350"
   >
     <span className="text-white pt-0.5">C</span>
   </NavLink>

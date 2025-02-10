@@ -219,7 +219,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
   const [ivaCalculado, setIvaCalculado] = useState(0);
 
   useEffect(() => {
-    console.log("Data actualizada en Confirmacion_Pedido_Venta:", data);
     if (!data || !data.cabinets || data.cabinets.length === 0) return; 
 
     const calcularSumaTotal = (productos) => {

@@ -211,7 +211,7 @@ const ShopsForm = ({ setListaTiendas }) => {
         ))}
         <Form.Item wrapperCol={{ offset: 14 }}>
           <Button
-            className="bg-blue text-white"
+            className="bg-blue-600 text-white"
             type="default"
             htmlType="submit"
           >
@@ -428,6 +428,7 @@ const Admin = () => {
           columns={columns}
           dataSource={listaTiendas}
           loading={load}
+          rowKey={"id"}
           pagination={{ pageSize }}
         />
       </section>

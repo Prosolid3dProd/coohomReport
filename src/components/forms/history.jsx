@@ -266,6 +266,7 @@ const History = () => {
             loading={load}
             dataSource={data}
             columns={columns}
+            rowKey={"_id"}
             pagination={{ pageSize }}
           />
         </Card>

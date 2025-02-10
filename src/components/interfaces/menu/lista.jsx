@@ -17,12 +17,17 @@ const Item = ({ name, Icon, textShown }) => (
 
 const Lista = ({ change, textShown }) => {
   const campaign = localStorage.getItem("campaign");
-  const roleItems = campaign === CONFIG.ROLE.ADMIN ? items : campaign === CONFIG.ROLE.CLIENT ? itemsCliente : [];
+  const roleItems =
+    campaign === CONFIG.ROLE.ADMIN
+      ? items
+      : campaign === CONFIG.ROLE.CLIENT
+      ? itemsCliente
+      : [];
 
   return (
     <ul className="flex items-center h-full w-full flex-col pt-4 list-disc relative">
-      {roleItems.map(({ id, name, icon }) => (
-        <li key={id} className="w-full">
+      {roleItems.map(({ name, icon }, index) => (
+        <li key={index} className="w-full">
           <Item
             name={name}
             Icon={icon}

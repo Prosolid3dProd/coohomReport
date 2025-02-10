@@ -416,6 +416,7 @@ const Muebles = () => {
           //   expandedRowRender
           // }}
           pagination={false}
+          rowKey={"id"}
           scroll={{ y: 'calc(100vh - 390px)' }}
         >
           <Table.Column

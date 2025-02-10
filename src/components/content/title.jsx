@@ -4,8 +4,8 @@ import { File } from "../icons";
 import { LabelAction } from "../utils";
 import { ButtonAction } from "../utils/btnAction";
 import { FiDownload } from "../icons";
+import { DeleteOutlined, DownloadOutlined, UploadOutlined } from "@ant-design/icons";
 import { breakPointMD, breakpoint, typeOfText as type } from "./logic/btnLogic";
-import { UploadOutlined } from "@ant-design/icons";
 import { fetchData } from "../pages/Encimeras/encimeras";
 import { parseJson3D } from "../../data";
 import { createOrder } from "../../handlers/order";
@@ -58,13 +58,13 @@ const Actions = ({
   //   setLoading(true);
   //   try {
   //     const newData = await parseJson3D(json);
-  
+
   //     const existingIndex = data.findIndex((item) => item.orderCode === newData.orderCode);
-  
+
   //     if (existingIndex !== -1) {
   //       const existingItem = data[existingIndex];
   //       const result = await updateOrder({ ...newData, _id: existingItem._id });
-  
+
   //       console.log(result)
   //       if (result) {
   //         setData((prevData) => {
@@ -93,9 +93,11 @@ const Actions = ({
     setLoading(true);
     try {
       const newData = await parseJson3D(json);
-  
-      const existingIndex = data.findIndex((item) => item.orderCode === newData.orderCode);
-  
+
+      const existingIndex = data.findIndex(
+        (item) => item.orderCode === newData.orderCode
+      );
+
       if (existingIndex !== -1) {
         const upData = await createOrder(newData);
         setData((prevData) => {
@@ -104,7 +106,9 @@ const Actions = ({
           );
           return updatedData;
         });
-        message.success(upData.result.projectName + " actualizado correctamente");
+        message.success(
+          upData.result.projectName + " actualizado correctamente"
+        );
       } else {
         const order = await createOrder(newData);
         setData((prevData) => [order.result, ...prevData]);
@@ -116,10 +120,9 @@ const Actions = ({
     }
     setLoading(false);
   };
-  
 
   const handleChange = async (info) => {
-    console.log(info.file)
+    console.log(info.file);
     setLoading(true);
     if (info.file.status === "done") {
       message.success(`${info.file.name} biblioteca actualizada con exito`);
@@ -198,7 +201,7 @@ const Actions = ({
                   border: "1px solid red",
                   color: "red",
                 }}
-                icon={<UploadOutlined />}
+                icon={<DeleteOutlined />}
               >
                 Eliminar
               </Button>
@@ -220,23 +223,26 @@ const Exportar = ({ file }) => {
     setScreenWidth((width) => (width = window.innerWidth));
 
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div>
       {file && (
-        <>
-          <LabelAction
-            text={
-              <>
-                <input className="hidden z-10" onClick={file} />
-                {type(
-                  breakpoint(screenWidth, breakPointMD),
-                  "Descargar",
-                  <FiDownload className="text-sv" />
-                )}
-              </>
-            }
-            color={"green"}
-          ></LabelAction>
-        </>
+        <Button
+          type="default"
+          className="flex items-center"
+          style={{
+            height: "60px",
+            border: "1px solid green",
+            color: "green",
+            width: "102px",
+          }}
+          onClick={file}
+          icon={<DownloadOutlined />}
+        >
+          {type(
+            breakpoint(screenWidth, breakPointMD),
+            "Descargar",
+            <FiDownload className="text-xl" />
+          )}
+        </Button>
       )}
     </div>
   );

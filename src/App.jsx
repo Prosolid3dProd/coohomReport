@@ -13,6 +13,7 @@ import {
   Admin,
 } from "./components/index";
 import { getLocalToken } from "./data/localStorage";
+import './index.css'
 
 export const userContext = React.createContext();
 
