@@ -66,6 +66,7 @@ const General = ({ getData, data }) => {
   const [isInputEditable, setIsInputEditable] = useState(role !== "client");
   const [password, setPassword] = useState("");
   const [isClient, setIsClient] = useState(role === "client");
+  const [coefficientValue, setCoefficientValue] = useState(data.coefficient);
   const correctPassword = "1234";
 
   const [precios, setPrecios] = useState({
@@ -98,16 +99,22 @@ const General = ({ getData, data }) => {
     }
   };
 
-  const handleOk = () => {
-    if (password === correctPassword) {
-      setIsInputEditable(true);
-      message.success("Coeficiente desbloqueado");
-    } else {
-      message.error("Contraseña incorrecta");
-    }
-    setIsOpenModal(false);
-    setPassword("");
-  };
+
+const handleOk = () => {
+  if (password === correctPassword) {
+    setIsInputEditable(true); // Permite editar el campo
+    message.success("Coeficiente desbloqueado");
+  } else {
+    message.error("Contraseña incorrecta");
+  }
+  setIsOpenModal(false);
+  setPassword(""); // Reseteamos la contraseña
+};
+
+const handleCoefficientChange = (e) => {
+  setCoefficientValue(e.target.value); // Cambiar el valor del coeficiente
+};
+
 
   const handleCancel = () => {
     setIsOpenModal(false);
@@ -222,30 +229,32 @@ const General = ({ getData, data }) => {
             </p>
           </Divider>
           <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Coeficiente de Venta" name="coefficient">
-              <div style={{ position: "relative" }}>
-                <Input
-                  value={data.coefficient}
-                  readOnly={!isInputEditable}
-                  style={!isInputEditable ? { opacity: 0.7 } : {}}
-                  disabled={role === "admin" ? true : false}
-                />
-                {!isInputEditable && (
-                  <div
-                    onClick={showModal}
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: "rgba(255, 255, 255, 0.2)",
-                      cursor: "pointer",
-                    }}
-                  ></div>
-                )}
-              </div>
-            </Form.Item>
+          <Form.Item label="Coeficiente de Venta" name="coefficient">
+  <div style={{ position: "relative" }}>
+    <Input
+      value={coefficientValue}
+      onChange={handleCoefficientChange} // Manejar el cambio de valor
+      readOnly={!isInputEditable}
+      style={!isInputEditable ? { opacity: 0.7 } : {}}
+      disabled={role === "admin"}
+    />
+    {!isInputEditable && (
+      <div
+        onClick={showModal}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(255, 255, 255, 0.2)",
+          cursor: "pointer",
+        }}
+      ></div>
+    )}
+  </div>
+</Form.Item>
+
           </Col>
           {role === "admin" && (
             <Col xs={24} sm={24} md={4}>
