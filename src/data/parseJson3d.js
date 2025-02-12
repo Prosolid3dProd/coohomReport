@@ -618,7 +618,7 @@ const getPerfil = (perf) => {
 const getTotalDoors = (submodels) => {
   let total = 0;
   if (!submodels) {
-    submodels.forEach((item) => {
+    submodels?.forEach((item) => {
       if (String(item.customCode).substring(0, 2) === CONFIG.CUSTOMCODE.DOOR) {
         let perfil;
         if (
