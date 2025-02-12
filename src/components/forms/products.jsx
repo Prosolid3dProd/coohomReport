@@ -75,15 +75,15 @@ const Product = ({ getData }) => {
     const { cantidad, unidad } = formValues;
     const descuento = form.getFieldValue("discount") || 0; // Obtener el descuento del formulario
     const unidadConDescuento = unidad - (descuento / 100) * unidad; // Aplicar descuento
-  
-    const total = !isNaN(cantidad) && !isNaN(unidadConDescuento) 
-      ? cantidad * unidadConDescuento 
-      : 0;
-  
+
+    const total =
+      !isNaN(cantidad) && !isNaN(unidadConDescuento)
+        ? cantidad * unidadConDescuento
+        : 0;
+
     setFormValues((prev) => ({ ...prev, unidad: unidadConDescuento, total }));
     form.setFieldsValue({ unidad: unidadConDescuento.toFixed(2) }); // Actualizar visualmente
-  }, [formValues.cantidad, formValues.unidad, form.getFieldValue("discount")]);
-  
+  }, [form.getFieldValue("discount")]);
 
   const updateLocalOrderData = useCallback(
     (updatedDetails) => {
@@ -95,44 +95,43 @@ const Product = ({ getData }) => {
             : detail
         ),
       };
-  
+
       // Actualizar el estado global
       setState((prev) => ({ ...prev, data: updatedData }));
-  
+
       // Guardar los datos en el almacenamiento local o en otro estado compartido
       setLocalOrder(updatedData);
-      getData(updatedData);  // Si esta función propaga los datos a otras pestañas
+      getData(updatedData); // Si esta función propaga los datos a otras pestañas
     },
     [state.data, getData]
   );
-  
-  
 
   const onFinish = async (values) => {
     try {
       const parsedUnidad = parseFloat(values.unidad || 0);
       const descuento = values.discount || 0;
-      const unidadConDescuento = parsedUnidad - (descuento / 100) * parsedUnidad;
-  
+      const unidadConDescuento =
+        parsedUnidad - (descuento / 100) * parsedUnidad;
+
       if (!values.type) {
         message.error("Por favor seleccione un TIPO DE COMPONENTE");
         return;
       }
-  
+
       if (!state.data?._id) return;
-  
+
       const updatedDetails = {
         ...values,
         unidad: unidadConDescuento.toFixed(2), // Aplicamos el descuento en la unidad
         total: parseFloat(values.qty) * unidadConDescuento,
       };
-  
+
       const result = await CreateOrderDetails({
         details: updatedDetails,
         isUpdate: state.isUpdate,
         _id: state.data._id,
       });
-  
+
       if (result) {
         const updatedData = {
           ...state.data,
@@ -142,7 +141,7 @@ const Product = ({ getData }) => {
         setLocalOrder(updatedData);
         getData(updatedData);
         message.success("Se ha actualizado correctamente");
-  
+
         form.resetFields(); // Resetea el formulario
       }
     } catch (error) {
@@ -155,27 +154,28 @@ const Product = ({ getData }) => {
       const parsedUnidad = parseFloat(values.unidad) || 0; // El precio unitario original (sin descuento)
       const parsedDiscount = parseFloat(values.discount) || 0; // Descuento
       const parsedQty = parseFloat(values.qty) || 1; // Cantidad, por defecto 1
-      
+
       // 🔹 Calcular el precio con descuento aplicado
-      const discountedPrice = parsedUnidad - (parsedDiscount / 100) * parsedUnidad; // Precio unitario con descuento
-  
+      const discountedPrice =
+        parsedUnidad - (parsedDiscount / 100) * parsedUnidad; // Precio unitario con descuento
+
       // 🔹 Recalcular el total con la cantidad y el precio con descuento
       const updatedTotal = discountedPrice * parsedQty; // Total con la cantidad y el precio con descuento
-  
+
       // 🔹 Crear el nuevo objeto actualizado con descuento aplicado
       const updatedValues = {
         ...values,
         unidad: parsedUnidad.toFixed(2), // Mantener el precio unitario original (sin descuento)
         total: updatedTotal.toFixed(2), // Total calculado con descuento
       };
-  
+
       // 🔹 Actualizar el detalle en la base de datos
       const result = await updateOrderDetails({
         details: updatedValues,
         isUpdate: state.isUpdate,
         _id: state.data._id,
       });
-  
+
       if (result) {
         // 🔹 Actualizar los datos locales y la tabla
         updateLocalOrderData(updatedValues);
@@ -186,40 +186,36 @@ const Product = ({ getData }) => {
       console.error("Error al actualizar detalles:", error);
     }
   };
-  
-  
-  
-  
-const [loading, setLoading] = useState(false); // Estado de carga para la tabla
 
-const archivedComplementDetails = async (details) => {
-  try {
-    setLoading(true); // Activar el loading antes de eliminar
+  const [loading, setLoading] = useState(false); // Estado de carga para la tabla
 
-    const result = await handleArchivedOrderDetails({
-      _id: state.data._id,
-      details,
-    });
+  const archivedComplementDetails = async (details) => {
+    try {
+      setLoading(true); // Activar el loading antes de eliminar
 
-    if (result) {
-      const updatedDetails = state.data.details.filter(
-        (detail) => detail.referencia !== details.referencia
-      );
-      const updatedData = { ...state.data, details: updatedDetails };
+      const result = await handleArchivedOrderDetails({
+        _id: state.data._id,
+        details,
+      });
 
-      setState((prev) => ({ ...prev, data: updatedData }));
-      setLocalOrder(updatedData);
-      getData(updatedData);
-      message.success("Se ha eliminado el complemento");
+      if (result) {
+        const updatedDetails = state.data.details.filter(
+          (detail) => detail.referencia !== details.referencia
+        );
+        const updatedData = { ...state.data, details: updatedDetails };
+
+        setState((prev) => ({ ...prev, data: updatedData }));
+        setLocalOrder(updatedData);
+        getData(updatedData);
+        message.success("Se ha eliminado el complemento");
+      }
+    } catch (error) {
+      console.error("Error al eliminar detalles:", error);
+      message.error("Hubo un error al eliminar el complemento");
+    } finally {
+      setLoading(false); // Desactivar el loading cuando termine
     }
-  } catch (error) {
-    console.error("Error al eliminar detalles:", error);
-    message.error("Hubo un error al eliminar el complemento");
-  } finally {
-    setLoading(false); // Desactivar el loading cuando termine
-  }
-};
-
+  };
 
   const columns = [
     { title: "Codigo", dataIndex: "referencia", key: "referencia" },
@@ -302,7 +298,9 @@ const archivedComplementDetails = async (details) => {
               <Input
                 type="number"
                 min={0}
-                onChange={(e) => setCantidad(e.target.value || 0)}
+                onChange={(e) =>
+                  setFormValues({ cantidad: e.target.value || 0 })
+                }
               />
             </Form.Item>
           </Col>
@@ -322,9 +320,7 @@ const archivedComplementDetails = async (details) => {
             <Form.Item label="Precio Unidad" name="unidad">
               <Input
                 type="number"
-                onChange={(e) =>
-                  setUnidad(parseFloat(e.target.value).toFixed(2))
-                }
+                onChange={(e) => setFormValues({ unidad: e.target.value || 0 })}
               />
             </Form.Item>
           </Col>
@@ -344,7 +340,9 @@ const archivedComplementDetails = async (details) => {
                 type="link"
                 onClick={() => {
                   if (!state.type) {
-                    message.warning("Por favor seleccione un TIPO DE COMPONENTE antes de buscar.");
+                    message.warning(
+                      "Por favor seleccione un TIPO DE COMPONENTE antes de buscar."
+                    );
                     return;
                   }
                   updateModals({ isModalOpen: true });
@@ -371,7 +369,7 @@ const archivedComplementDetails = async (details) => {
         footer={null}
       >
         <EncimerasModal
-        title={"Complementos"}
+          title={"Complementos"}
           setEncimera={(encimera) =>
             setState((prev) => ({ ...prev, encimera }))
           }
