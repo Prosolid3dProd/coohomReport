@@ -53,7 +53,7 @@ const Report = () => {
       }
     };
     fetchData();
-  }, [orderId]); // Solo ejecutará cuando el `orderId` cambie
+  }, [tabActivo]); // Solo ejecutará cuando el `orderId` cambie
 
   // useEffect que maneja el cambio de tabs. No realiza actualizaciones innecesarias.
   useEffect(() => {

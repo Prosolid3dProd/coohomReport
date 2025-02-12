@@ -49,11 +49,11 @@ const General = ({ getData, data }) => {
     drawer: data?.modelDrawer + data?.materialDrawer,
     // materialCabinet: data?.materialCabinet,
     // observation: data?.observation?.includes("null") ? "" : data.observation,
-    // fecha: String(data?.fecha).split(" ")[0],
-    // discountEncimeras: data?.discountEncimeras,
-    // discountCabinets: data?.discountCabinets,
-    // discountElectrodomesticos: data?.discountElectrodomesticos,
-    // discountEquipamientos: data?.discountEquipamientos,
+    fecha: String(data?.fecha).split(" ")[0],
+    discountEncimeras: data?.discountEncimeras,
+    discountCabinets: data?.discountCabinets,
+    discountElectrodomesticos: data?.discountElectrodomesticos,
+    discountEquipamientos: data?.discountEquipamientos,
     // ivaEncimeras: data?.ivaEncimeras,
     // ivaCabinets: data?.ivaCabinets,
     // ivaElectrodomesticos: data?.ivaElectrodomesticos,
@@ -129,7 +129,6 @@ const General = ({ getData, data }) => {
         setLocalOrder(result);
         localStorage.setItem("order", JSON.stringify(result));
         message.success("Se ha actualizado correctamente");
-        console.log("result", result);
         // setTimeout(() => {
         //   location.reload();
         // }, 1000);
@@ -226,7 +225,7 @@ const General = ({ getData, data }) => {
             <Form.Item label="Coeficiente de Venta" name="coefficient">
               <div style={{ position: "relative" }}>
                 <Input
-                  defaultValue={data.coefficient}
+                  value={data.coefficient}
                   readOnly={!isInputEditable}
                   style={!isInputEditable ? { opacity: 0.7 } : {}}
                   disabled={role === "admin" ? true : false}
@@ -253,7 +252,7 @@ const General = ({ getData, data }) => {
               <Form.Item label="Coeficiente Venta" name="coefficient">
                 <div style={{ position: "relative" }}>
                   <Input
-                    defaultValue={data?.userId?.coefficientVentaTienda}
+                    value={data?.userId?.coefficientVentaTienda}
                     readOnly={!isInputEditable}
                     style={!isInputEditable ? { opacity: 0.7 } : {}}
                     disabled={role === "admin" ? true : false}
@@ -292,11 +291,11 @@ const General = ({ getData, data }) => {
               />
             </Form.Item>
           </Modal>
-          <Col xs={24} sm={24} md={2}>
-            <Form.Item label="IVA" name="iva">
-              <Input placeholder="" maxLength="5" defaultValue="21%" disabled />
+          {/* <Col xs={24} sm={24} md={2}>
+            <Form.Item label="IVA" name="iva" initialValue={"21%"}>
+              <Input placeholder="" maxLength="5" disabled />
             </Form.Item>
-          </Col>
+          </Col> */}
           <Divider orientation="left">
             <p className="uppercase">
               <b>Descuentos</b>
@@ -332,22 +331,22 @@ const General = ({ getData, data }) => {
           </Divider>
           <Col xs={24} sm={24} md={4}>
             <Form.Item label="Encimeras" name="ivaEncimeras">
-              <Input placeholder="" maxLength="50" defaultValue={21} />
+              <Input placeholder="" maxLength="50" />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={4}>
             <Form.Item label="Muebles" name="ivaCabinets">
-              <Input placeholder="" maxLength="50" defaultValue={21} />
+              <Input placeholder="" maxLength="50" />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={4}>
             <Form.Item label="Electrodomésticos" name="ivaElectrodomesticos">
-              <Input placeholder="" maxLength="50" defaultValue={21} />
+              <Input placeholder="" maxLength="50" />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={4}>
             <Form.Item label="Equipamientos" name="ivaEquipamientos">
-              <Input placeholder="" maxLength="50" defaultValue={21} />
+              <Input placeholder="" maxLength="50" />
             </Form.Item>
           </Col>
 

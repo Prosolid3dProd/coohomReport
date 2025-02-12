@@ -21,25 +21,26 @@ import {
 import { Header } from "../content"; // Componente de encabezado.
 
 const getDiferenciaDias = (creacionPresupuesto) => {
-  const creationalDate = new Date(creacionPresupuesto); // Convierte la fecha de creación en un objeto Date.
-  const actualDate = new Date(); // Obtiene la fecha actual.
+  if (!creacionPresupuesto) return [0, false]; // Evita valores inválidos
 
-  // Función para verificar si dos fechas son el mismo día.
-  const esMismoDia = (date1, date2) => {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  };
+  const creationalDate = new Date(creacionPresupuesto);
+  if (isNaN(creationalDate)) return [0, false]; // Evita cálculos con fechas inválidas
 
-  const creadoHoy = esMismoDia(actualDate, creationalDate); // Determina si la fecha de creación es hoy.
-  // Calcula la diferencia de días si no es el mismo día.
+  const actualDate = new Date();
+
+  const esMismoDia = (date1, date2) =>
+    date1.getDate() === date2.getDate() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getFullYear() === date2.getFullYear();
+
+  const creadoHoy = esMismoDia(actualDate, creationalDate);
   const diffTiempo = creadoHoy
     ? 0
     : Math.ceil(Math.abs(actualDate - creationalDate) / (1000 * 3600 * 24));
-  return [diffTiempo, creadoHoy]; // Devuelve un array con la diferencia y si fue creado hoy.
+
+  return [diffTiempo, creadoHoy];
 };
+
 
 const History = () => {
   const [data, setData] = useState([]); // Estado para almacenar los datos mostrados en la tabla.
@@ -107,11 +108,15 @@ const History = () => {
   // Efecto para manejar el tamaño de paginación según el tamaño de la ventana.
   useEffect(() => {
     const handleResize = () => {
-      const windowHeight = window.innerHeight; // Altura de la ventana.
-      const newRowHeight = 100; // Altura aproximada de una fila.
-      const newPageSize = Math.floor((windowHeight - 200) / newRowHeight); // Calcula cuántas filas caben.
-      setPageSize(newPageSize); // Actualiza el tamaño de la página.
-    };
+      const windowHeight = window.innerHeight;
+      const newRowHeight = 100;
+      let newPageSize = Math.floor((windowHeight - 200) / newRowHeight);
+    
+      if (isNaN(newPageSize) || newPageSize <= 0) {
+        newPageSize = 5; // Valor por defecto en caso de error
+      }
+      setPageSize(newPageSize);
+    };    
 
     handleResize(); // Ajusta el tamaño inicial.
     window.addEventListener("resize", handleResize); // Añade un listener para cambios de tamaño.
@@ -264,10 +269,10 @@ const History = () => {
               borderRight: "1px solid #e8e8e8",
             }}
             loading={load}
-            dataSource={data}
+            dataSource={Array.isArray(data) ? data : []}
             columns={columns}
             rowKey={"_id"}
-            pagination={{ pageSize }}
+            pagination={{ pageSize: Number(pageSize) || 5 }} 
           />
         </Card>
       </article>

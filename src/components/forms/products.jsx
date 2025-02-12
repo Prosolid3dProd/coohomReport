@@ -280,8 +280,8 @@ const Product = ({ getData }) => {
             </Form.Item>
           </Col>
           <Col xs={24} md={4}>
-            <Form.Item label="Descuento(%)" name="discount">
-              <Input type="number" defaultValue={0} />
+            <Form.Item label="Descuento(%)" name="discount" initialValue={0}>
+              <Input type="number" />
             </Form.Item>
           </Col>
         </Row>
