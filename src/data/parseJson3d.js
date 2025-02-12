@@ -297,6 +297,7 @@ const getFrente = (block) => {
 
 const getPrice = (parametros, tipo, materialCasco) => {
   const isCabinet = tipo === "cabinet";
+
   let price = 0;
 
   const findPrice = (items) => {
@@ -320,6 +321,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
 
   price = findPrice(arrParameters);
   if (isCabinet) {
+    price == 0 ? price = 10000 : price;
     const intv = arrParameters?.some(
       (param) =>
         param?.displayName?.toLocaleUpperCase() === "INTV" &&

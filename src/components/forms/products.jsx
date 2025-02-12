@@ -22,6 +22,7 @@ import {
   setLocalOrder,
 } from "../../handlers/order";
 import EncimerasModal from "../pages/Encimeras/encimerasModal";
+import { data } from "autoprefixer";
 
 const Product = ({ getData }) => {
   const [form] = Form.useForm();
@@ -72,9 +73,17 @@ const Product = ({ getData }) => {
   // Calcula el total dinámicamente
   useEffect(() => {
     const { cantidad, unidad } = formValues;
-    const total = !isNaN(cantidad) && !isNaN(unidad) ? cantidad * unidad : 0;
-    setFormValues((prev) => ({ ...prev, total }));
-  }, [formValues.cantidad, formValues.unidad]);
+    const descuento = form.getFieldValue("discount") || 0; // Obtener el descuento del formulario
+    const unidadConDescuento = unidad - (descuento / 100) * unidad; // Aplicar descuento
+  
+    const total = !isNaN(cantidad) && !isNaN(unidadConDescuento) 
+      ? cantidad * unidadConDescuento 
+      : 0;
+  
+    setFormValues((prev) => ({ ...prev, unidad: unidadConDescuento, total }));
+    form.setFieldsValue({ unidad: unidadConDescuento.toFixed(2) }); // Actualizar visualmente
+  }, [formValues.cantidad, formValues.unidad, form.getFieldValue("discount")]);
+  
 
   const updateLocalOrderData = useCallback(
     (updatedDetails) => {
@@ -82,42 +91,48 @@ const Product = ({ getData }) => {
         ...state.data,
         details: state.data.details.map((detail) =>
           detail.referencia === updatedDetails.referencia
-            ? updatedDetails
+            ? { ...detail, ...updatedDetails } // Solo actualiza el que coincide
             : detail
         ),
       };
+  
+      // Actualizar el estado global
       setState((prev) => ({ ...prev, data: updatedData }));
+  
+      // Guardar los datos en el almacenamiento local o en otro estado compartido
       setLocalOrder(updatedData);
-      getData(updatedData);
+      getData(updatedData);  // Si esta función propaga los datos a otras pestañas
     },
     [state.data, getData]
   );
+  
+  
 
   const onFinish = async (values) => {
     try {
-      const parsedUnidad = parseFloat(values.unidad || 0).toFixed(2);
-
+      const parsedUnidad = parseFloat(values.unidad || 0);
+      const descuento = values.discount || 0;
+      const unidadConDescuento = parsedUnidad - (descuento / 100) * parsedUnidad;
+  
       if (!values.type) {
         message.error("Por favor seleccione un TIPO DE COMPONENTE");
         return;
       }
-
+  
       if (!state.data?._id) return;
-
+  
       const updatedDetails = {
         ...values,
-        unidad: values.discount
-          ? parseFloat(parsedUnidad) - (values.discount / 100) * parsedUnidad
-          : parseFloat(parsedUnidad),
-        total: parseFloat(values.qty) * parseFloat(parsedUnidad),
+        unidad: unidadConDescuento.toFixed(2), // Aplicamos el descuento en la unidad
+        total: parseFloat(values.qty) * unidadConDescuento,
       };
-
+  
       const result = await CreateOrderDetails({
         details: updatedDetails,
         isUpdate: state.isUpdate,
         _id: state.data._id,
       });
-
+  
       if (result) {
         const updatedData = {
           ...state.data,
@@ -127,6 +142,8 @@ const Product = ({ getData }) => {
         setLocalOrder(updatedData);
         getData(updatedData);
         message.success("Se ha actualizado correctamente");
+  
+        form.resetFields(); // Resetea el formulario
       }
     } catch (error) {
       console.error("Error al guardar los detalles:", error);
@@ -135,13 +152,33 @@ const Product = ({ getData }) => {
 
   const onEditFinish = async (values) => {
     try {
+      const parsedUnidad = parseFloat(values.unidad) || 0; // El precio unitario original (sin descuento)
+      const parsedDiscount = parseFloat(values.discount) || 0; // Descuento
+      const parsedQty = parseFloat(values.qty) || 1; // Cantidad, por defecto 1
+      
+      // 🔹 Calcular el precio con descuento aplicado
+      const discountedPrice = parsedUnidad - (parsedDiscount / 100) * parsedUnidad; // Precio unitario con descuento
+  
+      // 🔹 Recalcular el total con la cantidad y el precio con descuento
+      const updatedTotal = discountedPrice * parsedQty; // Total con la cantidad y el precio con descuento
+  
+      // 🔹 Crear el nuevo objeto actualizado con descuento aplicado
+      const updatedValues = {
+        ...values,
+        unidad: parsedUnidad.toFixed(2), // Mantener el precio unitario original (sin descuento)
+        total: updatedTotal.toFixed(2), // Total calculado con descuento
+      };
+  
+      // 🔹 Actualizar el detalle en la base de datos
       const result = await updateOrderDetails({
-        details: values,
+        details: updatedValues,
         isUpdate: state.isUpdate,
         _id: state.data._id,
       });
+  
       if (result) {
-        updateLocalOrderData(values);
+        // 🔹 Actualizar los datos locales y la tabla
+        updateLocalOrderData(updatedValues);
         message.success("Actualización exitosa");
         updateModals({ isEditModalOpen: false });
       }
@@ -149,28 +186,40 @@ const Product = ({ getData }) => {
       console.error("Error al actualizar detalles:", error);
     }
   };
+  
+  
+  
+  
+const [loading, setLoading] = useState(false); // Estado de carga para la tabla
 
-  const archivedComplementDetails = async (details) => {
-    try {
-      const result = await handleArchivedOrderDetails({
-        _id: state.data._id,
-        details,
-      });
-      if (result) {
-        const updatedDetails = state.data.details.filter(
-          (detail) => detail.referencia !== details.referencia
-        );
-        const updatedData = { ...state.data, details: updatedDetails };
+const archivedComplementDetails = async (details) => {
+  try {
+    setLoading(true); // Activar el loading antes de eliminar
 
-        setState((prev) => ({ ...prev, data: updatedData }));
-        setLocalOrder(updatedData);
-        getData(updatedData);
-        message.success("Se ha eliminado el complemento");
-      }
-    } catch (error) {
-      console.error("Error al archivar detalles:", error);
+    const result = await handleArchivedOrderDetails({
+      _id: state.data._id,
+      details,
+    });
+
+    if (result) {
+      const updatedDetails = state.data.details.filter(
+        (detail) => detail.referencia !== details.referencia
+      );
+      const updatedData = { ...state.data, details: updatedDetails };
+
+      setState((prev) => ({ ...prev, data: updatedData }));
+      setLocalOrder(updatedData);
+      getData(updatedData);
+      message.success("Se ha eliminado el complemento");
     }
-  };
+  } catch (error) {
+    console.error("Error al eliminar detalles:", error);
+    message.error("Hubo un error al eliminar el complemento");
+  } finally {
+    setLoading(false); // Desactivar el loading cuando termine
+  }
+};
+
 
   const columns = [
     { title: "Codigo", dataIndex: "referencia", key: "referencia" },
@@ -293,7 +342,13 @@ const Product = ({ getData }) => {
               </Button>
               <Button
                 type="link"
-                onClick={() => updateModals({ isModalOpen: true })}
+                onClick={() => {
+                  if (!state.type) {
+                    message.warning("Por favor seleccione un TIPO DE COMPONENTE antes de buscar.");
+                    return;
+                  }
+                  updateModals({ isModalOpen: true });
+                }}
               >
                 Buscar más elementos
               </Button>
@@ -305,6 +360,7 @@ const Product = ({ getData }) => {
       <Table
         dataSource={state.data?.details || []}
         columns={columns}
+        loading={loading}
         rowKey="referencia"
       />
       <Modal
@@ -349,7 +405,7 @@ const Product = ({ getData }) => {
           <Form.Item label="Descuento" name="discount">
             <Input />
           </Form.Item>
-          <Form.Item label="Total" name="total">
+          <Form.Item label="Total" name="unidad">
             <Input />
           </Form.Item>
           <Form.Item>
@@ -357,7 +413,7 @@ const Product = ({ getData }) => {
               Guardar
             </Button>
             <Button
-              onClick={() => setIsEditModalOpen(false)}
+              onClick={() => updateModals({ isEditModalOpen: false })}
               style={{ marginLeft: 8 }}
             >
               Cancelar

@@ -55,8 +55,8 @@ const Presupuesto_Cliente = ({
   totalEquipamiento,
   totalElectrodomesticos,
 }) => {
-
   let sumPrice = 0;
+  const hasDiscount = data.details.some((item) => item.discount > 0);
   const [cabinets, setCabinets] = useState({
     decorativos: [],
     altos: [],
@@ -106,7 +106,7 @@ const Presupuesto_Cliente = ({
   const calcularTotalDescuento = (imp, descuento, iva) => {
     const importe = parseFloat(calcularImporteDescuento(imp, descuento));
     const ivaCalculado = parseFloat(calcularIva(imp, descuento, iva));
-    const total = (importe + ivaCalculado);
+    const total = importe + ivaCalculado;
     return total.toFixed(2);
   };
 
@@ -123,10 +123,8 @@ const Presupuesto_Cliente = ({
     return parseFloat(total).toFixed(2);
   };
 
-  const Total2 = ({ descuento, importe, seccion, iva}) => {
-    const sumaImportes = parseFloat(
-      calcularTotal(importe, seccion)
-    );
+  const Total2 = ({ descuento, importe, seccion, iva }) => {
+    const sumaImportes = parseFloat(calcularTotal(importe, seccion));
     const ivaPorcentaje = parseFloat(iva || 21);
     return (
       <View
@@ -250,7 +248,6 @@ const Presupuesto_Cliente = ({
               marginBottom: "18",
             }}
           >
-            {/* {console.log(data)} */}
             <View>{logoGrande(data.userId?.logo)}</View>
             <Text
               style={{
@@ -541,7 +538,10 @@ const Presupuesto_Cliente = ({
                         ).toFixed(2)}
                       </Text>
                     )}
-                    {sumPrice+=parseFloat(item?.total)*parseFloat(data?.coefficient)}
+                    {
+                      (sumPrice +=
+                        parseFloat(item?.total) * parseFloat(data?.coefficient))
+                    }
                   </View>
                 </View>
               ))}
@@ -594,7 +594,10 @@ const Presupuesto_Cliente = ({
                         ).toFixed(2)}
                       </Text>
                     )}
-                    {sumPrice+=parseFloat(item?.total)*parseFloat(data?.coefficient)}
+                    {
+                      (sumPrice +=
+                        parseFloat(item?.total) * parseFloat(data?.coefficient))
+                    }
                   </View>
                 </View>
               ))}
@@ -647,7 +650,10 @@ const Presupuesto_Cliente = ({
                         ).toFixed(2)}
                       </Text>
                     )}
-                    {sumPrice+=parseFloat(item?.total)*parseFloat(data?.coefficient)}
+                    {
+                      (sumPrice +=
+                        parseFloat(item?.total) * parseFloat(data?.coefficient))
+                    }
                   </View>
                 </View>
               ))}
@@ -700,7 +706,10 @@ const Presupuesto_Cliente = ({
                         ).toFixed(2)}
                       </Text>
                     )}
-                    {sumPrice+=parseFloat(item?.total)*parseFloat(data?.coefficient)}
+                    {
+                      (sumPrice +=
+                        parseFloat(item?.total) * parseFloat(data?.coefficient))
+                    }
                   </View>
                 </View>
               ))}
@@ -753,7 +762,10 @@ const Presupuesto_Cliente = ({
                         ).toFixed(2)}
                       </Text>
                     )}
-                    {sumPrice+=parseFloat(item?.total)*parseFloat(data?.coefficient)}
+                    {
+                      (sumPrice +=
+                        parseFloat(item?.total) * parseFloat(data?.coefficient))
+                    }
                   </View>
                 </View>
               ))}
@@ -806,7 +818,10 @@ const Presupuesto_Cliente = ({
                         ).toFixed(2)}
                       </Text>
                     )}
-                    {sumPrice+=parseFloat(item?.total)*parseFloat(data?.coefficient)}
+                    {
+                      (sumPrice +=
+                        parseFloat(item?.total) * parseFloat(data?.coefficient))
+                    }
                   </View>
                 </View>
               ))}
@@ -859,7 +874,10 @@ const Presupuesto_Cliente = ({
                         ).toFixed(2)}
                       </Text>
                     )}
-                    {sumPrice+=parseFloat(item?.total)*parseFloat(data?.coefficient)}
+                    {
+                      (sumPrice +=
+                        parseFloat(item?.total) * parseFloat(data?.coefficient))
+                    }
                   </View>
                 </View>
               ))}
@@ -912,7 +930,10 @@ const Presupuesto_Cliente = ({
                       ).toFixed(2)}
                     </Text>
                   )}
-                  {sumPrice+=parseFloat(item?.total)*parseFloat(data?.coefficient)}
+                  {
+                    (sumPrice +=
+                      parseFloat(item?.total) * parseFloat(data?.coefficient))
+                  }
                 </View>
               </View>
             ))}
@@ -1071,9 +1092,11 @@ const Presupuesto_Cliente = ({
                           <View style={{ width: "300" }}>
                             <Text>Descripción</Text>
                           </View>
-                          <View style={{ width: "30" }}>
-                            <Text>Desc(%)</Text>
-                          </View>
+                          {hasDiscount && (
+                            <View style={{ width: "30" }}>
+                              <Text>Desc(%)</Text>
+                            </View>
+                          )}
                           <View style={{ width: "100", textAlign: "right" }}>
                             <Text>Total</Text>
                           </View>
@@ -1109,9 +1132,11 @@ const Presupuesto_Cliente = ({
                         <View style={{ width: "300" }}>
                           <Text>{item.descripcion}</Text>
                         </View>
-                        <View style={{ width: "30" }}>
-                          <Text>{item.discount || 0}%</Text>
-                        </View>
+                        {hasDiscount && (
+                          <View style={{ width: "30" }}>
+                            <Text>{item.discount || 0}%</Text>
+                          </View>
+                        )}
                         <View style={{ width: "100", textAlign: "right" }}>
                           <Text>{parseFloat(item.total).toFixed(2)}</Text>
                         </View>
@@ -1191,9 +1216,11 @@ const Presupuesto_Cliente = ({
                             <View style={{ width: "300" }}>
                               <Text>Descripción</Text>
                             </View>
-                            <View style={{ width: "30" }}>
-                              <Text>Desc(%)</Text>
-                            </View>
+                            {hasDiscount && (
+                              <View style={{ width: "30" }}>
+                                <Text>Desc(%)</Text>
+                              </View>
+                            )}
                             <View style={{ width: "100", textAlign: "right" }}>
                               <Text>Total</Text>
                             </View>
@@ -1232,9 +1259,11 @@ const Presupuesto_Cliente = ({
                           <View style={{ width: "300" }}>
                             <Text>{item.descripcion}</Text>
                           </View>
-                          <View style={{ width: "30" }}>
-                            <Text>{item.discount || 0}%</Text>
-                          </View>
+                          {hasDiscount && (
+                            <View style={{ width: "30" }}>
+                              <Text>{item.discount || 0}%</Text>
+                            </View>
+                          )}
                           <View style={{ width: "100", textAlign: "right" }}>
                             <Text>{parseFloat(item.total).toFixed(2)}</Text>
                           </View>
@@ -1321,9 +1350,11 @@ const Presupuesto_Cliente = ({
                           <View style={{ width: "300" }}>
                             <Text>Descripción</Text>
                           </View>
-                          <View style={{ width: "30" }}>
-                            <Text>Desc(%)</Text>
-                          </View>
+                          {hasDiscount && (
+                            <View style={{ width: "30" }}>
+                              <Text>Desc(%)</Text>
+                            </View>
+                          )}
                           <View style={{ width: "100", textAlign: "right" }}>
                             <Text>Total</Text>
                           </View>
@@ -1363,9 +1394,11 @@ const Presupuesto_Cliente = ({
                         <View style={{ width: "300" }}>
                           <Text>{item.descripcion}</Text>
                         </View>
-                        <View style={{ width: "30" }}>
-                          <Text>{item.discount || 0}%</Text>
-                        </View>
+                        {hasDiscount && (
+                          <View style={{ width: "30" }}>
+                            <Text>{item.discount || 0}%</Text>
+                          </View>
+                        )}
                         <View style={{ width: "100", textAlign: "right" }}>
                           <Text>{parseFloat(item.total).toFixed(2)}</Text>
                         </View>
