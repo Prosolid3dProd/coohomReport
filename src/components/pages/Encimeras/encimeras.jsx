@@ -157,7 +157,6 @@ const Encimeras = () => {
         setLoading={setEditado}
         setData={setData}
       />
-      {console.log(data)}
       <Table
         className="border border-t-0 border-border mx-3 relative"
         loading={editado}

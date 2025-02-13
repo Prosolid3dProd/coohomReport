@@ -204,7 +204,7 @@ const Report = () => {
               type="default"
               onClick={() => {
                 const contenidoJSON = JSON.stringify(
-                  JSON.parse(localStorage.getItem("orderErp")),
+                  JSON.parse(localStorage.getItem("order")),
                   null,
                   2
                 );
@@ -215,7 +215,7 @@ const Report = () => {
                 const enlace = document.createElement("a");
                 enlace.href = url;
                 enlace.download = `${
-                  JSON.parse(localStorage.getItem("orderErp")).storeName + " " + JSON.parse(localStorage.getItem("orderErp")).customerName
+                  JSON.parse(localStorage.getItem("order")).storeName + " " + JSON.parse(localStorage.getItem("order")).customerName
                 }.json`;
                 document.body.appendChild(enlace);
                 enlace.click();

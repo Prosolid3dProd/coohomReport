@@ -163,7 +163,7 @@ export const getOrderById = async (params) => {
       ...params,
       token: Settings.TOKEN,
     });
-    localStorage.setItem("orderErp", JSON.stringify(data.data));
+    localStorage.setItem("order", JSON.stringify(data.data));
 
     // console.log(data.data, "getOrderById");
     return data.data;
@@ -471,8 +471,6 @@ export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
     return orderJson;
   }
 };
-
-// ok
 
 // Esta funcion es para obtener en localstorage
 export const getLocalOrder = () => {

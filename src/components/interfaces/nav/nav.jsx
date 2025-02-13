@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { BtnReport } from "../../utils";
-import { Typography } from "antd";
+import { message, Typography } from "antd";
 
 const Icono = () => (
   <NavLink
@@ -25,12 +25,24 @@ const Header = () => (
 );
 
 const Boton = () => {
+  const order = localStorage.getItem("order");
+
+  const handleClick = (e) => {
+    if (!order || order !== "true") { // Verifica si no existe o no es "true"
+      e.preventDefault(); // Evita la navegación
+      message.warning("No hay ningún presupuesto cargado");
+    }
+  };
+
+  const ruta = order === "true" ? "/Dashboard/Report" : "/Dashboard/Presupuestos";
+
   return (
-    <NavLink to={"/Dashboard/Report"}>
+    <NavLink to={ruta} onClick={handleClick}>
       <BtnReport title={"Orden"} />
     </NavLink>
   );
 };
+
 
 const Nav = () => (
   <nav className="col-span-12 row-start-1 row-span-1 flex flex-row justify-between border-b border-border bg-gray dark:bordes dark:bg-general">

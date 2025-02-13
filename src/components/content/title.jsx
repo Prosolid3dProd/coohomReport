@@ -122,7 +122,6 @@ const Actions = ({
   };
 
   const handleChange = async (info) => {
-    console.log(info.file);
     setLoading(true);
     if (info.file.status === "done") {
       message.success(`${info.file.name} biblioteca actualizada con exito`);
