@@ -72,22 +72,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     }
   };
 
-  // const convertirFechaCreacion = (fecha) => {
-  //   try {
-  //     const partes = fecha.split("T");
-  //     const fechaPartes = partes[0].split("-");
-
-  //     const año = fechaPartes[0];
-  //     const mes = fechaPartes[1];
-  //     const dia = fechaPartes[2];
-
-  //     const fechaFormateada = `${dia}/${mes}/${año}`;
-  //     return fechaFormateada;
-  //   } catch (e) {
-  //     return fecha;
-  //   }
-  // };
-
   const loadImage = (serial) => {
     const xxx = SolaImagenes().find((item) => item.serial === serial);
 
@@ -145,7 +129,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
   // const calcularSumaTotal = (productos) => {
   //   return productos.reduce(
-  //     (total, producto) => total + (producto.priceTotal * data.coefficient),
+  //     (total, producto) => total + (producto.total * data.coefficient),
   //     0
   //   );
   // };
@@ -218,66 +202,89 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
   const [totalConDescuentoEIVA, setTotalConDescuentoEIVA] = useState(0);
   const [ivaCalculado, setIvaCalculado] = useState(0);
 
+  const calcularSumaTotal = (productos, coefficient) => {
+    if (!Array.isArray(productos) || productos.length === 0) return 0;
+    if (typeof coefficient !== "number" || isNaN(coefficient)) {
+      console.error("Error: Coefficient inválido", coefficient);
+      return 0;
+    }
+  
+    let total = 0;
+    for (let i = 0; i < productos.length; i++) {
+      // Aseguramos que 'total' sea un número, y luego lo multiplicamos por el coeficiente
+      const precio = parseFloat(productos[i].total);  // Si no es un número válido, lo asignamos como 0
+      console.log("Precio:", precio);
+      total += (precio * coefficient);
+      console.log("Total:", total);
+    }
+  
+    return total;
+  };
+  
+  
+
+  const calcularTotalDescuentos = (data) => {
+    let totalDescuentos = 0;
+    if (data.discountCabinets > 0) {
+      totalDescuentos += parseFloat(data.discountCabinetsPorcentaje) || 0;
+    }
+    return totalDescuentos;
+  };
+
+  const calcularTotalIva = (data) => {
+    let ivaCabinetsPorcentaje = parseFloat(data.ivaCabinets) || 21;
+    return { ivaCabinetsPorcentaje };
+  };
+
+  const calcularTotalConDescuento = (sumaTotal, totalZocalo, totalDescuentos) => {
+    return parseFloat(sumaTotal + totalZocalo - totalDescuentos).toFixed(2);
+  };
+
+  const calcularTotalConDescuentoEIVA = (
+    sumaTotal,
+    totalZocalo,
+    totalDescuentos,
+    totalIva
+  ) => {
+    const total = sumaTotal + totalZocalo;
+    const totalConDescuento = total - totalDescuentos;
+    const totalConIva =
+      totalConDescuento * (1 + parseFloat(totalIva.ivaCabinetsPorcentaje) / 100);
+    return parseFloat(totalConIva).toFixed(2);
+  };
+
+  const calcularIva = (sumaTotalSinDescuento, totalIva) => {
+    const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
+    return parseFloat(
+      sumaTotalSinDescuento * (ivaCabinetsPorcentaje / 100)
+    ).toFixed(2);
+  };
+
+
   useEffect(() => {
-    if (!data || !data.cabinets || data.cabinets.length === 0) return; 
-
-    const calcularSumaTotal = (productos) => {
-      return productos.reduce(
-        (total, producto) => total + producto.total * data.coefficient,
-        0
-      );
-    };
-
-    const calcularTotalDescuentos = (data) => {
-      let totalDescuentos = 0;
-      if (data.discountCabinets > 0) {
-        totalDescuentos += parseFloat(data.discountCabinetsPorcentaje) || 0;
-      }
-      return totalDescuentos;
-    };
+    if (!data || !Array.isArray(data.cabinets) || data.cabinets.length === 0) return;
+  
+    // Aseguramos que coefficient sea un número válido
+    const coefficient = parseFloat(data.coefficient);
+  
+    // Calculamos la suma total multiplicando el precio de cada producto por el coeficiente
+    const suma = calcularSumaTotal(data.cabinets, coefficient);
     
-
-    const calcularTotalIva = (data) => {
-      let ivaCabinetsPorcentaje = parseFloat(data.ivaCabinets) || 21;
-      return { ivaCabinetsPorcentaje };
-    };
-
-    const calcularTotalConDescuento = (sumaTotal, totalZocalo, totalDescuentos) => {
-      return parseFloat(sumaTotal + totalZocalo - totalDescuentos).toFixed(2);
-    };
-
-    const calcularTotalConDescuentoEIVA = (
-      sumaTotal,
-      totalZocalo,
-      totalDescuentos,
-      totalIva
-    ) => {
-      const total = sumaTotal + totalZocalo;
-      const totalConDescuento = total - totalDescuentos;
-      const totalConIva =
-        totalConDescuento * (1 + parseFloat(totalIva.ivaCabinetsPorcentaje) / 100);
-      return parseFloat(totalConIva).toFixed(2);
-    };
-
-    const calcularIva = (sumaTotalSinDescuento, totalIva) => {
-      const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
-      return parseFloat(
-        sumaTotalSinDescuento * (ivaCabinetsPorcentaje / 100)
-      ).toFixed(2);
-    };
-
-    const suma = calcularSumaTotal(data.cabinets);
+    console.log("Suma total calculada:", suma);
+    console.log("Coefficient:", coefficient);
+  
     const iva = calcularTotalIva(data);
     const descuentos = calcularTotalDescuentos(data);
-    const zocalo = data.infoZocalos?.reduce(
-      (total, zocalo) => total + (zocalo.precio ? zocalo.precio : 0),
-      0
-    ) || 0;
-    
+    const zocalo =
+      data.infoZocalos?.reduce(
+        (total, zocalo) => total + (parseFloat(zocalo.precio) || 0),
+        0
+      ) || 0;
+  
     const totalDescuento = calcularTotalConDescuento(suma, zocalo, descuentos);
     const totalIvaConDescuento = calcularTotalConDescuentoEIVA(suma, zocalo, descuentos, iva);
     const ivaFinal = calcularIva(suma, iva);
-
+  
     setSumaTotal(suma);
     setTotalIva(iva);
     setTotalDescuentos(descuentos);
@@ -286,6 +293,8 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     setTotalConDescuentoEIVA(totalIvaConDescuento);
     setIvaCalculado(ivaFinal);
   }, [data]);
+  
+  
 
 
   return (

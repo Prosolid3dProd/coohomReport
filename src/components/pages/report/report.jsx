@@ -21,6 +21,13 @@ import {
   getTotales,
 } from "../../../data/localStorage";
 import "./report.css";
+import {
+  calcularTotalIva,
+  calcularSumaTotal,
+  calcularTotalZocalo,
+  calcularTotalDescuentos,
+  calcularTotalConDescuentoEIVA,
+} from "./operaciones";
 
 const Report = () => {
   const [main, setMain] = useState(null);
@@ -29,12 +36,24 @@ const Report = () => {
   const [visible, setBtnVisible] = useState(false);
   const [tabActivo, setTabActivo] = useState(0);
   const [profile, setProfile] = useState(null);
-
   const priceC = existePrecio(getPrecio("C"));
   const priceP = existePrecio(getPrecio("P"));
   const total_Encimeras = existeTotales(getTotales("Encimeras"));
   const total_Equipamiento = existeTotales(getTotales("Equipamiento"));
-  const total_Electrodomesticos = existeTotales(getTotales("Electrodomesticos"));
+  const total_Electrodomesticos = existeTotales(
+    getTotales("Electrodomesticos")
+  );
+  const [totales, setTotales] = useState({
+    sumaTotal: 0,
+    totalZocalo: 0,
+    totalDescuentos: 0,
+    totalIva: 0,
+    resultadoFinal: {},
+  });
+  const handleTabChange = (key) => {
+    setTabActivo(parseInt(key));
+    localStorage.setItem("activeTab", key);
+  };
 
   // useEffect que se ejecuta solo una vez cuando se monta el componente o cuando cambia el `orderId`
   useEffect(() => {
@@ -68,6 +87,47 @@ const Report = () => {
     }
   }, [tabActivo, data, orderId]); // Este efecto se ejecutará solo cuando `tabActivo` cambie, no por cambios de `data` innecesarios
 
+  useEffect(() => {
+    if (main) {
+      const handleScroll = () => {
+        if (main.scrollTop > 100) {
+          setBtnVisible(true);
+        } else {
+          setBtnVisible(false);
+        }
+      };
+
+      main.addEventListener("scroll", handleScroll);
+      return () => main.removeEventListener("scroll", handleScroll);
+    }
+  }, [main]);
+
+  useEffect(() => {
+    // Calcular las sumas y totales
+    const sumaTotal = calcularSumaTotal(data.cabinets);
+    const totalZocalo = calcularTotalZocalo(data.infoZocalos);
+    const totalDescuentos = calcularTotalDescuentos(data);
+    const totalIva = calcularTotalIva(sumaTotal, data.ivaCabinets);
+    const resultado = calcularTotalConDescuentoEIVA(
+      sumaTotal,
+      totalZocalo,
+      totalDescuentos,
+      data.ivaCabinets
+    );
+    setTotales({
+      sumaTotal,
+      totalZocalo,
+      totalDescuentos,
+      totalIva,
+      resultadoFinal: resultado,
+    });
+    console.log("Totales", totales);
+    // --------------------------------------------------------------------------
+  }, [data]);
+
+  const { totalDescuento, totalFinal } = totales.resultadoFinal;
+  console.log(totalDescuento)
+
   const tabs = [
     {
       key: "0",
@@ -78,6 +138,11 @@ const Report = () => {
             <Confirmacion_Pedido
               price={priceP}
               data={data}
+              sumaTotal={totales.sumaTotal}
+              totalZocalo={totales.totalZocalo}
+              totalconDescuento={totalDescuento}
+              totalIva={totales.totalIva}
+              resultadoFinal={totalFinal}
               title="Confirmación de Pedido"
             />
           </PDFViewer>
@@ -94,6 +159,11 @@ const Report = () => {
               price={priceP}
               data={data}
               title="Presupuesto"
+              sumaTotal={totales.sumaTotal}
+              totalZocalo={totales.totalZocalo}
+              totalconDescuento={totalDescuento}
+              totalIva={totales.totalIva}
+              resultadoFinal={totalFinal}
             />
           </PDFViewer>
         </div>
@@ -106,8 +176,8 @@ const Report = () => {
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido_Venta
-              price={priceP}
               data={data}
+              price={priceP}
               title="Presupuesto Venta"
             />
           </PDFViewer>
@@ -159,27 +229,6 @@ const Report = () => {
       ),
     },
   ];
-  
-
-  const handleTabChange = (key) => {
-    setTabActivo(parseInt(key));
-    localStorage.setItem("activeTab", key);
-  };
-
-  useEffect(() => {
-    if (main) {
-      const handleScroll = () => {
-        if (main.scrollTop > 100) {
-          setBtnVisible(true);
-        } else {
-          setBtnVisible(false);
-        }
-      };
-
-      main.addEventListener("scroll", handleScroll);
-      return () => main.removeEventListener("scroll", handleScroll);
-    }
-  }, [main]);
 
   return (
     data &&
@@ -215,7 +264,9 @@ const Report = () => {
                 const enlace = document.createElement("a");
                 enlace.href = url;
                 enlace.download = `${
-                  JSON.parse(localStorage.getItem("order")).storeName + " " + JSON.parse(localStorage.getItem("order")).customerName
+                  JSON.parse(localStorage.getItem("order")).storeName +
+                  " " +
+                  JSON.parse(localStorage.getItem("order")).customerName
                 }.json`;
                 document.body.appendChild(enlace);
                 enlace.click();

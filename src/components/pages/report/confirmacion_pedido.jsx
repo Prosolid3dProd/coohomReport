@@ -3,6 +3,7 @@ import { Page, Text, View, Document, Image, Font } from "@react-pdf/renderer";
 import LogoSola from "../../../assets/sola.png";
 import { CONFIG } from "../../../data/constants";
 import { SolaImagenes } from "./solaImages";
+import { formatNumber } from "./operaciones";
 
 Font.register({
   family: "Courier",
@@ -11,7 +12,17 @@ Font.register({
   fontWeight: "normal",
 });
 
-const Confirmacion_Pedido = ({ data, price, title }) => {
+const Confirmacion_Pedido = ({
+  data,
+  price,
+  title,
+  sumaTotal,
+  totalZocalo,
+  totalconDescuento,
+  totalIva,
+  resultadoFinal,
+}) => {
+  let contador = 1;
   const [cabinets, setCabinets] = useState({
     decorativos: [],
     altos: [],
@@ -22,7 +33,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     costados: [],
     accesorios: [],
   });
-
   const logoGrande = (url) => {
     if (!url || url === "") {
       return <Image style={{ width: "100px" }} src={LogoSola} />;
@@ -34,26 +44,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     const r = Math.floor(0.299 * color.r + 0.587 * color.g + 0.114 * color.b);
     return { r, g: r, b: r };
   };
-
-  /**
-   *
-   *
-   * @param {number | string} x
-   * @return {number}
-   */
-  const formatNumber = (x) => {
-    if (!x) return 0;
-    const result =
-      // parseFloat(x).toFixed(0) * parseFloat(data.profile.role === "admin" ? data.userId.coefficient : data.coefficient).toFixed(2)
-      (
-        parseFloat(x).toFixed(0) * parseFloat(data.coefficient).toFixed(2)
-      ).toFixed(0);
-    return result;
-  };
-
-  let contador = 1;
-  let totalDescuentos = 0;
-
   const convertirFecha = (fecha) => {
     try {
       const partes = fecha.split(" ");
@@ -71,23 +61,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
       return fecha;
     }
   };
-
-  // const convertirFechaCreacion = (fecha) => {
-  //   try {
-  //     const partes = fecha.split("T");
-  //     const fechaPartes = partes[0].split("-");
-
-  //     const año = fechaPartes[0];
-  //     const mes = fechaPartes[1];
-  //     const dia = fechaPartes[2];
-
-  //     const fechaFormateada = `${dia}/${mes}/${año}`;
-  //     return fechaFormateada;
-  //   } catch (e) {
-  //     return fecha;
-  //   }
-  // };
-
   const loadImage = (serial) => {
     const xxx = SolaImagenes().find((item) => item.serial === serial);
 
@@ -100,7 +73,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
     }
     // return SolaImagenes().find((item) => item.serial === serial)?.link || null;
   };
-
   const verificarVariable = (material) => {
     if (typeof material === "string") {
       return material;
@@ -108,7 +80,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
       if (material.materialCabinet !== null) return material.materialCabinet;
     }
   };
-
   useEffect(() => {
     data &&
       data.cabinets &&
@@ -141,68 +112,6 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
         ),
       });
   }, [data]);
-  let totalIva = 0;
-
-  const calcularSumaTotal = (productos) => {
-    return productos.reduce(
-      (total, producto) => total + producto.priceTotal,
-      0
-    );
-  };
-
-  let totalZocalo = data.infoZocalos.reduce(
-    (total, zocalo) => total + (zocalo.precio ? zocalo.precio : 0),
-    0
-  );
-
-  const calcularTotalDescuentos = (data) => {
-    let totalDescuentos = 0;
-    if (data.discountCabinets > 0) {
-      totalDescuentos += parseFloat(data.discountCabinetsPorcentaje) || 0;
-    }
-    return totalDescuentos;
-  };
-
-  const calcularTotalIva = (data) => {
-    let ivaCabinetsPorcentaje = parseFloat(data.ivaCabinets) || 21;
-    const totalIva = {
-      ivaCabinetsPorcentaje: ivaCabinetsPorcentaje,
-    };
-    return totalIva;
-  };
-
-  const calcularTotalConDescuento = (
-    sumaTotal,
-    totalZocalo,
-    totalDescuentos
-  ) => {
-    return parseFloat(sumaTotal + totalZocalo - totalDescuentos).toFixed(2);
-  };
-
-  const calcularTotalConDescuentoEIVA = (
-    sumaTotal,
-    totalZocalo,
-    totalDescuentos,
-    totalIva
-  ) => {
-    const total = sumaTotal + totalZocalo;
-    const totalConDescuento = total - totalDescuentos;
-    const totalConIva =
-      totalConDescuento *
-      (1 + parseFloat(totalIva.ivaCabinetsPorcentaje) / 100);
-    return parseFloat(totalConIva).toFixed(2);
-  };
-
-  const calcularIva = (sumaTotalSinDescuento, totalIva) => {
-    const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
-    return parseFloat(
-      sumaTotalSinDescuento * (ivaCabinetsPorcentaje / 100)
-    ).toFixed(2);
-  };
-
-  const sumaTotal = calcularSumaTotal(data.cabinets);
-  totalIva = calcularTotalIva(data);
-  totalDescuentos = calcularTotalDescuentos(data);
 
   const complementos =
     data.infoZocalos.length > 0 || cabinets.complementos.length > 0
@@ -326,7 +235,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   }) : "." } */}
                   .{data?.infoZocalos[0]?.size?.z || "."}
                 </Text>
-                
+
                 <Text>{data?.modelHandler || "."}</Text>
                 <Text>
                   {String(data?.modelDrawer + "/" + data?.materialDrawer) ||
@@ -527,11 +436,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -566,7 +473,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.priceTotal).toFixed(2)}
+                      {parseFloat(item.total).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -773,11 +680,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                             flexDirection: "column",
                           }}
                         >
-                          
                           <Text>Variantes: </Text>
                           {item.variants.map((it) => (
                             <Text>
-                              
                               {it.name}:
                               {it.name === "PVA" ||
                               it.name === "PVL" ||
@@ -813,7 +718,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {parseFloat(item.total).toFixed(2)}
                       </Text>
                     </View>
                   )}
@@ -980,11 +885,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -1020,7 +923,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.priceTotal).toFixed(2)}
+                      {parseFloat(item.total).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1133,15 +1036,17 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                       <Text>- Frente: </Text>
                     )}
                     <Text>- Frente: {item.materialRegletaF}</Text>
-                    {formatNumber(item.priceCabinet) >= 0 &&  !item.name.includes("Puerta") && !item.name.includes("Frente") && (
-                      <Text>
-                        - Armazón:
-                        <Text style={{ fontSize: "8" }}>
-                          {item.materialRegleta}
-                          {/* / [{formatNumber(item.priceCabinet)} ] */}
+                    {formatNumber(item.priceCabinet) >= 0 &&
+                      !item.name.includes("Puerta") &&
+                      !item.name.includes("Frente") && (
+                        <Text>
+                          - Armazón:
+                          <Text style={{ fontSize: "8" }}>
+                            {item.materialRegleta}
+                            {/* / [{formatNumber(item.priceCabinet)} ] */}
+                          </Text>
                         </Text>
-                      </Text>
-                    )}
+                      )}
 
                     {formatNumber(item.priceVariants) > 0 && (
                       <View
@@ -1150,11 +1055,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -1190,7 +1093,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.priceTotal).toFixed(2)}
+                      {parseFloat(item.total).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1364,11 +1267,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -1404,7 +1305,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.priceTotal).toFixed(2)}
+                      {parseFloat(item.total).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1646,7 +1547,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.priceTotal).toFixed(2)}
+                      {parseFloat(item.total).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1770,11 +1671,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                           flexDirection: "column",
                         }}
                       >
-                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -1809,7 +1708,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.priceTotal).toFixed(2)}
+                        {parseFloat(item.total).toFixed(2)}
                       </Text>
                     </View>
                   )}
@@ -1917,11 +1816,9 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                         flexDirection: "column",
                       }}
                     >
-                      
                       <Text>Variantes: </Text>
                       {item.variants.map((it) => (
                         <Text>
-                          
                           {it.name}:
                           {it.name === "PVA" ||
                           it.name === "PVL" ||
@@ -1956,7 +1853,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.priceTotal).toFixed(2)}
+                      {parseFloat(item.total).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -2060,23 +1957,12 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
 
                 {data?.discountCabinets > 0 && (
                   <View>
-                    <Text>
-                      {calcularTotalConDescuento(
-                        sumaTotal,
-                        totalZocalo,
-                        totalDescuentos
-                      )}
-                    </Text>
+                    <Text>{parseFloat(totalconDescuento).toFixed(2)}</Text>
                   </View>
                 )}
 
                 <View>
-                  <Text>
-                    {calcularIva(
-                      sumaTotal + totalZocalo - totalDescuentos,
-                      totalIva
-                    )}
-                  </Text>
+                  <Text>{parseFloat(totalIva).toFixed(2)}</Text>
                 </View>
 
                 <View
@@ -2087,14 +1973,7 @@ const Confirmacion_Pedido = ({ data, price, title }) => {
                   }}
                 >
                   <View>
-                    <Text>
-                      {calcularTotalConDescuentoEIVA(
-                        sumaTotal,
-                        totalZocalo,
-                        totalDescuentos,
-                        totalIva
-                      )}
-                    </Text>
+                    <Text>{parseFloat(resultadoFinal).toFixed(2)}</Text>
                   </View>
                 </View>
               </View>

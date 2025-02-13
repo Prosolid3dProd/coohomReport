@@ -124,6 +124,7 @@ const handleCoefficientChange = (e) => {
     if (data._id) {
       const result = await updateOrder({ ...values, _id: data._id });
       if (result) {
+        console.log(result);
         getData(result);
         setInitialValues(result);
         // setInitialValues((prevValues) => ({
