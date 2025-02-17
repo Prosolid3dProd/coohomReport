@@ -3,7 +3,6 @@ import { Page, Text, View, Document, Image, Font } from "@react-pdf/renderer";
 import LogoSola from "../../../assets/sola.png";
 import { CONFIG } from "../../../data/constants";
 import { SolaImagenes } from "./solaImages";
-import { formatNumber } from "./operaciones";
 
 Font.register({
   family: "Courier",
@@ -12,16 +11,7 @@ Font.register({
   fontWeight: "normal",
 });
 
-const Confirmacion_Pedido = ({
-  data,
-  price,
-  title,
-  totalconDescuento,
-  ivaCalculado,
-  resultadoFinal,
-  importeTotal
-}) => {
-  let contador = 1;
+const Confirmacion_Pedido = ({ data, price, title }) => {
   const [cabinets, setCabinets] = useState({
     decorativos: [],
     altos: [],
@@ -32,6 +22,7 @@ const Confirmacion_Pedido = ({
     costados: [],
     accesorios: [],
   });
+
   const logoGrande = (url) => {
     if (!url || url === "") {
       return <Image style={{ width: "100px" }} src={LogoSola} />;
@@ -43,6 +34,26 @@ const Confirmacion_Pedido = ({
     const r = Math.floor(0.299 * color.r + 0.587 * color.g + 0.114 * color.b);
     return { r, g: r, b: r };
   };
+
+  /**
+   *
+   *
+   * @param {number | string} x
+   * @return {number}
+   */
+  const formatNumber = (x) => {
+    if (!x) return 0;
+    const result =
+      // parseFloat(x).toFixed(0) * parseFloat(data.profile.role === "admin" ? data.userId.coefficient : data.coefficient).toFixed(2)
+      (
+        parseFloat(x).toFixed(0) * parseFloat(data.coefficient).toFixed(2)
+      ).toFixed(0);
+    return result;
+  };
+
+  let contador = 1;
+  // let totalDescuentos = 0;
+
   const convertirFecha = (fecha) => {
     try {
       const partes = fecha.split(" ");
@@ -60,6 +71,7 @@ const Confirmacion_Pedido = ({
       return fecha;
     }
   };
+
   const loadImage = (serial) => {
     const xxx = SolaImagenes().find((item) => item.serial === serial);
 
@@ -72,6 +84,7 @@ const Confirmacion_Pedido = ({
     }
     // return SolaImagenes().find((item) => item.serial === serial)?.link || null;
   };
+
   const verificarVariable = (material) => {
     if (typeof material === "string") {
       return material;
@@ -80,77 +93,210 @@ const Confirmacion_Pedido = ({
     }
   };
 
-  const coeficiente = data.coefficient;
   useEffect(() => {
-    if (data && data.cabinets && Array.isArray(data.cabinets)) {
-  
-      console.log("Coeficiente aplicado:", coeficiente);
-      console.log("Gabinetes antes de modificar:", data.cabinets);
-  
+    data &&
+      data.cabinets &&
       setCabinets({
-        decorativos: data.cabinets
-          .filter((item) => item.tipo === CONFIG.MODELNAME.DECORATIVOS.CODE)
-          .map((item) => ({
-            ...item,
-            total: item.total ? item.total * coeficiente : 0, // Evita NaN
-          })),
-        altos: data.cabinets
-          .filter((item) => item.tipo === CONFIG.MODELNAME.ALTOS.CODE)
-          .map((item) => ({
-            ...item,
-            total: item.total ? item.total * coeficiente : 0,
-          })),
-        accesorios: data.cabinets
-          .filter((item) => item.tipo === CONFIG.MODELNAME.ACCESORIOS.CODE)
-          .map((item) => ({
-            ...item,
-            total: item.total ? item.total * coeficiente : 0,
-          })),
-        murales: data.cabinets
-          .filter(
-            (item) =>
-              item.tipo === CONFIG.MODELNAME.MURALES.CODE ||
-              item.tipo === CONFIG.MODELNAME.SOBREENCIMERAS.CODE
-          )
-          .map((item) => ({
-            ...item,
-            total: item.total ? item.total * coeficiente : 0,
-          })),
-        regletas: data.cabinets
-          .filter((item) => item.tipo === CONFIG.MODELNAME.REGLETAS.CODE)
-          .map((item) => ({
-            ...item,
-            total: item.total ? item.total * coeficiente : 0,
-          })),
-        bajos: data.cabinets
-          .filter((item) => item.tipo === CONFIG.MODELNAME.BAJOS.CODE)
-          .map((item) => ({
-            ...item,
-            total: item.total ? item.total * coeficiente : 0,
-          })),
-        complementos: data.cabinets
-          .filter((item) => item.tipo === CONFIG.MODELNAME.COMPLEMENTOS.CODE)
-          .map((item) => ({
-            ...item,
-            total: item.total ? item.total * coeficiente : 0,
-          })),
-        costados: data.cabinets
-          .filter((item) => item.tipo === CONFIG.MODELNAME.COSTADOS.CODE)
-          .map((item) => ({
-            ...item,
-            total: item.total ? item.total * coeficiente : 0,
-          })),
+        decorativos: data.cabinets.filter(
+          (item2) => item2.tipo === CONFIG.MODELNAME.DECORATIVOS.CODE
+        ),
+        altos: data.cabinets.filter(
+          (item2) => item2.tipo === CONFIG.MODELNAME.ALTOS.CODE
+        ),
+        accesorios: data.cabinets.filter(
+          (item2) => item2.tipo === CONFIG.MODELNAME.ACCESORIOS.CODE
+        ),
+        murales: data.cabinets.filter(
+          (item2) =>
+            item2.tipo === CONFIG.MODELNAME.MURALES.CODE ||
+            item2.tipo === CONFIG.MODELNAME.SOBREENCIMERAS.CODE
+        ),
+        regletas: data.cabinets.filter(
+          (item2) => item2.tipo === CONFIG.MODELNAME.REGLETAS.CODE
+        ),
+        bajos: data.cabinets.filter(
+          (item2) => item2.tipo === CONFIG.MODELNAME.BAJOS.CODE
+        ),
+        complementos: data.cabinets.filter(
+          (item2) => item2.tipo === CONFIG.MODELNAME.COMPLEMENTOS.CODE
+        ),
+        costados: data.cabinets.filter(
+          (item2) => item2.tipo === CONFIG.MODELNAME.COSTADOS.CODE
+        ),
       });
-  
-      console.log("Gabinetes después de modificar:", cabinets);
-    }
-  }, [data]); // Se ejecuta cuando `data` cambia
-  
+  }, [data]);
+  // let totalIva = 0;
+
+  // const calcularSumaTotal = (productos) => {
+  //   return productos.reduce(
+  //     (total, producto) => total + (producto.total * data.coefficient),
+  //     0
+  //   );
+  // };
+
+  // let totalZocalo = data.infoZocalos.reduce(
+  //   (total, zocalo) => total + (zocalo.precio ? zocalo.precio : 0),
+  //   0
+  // );
+
+  // const calcularTotalDescuentos = (data) => {
+  //   let totalDescuentos = 0;
+  //   if (data.discountCabinets > 0) {
+  //     totalDescuentos += parseFloat(data.discountCabinetsPorcentaje) || 0;
+  //   }
+  //   return totalDescuentos;
+  // };
+
+  // const calcularTotalIva = (data) => {
+  //   let ivaCabinetsPorcentaje = parseFloat(data.ivaCabinets) || 21;
+  //   const totalIva = {
+  //     ivaCabinetsPorcentaje: ivaCabinetsPorcentaje,
+  //   };
+  //   return totalIva;
+  // };
+
+  // const calcularTotalConDescuento = (
+  //   sumaTotal,
+  //   totalZocalo,
+  //   totalDescuentos
+  // ) => {
+  //   return parseFloat(sumaTotal + totalZocalo - totalDescuentos).toFixed(2);
+  // };
+
+  // const calcularTotalConDescuentoEIVA = (
+  //   sumaTotal,
+  //   totalZocalo,
+  //   totalDescuentos,
+  //   totalIva
+  // ) => {
+  //   const total = sumaTotal + totalZocalo;
+  //   const totalConDescuento = total - totalDescuentos;
+  //   const totalConIva =
+  //     totalConDescuento *
+  //     (1 + parseFloat(totalIva.ivaCabinetsPorcentaje) / 100);
+  //   return parseFloat(totalConIva).toFixed(2);
+  // };
+
+  // const calcularIva = (sumaTotalSinDescuento, totalIva) => {
+  //   const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
+  //   return parseFloat(
+  //     sumaTotalSinDescuento * (ivaCabinetsPorcentaje / 100)
+  //   ).toFixed(2);
+  // };
+
+  // const sumaTotal = calcularSumaTotal(data.cabinets);
+  // totalIva = calcularTotalIva(data);
+  // totalDescuentos = calcularTotalDescuentos(data);
 
   const complementos =
     data.infoZocalos.length > 0 || cabinets.complementos.length > 0
       ? true
       : false;
+
+
+  const [sumaTotal, setSumaTotal] = useState(0);
+  const [totalIva, setTotalIva] = useState({});
+  const [totalDescuentos, setTotalDescuentos] = useState(0);
+  const [totalZocalo, setTotalZocalo] = useState(0);
+  const [totalConDescuento, setTotalConDescuento] = useState(0);
+  const [totalConDescuentoEIVA, setTotalConDescuentoEIVA] = useState(0);
+  const [ivaCalculado, setIvaCalculado] = useState(0);
+
+  const calcularSumaTotal = (productos, coefficient) => {
+    if (!Array.isArray(productos) || productos.length === 0) return 0;
+    if (typeof coefficient !== "number" || isNaN(coefficient)) {
+      console.error("Error: Coefficient inválido", coefficient);
+      return 0;
+    }
+  
+    let total = 0;
+    for (let i = 0; i < productos.length; i++) {
+      // Aseguramos que 'total' sea un número, y luego lo multiplicamos por el coeficiente
+      const precio = parseFloat(productos[i].total);  // Si no es un número válido, lo asignamos como 0
+      console.log("Precio:", precio);
+      total += (precio * coefficient);
+      console.log("Total:", total);
+    }
+  
+    return total;
+  };
+  
+  
+
+  const calcularTotalDescuentos = (data) => {
+    let totalDescuentos = 0;
+    if (data.discountCabinets > 0) {
+      totalDescuentos += parseFloat(data.discountCabinetsPorcentaje) || 0;
+    }
+    return totalDescuentos;
+  };
+
+  const calcularTotalIva = (data) => {
+    let ivaCabinetsPorcentaje = parseFloat(data.ivaCabinets) || 21;
+    return { ivaCabinetsPorcentaje };
+  };
+
+  const calcularTotalConDescuento = (sumaTotal, totalZocalo, totalDescuentos) => {
+    return parseFloat(sumaTotal + totalZocalo - totalDescuentos).toFixed(2);
+  };
+
+  const calcularTotalConDescuentoEIVA = (
+    sumaTotal,
+    totalZocalo,
+    totalDescuentos,
+    totalIva
+  ) => {
+    const total = sumaTotal + totalZocalo;
+    const totalConDescuento = total - totalDescuentos;
+    const totalConIva =
+      totalConDescuento * (1 + parseFloat(totalIva.ivaCabinetsPorcentaje) / 100);
+    return parseFloat(totalConIva).toFixed(2);
+  };
+
+  const calcularIva = (sumaTotalSinDescuento, totalIva) => {
+    const ivaCabinetsPorcentaje = totalIva.ivaCabinetsPorcentaje || 21;
+    return parseFloat(
+      sumaTotalSinDescuento * (ivaCabinetsPorcentaje / 100)
+    ).toFixed(2);
+  };
+
+
+  useEffect(() => {
+    if (!data || !Array.isArray(data.cabinets) || data.cabinets.length === 0) return;
+  
+    // Aseguramos que coefficient sea un número válido
+    const coefficient = parseFloat(data.coefficient);
+  
+    // Calculamos la suma total multiplicando el precio de cada producto por el coeficiente
+    const suma = calcularSumaTotal(data.cabinets, coefficient);
+    
+    console.log("Suma total calculada:", suma);
+    console.log("Coefficient:", coefficient);
+  
+    const iva = calcularTotalIva(data);
+    const descuentos = calcularTotalDescuentos(data);
+    const zocalo =
+      data.infoZocalos?.reduce(
+        (total, zocalo) => total + (parseFloat(zocalo.precio) || 0),
+        0
+      ) || 0;
+  
+    const totalDescuento = calcularTotalConDescuento(suma, zocalo, descuentos);
+    const totalIvaConDescuento = calcularTotalConDescuentoEIVA(suma, zocalo, descuentos, iva);
+    const ivaFinal = calcularIva(suma, iva);
+  
+    setSumaTotal(suma);
+    setTotalIva(iva);
+    setTotalDescuentos(descuentos);
+    setTotalZocalo(zocalo);
+    setTotalConDescuento(totalDescuento);
+    setTotalConDescuentoEIVA(totalIvaConDescuento);
+    setIvaCalculado(ivaFinal);
+  }, [data]);
+  
+  
+
+
   return (
     <Document title="Presupuesto COOHOM">
       <Page
@@ -269,7 +415,6 @@ const Confirmacion_Pedido = ({
                   }) : "." } */}
                   .{data?.infoZocalos[0]?.size?.z || "."}
                 </Text>
-
                 <Text>{data?.modelHandler || "."}</Text>
                 <Text>
                   {String(data?.modelDrawer + "/" + data?.materialDrawer) ||
@@ -368,7 +513,7 @@ const Confirmacion_Pedido = ({
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
 
-                    {formatNumber(item.priceDrawers, coeficiente) > 0 && (
+                    {formatNumber(item.priceDrawers) > 0 && (
                       <Text>
                         - Frente:
                         {item.drawerMaterialDetails.length > 0 &&
@@ -435,7 +580,7 @@ const Confirmacion_Pedido = ({
                         </View>
                       )}
 
-                    {formatNumber(item.priceDoor, coeficiente) > 0 && (
+                    {formatNumber(item.priceDoor) > 0 && (
                       <Text>
                         - Puertas:
                         <Text
@@ -454,7 +599,7 @@ const Confirmacion_Pedido = ({
                       </Text>
                     )}
 
-                    {formatNumber(item.priceCabinet, coeficiente) > 0 && (
+                    {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
                         - Armazón:
                         <Text style={{ fontSize: "8" }}>
@@ -463,16 +608,18 @@ const Confirmacion_Pedido = ({
                         </Text>
                       </Text>
                     )}
-                    {formatNumber(item.priceVariants, coeficiente) > 0 && (
+                    {formatNumber(item.priceVariants) > 0 && (
                       <View
                         style={{
                           display: "flex",
                           flexDirection: "column",
                         }}
                       >
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
+                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -507,7 +654,9 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {/* {parseFloat(item.priceTotal).toFixed(2)} */}
+                      {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
+
                     </Text>
                   </View>
                 )}
@@ -617,7 +766,7 @@ const Confirmacion_Pedido = ({
                           M: {item?.opening}
                         </Text>
                       )}
-                      {formatNumber(item.priceDrawers, coeficiente) > 0 && (
+                      {formatNumber(item.priceDrawers) > 0 && (
                         <Text>
                           - Frente:
                           {item.drawerMaterialDetails.length > 0 &&
@@ -637,7 +786,7 @@ const Confirmacion_Pedido = ({
                             )}
                         </Text>
                       )}
-                      {formatNumber(item.priceDoor, coeficiente) > 0 && (
+                      {formatNumber(item.priceDoor) > 0 && (
                         <Text>
                           - Puertas:
                           <Text
@@ -697,7 +846,7 @@ const Confirmacion_Pedido = ({
                           </View>
                         )}
 
-                      {formatNumber(item.priceCabinet, coeficiente) > -1 && (
+                      {formatNumber(item.priceCabinet) > -1 && (
                         <Text>
                           - Armazón:
                           <Text style={{ fontSize: "8" }}>
@@ -707,16 +856,18 @@ const Confirmacion_Pedido = ({
                         </Text>
                       )}
 
-                      {formatNumber(item.priceVariants, coeficiente) > 0 && (
+                      {formatNumber(item.priceVariants) > 0 && (
                         <View
                           style={{
                             display: "flex",
                             flexDirection: "column",
                           }}
                         >
+                          
                           <Text>Variantes: </Text>
                           {item.variants.map((it) => (
                             <Text>
+                              
                               {it.name}:
                               {it.name === "PVA" ||
                               it.name === "PVL" ||
@@ -752,7 +903,8 @@ const Confirmacion_Pedido = ({
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.total).toFixed(2)}
+                        {/* {parseFloat(item.priceTotal).toFixed(2)} */}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     </View>
                   )}
@@ -874,10 +1026,10 @@ const Confirmacion_Pedido = ({
                     {item.opening && (
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
-                    {formatNumber(item.priceDrawers, coeficiente) > 0 && (
+                    {formatNumber(item.priceDrawers) > 0 && (
                       <Text>- Frente: </Text>
                     )}
-                    {formatNumber(item.priceDoor, coeficiente) > 0 && (
+                    {formatNumber(item.priceDoor) > 0 && (
                       <View
                         style={{
                           display: "flex",
@@ -890,7 +1042,7 @@ const Confirmacion_Pedido = ({
                             fontSize: "8",
                           }}
                         >
-                          {formatNumber(item.priceDoor, coeficiente) + " "}
+                          {formatNumber(item.priceDoor) + " "}
                         </Text>
                         <Text
                           style={{
@@ -902,7 +1054,7 @@ const Confirmacion_Pedido = ({
                         </Text>
                       </View>
                     )}
-                    {formatNumber(item.priceCabinet, coeficiente) > 0 && (
+                    {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
                         - Armazón:
                         <Text style={{ fontSize: "8" }}>
@@ -912,16 +1064,18 @@ const Confirmacion_Pedido = ({
                       </Text>
                     )}
 
-                    {formatNumber(item.priceVariants, coeficiente) > 0 && (
+                    {formatNumber(item.priceVariants) > 0 && (
                       <View
                         style={{
                           display: "flex",
                           flexDirection: "column",
                         }}
                       >
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
+                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -957,7 +1111,9 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {/* {parseFloat(item.priceTotal).toFixed(2)} */}
+                      {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
+
                     </Text>
                   </View>
                 )}
@@ -1066,32 +1222,32 @@ const Confirmacion_Pedido = ({
                     {item.opening && (
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
-                    {formatNumber(item.priceDrawers, coeficiente) > 0 && (
+                    {formatNumber(item.priceDrawers) > 0 && (
                       <Text>- Frente: </Text>
                     )}
                     <Text>- Frente: {item.materialRegletaF}</Text>
-                    {formatNumber(item.priceCabinet, coeficiente) >= 0 &&
-                      !item.name.includes("Puerta") &&
-                      !item.name.includes("Frente") && (
-                        <Text>
-                          - Armazón:
-                          <Text style={{ fontSize: "8" }}>
-                            {item.materialRegleta}
-                            {/* / [{formatNumber(item.priceCabinet)} ] */}
-                          </Text>
+                    {formatNumber(item.priceCabinet) >= 0 &&  !item.name.includes("Puerta") && !item.name.includes("Frente") && (
+                      <Text>
+                        - Armazón:
+                        <Text style={{ fontSize: "8" }}>
+                          {item.materialRegleta}
+                          {/* / [{formatNumber(item.priceCabinet)} ] */}
                         </Text>
-                      )}
+                      </Text>
+                    )}
 
-                    {formatNumber(item.priceVariants, coeficiente) > 0 && (
+                    {formatNumber(item.priceVariants) > 0 && (
                       <View
                         style={{
                           display: "flex",
                           flexDirection: "column",
                         }}
                       >
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
+                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -1127,7 +1283,8 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {/* {parseFloat(item.priceTotal).toFixed(2)} */}
+                      {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1232,7 +1389,7 @@ const Confirmacion_Pedido = ({
                     {item.opening && (
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
-                    {formatNumber(item.priceDoor, coeficiente) > 0 && (
+                    {formatNumber(item.priceDoor) > 0 && (
                       <View
                         style={{
                           display: "flex",
@@ -1245,7 +1402,7 @@ const Confirmacion_Pedido = ({
                             fontSize: "8",
                           }}
                         >
-                          {formatNumber(item.priceDoor, coeficiente) + " "}
+                          {formatNumber(item.priceDoor) + " "}
                         </Text>
                         <Text
                           style={{
@@ -1257,10 +1414,10 @@ const Confirmacion_Pedido = ({
                         </Text>
                       </View>
                     )}
-                    {formatNumber(item.priceDrawers, coeficiente) > 0 && (
+                    {formatNumber(item.priceDrawers) > 0 && (
                       <Text>- Frente: </Text>
                     )}
-                    {formatNumber(item.priceDoor, coeficiente) > 0 && (
+                    {formatNumber(item.priceDoor) > 0 && (
                       <View
                         style={{
                           display: "flex",
@@ -1273,7 +1430,7 @@ const Confirmacion_Pedido = ({
                             fontSize: "8",
                           }}
                         >
-                          {formatNumber(item.priceDoor, coeficiente) + " "}
+                          {formatNumber(item.priceDoor) + " "}
                         </Text>
                         <Text
                           style={{
@@ -1285,7 +1442,7 @@ const Confirmacion_Pedido = ({
                         </Text>
                       </View>
                     )}
-                    {formatNumber(item.priceCabinet, coeficiente) > 0 && (
+                    {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
                         - Acabado:
                         <Text style={{ fontSize: "8" }}>
@@ -1294,16 +1451,18 @@ const Confirmacion_Pedido = ({
                       </Text>
                     )}
 
-                    {formatNumber(item.priceVariants, coeficiente) > 0 && (
+                    {formatNumber(item.priceVariants) > 0 && (
                       <View
                         style={{
                           display: "flex",
                           flexDirection: "column",
                         }}
                       >
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
+                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -1339,7 +1498,8 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {/* {parseFloat(item.priceTotal).toFixed(2)} */}
+                      {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1447,10 +1607,10 @@ const Confirmacion_Pedido = ({
                     {item.opening && (
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
-                    {formatNumber(item.priceDrawers, coeficiente) > 0 && (
+                    {formatNumber(item.priceDrawers) > 0 && (
                       <Text>- Frente: </Text>
                     )}
-                    {formatNumber(item.priceDoor, coeficiente) > 0 && (
+                    {formatNumber(item.priceDoor) > 0 && (
                       <View
                         style={{
                           display: "flex",
@@ -1464,7 +1624,7 @@ const Confirmacion_Pedido = ({
                             fontSize: "8",
                           }}
                         >
-                          {formatNumber(item.priceDoor, coeficiente) + " "}
+                          {formatNumber(item.priceDoor) + " "}
                         </Text>
                         <Text
                           style={{
@@ -1477,7 +1637,7 @@ const Confirmacion_Pedido = ({
                         </Text>
                       </View>
                     )}
-                    {formatNumber(item.priceCabinet, coeficiente) > 0 && (
+                    {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
                         {item.materialCabinetMP && (
                           <>
@@ -1510,7 +1670,7 @@ const Confirmacion_Pedido = ({
                       </Text>
                     )}
 
-                    {formatNumber(item.priceVariants, coeficiente) > 0 && (
+                    {formatNumber(item.priceVariants) > 0 && (
                       <View
                         style={{
                           display: "flex",
@@ -1581,7 +1741,8 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {/* {parseFloat(item.priceTotal).toFixed(2)} */}
+                      {(parseFloat(item.total) * parseFloat(data.coefficient)).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1698,16 +1859,18 @@ const Confirmacion_Pedido = ({
                         </Text>
                       }
                     </View>
-                    {formatNumber(item.priceVariants, coeficiente) > 0 && (
+                    {formatNumber(item.priceVariants) > 0 && (
                       <View
                         style={{
                           display: "flex",
                           flexDirection: "column",
                         }}
                       >
+                        
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
+                            
                             {it.name}:
                             {it.name === "PVA" ||
                             it.name === "PVL" ||
@@ -1742,7 +1905,8 @@ const Confirmacion_Pedido = ({
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.total).toFixed(2)}
+                        {/* {parseFloat(item.priceTotal).toFixed(2)} */}
+                        {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                       </Text>
                     </View>
                   )}
@@ -1833,7 +1997,7 @@ const Confirmacion_Pedido = ({
                     <Text style={{ fontSize: "8" }}>
                       L: {item.size?.x} F: {item.size?.y} A: {item.size?.z}
                     </Text>
-                    {formatNumber(item.priceCabinet, coeficiente) > 0 && (
+                    {formatNumber(item.priceCabinet) > 0 && (
                       <Text>
                         - Acabado:
                         <Text style={{ fontSize: "8" }}>{item.material}</Text>
@@ -1843,16 +2007,18 @@ const Confirmacion_Pedido = ({
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
                     )}
                   </View>
-                  {formatNumber(item.priceVariants, coeficiente) > 0 && (
+                  {formatNumber(item.priceVariants) > 0 && (
                     <View
                       style={{
                         display: "flex",
                         flexDirection: "column",
                       }}
                     >
+                      
                       <Text>Variantes: </Text>
                       {item.variants.map((it) => (
                         <Text>
+                          
                           {it.name}:
                           {it.name === "PVA" ||
                           it.name === "PVL" ||
@@ -1887,7 +2053,8 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {/* {parseFloat(item.priceTotal).toFixed(2)} */}
+                      {(parseFloat(item.total)*parseFloat(data.coefficient)).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1977,7 +2144,7 @@ const Confirmacion_Pedido = ({
                     textAlign: "right",
                   }}
                 >
-                  <Text>{parseFloat(importeTotal).toFixed(2)}</Text>
+                  <Text>{parseFloat(sumaTotal + totalZocalo).toFixed(2)}</Text>
                 </View>
                 <View>
                   {data?.discountCabinets > 0 && (
@@ -1988,14 +2155,19 @@ const Confirmacion_Pedido = ({
                     </View>
                   )}
                 </View>
+
                 {data?.discountCabinets > 0 && (
                   <View>
-                    <Text>{parseFloat(totalconDescuento).toFixed(2)}</Text>
+                    <Text>
+                      {totalConDescuento}
+                    </Text>
                   </View>
                 )}
 
                 <View>
-                  <Text>{parseFloat(ivaCalculado).toFixed(2)}</Text>
+                  <Text>
+                    {ivaCalculado}
+                  </Text>
                 </View>
 
                 <View
@@ -2006,7 +2178,9 @@ const Confirmacion_Pedido = ({
                   }}
                 >
                   <View>
-                    <Text>{parseFloat(resultadoFinal).toFixed(2)}</Text>
+                    <Text>
+                      {totalConDescuentoEIVA}
+                    </Text>
                   </View>
                 </View>
               </View>

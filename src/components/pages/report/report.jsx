@@ -103,17 +103,28 @@ const Report = () => {
   }, [main]);
 
   useEffect(() => {
-    // Calcular las sumas y totales
-    const sumaTotal = calcularSumaTotal(data.cabinets);
-    const totalZocalo = calcularTotalZocalo(data.infoZocalos);
-    const totalDescuentos = calcularTotalDescuentos(data);
+    // Determina si se debe aplicar el coeficiente (solo en los tabs 2 y 3)
+    const usarCoeficiente = tabActivo === 2 || tabActivo === 3;
+  
+    // Obtener el coeficiente desde donde lo tengas almacenado (ejemplo: localStorage o un contexto global)
+    const coeficiente = usarCoeficiente ? parseFloat(data.coefficient) : 1;
+
+    // Calcular las sumas y totales con el coeficiente aplicado correctamente
+    const sumaTotal = calcularSumaTotal(data.cabinets, coeficiente);
+    const totalZocalo = calcularTotalZocalo(data.infoZocalos, coeficiente);
+    const totalDescuentos = calcularTotalDescuentos(data, coeficiente);
+  
+    // Ahora el IVA también se basa en el total con coeficiente ya aplicado
     const totalIva = calcularTotalIva(sumaTotal, data.ivaCabinets);
+  
     const resultado = calcularTotalConDescuentoEIVA(
-      sumaTotal,
-      totalZocalo,
+      data.cabinets,
+      data.infoZocalos,
       totalDescuentos,
-      data.ivaCabinets
+      data.ivaCabinets,
+      coeficiente
     );
+  
     setTotales({
       sumaTotal,
       totalZocalo,
@@ -121,12 +132,11 @@ const Report = () => {
       totalIva,
       resultadoFinal: resultado,
     });
-    console.log("Totales", totales);
-    // --------------------------------------------------------------------------
-  }, [data]);
+  }, [data, tabActivo]);
 
-  const { totalDescuento, totalFinal } = totales.resultadoFinal;
-  console.log(totalDescuento)
+  
+  const { totalConDescuento, totalFinal, importeTotal, ivaCalculado } = totales.resultadoFinal;
+  console.log(totales)
 
   const tabs = [
     {
@@ -138,11 +148,10 @@ const Report = () => {
             <Confirmacion_Pedido
               price={priceP}
               data={data}
-              sumaTotal={totales.sumaTotal}
-              totalZocalo={totales.totalZocalo}
-              totalconDescuento={totalDescuento}
-              totalIva={totales.totalIva}
+              totalconDescuento={totalConDescuento}
+              ivaCalculado={ivaCalculado}
               resultadoFinal={totalFinal}
+              importeTotal={importeTotal}
               title="Confirmación de Pedido"
             />
           </PDFViewer>
@@ -159,11 +168,10 @@ const Report = () => {
               price={priceP}
               data={data}
               title="Presupuesto"
-              sumaTotal={totales.sumaTotal}
-              totalZocalo={totales.totalZocalo}
-              totalconDescuento={totalDescuento}
-              totalIva={totales.totalIva}
+              totalconDescuento={totalConDescuento}
+              ivaCalculado={ivaCalculado}
               resultadoFinal={totalFinal}
+              importeTotal={importeTotal}
             />
           </PDFViewer>
         </div>
@@ -179,6 +187,10 @@ const Report = () => {
               data={data}
               price={priceP}
               title="Presupuesto Venta"
+              totalconDescuento={totalConDescuento}
+              ivaCalculado={ivaCalculado}
+              resultadoFinal={totalFinal}
+              importeTotal={importeTotal}
             />
           </PDFViewer>
         </div>
@@ -196,6 +208,11 @@ const Report = () => {
               totalElectrodomesticos={total_Electrodomesticos}
               price={priceC}
               data={data}
+              sumaTotal={totales.sumaTotal}
+              totalZocalo={totales.totalZocalo}
+              totalconDescuento={totalConDescuento}
+              totalIva={totales.totalIva}
+              resultadoFinal={totalFinal}
             />
           </PDFViewer>
         </div>

@@ -1,60 +1,63 @@
-import { getLocalOrder } from "../../../handlers/order";
-
-const data = getLocalOrder();
-const formatNumber = (x) => {
+const formatNumber = (x, coefficient = 1) => {
   if (!x) return 0;
-  // Multiplicar y redondear el resultado
-  const result = parseFloat(x) * parseFloat(data.coefficient);
+  // Multiplicar y redondear el resultado por el coeficiente
+  const result = parseFloat(x) * parseFloat(coefficient);
 
   // Devolver el valor redondeado a un número entero
   return Math.round(result);
 };
 
-const calcularSumaTotal = (productos) =>
-  productos.reduce((total, { priceTotal }) => total + priceTotal, 0);
+const calcularSumaTotal = (productos, coefficient = 1) =>
+  productos
+    .map(({ total }) => total * coefficient)  // Multiplica cada total por el coeficiente
+    .reduce((acumulador, total) => acumulador + total, 0);  // Suma todos los totales
 
-const calcularTotalZocalo = (zocalos) =>
-  zocalos.reduce((total, { precio = 0 }) => total + precio, 0);
 
-const calcularTotalDescuentos = ({
-  discountCabinets,
-  discountCabinetsPorcentaje = 0,
-}) => (discountCabinets > 0 ? parseFloat(discountCabinetsPorcentaje) : 0);
+const calcularTotalZocalo = (zocalos, coefficient = 1) =>
+  zocalos.reduce((total, { precio = 0 }) => total + precio * coefficient, 0);
 
-// Modificado: IVA como porcentaje del total calculado
-const calcularTotalIva = (importeTotal, ivaPorcentaje = 21) =>
-  (importeTotal * ivaPorcentaje) / 100; // 21% de `importeTotal`
-
-const calcularTotalConDescuento = (sumaTotal, totalZocalo, totalDescuentos) => {
-  const totalConDescuento = sumaTotal + totalZocalo - totalDescuentos;
-  return { totalConDescuento, descuentoAplicado: totalDescuentos };
+const calcularTotalDescuentos = (
+  { discountCabinets, discountCabinetsPorcentaje = 0 },
+  coefficient = 1
+) => {
+  return discountCabinets > 0 ? discountCabinetsPorcentaje * coefficient : 0;
 };
 
-const calcularIva = (importe, totalIva) => parseFloat(importe * (totalIva / 100));
+const calcularTotalIva = (importeTotal, ivaPorcentaje = 21) =>
+  (importeTotal * ivaPorcentaje) / 100; // No aplicamos coefficient aquí porque importeTotal ya lo tiene
 
 const calcularTotalConDescuentoEIVA = (
-  sumaTotal,
-  totalZocalo,
+  productos,
+  zocalos,
   totalDescuentos,
-  ivaPorcentaje
+  ivaPorcentaje,
+  coefficient = 1
 ) => {
-  const { totalConDescuento, descuentoAplicado } = calcularTotalConDescuento(
-    sumaTotal,
-    totalZocalo,
-    totalDescuentos
-  );
-  // Modificado: IVA calculado a partir del importe total
+  // Aplicamos coefficient a cada elemento individualmente
+  const sumaTotal = calcularSumaTotal(productos, coefficient);
+  const totalZocalo = calcularTotalZocalo(zocalos, coefficient);
+
+  // Sumamos los valores ya ajustados
+  const importeTotal = sumaTotal + totalZocalo;
+
+  // Aplicamos descuentos
+  const totalConDescuento = importeTotal - totalDescuentos;
+
+  // Calculamos el IVA sobre el total ya con descuento
   const ivaCalculado = calcularTotalIva(totalConDescuento, ivaPorcentaje);
+
+  // Total final con IVA incluido
   const totalFinal = totalConDescuento + ivaCalculado;
 
   return {
-    importeTotal: sumaTotal + totalZocalo,
-    descuentoAplicado,
+    importeTotal,
+    descuentoAplicado: totalDescuentos,
     totalConDescuento,
     ivaCalculado,
     totalFinal,
   };
 };
+
 
 export {
   calcularTotalIva,

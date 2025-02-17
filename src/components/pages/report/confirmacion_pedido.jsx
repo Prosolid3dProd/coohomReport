@@ -16,11 +16,10 @@ const Confirmacion_Pedido = ({
   data,
   price,
   title,
-  sumaTotal,
-  totalZocalo,
   totalconDescuento,
-  totalIva,
+  ivaCalculado,
   resultadoFinal,
+  importeTotal
 }) => {
   let contador = 1;
   const [cabinets, setCabinets] = useState({
@@ -1943,7 +1942,7 @@ const Confirmacion_Pedido = ({
                     textAlign: "right",
                   }}
                 >
-                  <Text>{parseFloat(sumaTotal + totalZocalo).toFixed(2)}</Text>
+                  <Text>{parseFloat(importeTotal).toFixed(2)}</Text>
                 </View>
                 <View>
                   {data?.discountCabinets > 0 && (
@@ -1954,7 +1953,6 @@ const Confirmacion_Pedido = ({
                     </View>
                   )}
                 </View>
-
                 {data?.discountCabinets > 0 && (
                   <View>
                     <Text>{parseFloat(totalconDescuento).toFixed(2)}</Text>
@@ -1962,7 +1960,7 @@ const Confirmacion_Pedido = ({
                 )}
 
                 <View>
-                  <Text>{parseFloat(totalIva).toFixed(2)}</Text>
+                  <Text>{parseFloat(ivaCalculado).toFixed(2)}</Text>
                 </View>
 
                 <View
