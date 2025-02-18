@@ -6,7 +6,7 @@ import {
   Popconfirm,
   Typography,
 } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import {
   deleteComplements,
@@ -16,23 +16,19 @@ import {
 import { Header } from "../../content";
 import { exportarArchivo } from "../../content/logic/obtenerArchivoJson";
 
+// ✅ Función para obtener datos de manera reutilizable
 export const fetchData = async (setLoading, setData) => {
   try {
     setLoading(true);
     const result = await getComplements();
+    const newData = Array.isArray(result) ? result.filter((el) => el.name) : [];
 
-    if (!Array.isArray(result) || result.length === 0) {
-      console.warn("No se encontraron datos");
-      setData([]); // Setear como [] solo si no hay datos
-      return;
-    }
-
-    const newData = result.filter((el) => el.name); // Filtrar solo con nombre definido
-
-    setData((prevData) => (JSON.stringify(prevData) !== JSON.stringify(newData) ? newData : prevData));
+    setData((prevData) =>
+      JSON.stringify(prevData) !== JSON.stringify(newData) ? newData : prevData
+    );
   } catch (error) {
-    console.error("Error fetching orders:", error);
-    setData([]); // Asegurar que en caso de error, el estado es un array vacío
+    console.error("Error fetching data:", error);
+    setData([]); // En caso de error, asegurar que el estado es un array vacío
   } finally {
     setLoading(false);
   }
@@ -40,82 +36,69 @@ export const fetchData = async (setLoading, setData) => {
 
 const Encimeras = () => {
   const [data, setData] = useState([]);
-  const [editado, setEditado] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [pageSize, setPageSize] = useState(5);
-  
+
+  // ✅ Carga inicial de datos
   useEffect(() => {
-    fetchData(setEditado, setData);
+    fetchData(setLoading, setData);
   }, []);
 
-  const handleResize = () => {
-      const windowHeight = window.innerHeight;
-      const newRowHeight = 88;
-      const newPageSize = Math.floor((windowHeight - 200) / newRowHeight);
-      setPageSize(newPageSize);
-    };
-  
-    useEffect(() => {
-      handleResize();
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }, []);
+  // ✅ Manejo de tamaño de la tabla en función del viewport
+  const handleResize = useCallback(() => {
+    const windowHeight = window.innerHeight;
+    const newRowHeight = 88;
+    setPageSize(Math.floor((windowHeight - 200) / newRowHeight));
+  }, []);
 
+  useEffect(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleResize]);
+
+  // ✅ Filtrar complementos por texto
   const getFilterComplements = async (params) => {
-    setEditado(true);
+    setLoading(true);
     try {
       const result = await getComplementsByText(params);
-      if (result && result.length > 0) setData(result);
-      else {
+      if (result && result.length > 0) {
+        setData(result);
+      } else {
         message.error("No se encontraron resultados");
-        fetchData(setEditado, setData);
+        fetchData(setLoading, setData);
       }
     } catch (error) {
       console.error("Error filtering orders:", error);
     }
-    setEditado(false);
+    setLoading(false);
   };
 
+  // ✅ Eliminar un complemento
   const onDelete = async (item) => {
-    setEditado(true);
+    setLoading(true);
     try {
       const result = await deleteComplements(item);
       if (result) {
-        setData((prevValues) =>
-          prevValues.filter((value) => value._id !== item._id)
-        );
+        setData((prev) => prev.filter((value) => value._id !== item._id));
         message.success(`${item.code} eliminado correctamente`);
-        setEditado(false);
       } else {
         message.error(`Error al eliminar ${item.code}`);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.error("Error deleting complement:", error);
       message.error(`Error al eliminar ${item.code}`);
+    } finally {
+      setLoading(false);
     }
   };
-  
-  let columns = [
-    {
-      title: "Referencia",
-      dataIndex: "code",
-      key: "code",
-    },
-    {
-      title: "Descripcion",
-      dataIndex: "name",
-      key: "name",
-      width: 720,
-    },
-    {
-      title: "Tipo",
-      dataIndex: "type",
-      key: "type",
-    },
-    {
-      title: "Marca",
-      dataIndex: "marca",
-      key: "marca",
-    },
+
+  // ✅ Definición de columnas de la tabla
+  const columns = [
+    { title: "Referencia", dataIndex: "code", key: "code" },
+    { title: "Descripción", dataIndex: "name", key: "name", width: 720 },
+    { title: "Tipo", dataIndex: "type", key: "type" },
+    { title: "Marca", dataIndex: "marca", key: "marca" },
     {
       title: "Precio",
       dataIndex: "price",
@@ -127,15 +110,13 @@ const Encimeras = () => {
       key: "actions",
       fixed: "right",
       width: 110,
-      render: (text, record) => (
+      render: (_, record) => (
         <Space>
           <Popconfirm
-            title="¿Estás seguro de que deseas eliminar este reporte?"
+            title="¿Seguro que deseas eliminar este complemento?"
             icon={<QuestionCircleOutlined style={{ color: "red" }} />}
             onConfirm={() => onDelete(record)}
-            onCancel={() => {}}
-            okType="default"
-            okText="Si"
+            okText="Sí"
             cancelText="No"
           >
             <Typography.Link>
@@ -146,24 +127,24 @@ const Encimeras = () => {
       ),
     },
   ];
+
   return (
     <main className="flex flex-col px-4">
       <Header
-        name={"Biblioteca"}
-        input={true}
+        name="Biblioteca"
+        input
         getFilter={getFilterComplements}
         downloadFile={() => exportarArchivo(data)}
-        showUploadButtons={true}
-        setLoading={setEditado}
+        showUploadButtons
+        setLoading={setLoading}
         setData={setData}
       />
       <Table
         className="border border-t-0 border-border mx-3 relative"
-        loading={editado}
+        loading={loading}
         dataSource={data}
-        rowKey={"_id"}
-        pagination={{pageSize}}
-        searchable
+        rowKey="_id"
+        pagination={{ pageSize }}
         columns={columns}
       />
     </main>

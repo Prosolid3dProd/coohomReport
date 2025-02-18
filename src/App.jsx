@@ -1,20 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import {
   Config,
   Report,
   Dashboard,
-  Login,
   Encimeras,
   RedirectLogin,
-  Error,
   History,
   Admin,
 } from "./components/index";
 
+const Login = lazy(() => import("./components/pages/log/login"));
+const Error = lazy(() => import("./components/pages/error/errorPage"));
+
 import { getLocalToken } from "./data/localStorage";
-import './index.css'
+import "./index.css";
 
 export const userContext = React.createContext();
 
@@ -33,20 +34,22 @@ const App = () => {
   return (
     <>
       <userContext.Provider value={users}>
-        <Routes>
-          <Route path="/Login" element={<Login />} />
-          <Route element={<RedirectLogin />}>
-            <Route path="/" element={<Login />} />
-            <Route path="/Dashboard" element={<Dashboard />}>
-              <Route path="Tiendas" element={<Admin />} />
-              <Route path="Config" element={<Config />} />
-              <Route path="Biblioteca" element={<Encimeras />} />
-              <Route path="Presupuestos" element={<History />} />
-              <Route path="Report" element={<Report />} />
+        <Suspense >
+          <Routes>
+            <Route path="/Login" element={<Login />} />
+            <Route element={<RedirectLogin />}>
+              <Route path="/" element={<Login />} />
+              <Route path="/Dashboard" element={<Dashboard />}>
+                <Route path="Tiendas" element={<Admin />} />
+                <Route path="Config" element={<Config />} />
+                <Route path="Biblioteca" element={<Encimeras />} />
+                <Route path="Presupuestos" element={<History />} />
+                <Route path="Report" element={<Report />} />
+              </Route>
             </Route>
-          </Route>
-          <Route path="*" element={<Error />} />
-        </Routes>
+            <Route path="*" element={<Error />} />
+          </Routes>
+        </Suspense>
       </userContext.Provider>
     </>
   );

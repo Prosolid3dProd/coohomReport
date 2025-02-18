@@ -16,10 +16,10 @@ export const lista = [
     name: "Tiendas",
     icon: Tiendas,
   },
-  // {
-  //   name: "Config",
-  //   icon: Config,
-  // },
+  //{
+    //name: "Config",
+    //icon: Config,
+  //},
 ];
 
 export const listaCliente = [
@@ -30,5 +30,5 @@ export const listaCliente = [
   {
     name: "Biblioteca",
     icon: Encimera,
-  },
+  }
 ];

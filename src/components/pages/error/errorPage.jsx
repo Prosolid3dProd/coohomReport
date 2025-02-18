@@ -4,7 +4,7 @@ import { BtnReport } from "../../utils";
 const ErrorPage = () => {
   const navigate = useNavigate();
 
-  const navigateHome = () => navigate("/", { replace: true });
+  const navigateHome = () => navigate("/");
 
   return (
     <>
