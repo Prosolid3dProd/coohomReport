@@ -84,9 +84,6 @@ const Confirmacion_Pedido = ({
   useEffect(() => {
     if (data && data.cabinets && Array.isArray(data.cabinets)) {
   
-      console.log("Coeficiente aplicado:", coeficiente);
-      console.log("Gabinetes antes de modificar:", data.cabinets);
-  
       setCabinets({
         decorativos: data.cabinets
           .filter((item) => item.tipo === CONFIG.MODELNAME.DECORATIVOS.CODE)
@@ -142,10 +139,9 @@ const Confirmacion_Pedido = ({
           })),
       });
   
-      console.log("Gabinetes después de modificar:", cabinets);
+      // console.log("Gabinetes después de modificar:", cabinets);
     }
   }, [data]); // Se ejecuta cuando `data` cambia
-  
 
   const complementos =
     data.infoZocalos.length > 0 || cabinets.complementos.length > 0

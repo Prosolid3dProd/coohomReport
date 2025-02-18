@@ -54,7 +54,6 @@ const Report = () => {
     setTabActivo(parseInt(key));
     localStorage.setItem("activeTab", key);
   };
-
   // useEffect que se ejecuta solo una vez cuando se monta el componente o cuando cambia el `orderId`
   useEffect(() => {
     const fetchData = async () => {
@@ -136,7 +135,6 @@ const Report = () => {
 
   
   const { totalConDescuento, totalFinal, importeTotal, ivaCalculado } = totales.resultadoFinal;
-  console.log(totales)
 
   const tabs = [
     {
@@ -208,11 +206,6 @@ const Report = () => {
               totalElectrodomesticos={total_Electrodomesticos}
               price={priceC}
               data={data}
-              sumaTotal={totales.sumaTotal}
-              totalZocalo={totales.totalZocalo}
-              totalconDescuento={totalConDescuento}
-              totalIva={totales.totalIva}
-              resultadoFinal={totalFinal}
             />
           </PDFViewer>
         </div>

@@ -8,10 +8,7 @@ const formatNumber = (x, coefficient = 1) => {
 };
 
 const calcularSumaTotal = (productos, coefficient = 1) =>
-  productos
-    .map(({ total }) => total * coefficient)  // Multiplica cada total por el coeficiente
-    .reduce((acumulador, total) => acumulador + total, 0);  // Suma todos los totales
-
+  productos.reduce((acumulador, { total }) => acumulador + total * coefficient, 0);
 
 const calcularTotalZocalo = (zocalos, coefficient = 1) =>
   zocalos.reduce((total, { precio = 0 }) => total + precio * coefficient, 0);
