@@ -24,7 +24,7 @@ import {
   resetPassword,
 } from "../../../handlers/user";
 
-const { Option } = Select;
+// const { Option } = Select;
 const { success, info, error } = message;
 
 const MENSAJES = {

@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const totales = [];
+// const totales = [];
 
 const convertirFecha = (fecha) => {
   try {

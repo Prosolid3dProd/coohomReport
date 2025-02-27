@@ -14,17 +14,17 @@ const getUserData = () => JSON.parse(localStorage.getItem(userData))
  */
 const setUserData = (data) => JSON.parse(localStorage.setItem(userData, data))
 
-/**
- *
- *@returns {number} --> sección reporte en la que se encuentra
- */
-const getTabActual = () => JSON.parse(localStorage.getItem('tabActual'))
-/**
- *
- *
- * @param {number} tab --> tab activa (Report)
- */
-const setTabActual = (tab) => localStorage.setItem('tabActual', JSON.stringify(tab))
+// /**
+//  *
+//  *@returns {number} --> sección reporte en la que se encuentra
+//  */
+// const getTabActual = () => JSON.parse(localStorage.getItem('tabActual'))
+// /**
+//  *
+//  *
+//  * @param {number} tab --> tab activa (Report)
+//  */
+// const setTabActual = (tab) => localStorage.setItem('tabActual', JSON.stringify(tab))
 
 /**
  *

@@ -1,0 +1,22 @@
+src/components/utils/btnTabla.jsx no se usa
+
+src/data/localStorage.js/const getTabActual  no se usa
+src/data/localStorage.js/const setTabActual  no se usa
+src/data/parseJson3d.js/ line 1781 variables no declaradas
+
+src/handlers/order.js line 20 y 26 tokenLocal no se usa || axiosToken no se usa
+
+src/handlers/order.js line 236 no se usa archivedOrderDetails
+src/handlers/order.js line 333 no se usa importLibrary
+src/handlers/order.js line 488 no se usa clearLocalOrder
+
+src/components/content/logic/muebles.js line 488 clearLocalOrder no se usa
+src/components/forms/products.jsx line 67 no se usa onFinishw
+
+src/components/pages/admin/admin.jsx line 27 Option no se usa.
+
+src/components/pages/others/config.jsx line 236 BUTTON html
+
+src/components/pages/report/presupuesto_cliente.jsx line 32 totales no se usa
+
+seguir desde presupuesto fabrica

@@ -1572,7 +1572,7 @@ export const parseJson3D = async (json) => {
                   drawerPriceDetails,
                   drawerMaterialDetails,
                   material: item.textureName,
-                  variants: [],
+                  // variants: [],
                   designerName: json.partnerOrder?.designerName || "",
                   quantity: parseInt(itemx.quantity) || 1,
                   ...extra,
@@ -1651,7 +1651,7 @@ export const parseJson3D = async (json) => {
               modelName: String(nameFinal).replace("-", ""),
               doors: getDoors(item.subModels),
               opening,
-              modelDrawer: modeloDrawer,
+              // modelDrawer: modeloDrawer,
               zocalo: zocalo,
               priceDoor: parseInt(getTotalDoors(item.subModels)),
               total: totalPrice,
@@ -1778,10 +1778,11 @@ export const parseJson3D = async (json) => {
     //   cabinets.push(tirador);
     // });
 
-    if (modelDrawer) {
-      drawerTemp = modelDrawer[0].modelDrawer;
-      drawerTexture = modelDrawer[0].textureDrawer;
-    }
+    // No estan declaradas las variables
+    // if (modelDrawer) {
+    //   drawerTemp = modelDrawer[0].modelDrawer;
+    //   drawerTexture = modelDrawer[0].textureDrawer;
+    // }
 
     const conteo = cabinets.reduce((contador, item) => {
       const id = item.obsBrandGoodId;

@@ -17,17 +17,17 @@ let _AXIOS_ = axios.create({
   },
 });
 
-const tokenLocal = () => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("token");
-  }
-};
-
-export const axiosToken = axios.create({
-  headers: {
-    Authorization: Cookies.get("token") || tokenLocal(),
-  },
-});
+// const tokenLocal = () => {
+//   if (typeof window !== "undefined") {
+//     return localStorage.getItem("token");
+//   }
+// };
+//
+// export const axiosToken = axios.create({
+//   headers: {
+//     Authorization: Cookies.get("token") || tokenLocal(),
+//   },
+// });
 
 export const createOrder = async (params) => {
 
@@ -233,18 +233,18 @@ export const updateCabinetsOrder = async (params) => {
   }
 };
 
-export const archivedOrderDetails = async (params) => {
-  try {
-    const data = await axios.put(`${CONFIG.API.BACKEND_URL}/reporthomDetails`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
-    return data.data;
-  } catch (error) {
-    console.log(error);
-    return false;
-  }
-};
+// export const archivedOrderDetails = async (params) => {
+//   try {
+//     const data = await axios.put(`${CONFIG.API.BACKEND_URL}/reporthomDetails`, {
+//       ...params,
+//       token: Settings.TOKEN,
+//     });
+//     return data.data;
+//   } catch (error) {
+//     console.log(error);
+//     return false;
+//   }
+// };
 
 export const handleArchivedOrderDetails = async (params) => {
   try {
@@ -330,23 +330,23 @@ export const deleteComplements = async (params) => {
   }
 };
 
-export const importLibrary = async (formData) => {
-  try {
-    await axios.post(
-      `${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        ...formData,
-        token: Settings.TOKEN,
-      }
-    );
-  } catch (error) {
-    console.error("Error uploading file:", error);
-  }
-};
+// export const importLibrary = async (formData) => {
+//   try {
+//     await axios.post(
+//       `${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`,
+//       formData,
+//       {
+//         headers: {
+//           "Content-Type": "multipart/form-data",
+//         },
+//         ...formData,
+//         token: Settings.TOKEN,
+//       }
+//     );
+//   } catch (error) {
+//     console.error("Error uploading file:", error);
+//   }
+// };
 
 export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
   let total = 0;

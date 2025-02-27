@@ -64,21 +64,21 @@ const Product = ({ getData }) => {
     setTotal(newTotal);
   }, [cantidad, unidad]);
 
-  const onFinishw = async (values) => {
-    try {
-      const updatedDetails = { ...values };
-      const result = await updateOrderDetails({ details: updatedDetails, isUpdate, _id: data._id });
-      if (result) {
-        getData(result);
-        setLocalOrder(result);
-        message.success("Actualización exitosa");
-        setModal2Open(false);
-        setTimeout(() => location.reload(), 1000);
-      }
-    } catch (error) {
-      console.error("Error al actualizar detalles:", error);
-    }
-  };
+  // const onFinishw = async (values) => {
+  //   try {
+  //     const updatedDetails = { ...values };
+  //     const result = await updateOrderDetails({ details: updatedDetails, isUpdate, _id: data._id });
+  //     if (result) {
+  //       getData(result);
+  //       setLocalOrder(result);
+  //       message.success("Actualización exitosa");
+  //       setModal2Open(false);
+  //       setTimeout(() => location.reload(), 1000);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error al actualizar detalles:", error);
+  //   }
+  // };
 
   // Maneja el envío del formulario
   const onFinish = async (values) => {
