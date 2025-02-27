@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { General, Product, Profile } from "./../../index";
 import { Tabs, Card, Button, Space } from "antd";
@@ -31,7 +31,11 @@ import {
 
 const Report = () => {
   const [main, setMain] = useState(null);
-  const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
+  const [data, setData] = useState(() => {
+    const storedOrder = JSON.parse(localStorage.getItem("order"));
+    console.log("Datos iniciales desde localStorage:", storedOrder);
+    return storedOrder;
+  });
   const [orderId, setOrderId] = useState(getLocalOrder());
   const [visible, setBtnVisible] = useState(false);
   const [tabActivo, setTabActivo] = useState(0);
@@ -50,11 +54,41 @@ const Report = () => {
     totalIva: 0,
     resultadoFinal: {},
   });
+
+  const dataAjustada = useMemo(() => {
+    if (!data || !data.cabinets || !data.infoZocalos) return data;
+
+    let coeficiente;
+    if (tabActivo === 0 || tabActivo === 1) {
+      coeficiente = parseFloat(data.userId?.coefficient) || 1;
+    } else if (tabActivo === 2 || tabActivo === 3) {
+      coeficiente = parseFloat(data.coefficient) || 1;
+    } else {
+      coeficiente = 1;
+    }
+
+    console.log("Coeficiente usado:", coeficiente, "Tab activo:", tabActivo);
+
+    return {
+      ...data,
+      cabinets: data.cabinets.map((item) => ({
+        ...item,
+        total: (parseFloat(item.total) || 0) * coeficiente,
+      })),
+      infoZocalos: data.infoZocalos.map((zocalo) => ({
+        ...zocalo,
+        precio: (parseFloat(zocalo.precio) || 0) * coeficiente,
+      })),
+      discountCabinets: parseFloat(data.discountCabinets) || 0, // No ajustar por coeficiente aquí
+      coeficiente,
+    };
+  }, [data, tabActivo]);
+
   const handleTabChange = (key) => {
     setTabActivo(parseInt(key));
     localStorage.setItem("activeTab", key);
   };
-  // useEffect que se ejecuta solo una vez cuando se monta el componente o cuando cambia el `orderId`
+
   useEffect(() => {
     const fetchData = async () => {
       if (orderId._id) {
@@ -71,20 +105,17 @@ const Report = () => {
       }
     };
     fetchData();
-  }, [tabActivo]); // Solo ejecutará cuando el `orderId` cambie
+  }, [orderId]);
 
-  // useEffect que maneja el cambio de tabs. No realiza actualizaciones innecesarias.
   useEffect(() => {
-    // Solo realiza la actualización de datos si el tabActivo cambia y no si `data` o `profile` no han cambiado
     if (tabActivo <= 3 && orderId._id && data) {
-      // const updatedInfo = fixOrder(data, tabActivo);
       const fetchProfile = async () => {
         const profileData = await getProfile();
         setProfile(profileData);
       };
       fetchProfile();
     }
-  }, [tabActivo, data, orderId]); // Este efecto se ejecutará solo cuando `tabActivo` cambie, no por cambios de `data` innecesarios
+  }, [tabActivo, data, orderId]);
 
   useEffect(() => {
     if (main) {
@@ -95,54 +126,77 @@ const Report = () => {
           setBtnVisible(false);
         }
       };
-
       main.addEventListener("scroll", handleScroll);
       return () => main.removeEventListener("scroll", handleScroll);
     }
   }, [main]);
 
   useEffect(() => {
-    // Determina qué coeficiente usar según el tab activo
-    let coeficiente;
-    if (tabActivo === 0 || tabActivo === 1) {
-      // Coeficiente para tabs 0 y 1 (puedes definirlo como una constante o sacarlo de otro lugar)
-      coeficiente = parseFloat(data.userId.coefficient) || 1; // Ejemplo: usa 1.5 para tabs 0 y 1, ajusta según necesites
-    } else if (tabActivo === 2 || tabActivo === 3) {
-      // Coeficiente para tabs 2 y 3, obtenido de data.coefficient
-      coeficiente = parseFloat(data.coefficient);
-    } else {
-      // Valor por defecto si tabActivo no está en el rango esperado
-      coeficiente = 1;
+    // Solo calcular totales para tabs 0, 1, 2 y 3
+    if (tabActivo > 3 || !dataAjustada || !dataAjustada.cabinets || !dataAjustada.infoZocalos) {
+      setTotales({
+        sumaTotal: 0,
+        totalZocalo: 0,
+        totalDescuentos: 0,
+        totalIva: 0,
+        resultadoFinal: {},
+      });
+      return;
     }
-  
-    // Calcular las sumas y totales con el coeficiente aplicado
-    const sumaTotal = calcularSumaTotal(data.cabinets, coeficiente);
-    const totalZocalo = calcularTotalZocalo(data.infoZocalos, coeficiente);
-    const totalDescuentos = calcularTotalDescuentos(data, coeficiente);
-  
-    // Calcular el IVA basado en el total con coeficiente
-    const totalIva = calcularTotalIva(sumaTotal, data.ivaCabinets);
-  
-    const resultado = calcularTotalConDescuentoEIVA(
-      data.cabinets,
-      data.infoZocalos,
-      totalDescuentos,
-      data.ivaCabinets,
-      coeficiente
-    );
-  
-    // Actualizar el estado con los nuevos totales
+
+    const coeficiente = dataAjustada.coeficiente;
+
+    const sumaTotalBase = calcularSumaTotal(dataAjustada.cabinets);
+    const totalZocaloBase = calcularTotalZocalo(dataAjustada.infoZocalos);
+    const importeTotalBase = sumaTotalBase + totalZocaloBase;
+
+    // Interpretar discountCabinets como porcentaje del importeTotal
+    const discountPercentage = (parseFloat(dataAjustada.discountCabinets) || 0) / 100;
+    const totalDescuentosBase = importeTotalBase * discountPercentage;
+
+    // Multiplicar totales por coeficiente solo en tabs 2 y 3
+    const sumaTotal = (tabActivo === 2 || tabActivo === 3) ? sumaTotalBase * coeficiente : sumaTotalBase;
+    const totalZocalo = (tabActivo === 2 || tabActivo === 3) ? totalZocaloBase * coeficiente : totalZocaloBase;
+    const importeTotal = sumaTotal + totalZocalo;
+    const totalDescuentos = (tabActivo === 2 || tabActivo === 3) ? totalDescuentosBase * coeficiente : totalDescuentosBase;
+
+    const totalConDescuento = importeTotal - totalDescuentos;
+    const totalIva = calcularTotalIva(totalConDescuento, dataAjustada.ivaCabinets || 21);
+    const totalFinal = totalConDescuento + totalIva;
+
     setTotales({
       sumaTotal,
       totalZocalo,
       totalDescuentos,
       totalIva,
-      resultadoFinal: resultado,
+      resultadoFinal: {
+        importeTotal,
+        descuentoAplicado: totalDescuentos,
+        totalConDescuento,
+        ivaCalculado: totalIva,
+        totalFinal,
+      },
     });
-  }, [data, tabActivo]);
 
-  
-  const { totalConDescuento, totalFinal, importeTotal, ivaCalculado } = totales.resultadoFinal;
+    console.log("Totales actualizados:", {
+      sumaTotalBase,
+      totalZocaloBase,
+      importeTotalBase,
+      discountPercentage,
+      totalDescuentosBase,
+      sumaTotal,
+      totalZocalo,
+      totalDescuentos,
+      importeTotal,
+      totalConDescuento,
+      totalIva,
+      totalFinal,
+      coeficiente,
+      tabActivo,
+    });
+  }, [dataAjustada, tabActivo]);
+
+  const { totalConDescuento, totalFinal, importeTotal, ivaCalculado } = totales.resultadoFinal || {};
 
   const tabs = [
     {
@@ -153,7 +207,7 @@ const Report = () => {
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
               price={priceP}
-              data={data}
+              data={dataAjustada}
               totalconDescuento={totalConDescuento}
               ivaCalculado={ivaCalculado}
               resultadoFinal={totalFinal}
@@ -172,7 +226,7 @@ const Report = () => {
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
               price={priceP}
-              data={data}
+              data={dataAjustada}
               title="Presupuesto"
               totalconDescuento={totalConDescuento}
               ivaCalculado={ivaCalculado}
@@ -190,7 +244,7 @@ const Report = () => {
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido_Venta
-              data={data}
+              data={dataAjustada}
               price={priceP}
               title="Presupuesto Venta"
               totalconDescuento={totalConDescuento}
@@ -213,7 +267,7 @@ const Report = () => {
               totalEquipamiento={total_Equipamiento}
               totalElectrodomesticos={total_Electrodomesticos}
               price={priceC}
-              data={data}
+              data={dataAjustada}
             />
           </PDFViewer>
         </div>
@@ -224,7 +278,7 @@ const Report = () => {
       label: "Información General",
       component: (
         <div className="alturaPreview">
-          <General getData={setData} data={data} />
+          <General getData={setData} data={dataAjustada} />
         </div>
       ),
     },
@@ -242,15 +296,15 @@ const Report = () => {
       label: "Mi Perfil",
       component: (
         <div className="alturaPreview">
-          <Profile getData={setData} data={data} />
+          <Profile getData={setData} data={dataAjustada} />
         </div>
       ),
     },
   ];
 
   return (
-    data &&
-    data._id && (
+    dataAjustada &&
+    dataAjustada._id && (
       <main className="flex flex-col" id="main">
         <Card className="rounded-none m-0 pt-0 border-0">
           <header
@@ -263,18 +317,14 @@ const Report = () => {
                 to="/Dashboard/Presupuestos"
                 className="italic font-bold hover:underline hover:text-blue"
               >
-                #{data?.orderCode || "Sin especificar"}
+                #{dataAjustada?.orderCode || "Sin especificar"}
               </NavLink>
             </h1>
             <Button
               style={{ float: "right", width: 150 }}
               type="default"
               onClick={() => {
-                const contenidoJSON = JSON.stringify(
-                  JSON.parse(localStorage.getItem("order")),
-                  null,
-                  2
-                );
+                const contenidoJSON = JSON.stringify(dataAjustada, null, 2);
                 const blob = new Blob([contenidoJSON], {
                   type: "application/json",
                 });
@@ -282,9 +332,7 @@ const Report = () => {
                 const enlace = document.createElement("a");
                 enlace.href = url;
                 enlace.download = `${
-                  JSON.parse(localStorage.getItem("order")).storeName +
-                  " " +
-                  JSON.parse(localStorage.getItem("order")).customerName
+                  dataAjustada.storeName + " " + dataAjustada.customerName
                 }.json`;
                 document.body.appendChild(enlace);
                 enlace.click();
@@ -302,13 +350,11 @@ const Report = () => {
             activeKey={tabActivo.toString()}
             centered
             defaultActiveKey="0"
-            items={tabs.map(({ key, label, component }) => {
-              return {
-                label,
-                key,
-                children: component,
-              };
-            })}
+            items={tabs.map(({ key, label, component }) => ({
+              label,
+              key,
+              children: component,
+            }))}
           />
         </Card>
       </main>
