@@ -102,18 +102,25 @@ const Report = () => {
   }, [main]);
 
   useEffect(() => {
-    // Determina si se debe aplicar el coeficiente (solo en los tabs 2 y 3)
-    const usarCoeficiente = tabActivo === 2 || tabActivo === 3;
+    // Determina qué coeficiente usar según el tab activo
+    let coeficiente;
+    if (tabActivo === 0 || tabActivo === 1) {
+      // Coeficiente para tabs 0 y 1 (puedes definirlo como una constante o sacarlo de otro lugar)
+      coeficiente = parseFloat(data.userId.coefficient) || 1; // Ejemplo: usa 1.5 para tabs 0 y 1, ajusta según necesites
+    } else if (tabActivo === 2 || tabActivo === 3) {
+      // Coeficiente para tabs 2 y 3, obtenido de data.coefficient
+      coeficiente = parseFloat(data.coefficient);
+    } else {
+      // Valor por defecto si tabActivo no está en el rango esperado
+      coeficiente = 1;
+    }
   
-    // Obtener el coeficiente desde donde lo tengas almacenado (ejemplo: localStorage o un contexto global)
-    const coeficiente = usarCoeficiente ? parseFloat(data.coefficient) : 1;
-
-    // Calcular las sumas y totales con el coeficiente aplicado correctamente
+    // Calcular las sumas y totales con el coeficiente aplicado
     const sumaTotal = calcularSumaTotal(data.cabinets, coeficiente);
     const totalZocalo = calcularTotalZocalo(data.infoZocalos, coeficiente);
     const totalDescuentos = calcularTotalDescuentos(data, coeficiente);
   
-    // Ahora el IVA también se basa en el total con coeficiente ya aplicado
+    // Calcular el IVA basado en el total con coeficiente
     const totalIva = calcularTotalIva(sumaTotal, data.ivaCabinets);
   
     const resultado = calcularTotalConDescuentoEIVA(
@@ -124,6 +131,7 @@ const Report = () => {
       coeficiente
     );
   
+    // Actualizar el estado con los nuevos totales
     setTotales({
       sumaTotal,
       totalZocalo,

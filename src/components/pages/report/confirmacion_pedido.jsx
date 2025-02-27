@@ -472,7 +472,7 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {parseFloat(item.total * data.userId.coefficient).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -717,7 +717,7 @@ const Confirmacion_Pedido = ({
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.total).toFixed(2)}
+                        {parseFloat(item.total * data.userId.coefficient).toFixed(2)}
                       </Text>
                     </View>
                   )}
@@ -922,7 +922,7 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {parseFloat(item.total * data.userId.coefficient).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1092,7 +1092,7 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {parseFloat(item.total * data.userId.coefficient).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1304,7 +1304,7 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {parseFloat(item.total * data.userId.coefficient).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1546,7 +1546,7 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {parseFloat(item.total * data.userId.coefficient).toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -1707,7 +1707,7 @@ const Confirmacion_Pedido = ({
                   {price && (
                     <View style={{ width: "70" }}>
                       <Text style={{ fontSize: "8", textAlign: "right" }}>
-                        {parseFloat(item.total).toFixed(2)}
+                        {parseFloat(item.total * data.userId.coefficient).toFixed(2)}
                       </Text>
                     </View>
                   )}
@@ -1852,7 +1852,7 @@ const Confirmacion_Pedido = ({
                 {price && (
                   <View style={{ width: "70" }}>
                     <Text style={{ fontSize: "8", textAlign: "right" }}>
-                      {parseFloat(item.total).toFixed(2)}
+                      {parseFloat(item.total * data.userId.coefficient).toFixed(2)}
                     </Text>
                   </View>
                 )}

@@ -100,7 +100,7 @@ const General = ({ getData, data }) => {
   };
 
 
-const handleOk = () => {
+  const handleOk = () => {
   if (password === correctPassword) {
     setIsInputEditable(true); // Permite editar el campo
     message.success("Coeficiente desbloqueado");
@@ -109,17 +109,18 @@ const handleOk = () => {
   }
   setIsOpenModal(false);
   setPassword(""); // Reseteamos la contraseña
-};
+  };
 
-const handleCoefficientChange = (e) => {
+  const handleCoefficientChange = (e) => {
   setCoefficientValue(e.target.value); // Cambiar el valor del coeficiente
-};
+  };
 
 
   const handleCancel = () => {
     setIsOpenModal(false);
     setPassword("");
   };
+
   const onFinish = async (values) => {
     if (data._id) {
       const result = await updateOrder({ ...values, _id: data._id });

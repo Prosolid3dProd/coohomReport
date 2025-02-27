@@ -336,7 +336,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
       ) {
         price += price * 0.1;
       } else if (intv) {
-        price += price * 0.25;
+        price += price * 2;
       }
     }
     if (intv) {
@@ -345,20 +345,20 @@ const getPrice = (parametros, tipo, materialCasco) => {
         parametros.textureCustomCode === "ESTF" ||
         parametros.textureCustomCode === "ESTM"
       ) {
-        price += price * 0.4;
+        price += price * 3;
       } else if (
         parametros.textureCustomCode === "NP300" ||
         parametros.textureCustomCode === "NP200" ||
         parametros.textureCustomCode === "P200L"
       ) {
-        price += price * 0.6;
+        price += price * 4;
       } else if (
         parametros.textureCustomCode === "LACAM" ||
         parametros.textureCustomCode === "LACAB"
       ) {
-        price += price * 0.6;
+        price += price * 4;
       } else if (parametros.textureCustomCode === "PANT") {
-        price += price * 0.35;
+        price += price * 3;
       }
     } /*else {
       price += price * 0.1;
@@ -1577,7 +1577,6 @@ export const parseJson3D = async (json) => {
                   drawerPriceDetails,
                   drawerMaterialDetails,
                   material: item.textureName,
-                  variants: [],
                   designerName: json.partnerOrder?.designerName || "",
                   quantity: parseInt(itemx.quantity) || 1,
                   ...extra,
@@ -1656,7 +1655,6 @@ export const parseJson3D = async (json) => {
               modelName: String(nameFinal).replace("-", ""),
               doors: getDoors(item.subModels),
               opening,
-              modelDrawer: modeloDrawer,
               zocalo: zocalo,
               priceDoor: parseInt(getTotalDoors(item?.subModels)),
               total: totalPrice,
