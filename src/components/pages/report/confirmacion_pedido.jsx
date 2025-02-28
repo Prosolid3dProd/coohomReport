@@ -19,7 +19,8 @@ const Confirmacion_Pedido = ({
   totalconDescuento,
   ivaCalculado,
   resultadoFinal,
-  importeTotal
+  importeTotal,
+  descuentoAplicado
 }) => {
   let contador = 1;
   const [cabinets, setCabinets] = useState({
@@ -1948,7 +1949,7 @@ const Confirmacion_Pedido = ({
                   {data?.discountCabinets > 0 && (
                     <View>
                       <Text>
-                        {parseFloat(data.discountCabinetsPorcentaje).toFixed(2)}
+                        {parseFloat(descuentoAplicado).toFixed(2)}
                       </Text>
                     </View>
                   )}

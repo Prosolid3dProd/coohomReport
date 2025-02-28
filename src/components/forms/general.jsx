@@ -1,73 +1,18 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Input,
-  Form,
-  Card,
-  Row,
-  Col,
-  message,
-  Divider,
-  Space,
-  Checkbox,
-  Modal,
-} from "antd";
-
+import { Button, Input, Form, Card, Row, Col, message, Divider, Checkbox, Modal } from "antd";
 import { updateOrder, setLocalOrder } from "../../handlers/order";
-import {
-  existePrecio,
-  getPrecio,
-  setPrecio,
-  getTotales,
-  existeTotales,
-} from "../../data/localStorage";
+import { existePrecio, getPrecio, setPrecio, getTotales, existeTotales } from "../../data/localStorage";
 
 const General = ({ getData, data }) => {
-  let role = data?.profile?.role || "";
   const [form] = Form.useForm();
-  const [initialValues, setInitialValues] = useState({
-    ...data,
-    iva: undefined,
-    coefficient:
-      role === "client"
-        ? data.userId.coefficientVentaTienda
-        : data?.userId?.coefficient,
-    observation: data?.observation?.includes("null") ? "" : data.observation,
-    // reference: data?.reference,
-    // date: data?.date,
-    // customerName: data?.customerName,
-    // location: data?.location,
-    // phone: data?.phone,
-    // total: data?.total,
-    // coefficient:
-    //   role === "client"
-    //     ? data.userId.coefficientVentaTienda
-    //     : data?.userId?.coefficient,
-    // modelDoor: data?.modelDoor,
-    // materialDoor: data?.materialDoor,
-    modelHandler: data?.modelHandler,
-    drawer: data?.modelDrawer + data?.materialDrawer,
-    // materialCabinet: data?.materialCabinet,
-    // observation: data?.observation?.includes("null") ? "" : data.observation,
-    fecha: String(data?.fecha).split(" ")[0],
-    discountEncimeras: data?.discountEncimeras,
-    discountCabinets: data?.discountCabinets,
-    discountElectrodomesticos: data?.discountElectrodomesticos,
-    discountEquipamientos: data?.discountEquipamientos,
-    // ivaEncimeras: data?.ivaEncimeras,
-    // ivaCabinets: data?.ivaCabinets,
-    // ivaElectrodomesticos: data?.ivaElectrodomesticos,
-    // ivaEquipamientos: data?.ivaEquipamientos,
-    // semanaEntrega: data?.semanaEntrega,
-    // fechaEntrega: String(data?.fechaEntrega).split(" ")[0],
-  });
-
-  const [isOpenModal, setIsOpenModal] = useState(false);
-  const [isInputEditable, setIsInputEditable] = useState(role !== "client");
+  const role = data?.profile?.role || "";
+  const isClient = role === "client";
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCoefficientEditable, setIsCoefficientEditable] = useState(!isClient);
   const [password, setPassword] = useState("");
-  const [isClient, setIsClient] = useState(role === "client");
-  const [coefficientValue, setCoefficientValue] = useState(data.coefficient);
-  const correctPassword = "1234";
+  const [coefficient, setCoefficient] = useState(
+    isClient ? data?.userId?.coefficientVentaTienda : data?.userId?.coefficient || ""
+  );
 
   const [precios, setPrecios] = useState({
     C: existePrecio(getPrecio("C")),
@@ -81,361 +26,200 @@ const General = ({ getData, data }) => {
     Electrodomesticos: existeTotales(getTotales("Electrodomesticos")),
   });
 
+  const initialValues = {
+    ...data,
+    observation: data?.observation?.includes("null") ? "" : data?.observation || "",
+    fecha: data?.fecha?.split(" ")[0] || "",
+    fechaEntrega: data?.fechaEntrega?.split(" ")[0] || "",
+    coefficient: isClient ? data?.userId?.coefficientVentaTienda : data?.userId?.coefficient || "",
+    drawer: `${data?.modelDrawer || ""}${data?.materialDrawer || ""}`,
+    discountEncimeras: data?.discountEncimeras || "",
+    discountCabinets: data?.discountCabinets || "",
+    discountElectrodomesticos: data?.discountElectrodomesticos || "",
+    discountEquipamientos: data?.discountEquipamientos || "",
+    modelHandler: data?.modelHandler || "",
+    semanaEntrega: data?.semanaEntrega || "",
+    customerName: data?.customerName || "",
+    phone: data?.phone || "",
+    location: data?.location || "",
+    modelDoor: data?.modelDoor || "",
+    materialDoor: data?.materialDoor || "",
+    materialCabinet: data?.materialCabinet || "",
+    ivaEncimeras: data?.ivaEncimeras || "",
+    ivaCabinets: data?.ivaCabinets || "",
+    ivaElectrodomesticos: data?.ivaElectrodomesticos || "",
+    ivaEquipamientos: data?.ivaEquipamientos || "",
+  };
+
   const handlePrecioChange = (key) => {
-    const newPrecios = { ...precios, [key]: !precios[key] };
-    setPrecios(newPrecios);
-    setPrecio(key, newPrecios[key]);
+    setPrecios((prev) => {
+      const newValue = !prev[key];
+      setPrecio(key, newValue);
+      return { ...prev, [key]: newValue };
+    });
   };
 
   const handleTotalesChange = (key) => {
-    const newTotales = { ...totales, [key]: !totales[key] };
-    setTotales(newTotales);
-    setTotales(key, newTotales[key]);
+    setTotales((prev) => {
+      const newValue = !prev[key];
+      setTotales(key, newValue);
+      return { ...prev, [key]: newValue };
+    });
   };
 
-  const showModal = () => {
-    if (isClient) {
-      setIsOpenModal(true);
+  const unlockCoefficient = () => {
+    if (isClient && !isCoefficientEditable) setIsModalOpen(true);
+  };
+
+  const handleModalOk = () => {
+    if (password === "1234") {
+      setIsCoefficientEditable(true);
+      message.success("Coeficiente desbloqueado");
+    } else {
+      message.error("Contraseña incorrecta");
     }
-  };
-
-
-const handleOk = () => {
-  if (password === correctPassword) {
-    setIsInputEditable(true); // Permite editar el campo
-    message.success("Coeficiente desbloqueado");
-  } else {
-    message.error("Contraseña incorrecta");
-  }
-  setIsOpenModal(false);
-  setPassword(""); // Reseteamos la contraseña
-};
-
-const handleCoefficientChange = (e) => {
-  setCoefficientValue(e.target.value); // Cambiar el valor del coeficiente
-};
-
-
-  const handleCancel = () => {
-    setIsOpenModal(false);
+    setIsModalOpen(false);
     setPassword("");
   };
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+    setPassword("");
+  };
+
   const onFinish = async (values) => {
-    if (data._id) {
-      const result = await updateOrder({ ...values, _id: data._id });
-      if (result) {
-        getData(result);
-        setInitialValues(result);
-        // setInitialValues((prevValues) => ({
-        //   ...prevValues,
-        //   coefficient:
-        //     role === "client"
-        //       ? values.userId.coefficientVentaTienda
-        //       : data?.userId?.coefficient,
-        // }));
-        setLocalOrder(result);
-        localStorage.setItem("order", JSON.stringify(result));
-        message.success("Se ha actualizado correctamente");
-        // setTimeout(() => {
-        //   location.reload();
-        // }, 1000);
-      }
+    if (!data?._id) return;
+    const updatedOrder = { ...values, _id: data._id, coefficient };
+    const result = await updateOrder(updatedOrder);
+    if (result) {
+      getData(result);
+      setLocalOrder(result);
+      localStorage.setItem("order", JSON.stringify(result));
+      message.success("Se ha actualizado correctamente");
+      form.setFieldsValue({ coefficient });
     }
   };
+
   return (
     <Card className="rounded-none bg-gray border border-border">
-      <Form
-        layout="vertical"
-        form={form}
-        initialValues={initialValues}
-        onFinish={onFinish}
-      >
-        <Row gutter={16}>
-          <Col xs={24} sm={24} md={24}>
-            <Divider orientation="left">
-              <p className="uppercase">
-                <b>Acerca del Cliente</b>
-              </p>
-            </Divider>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Fecha Confirmación" name="fecha">
-              <Input placeholder="" type="date" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Envio Mercancia" name="fechaEntrega">
-              <Input placeholder="" type="date" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Semana de Entrega" name="semanaEntrega">
-              <Input placeholder="" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={5}>
-            <Form.Item label="Nombre Cliente" name="customerName">
-              <Input placeholder="" maxLength="100" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={3}>
-            <Form.Item label="Teléfono" name="phone">
-              <Input placeholder="" maxLength="15" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Localización" name="location">
-              <Input placeholder="" maxLength="100" />
-            </Form.Item>
-          </Col>
-          <Divider orientation="left">
-            <p className="uppercase">
-              <b>Acerca del Mueble</b>
-            </p>
-          </Divider>
-          <Col xs={24} sm={24} md={5}>
-            <Form.Item label="Modelo" name="modelDoor">
-              <Input placeholder="" maxLength="50" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={5}>
-            <Form.Item label="Acabado" name="materialDoor">
-              <Input placeholder="" maxLength="200" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={5}>
-            <Form.Item label="Tirador" name="modelHandler">
-              <Input placeholder="" maxLength="200" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={5}>
-            <Form.Item label="Cajon" name="drawer">
-              <Input placeholder="" maxLength="200" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Armazón" name="materialCabinet">
-              <Input placeholder="" maxLength="200" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={24}>
-            <Form.Item label="Observaciones" name="observation">
-              <Input.TextArea placeholder="" cols={4} />
-            </Form.Item>
-          </Col>
-          <Divider orientation="left">
-            <p className="uppercase">
-              <b>Acerca de los Precios</b>
-            </p>
-          </Divider>
-          <Col xs={24} sm={24} md={4}>
-          <Form.Item label="Coeficiente de Venta" name="coefficient">
-  <div style={{ position: "relative" }}>
-    <Input
-      value={coefficientValue}
-      onChange={handleCoefficientChange} // Manejar el cambio de valor
-      readOnly={!isInputEditable}
-      style={!isInputEditable ? { opacity: 0.7 } : {}}
-      disabled={role === "admin"}
-    />
-    {!isInputEditable && (
-      <div
-        onClick={showModal}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(255, 255, 255, 0.2)",
-          cursor: "pointer",
-        }}
-      ></div>
-    )}
-  </div>
-</Form.Item>
+      <div style={{ maxHeight: "70vh", overflowY: "auto", padding: "0 16px" }}>
+        <Form form={form} layout="vertical" initialValues={initialValues} onFinish={onFinish}>
+          <Row gutter={16}>
+            <DividerSection title="Acerca del Cliente" />
+            <FormField label="Fecha Confirmación" name="fecha" type="date" span={4} />
+            <FormField label="Envio Mercancia" name="fechaEntrega" type="date" span={4} />
+            <FormField label="Semana de Entrega" name="semanaEntrega" span={4} />
+            <FormField label="Nombre Cliente" name="customerName" maxLength={100} span={5} />
+            <FormField label="Teléfono" name="phone" maxLength={15} span={3} />
+            <FormField label="Localización" name="location" maxLength={100} span={4} />
 
-          </Col>
-          {role === "admin" && (
-            <Col xs={24} sm={24} md={4}>
-              <Form.Item label="Coeficiente Venta" name="coefficient">
-                <div style={{ position: "relative" }}>
-                  <Input
-                    value={data?.userId?.coefficientVentaTienda}
-                    readOnly={!isInputEditable}
-                    style={!isInputEditable ? { opacity: 0.7 } : {}}
-                    disabled={role === "admin" ? true : false}
-                  />
-                  {!isInputEditable && (
-                    <div
-                      onClick={showModal}
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: "rgba(255, 255, 255, 0.2)",
-                        cursor: "pointer",
-                      }}
-                    ></div>
-                  )}
-                </div>
-              </Form.Item>
-            </Col>
-          )}
+            <DividerSection title="Acerca del Mueble" />
+            <FormField label="Modelo" name="modelDoor" maxLength={50} span={5} />
+            <FormField label="Acabado" name="materialDoor" maxLength={200} span={5} />
+            <FormField label="Tirador" name="modelHandler" maxLength={200} span={5} />
+            <FormField label="Cajon" name="drawer" maxLength={200} span={5} />
+            <FormField label="Armazón" name="materialCabinet" maxLength={200} span={4} />
+            <FormField label="Observaciones" name="observation" type="textarea" span={24} />
 
-          <Modal
-            title="Introduce la contraseña"
-            open={isOpenModal}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            okText="Guardar"
-            okType="default"
-          >
-            <Form.Item label="Contraseña">
-              <Input.Password
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+            <DividerSection title="Acerca de los Precios" />
+            <FormField
+              label="Coeficiente de Venta"
+              name="coefficient"
+              span={4}
+              customInput={
+                <Input
+                  value={coefficient}
+                  onChange={(e) => setCoefficient(e.target.value)}
+                  readOnly={!isCoefficientEditable}
+                  onClick={unlockCoefficient}
+                  style={!isCoefficientEditable ? { opacity: 0.7, cursor: "pointer" } : {}}
+                  disabled={role === "admin"}
+                />
+              }
+            />
+
+            <DividerSection title="Descuentos" />
+            <FormField label="Encimeras" name="discountEncimeras" maxLength={50} span={4} />
+            <FormField label="Muebles" name="discountCabinets" maxLength={50} span={4} />
+            <FormField label="Electrodomésticos" name="discountElectrodomesticos" maxLength={50} span={4} />
+            <FormField label="Equipamientos" name="discountEquipamientos" maxLength={50} span={4} />
+
+            <DividerSection title="IVA" />
+            <FormField label="Encimeras" name="ivaEncimeras" maxLength={50} span={4} />
+            <FormField label="Muebles" name="ivaCabinets" maxLength={50} span={4} />
+            <FormField label="Electrodomésticos" name="ivaElectrodomesticos" maxLength={50} span={4} />
+            <FormField label="Equipamientos" name="ivaEquipamientos" maxLength={50} span={4} />
+
+            <Col span={24}>
+              <CheckboxGroup
+                title="Mostrar Precios"
+                options={[
+                  { label: "Clientes", key: "C", checked: precios.C, onChange: handlePrecioChange },
+                  { label: "Fabrica", key: "F", checked: precios.F, onChange: handlePrecioChange },
+                  { label: "Confirmación Pedido", key: "P", checked: precios.P, onChange: handlePrecioChange },
+                ]}
               />
-            </Form.Item>
-          </Modal>
-          {/* <Col xs={24} sm={24} md={2}>
-            <Form.Item label="IVA" name="iva" initialValue={"21%"}>
-              <Input placeholder="" maxLength="5" disabled />
-            </Form.Item>
-          </Col> */}
-          <Divider orientation="left">
-            <p className="uppercase">
-              <b>Descuentos</b>
-            </p>
-          </Divider>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Encimeras" name="discountEncimeras">
-              <Input placeholder="" maxLength="50" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Muebles" name="discountCabinets">
-              <Input placeholder="" maxLength="50" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item
-              label="Electrodomésticos"
-              name="discountElectrodomesticos"
-            >
-              <Input placeholder="" maxLength="50" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Equipamientos" name="discountEquipamientos">
-              <Input placeholder="" maxLength="50" />
-            </Form.Item>
-          </Col>
-          <Divider orientation="left">
-            <p className="uppercase">
-              <b>IVA</b>
-            </p>
-          </Divider>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Encimeras" name="ivaEncimeras">
-              <Input placeholder="" maxLength="50" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Muebles" name="ivaCabinets">
-              <Input placeholder="" maxLength="50" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Electrodomésticos" name="ivaElectrodomesticos">
-              <Input placeholder="" maxLength="50" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={4}>
-            <Form.Item label="Equipamientos" name="ivaEquipamientos">
-              <Input placeholder="" maxLength="50" />
-            </Form.Item>
-          </Col>
-
-          <Col xs={24} sm={24} md={24}>
-            <Row>
-              <Divider orientation="left">
-                <p className="uppercase">
-                  <b>Mostrar Precios</b>
-                </p>
-              </Divider>
-              <div className="flex flex-col">
-                <Checkbox
-                  checked={precios.C}
-                  onChange={() => handlePrecioChange("C")}
-                >
-                  Mostrar Precios Clientes
-                </Checkbox>
-                <Checkbox
-                  checked={precios.F}
-                  onChange={() => handlePrecioChange("F")}
-                >
-                  Mostrar Precios Fabrica
-                </Checkbox>
-                <Checkbox
-                  checked={precios.P}
-                  onChange={() => handlePrecioChange("P")}
-                >
-                  Mostrar Precios Confirmación Pedido
-                </Checkbox>
-              </div>
-            </Row>
-            <Row>
-              <Divider orientation="left">
-                <p className="uppercase">
-                  <b>Mostrar Totales</b>
-                </p>
-              </Divider>
-              <div className="flex flex-col">
-                <Checkbox
-                  checked={totales.Encimeras}
-                  onChange={() => handleTotalesChange("Encimeras")}
-                >
-                  Mostrar Totales Encimeras
-                </Checkbox>
-                <Checkbox
-                  checked={totales.Equipamiento}
-                  onChange={() => handleTotalesChange("Equipamiento")}
-                >
-                  Mostrar Totales Equipamiento
-                </Checkbox>
-                <Checkbox
-                  checked={totales.Electrodomesticos}
-                  onChange={() => handleTotalesChange("Electrodomesticos")}
-                >
-                  Mostrar Totales Electrodomesticos
-                </Checkbox>
-              </div>
-            </Row>
-            <Space>
+              <CheckboxGroup
+                title="Mostrar Totales"
+                options={[
+                  { label: "Encimeras", key: "Encimeras", checked: totales.Encimeras, onChange: handleTotalesChange },
+                  { label: "Equipamiento", key: "Equipamiento", checked: totales.Equipamiento, onChange: handleTotalesChange },
+                  { label: "Electrodomesticos", key: "Electrodomesticos", checked: totales.Electrodomesticos, onChange: handleTotalesChange },
+                ]}
+              />
               <Button
-                htmlType="submit"
                 type="primary"
-                className="flex justify-center items-center"
-                style={{
-                  height: 50,
-                  width: 150,
-                  marginTop: 30,
-                  padding: "5px 20px",
-                  background: "#1a7af8",
-                  color: "#fff",
-                }}
+                htmlType="submit"
+                style={{ height: 50, width: 150, marginTop: 30, background: "#1a7af8" }}
               >
                 Guardar
               </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Form>
+            </Col>
+          </Row>
+        </Form>
+      </div>
+
+      <Modal
+        title="Introduce la contraseña"
+        open={isModalOpen}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Guardar"
+      >
+        <Input.Password value={password} onChange={(e) => setPassword(e.target.value)} />
+      </Modal>
     </Card>
   );
 };
+
+// Componentes reutilizables
+const DividerSection = ({ title }) => (
+  <Col span={24}>
+    <Divider orientation="left">
+      <p className="uppercase"><b>{title}</b></p>
+    </Divider>
+  </Col>
+);
+
+const FormField = ({ label, name, span, type = "text", maxLength, customInput }) => (
+  <Col xs={24} sm={24} md={span}>
+    <Form.Item label={label} name={name}>
+      {customInput || (type === "textarea" ? <Input.TextArea cols={4} /> : <Input type={type} maxLength={maxLength} />)}
+    </Form.Item>
+  </Col>
+);
+
+const CheckboxGroup = ({ title, options }) => (
+  <Row>
+    <DividerSection title={title} />
+    <div className="flex flex-col">
+      {options.map(({ label, key, checked, onChange }) => (
+        <Checkbox key={key} checked={checked} onChange={() => onChange(key)}>
+          Mostrar {label}
+        </Checkbox>
+      ))}
+    </div>
+  </Row>
+);
 
 export default General;

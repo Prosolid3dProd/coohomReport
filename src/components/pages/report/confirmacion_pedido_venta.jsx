@@ -19,7 +19,8 @@ const Confirmacion_Pedido = ({
   totalconDescuento,
   ivaCalculado,
   resultadoFinal,
-  importeTotal
+  importeTotal,
+  descuentoAplicado
 }) => {
   let contador = 1;
   const [cabinets, setCabinets] = useState({
@@ -83,25 +84,24 @@ const Confirmacion_Pedido = ({
   const coeficiente = data.coefficient;
   useEffect(() => {
     if (data && data.cabinets && Array.isArray(data.cabinets)) {
-  
       setCabinets({
         decorativos: data.cabinets
           .filter((item) => item.tipo === CONFIG.MODELNAME.DECORATIVOS.CODE)
           .map((item) => ({
             ...item,
-            total: item.total ? item.total * coeficiente : 0, // Evita NaN
+            total: item.total || 0, // Usar el valor ya ajustado, sin multiplicar
           })),
         altos: data.cabinets
           .filter((item) => item.tipo === CONFIG.MODELNAME.ALTOS.CODE)
           .map((item) => ({
             ...item,
-            total: item.total ? item.total * coeficiente : 0,
+            total: item.total || 0,
           })),
         accesorios: data.cabinets
           .filter((item) => item.tipo === CONFIG.MODELNAME.ACCESORIOS.CODE)
           .map((item) => ({
             ...item,
-            total: item.total ? item.total * coeficiente : 0,
+            total: item.total || 0,
           })),
         murales: data.cabinets
           .filter(
@@ -111,37 +111,35 @@ const Confirmacion_Pedido = ({
           )
           .map((item) => ({
             ...item,
-            total: item.total ? item.total * coeficiente : 0,
+            total: item.total || 0,
           })),
         regletas: data.cabinets
           .filter((item) => item.tipo === CONFIG.MODELNAME.REGLETAS.CODE)
           .map((item) => ({
             ...item,
-            total: item.total ? item.total * coeficiente : 0,
+            total: item.total || 0,
           })),
         bajos: data.cabinets
           .filter((item) => item.tipo === CONFIG.MODELNAME.BAJOS.CODE)
           .map((item) => ({
             ...item,
-            total: item.total ? item.total * coeficiente : 0,
+            total: item.total || 0,
           })),
         complementos: data.cabinets
           .filter((item) => item.tipo === CONFIG.MODELNAME.COMPLEMENTOS.CODE)
           .map((item) => ({
             ...item,
-            total: item.total ? item.total * coeficiente : 0,
+            total: item.total || 0,
           })),
         costados: data.cabinets
           .filter((item) => item.tipo === CONFIG.MODELNAME.COSTADOS.CODE)
           .map((item) => ({
             ...item,
-            total: item.total ? item.total * coeficiente : 0,
+            total: item.total || 0,
           })),
       });
-  
-      // console.log("Gabinetes después de modificar:", cabinets);
     }
-  }, [data]); // Se ejecuta cuando `data` cambia
+  }, [data]);
 
   const complementos =
     data.infoZocalos.length > 0 || cabinets.complementos.length > 0
@@ -1979,7 +1977,7 @@ const Confirmacion_Pedido = ({
                   {data?.discountCabinets > 0 && (
                     <View>
                       <Text>
-                        {parseFloat(data.discountCabinetsPorcentaje).toFixed(2)}
+                        {parseFloat(descuentoAplicado).toFixed(2)}
                       </Text>
                     </View>
                   )}
