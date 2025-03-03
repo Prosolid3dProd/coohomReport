@@ -2,68 +2,68 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const useFetch = ({ url, method = "GET", body = {} }) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [params, setParams] = useState(body);
-  const [skip, setSkip] = useState(1);
-  const [update, setUpdate] = useState(null);
-
-  useEffect(() => {
-    let cancelRequest = false;
-
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await axios({
-          method,
-          url,
-          data: { ...params, skip },
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: Cookies.get("token") || null,
-          },
-        });
-
-        if (!cancelRequest) {
-          setData(response.data);
-          setLoading(false);
-          setUpdate(Math.random());
-        }
-      } catch (err) {
-        if (!cancelRequest) {
-          setError("An error occurred. Awkward..");
-          setLoading(false);
-        }
-      }
-    };
-
-    if (url && !loading) {
-      fetchData();
-    }
-
-    return () => {
-      cancelRequest = true;
-    };
-  }, [url, method, params, skip]); // Solo vuelve a ejecutar el efecto si cambian estas dependencias
-
-  const reload = () => {
-    setUpdate(Math.random());
-  };
-
-  return {
-    data,
-    loading,
-    error,
-    reload,
-    setParams,
-    params,
-    setSkip,
-    skip,
-    update, // ¿Necesitas mantener este estado?
-  };
-};
+// const useFetch = ({ url, method = "GET", body = {} }) => {
+//   const [data, setData] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//   const [params, setParams] = useState(body);
+//   const [skip, setSkip] = useState(1);
+//   const [update, setUpdate] = useState(null);
+//
+//   useEffect(() => {
+//     let cancelRequest = false;
+//
+//     const fetchData = async () => {
+//       setLoading(true);
+//       try {
+//         const response = await axios({
+//           method,
+//           url,
+//           data: { ...params, skip },
+//           headers: {
+//             "Content-Type": "application/json",
+//             Authorization: Cookies.get("token") || null,
+//           },
+//         });
+//
+//         if (!cancelRequest) {
+//           setData(response.data);
+//           setLoading(false);
+//           setUpdate(Math.random());
+//         }
+//       } catch (err) {
+//         if (!cancelRequest) {
+//           setError("An error occurred. Awkward..");
+//           setLoading(false);
+//         }
+//       }
+//     };
+//
+//     if (url && !loading) {
+//       fetchData();
+//     }
+//
+//     return () => {
+//       cancelRequest = true;
+//     };
+//   }, [url, method, params, skip]); // Solo vuelve a ejecutar el efecto si cambian estas dependencias
+//
+//   const reload = () => {
+//     setUpdate(Math.random());
+//   };
+//
+//   return {
+//     data,
+//     loading,
+//     error,
+//     reload,
+//     setParams,
+//     params,
+//     setSkip,
+//     skip,
+//     update, // ¿Necesitas mantener este estado?
+//   };
+// };
 
 export default useFetch;
 

@@ -20,3 +20,16 @@ src/components/pages/others/config.jsx line 236 BUTTON html
 src/components/pages/report/presupuesto_cliente.jsx line 32 totales no se usa
 
 seguir desde presupuesto fabrica
+
+src/components/pages/report/tipoMueble.js no se usa todo el archivo
+
+src/components/utils/btnTabla.jsx no se usa todo el archivo
+
+src/data/localStorage.js line 50  no se usa
+
+src/data/localStorage.js line 71,72,76 llamada a funciones no existentes
+
+src/handlers/order.js line 488 no se usa clearLocalOrder
+
+src/hooks/useFecth.js no se llama a la funcion useFetch y el archivo no se usa
+

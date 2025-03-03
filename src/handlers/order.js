@@ -485,5 +485,5 @@ export const setLocalOrder = async (params) => {
   return getOrders();
 };
 
-export const clearLocalOrder = () =>
-  localStorage.setItem("order", JSON.stringify([]));
+// export const clearLocalOrder = () =>
+//   localStorage.setItem("order", JSON.stringify([]));

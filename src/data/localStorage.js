@@ -47,10 +47,10 @@ const setPrecio = (key, value) => {
     return value;
   };
 
-  const setTotales = (key, value) => {
-    localStorage.setItem(`Mostrar_Totales_${key}`, JSON.stringify(value));
-    return value;
-  };
+  // const setTotales = (key, value) => {
+  //   localStorage.setItem(`Mostrar_Totales_${key}`, JSON.stringify(value));
+  //   return value;
+  // };
 
 /**
  *
@@ -68,12 +68,12 @@ const setLocalToken = (token) => localStorage.setItem('token', JSON.stringify(to
 export {
     getUserData,
     setUserData,
-    getTabActual,
-    setTabActual,
+    // getTabActual,
+    // setTabActual,
     getPrecio,
     setPrecio,
     getTotales,
-    setTotales,
+    // setTotales,
     existePrecio,
     existeTotales,
     getLocalToken,
