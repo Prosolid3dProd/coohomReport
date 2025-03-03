@@ -105,7 +105,7 @@ const General = ({ getData, data }) => {
 
   const onFinish = async (values) => {
     if (!data?._id) return;
-    const updatedOrder = { ...values, _id: data._id};
+    const updatedOrder = { ...values, _id: data._id };
     const result = await updateOrder(updatedOrder);
     if (result) {
       getData(result);
@@ -214,7 +214,7 @@ const General = ({ getData, data }) => {
               </>
             )}
 
-{role === "admin" && (
+            {role === "admin" && (
               <>
                 <DividerSection title="Acerca de los Precios" />
                 <FormField

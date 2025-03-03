@@ -1,6 +1,6 @@
 const formatNumber = (value, coefficient = 1) => {
   if (!value || isNaN(value)) return 0;
-  return Math.round(parseFloat(value) * parseFloat(coefficient));
+  return parseFloat(value) * parseFloat(coefficient);
 };
 
 const calcularSumaTotal = (cabinets, coeficiente) => {
