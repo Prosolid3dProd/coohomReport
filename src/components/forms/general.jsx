@@ -105,13 +105,18 @@ const General = ({ getData, data }) => {
 
   const onFinish = async (values) => {
     if (!data?._id) return;
-    const updatedOrder = { ...values, _id: data._id };
+    const updatedOrder = { ...data, ...values, _id: data._id }; // Preservamos todos los datos originales
     const result = await updateOrder(updatedOrder);
     if (result) {
-      getData(result);
-      setLocalOrder(result);
-      // localStorage.setItem("order", JSON.stringify(result));
+      const updatedData = {
+        ...result,
+        profile: data.profile, // Preservamos profile para mantener role
+      };
+      getData(updatedData); // Propagamos el cambio completo a Report.js
+      setLocalOrder(updatedData);
+      // localStorage.setItem("order", JSON.stringify(updatedData)); // Guardamos el objeto completo
       message.success("Se ha actualizado correctamente");
+      form.setFieldsValue(updatedData); // Actualizamos el formulario con los nuevos valores
     }
   };
 
