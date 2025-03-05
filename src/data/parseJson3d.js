@@ -693,7 +693,7 @@ const getParameters = (param, tipoMueble) => {
 const getExcludedNames = (tipoMueble) => [
   "ELEC",
   // "CVI",
-  "CPI",
+  // "CPI",
   ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
   ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
 ];
@@ -755,6 +755,7 @@ const chooseVuelo = (customCode, item, vueloValue) => {
   }
   return false;
 };
+
 const getDoorParameters = (param, op) => {
   param.subModels
     .filter((puertas) => puertas.customCode === "0301")

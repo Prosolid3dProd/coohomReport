@@ -109,9 +109,10 @@ const Product = ({ getData }) => {
   const onFinish = async (values) => {
     try {
       const parsedUnidad = parseFloat(values.unidad || 0);
-      const descuento = values.discount || 0;
+      const descuento = parseFloat(values.discount || 0);
       const unidadConDescuento =
         parsedUnidad - (descuento / 100) * parsedUnidad;
+      const qtyNueva = parseFloat(values.qty || 1);
 
       if (!values.type) {
         message.error("Por favor seleccione un TIPO DE COMPONENTE");
@@ -120,32 +121,71 @@ const Product = ({ getData }) => {
 
       if (!state.data?._id) return;
 
-      const updatedDetails = {
-        ...values,
-        unidad: unidadConDescuento.toFixed(2), // Aplicamos el descuento en la unidad
-        total: parseFloat(values.qty) * unidadConDescuento,
-      };
+      const existingDetailIndex = state.data.details.findIndex(
+        (detail) => detail.referencia === values.referencia
+      );
 
-      const result = await CreateOrderDetails({
-        details: updatedDetails,
-        isUpdate: state.isUpdate,
-        _id: state.data._id,
-      });
+      let updatedDetails;
+      let updatedData;
 
-      if (result) {
-        const updatedData = {
-          ...state.data,
-          details: result.details,
+      if (existingDetailIndex !== -1) {
+        const existingDetail = state.data.details[existingDetailIndex];
+        const nuevaCantidad = parseFloat(existingDetail.qty) + qtyNueva;
+        const nuevoTotal = nuevaCantidad * unidadConDescuento;
+
+        updatedDetails = {
+          ...existingDetail,
+          qty: nuevaCantidad,
+          unidad: unidadConDescuento.toFixed(2),
+          total: nuevoTotal.toFixed(2),
+          discount: descuento,
         };
-        setState((prev) => ({ ...prev, data: updatedData }));
-        setLocalOrder(updatedData);
-        getData(updatedData);
-        message.success("Se ha actualizado correctamente");
 
-        form.resetFields(); // Resetea el formulario
+        const newDetails = [...state.data.details];
+        newDetails[existingDetailIndex] = updatedDetails;
+
+        updatedData = { ...state.data, details: newDetails };
+
+        const result = await updateOrderDetails({
+          details: updatedDetails,
+          isUpdate: true,
+          _id: state.data._id,
+        });
+
+        if (result) {
+          setState((prev) => ({ ...prev, data: updatedData }));
+          setLocalOrder(updatedData);
+          getData(updatedData);
+          message.success(
+            "Se ha actualizado la cantidad del elemento existente"
+          );
+        }
+      } else {
+        updatedDetails = {
+          ...values,
+          unidad: unidadConDescuento.toFixed(2),
+          total: (qtyNueva * unidadConDescuento).toFixed(2),
+        };
+
+        const result = await CreateOrderDetails({
+          details: updatedDetails,
+          isUpdate: state.isUpdate,
+          _id: state.data._id,
+        });
+
+        if (result) {
+          updatedData = { ...state.data, details: result.details };
+          setState((prev) => ({ ...prev, data: updatedData }));
+          setLocalOrder(updatedData);
+          getData(updatedData);
+          message.success("Se ha añadido un nuevo elemento");
+        }
       }
+
+      form.resetFields();
     } catch (error) {
       console.error("Error al guardar los detalles:", error);
+      message.error("Hubo un error al procesar el elemento");
     }
   };
 
@@ -193,20 +233,28 @@ const Product = ({ getData }) => {
     try {
       setLoading(true); // Activar el loading antes de eliminar
 
+      // Llamada a la API para archivar/eliminar el complemento
       const result = await handleArchivedOrderDetails({
         _id: state.data._id,
         details,
       });
 
       if (result) {
+        // Filtrar los detalles para eliminar solo el elemento correcto
         const updatedDetails = state.data.details.filter(
           (detail) => detail.referencia !== details.referencia
         );
+
+        // Crear un nuevo objeto de datos actualizado
         const updatedData = { ...state.data, details: updatedDetails };
 
+        // Actualizar el estado de forma inmutable
         setState((prev) => ({ ...prev, data: updatedData }));
+
+        // Sincronizar con el almacenamiento local y propagar los datos
         setLocalOrder(updatedData);
         getData(updatedData);
+
         message.success("Se ha eliminado el complemento");
       }
     } catch (error) {
