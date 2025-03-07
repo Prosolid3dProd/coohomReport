@@ -100,8 +100,9 @@ const Product = ({ getData }) => {
       setState((prev) => ({ ...prev, data: updatedData }));
 
       // Guardar los datos en el almacenamiento local o en otro estado compartido
-      setLocalOrder(updatedData);
-      getData(updatedData); // Si esta función propaga los datos a otras pestañas
+      setLocalOrder(updatedData).then(() => {
+        getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
+      }); // Si esta función propaga los datos a otras pestañas
     },
     [state.data, getData]
   );
@@ -138,8 +139,9 @@ const Product = ({ getData }) => {
           details: result.details,
         };
         setState((prev) => ({ ...prev, data: updatedData }));
-        setLocalOrder(updatedData);
-        getData(updatedData);
+        setLocalOrder(updatedData).then(() => {
+          getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
+        });
         message.success("Se ha actualizado correctamente");
 
         form.resetFields(); // Resetea el formulario
@@ -205,8 +207,9 @@ const Product = ({ getData }) => {
         const updatedData = { ...state.data, details: updatedDetails };
 
         setState((prev) => ({ ...prev, data: updatedData }));
-        setLocalOrder(updatedData);
-        getData(updatedData);
+        setLocalOrder(updatedData).then(() => {
+          getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
+        });
         message.success("Se ha eliminado el complemento");
       }
     } catch (error) {
