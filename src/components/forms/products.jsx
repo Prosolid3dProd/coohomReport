@@ -22,7 +22,6 @@ import {
   setLocalOrder,
 } from "../../handlers/order";
 import EncimerasModal from "../pages/Encimeras/encimerasModal";
-import { data } from "autoprefixer";
 
 const Product = ({ getData }) => {
   const [form] = Form.useForm();
@@ -99,9 +98,9 @@ const Product = ({ getData }) => {
       // Actualizar el estado global
       setState((prev) => ({ ...prev, data: updatedData }));
 
-      // Guardar los datos en el almacenamiento local o en otro estado compartido
-      setLocalOrder(updatedData);
-      getData(updatedData); // Si esta función propaga los datos a otras pestañas
+      setLocalOrder(updatedData).then(() => {
+        getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
+      });
     },
     [state.data, getData]
   );
@@ -154,8 +153,9 @@ const Product = ({ getData }) => {
 
         if (result) {
           setState((prev) => ({ ...prev, data: updatedData }));
-          setLocalOrder(updatedData);
-          getData(updatedData);
+          setLocalOrder(updatedData).then(() => {
+            getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
+          });
           message.success(
             "Se ha actualizado la cantidad del elemento existente"
           );
@@ -176,8 +176,9 @@ const Product = ({ getData }) => {
         if (result) {
           updatedData = { ...state.data, details: result.details };
           setState((prev) => ({ ...prev, data: updatedData }));
-          setLocalOrder(updatedData);
-          getData(updatedData);
+          setLocalOrder(updatedData).then(() => {
+            getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
+          });
           message.success("Se ha añadido un nuevo elemento");
         }
       }

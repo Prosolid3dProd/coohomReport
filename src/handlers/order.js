@@ -30,7 +30,6 @@ export const axiosToken = axios.create({
 });
 
 export const createOrder = async (params) => {
-
   try {
     const data = await _AXIOS_.post(
       `${CONFIG.API.BACKEND_URL}/${CONFIG.API.ENDPOINT}`,
@@ -479,8 +478,10 @@ export const getLocalOrder = () => {
 
 // Esta funcion es para guardar en localstorage
 export const setLocalOrder = async (params) => {
-  localStorage.setItem("order", JSON.stringify(params));
-  return getOrders();
+  return new Promise((resolve) => {
+    localStorage.setItem("order", JSON.stringify(params));
+    resolve(getOrders()); // Asegura que getOrders() se ejecuta después de actualizar localStorage
+  });
 };
 
 export const clearLocalOrder = () =>
