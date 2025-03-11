@@ -205,14 +205,14 @@ const Product = ({ getData }) => {
         total: updatedTotal.toFixed(2),
       };
 
-      console.log("Valores antes de actualizar:", updatedValues);
+      // console.log("Valores antes de actualizar:", updatedValues);
 
       // ✅ CORRECCIÓN: Mantener todos los detalles al actualizar
       const updatedDetails = state.data.details.map(detail =>
           detail.referencia === values.referencia ? updatedValues : detail
       );
 
-      console.log("Detalles actualizados a enviar:", updatedDetails); // <-- Nuevo log
+      // console.log("Detalles actualizados a enviar:", updatedDetails); // <-- Nuevo log
 
       const result = await updateOrderDetails({
         details: updatedDetails, // ✅ Ahora enviamos TODA la lista de detalles
@@ -220,7 +220,7 @@ const Product = ({ getData }) => {
         _id: state.data._id,
       });
 
-      console.log("Respuesta de updateOrderDetails:", result);
+      // console.log("Respuesta de updateOrderDetails:", result);
 
       if (result) {
         const updatedData = { ...state.data, details: updatedDetails };

@@ -203,7 +203,7 @@ export const CreateOrderDetails = async (params) => {
 export const updateOrderDetails = async (params) => {
   try {
 
-    console.log("Datos enviados a updateOrderDetails:", params);
+    // console.log("Datos enviados a updateOrderDetails:", params);
 
     const data = await _AXIOS_.put(
       `${CONFIG.API.BACKEND_URL}/reporthomDetails`,
@@ -213,7 +213,7 @@ export const updateOrderDetails = async (params) => {
       }
     );
 
-    console.log("Respuesta de la API en updateOrderDetails:", data.data);
+    // console.log("Respuesta de la API en updateOrderDetails:", data.data);
 
     return data.data;
   } catch (error) {
