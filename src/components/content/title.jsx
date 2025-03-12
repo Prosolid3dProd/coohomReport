@@ -134,9 +134,9 @@ const Actions = ({
 
   const props1 = {
     name: "sampleFile",
-    action: "http://localhost:3007/cargarNuevoXlsxSola",
+    // action: "http://localhost:3007/cargarNuevoXlsxSola",
     // action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
-    // action:"https://api.simulhome.com/coohomReport/cargarNuevoXlsxSola",
+    action:"https://api.simulhome.com/coohomReport/cargarNuevoXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",
@@ -146,9 +146,9 @@ const Actions = ({
 
   const props2 = {
     name: "sampleFile",
-    action: "http://localhost:3007/eliminarComplementsXlsxSola",
+    // action: "http://localhost:3007/eliminarComplementsXlsxSola",
     // action: "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
-    // action:"https://api.simulhome.com/coohomReport/eliminarComplementsXlsxSola",
+    action:"https://api.simulhome.com/coohomReport/eliminarComplementsXlsxSola",
     method: "POST",
     headers: {
       authorization: "authorization-text",
