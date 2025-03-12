@@ -192,41 +192,52 @@ const Product = ({ getData }) => {
 
   const onEditFinish = async (values) => {
     try {
-      const parsedUnidad = parseFloat(values.unidad) || 0; // El precio unitario original (sin descuento)
-      const parsedDiscount = parseFloat(values.discount) || 0; // Descuento
-      const parsedQty = parseFloat(values.qty) || 1; // Cantidad, por defecto 1
+      const parsedUnidad = parseFloat(values.unidad) || 0;
+      const parsedDiscount = parseFloat(values.discount) || 0;
+      const parsedQty = parseFloat(values.qty) || 1;
 
-      // 🔹 Calcular el precio con descuento aplicado
-      const discountedPrice =
-        parsedUnidad - (parsedDiscount / 100) * parsedUnidad; // Precio unitario con descuento
+      const discountedPrice = parsedUnidad - (parsedDiscount / 100) * parsedUnidad;
+      const updatedTotal = discountedPrice * parsedQty;
 
-      // 🔹 Recalcular el total con la cantidad y el precio con descuento
-      const updatedTotal = discountedPrice * parsedQty; // Total con la cantidad y el precio con descuento
-
-      // 🔹 Crear el nuevo objeto actualizado con descuento aplicado
       const updatedValues = {
         ...values,
-        unidad: parsedUnidad.toFixed(2), // Mantener el precio unitario original (sin descuento)
-        total: updatedTotal.toFixed(2), // Total calculado con descuento
+        unidad: parsedUnidad.toFixed(2),
+        total: updatedTotal.toFixed(2),
       };
 
-      // 🔹 Actualizar el detalle en la base de datos
+      // console.log("Valores antes de actualizar:", updatedValues);
+
+      // ✅ CORRECCIÓN: Mantener todos los detalles al actualizar
+      const updatedDetails = state.data.details.map(detail =>
+          detail.referencia === values.referencia ? updatedValues : detail
+      );
+
+      // console.log("Detalles actualizados a enviar:", updatedDetails); // <-- Nuevo log
+
       const result = await updateOrderDetails({
-        details: updatedValues,
+        details: updatedDetails, // ✅ Ahora enviamos TODA la lista de detalles
         isUpdate: state.isUpdate,
         _id: state.data._id,
       });
 
+      // console.log("Respuesta de updateOrderDetails:", result);
+
       if (result) {
-        // 🔹 Actualizar los datos locales y la tabla
-        updateLocalOrderData(updatedValues);
-        message.success("Actualización exitosa");
+        const updatedData = { ...state.data, details: updatedDetails };
+
+        setState((prev) => ({ ...prev, data: updatedData }));
+        setLocalOrder(updatedData).then(() => {
+          getData(updatedData);
+        });
+
+        message.success("Producto actualizado correctamente");
         updateModals({ isEditModalOpen: false });
       }
     } catch (error) {
       console.error("Error al actualizar detalles:", error);
     }
   };
+
 
   const [loading, setLoading] = useState(false); // Estado de carga para la tabla
 
@@ -253,8 +264,9 @@ const Product = ({ getData }) => {
         setState((prev) => ({ ...prev, data: updatedData }));
 
         // Sincronizar con el almacenamiento local y propagar los datos
-        setLocalOrder(updatedData);
-        getData(updatedData);
+        setLocalOrder(updatedData).then(() => {
+          getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
+        });
 
         message.success("Se ha eliminado el complemento");
       }
