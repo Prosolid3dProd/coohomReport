@@ -693,7 +693,7 @@ const getParameters = (param, tipoMueble) => {
 const getExcludedNames = (tipoMueble) => [
   "ELEC",
   "CVI",
-  // "CPI",
+  "CPI",
   ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
   ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
 ];
