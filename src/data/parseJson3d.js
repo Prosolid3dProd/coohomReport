@@ -692,8 +692,8 @@ const getParameters = (param, tipoMueble) => {
 
 const getExcludedNames = (tipoMueble) => [
   "ELEC",
-  "CVI",
-  "CPI",
+  // "CVI",
+  // "CPI",
   ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
   ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
 ];
@@ -776,8 +776,8 @@ const getPriceParameters = (param, ignoreParam, tipoMueble) => {
   let precioVariant = 0;
   const excludedNames = [
     "ELEC",
-    "CVI",
-    "CPI",
+    // "CVI",
+    // "CPI",
     ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
     ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
   ];
