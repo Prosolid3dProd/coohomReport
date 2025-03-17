@@ -185,6 +185,16 @@ const ShopsForm = ({ setListaTiendas }) => {
           <Input_ant className="" />
         </Form.Item>
         <Form.Item
+          name="coefficientVenta"
+          label="Coeficiente Venta"
+          className="w-full p-4 flex items-center m-0"
+          rules={[
+            { required: true, message: "Por favor introduce un coeficiente" },
+          ]}
+        >
+          <Input_ant className="" />
+        </Form.Item>
+        <Form.Item
           name="role"
           label="Rol"
           className="w-full p-4 flex items-center m-0"
@@ -513,6 +523,18 @@ const Admin = () => {
           <Form.Item
             name="coefficient"
             label="Coeficiente"
+            rules={[
+              {
+                required: true,
+                message: "Por favor introduce el coeficiente",
+              },
+            ]}
+          >
+            <Input_ant />
+          </Form.Item>
+          <Form.Item
+            name="coefficientVenta"
+            label="Coeficiente Venta"
             rules={[
               {
                 required: true,

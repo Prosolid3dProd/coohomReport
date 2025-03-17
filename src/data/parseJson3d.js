@@ -300,34 +300,30 @@ const getPrice = (parametros, tipo, materialCasco) => {
 
   let price = 0;
 
-  const findPrice = (items) => {
-    const name = items?.some(
-      (item) => item?.name && String(item.name).toUpperCase() === "PTOTAL"
-    )
-      ? "PTOTAL"
-      : "PRICE";
-
-    const prices = items
-      ?.filter((item) => item?.name && String(item.name).toUpperCase() === name)
-      .map((item) => parseFloat(item.value))
-      .filter((value) => !isNaN(value));
-
-    return prices?.length > 0 ? prices.reduce((acc, curr) => acc + curr, 0) : 0;
+  const findPrice = (items, targetName = "PRICE") => {
+    const name = items?.some(item => item?.name?.toUpperCase() === "PTOTAL") 
+      ? "PTOTAL" 
+      : targetName;
+    return items?.reduce((sum, item) => 
+      item?.name?.toUpperCase() === name && !isNaN(parseFloat(item.value)) 
+        ? sum + parseFloat(item.value) 
+        : sum, 0) || 0;
   };
 
-  const arrParameters = parametros?.parameters?.concat(
-    parametros.ignoreParameters
-  );
+  const arrParameters = [].concat(parametros?.parameters || [], parametros?.ignoreParameters || []);
 
   price = findPrice(arrParameters);
   if (isCabinet) {
-    price == 0 ? price = 10000 : price;
-    const intv = arrParameters?.some(
-      (param) =>
-        param?.displayName?.toLocaleUpperCase() === "INTV" &&
-        parseFloat(param?.value) > 0
+    price = price || 10000;
+    const intv = arrParameters.some(p => 
+      p?.displayName?.toUpperCase() === "INTV" && parseFloat(p?.value) > 0
     );
+
     if (parametros.textureCustomCode === "C1") {
+      // Recorrer cada subModel y sumar sus Preciocostados
+      price += parametros.subModels.reduce((sum, subModel) => {
+        return sum + findPrice(subModel?.parameters || [], "PRECIOCOSTADOS");
+      }, 0);
     } else if (parametros.textureCustomCode === "PLAM") {
       if (
         materialCasco === "171-EUCALIPTO" ||
@@ -339,6 +335,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
         price += price * 0.25;
       }
     }
+
     if (intv) {
       if (
         parametros.textureCustomCode === "ESTB" ||
@@ -360,9 +357,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
       } else if (parametros.textureCustomCode === "PANT") {
         price += price * 0.35;
       }
-    } /*else {
-      price += price * 0.1;
-    }*/
+    }
   }
   return price;
 };
@@ -809,6 +804,7 @@ const getPriceParameters = (param, ignoreParam, tipoMueble) => {
         precioVariant += itemValue;
       }
     }
+    
   });
   return parseFloat(precioVariant);
 };
