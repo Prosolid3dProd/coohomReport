@@ -780,6 +780,8 @@ const getPriceParameters = (param, ignoreParam, tipoMueble) => {
 
   allParameters.forEach((item) => {
     const itemName = String(item.name);
+    const itemdescription = String(item.description);
+    console.log(itemName);
 
     if (excludedNames.includes(itemName)) return;
 
@@ -788,7 +790,7 @@ const getPriceParameters = (param, ignoreParam, tipoMueble) => {
         precioVariant += 15;
       }
 
-      if (itemName === "INTV" || item.description.includes("$")) return;
+      if (itemdescription.includes("$") || itemName === "INTV") return;
 
       const itemValue =
         itemName === "PVA" || itemName === "PVL" ? 15 : parseFloat(item.value);
