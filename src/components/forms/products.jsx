@@ -59,7 +59,7 @@ const Product = ({ getData }) => {
     if (state.encimera) {
       form.setFieldsValue({
         descripcion: state.encimera?.name,
-        marca: state.encimera?.type,
+        marca: state.encimera?.marca,
         unidad: parseFloat(state.encimera?.price).toFixed(2),
         referencia: state.encimera?.code,
         qty: 1,
