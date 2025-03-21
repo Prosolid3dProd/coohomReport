@@ -47,7 +47,7 @@ const General = ({ getData, data }) => {
       : data?.observation || "",
     fecha: data?.fecha?.split(" ")[0] || "",
     fechaEntrega: data?.fechaEntrega?.split(" ")[0] || "",
-    coefficient: data.coefficient,
+    coefficient: data?.coefficient || "",
     drawer: `${data?.modelDrawer || ""}${data?.materialDrawer || ""}`,
     discountEncimeras: data?.discountEncimeras || "",
     discountCabinets: data?.discountCabinets || "",
@@ -104,21 +104,38 @@ const General = ({ getData, data }) => {
   };
 
   const onFinish = async (values) => {
-    if (!data?._id) return;
-    const updatedOrder = { ...data, ...values, _id: data._id }; // Preservamos todos los datos originales
-    const result = await updateOrder(updatedOrder);
-    if (result) {
-      const updatedData = {
-        ...result,
-        profile: data.profile, // Preservamos profile para mantener role
-      };
-      getData(updatedData); // Propagamos el cambio completo a Report.js
-      setLocalOrder(updatedData);
-      // localStorage.setItem("order", JSON.stringify(updatedData)); // Guardamos el objeto completo
-      message.success("Se ha actualizado correctamente");
-      form.setFieldsValue(updatedData); // Actualizamos el formulario con los nuevos valores
+    if (!data?._id) {
+      message.error("No se encontró el ID del pedido");
+      return;
+    }
+
+    try {
+      const updatedOrder = { ...data, ...values, _id: data._id };
+
+      const result = await updateOrder(updatedOrder);
+
+      if (result && result.order && result.order._id) { // Verificamos la estructura correcta
+        const updatedData = {
+          ...result.order, // Usamos result.order como base
+          profile: data.profile, // Preservamos profile del data original
+        };
+        getData(updatedData); // Propagamos al padre
+        setLocalOrder(updatedData);
+        message.success("Se ha actualizado correctamente");
+        form.setFieldsValue(updatedData); // Actualizamos el formulario
+      } else {
+        throw new Error("La respuesta de updateOrder no contiene un order válido");
+      }
+    } catch (error) {
+      console.error("Error en onFinish:", error);
+      message.error("Error al guardar los cambios: " + error.message);
+      form.setFieldsValue(initialValues); // Restauramos los valores originales
     }
   };
+
+  if (!data) {
+    return <div>No hay datos disponibles para mostrar.</div>;
+  }
 
   return (
     <Card className="rounded-none bg-gray border border-border">
@@ -205,7 +222,6 @@ const General = ({ getData, data }) => {
                   customInput={
                     <Input
                       value={data.coefficient}
-                      // onChange={(e) => setCoefficient(e.target.value)}
                       readOnly={!isCoefficientEditable}
                       onClick={unlockCoefficient}
                       style={
@@ -227,7 +243,7 @@ const General = ({ getData, data }) => {
                   span={4}
                   customInput={
                     <Input
-                      value={data.userId.coefficient}
+                      value={data.userId?.coefficient || ""}
                       style={{ opacity: 0.7, cursor: "pointer" }}
                       disabled
                     />
