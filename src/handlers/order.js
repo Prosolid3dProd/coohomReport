@@ -365,7 +365,7 @@ export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
     if (tab === 0 || tab === 1) {
       coefficient = order?.userId?.coefficient;
     } else if (tab === 2 || tab === 3) {
-      coefficient = order?.userId?.coefficientVentaTienda;
+      coefficient = order?.userId?.coefficientVenta;
     }
   }
 

@@ -781,7 +781,6 @@ const getPriceParameters = (param, ignoreParam, tipoMueble) => {
   allParameters.forEach((item) => {
     const itemName = String(item.name);
     const itemdescription = String(item.description);
-    console.log(itemName);
 
     if (excludedNames.includes(itemName)) return;
 
@@ -875,7 +874,6 @@ export const parseJson3D = async (json) => {
   try {
     let referenceTemp;
     let contador = 0;
-    let contador2 = 0;
     var cabinets = [];
     let door;
     let cabinet;

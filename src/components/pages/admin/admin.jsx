@@ -13,6 +13,8 @@ import {
   Modal,
   Table,
   Space,
+  Row,
+  Col,
 } from "antd";
 import { Header } from "../../content";
 import { QuestionCircleOutlined } from "@ant-design/icons";
@@ -21,7 +23,6 @@ import {
   getUsers,
   deleteUser,
   updateUser,
-  resetPassword,
 } from "../../../handlers/user";
 
 const { Option } = Select;
@@ -34,385 +35,9 @@ const MENSAJES = {
   DELETE: (nombreTienda) => info(`Se ha eliminado la Tienda: ${nombreTienda}`),
 };
 
-const ShopsForm = ({ setListaTiendas }) => {
-  const [logoUrl, setLogoUrl] = useState(""); // Estado para URL del logo
-
-  // Función para manejar la subida del logo
-  const handleUpload = () => {
-    const client = filestack.init("AXPWPBPSTvSKYoyHwByaaz");
-    const options = {
-      onUploadDone: async (file) => {
-        const uploadedUrl = file.filesUploaded[0].url;
-        setLogoUrl(uploadedUrl); // Actualiza la URL del logo
-      },
-      onFileUploadFailed: (error) => {
-        console.error("Error en la carga del archivo:", error);
-      },
-    };
-    const picker = client.picker(options);
-    picker.open();
-  };
-
-  // Función para manejar el envío del formulario
-  const onFinish = async (values) => {
-    try {
-      // Incluye el logo solo si hay una URL
-      const finalValues = { ...values, logo: logoUrl || "" }; // Usa logoUrl si existe, sino una cadena vacía
-
-      // Llama a la API para crear el usuario
-      const nuevaTienda = await createUser(finalValues);
-      if (nuevaTienda.response?.data.message === "Usuario ya existe") {
-        return MENSAJES.ERROR("Usuario existente");
-      }
-      if (!nuevaTienda) {
-        return MENSAJES.ERROR("Conexión Base de Datos");
-      }
-
-      // Obtén la lista actualizada de tiendas
-      const tiendasTemporal = await getUsers();
-      if (!tiendasTemporal) {
-        return MENSAJES.ERROR("Conexión Base de Datos");
-      }
-
-      // Actualiza el estado de la lista de tiendas
-      setListaTiendas(tiendasTemporal);
-      MENSAJES.INFO(nuevaTienda[0].name);
-    } catch (error) {
-      console.error("Error en onFinish:", error);
-    }
-  };
-
-  // Función para manejar el fallo del envío del formulario
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-
-  return (
-    <div style={{ height: "75vh", overflowY: "scroll" }}>
-      <Form
-        name="basic"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
-        className="w-full"
-      >
-        <Form.Item
-          name="name"
-          label="Propietario"
-          className="p-4 flex items-center m-0"
-          rules={[
-            {
-              required: true,
-              message: "Por favor introduce tu Propietario",
-              whitespace: true,
-            },
-          ]}
-        >
-          <Input_ant id="firstInputForm" />
-        </Form.Item>
-        <Form.Item
-          name="email"
-          label="E-mail"
-          className="w-full p-4 flex items-center m-0"
-          rules={[
-            { type: "email", message: "El email no es válido" },
-            { required: true, message: "Por favor introduce un email" },
-          ]}
-        >
-          <Input_ant />
-        </Form.Item>
-        <Form.Item name="logo" label="Logo" className="w-full flex items-center m-0">
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Button type="default" size="large" onClick={handleUpload}>
-                <FileAddOutlined /> Logo
-              </Button>
-              {logoUrl && (
-                <img
-                  src={logoUrl + `?${new Date().getTime()}`} // Forzar la recarga de la imagen
-                  alt="Logo"
-                  style={{ width: 200, height: 100, objectFit: 'contain'}}
-                />
-              )}
-            </div>
-          </Form.Item>
-        <Form.Item
-          name="nif"
-          label="NIF"
-          className="w-full p-4 flex items-center m-0"
-        >
-          <Input_ant />
-        </Form.Item>
-        <Form.Item
-          name="info1"
-          label="Info1"
-          className="w-full p-4 flex items-center m-0"
-        >
-          <Input_ant />
-        </Form.Item>
-        <Form.Item
-          name="info2"
-          className="w-full p-4 flex items-center m-0"
-          label="Info2"
-        >
-          <Input_ant className="" />
-        </Form.Item>
-        <Form.Item
-          name="info3"
-          className="w-full p-4 flex items-center m-0"
-          label="Info3"
-        >
-          <Input_ant className="" />
-        </Form.Item>
-        <Form.Item
-          name="password"
-          className="w-full p-4 flex items-center m-0"
-          label="Contraseña"
-          rules={[{ required: true, whitespace: true, type: "password" }]}
-        >
-          <Input_ant className="" />
-        </Form.Item>
-        <Form.Item
-          name="coefficient"
-          label="Coeficiente"
-          className="w-full p-4 flex items-center m-0"
-          rules={[
-            { required: true, message: "Por favor introduce un coeficiente" },
-          ]}
-        >
-          <Input_ant className="" />
-        </Form.Item>
-        <Form.Item
-          name="coefficientVenta"
-          label="Coeficiente Venta"
-          className="w-full p-4 flex items-center m-0"
-          rules={[
-            { required: true, message: "Por favor introduce un coeficiente" },
-          ]}
-        >
-          <Input_ant className="" />
-        </Form.Item>
-        <Form.Item
-          name="role"
-          label="Rol"
-          className="w-full p-4 flex items-center m-0"
-          rules={[{ required: true, message: "Por favor introduce un rol" }]}
-        >
-          <Select
-            defaultValue=""
-            style={{ width: 150 }}
-            options={[
-              { value: "admin", label: "Administrador" },
-              { value: "client", label: "Cliente" },
-            ]}
-          />
-        </Form.Item>
-        {[...Array(5).keys()].map((index) => (
-          <Form.Item
-            key={`observacion${index + 1}`}
-            name={`observacion${index + 1}`}
-            label={`Observacion${index + 1}`}
-            className="w-full p-4 flex items-center m-0"
-          >
-            <Input_ant className="" />
-          </Form.Item>
-        ))}
-        <Form.Item wrapperCol={{ offset: 14 }}>
-          <Button
-            className="bg-blue-600 text-white"
-            type="default"
-            htmlType="submit"
-          >
-            Crear
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
-  );
-};
-
-
-const Admin = () => {
-  const [listaTiendas, setListaTiendas] = useState([]);
-  const [load, setLoad] = useState(true);
-  const [pageSize, setPageSize] = useState(5);
-  const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+const ShopsForm = ({ setListaTiendas, open, setOpen }) => {
   const [logoUrl, setLogoUrl] = useState("");
   const [form] = Form.useForm();
-
-  const handleCancel = () => setOpen(false);
-
-  const handleResize = () => {
-    const windowHeight = window.innerHeight;
-    const newRowHeight = 75;
-    const newPageSize = Math.floor((windowHeight - 200) / newRowHeight);
-    setPageSize(newPageSize);
-  };
-
-  useEffect(() => {
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (open && selectedUser) {
-      setLogoUrl(selectedUser.logo);
-      form.setFieldsValue({
-        ...selectedUser,
-        logo: selectedUser.logo, // Asegúrate de que la URL del logo se pase aquí si es necesario
-      });
-    }
-  }, [open, selectedUser]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoad(true);
-      try {
-        const result = await getUsers();
-        setListaTiendas(result);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setLoad(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const showModal = (user) => {
-    if (user) {
-      setSelectedUser(user);
-      form.setFieldsValue({
-        ...user,
-        logo: user.logo, // Asegúrate de que la URL del logo se pase aquí si es necesario
-      });
-      setLogoUrl(user.logo); // Establecer la URL del logo en el estado
-      setOpen(true);
-    } else {
-      console.error("User is undefined");
-    }
-  };
-
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      setConfirmLoading(true);
-
-      if (values.oldPassword && values.newPassword) {
-        const resetResult = await resetPassword({
-          email: selectedUser.email,
-          password: values.newPassword,
-        });
-        if (resetResult.error) {
-          message.error("Error al cambiar la contraseña");
-          return;
-        }
-        message.success("Contraseña cambiada correctamente");
-      }
-
-      // Incluye la URL del logo en los valores a actualizar
-      const updateResult = await updateUser({
-        ...selectedUser,
-        ...values,
-        logo: logoUrl,
-      });
-      if (!updateResult) {
-        message.error("Error al actualizar el usuario");
-        return;
-      }
-
-      setListaTiendas((prevValues) =>
-        prevValues.map((user) =>
-          user._id === selectedUser._id
-            ? { ...user, ...values, logo: logoUrl }
-            : user
-        )
-      );
-      message.success("Usuario actualizado correctamente");
-      setOpen(false);
-    } catch (error) {
-      console.error("Failed to update user:", error);
-    } finally {
-      form.resetFields(["oldPassword", "newPassword"]);
-      setConfirmLoading(false);
-    }
-  };
-
-  const onDelete = async (item) => {
-    setLoad(true);
-    try {
-      const result = await deleteUser(item);
-      if (result) {
-        setListaTiendas((prevValues) =>
-          prevValues.filter((value) => value._id !== item._id)
-        );
-        message.success(`Usuario ${item.name} eliminado correctamente`);
-      } else {
-        message.error(`Error al eliminar el usuario ${item.name}`);
-      }
-    } catch (e) {
-      console.error(e);
-      message.error(`Error al eliminar el usuario ${item.name}`);
-    } finally {
-      setLoad(false);
-    }
-  };
-
-  const columns = [
-    {
-      title: "Propietario",
-      width: 100,
-      dataIndex: "name",
-      key: "name",
-      fixed: "left",
-    },
-    { title: "Email", width: 100, dataIndex: "email", key: "email" },
-
-    {
-      title: "Acción",
-      key: "operation",
-      fixed: "right",
-      width: 100,
-      render: (text, record) => (
-        <div className="flex flex-row justify-around">
-          <Space>
-            <Button type="default" onClick={() => showModal(record)}>
-              Editar
-            </Button>
-          </Space>
-          <Space>
-            <Popconfirm
-              title="¿Estás seguro de que deseas eliminar este reporte?"
-              icon={<QuestionCircleOutlined style={{ color: "red" }} />}
-              onConfirm={() => onDelete(record)}
-              okType="default"
-              okText="Sí"
-              cancelText="No"
-            >
-              <Button danger>Eliminar</Button>
-            </Popconfirm>
-          </Space>
-        </div>
-      ),
-    },
-  ];
-
-  const validateEmail = (_, value) => {
-    if (
-      !value ||
-      /^[^@]*[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)
-    ) {
-      return Promise.resolve();
-    }
-    return Promise.reject(
-      new Error("El email no es válido: no se permiten símbolos antes del @")
-    );
-  };
 
   const handleUpload = () => {
     const client = filestack.init("AXPWPBPSTvSKYoyHwByaaz");
@@ -429,129 +54,370 @@ const Admin = () => {
     picker.open();
   };
 
+  const onFinish = async (values) => {
+    try {
+      const finalValues = { ...values, logo: logoUrl || "" };
+      const nuevaTienda = await createUser(finalValues);
+      if (nuevaTienda.response?.data.message === "Usuario ya existe") {
+        return MENSAJES.ERROR("Usuario existente");
+      }
+      if (!nuevaTienda) {
+        return MENSAJES.ERROR("Conexión Base de Datos");
+      }
+      const tiendasTemporal = await getUsers();
+      setListaTiendas(tiendasTemporal);
+      MENSAJES.INFO(nuevaTienda[0].name);
+      setOpen(false);
+      form.resetFields();
+      setLogoUrl("");
+    } catch (error) {
+      console.error("Error en onFinish:", error);
+    }
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+    form.resetFields();
+    setLogoUrl("");
+  };
+
+  useEffect(() => {
+    if (open) {
+      form.resetFields();
+      setLogoUrl("");
+    }
+  }, [open, form]);
+
   return (
-    <main className="px-4 flex gap-4 flex-col">
-      <Header actions={false} name={"Tiendas"} />
-      <section className="grid grid-cols-[500px_1fr]">
-        <ShopsForm setListaTiendas={setListaTiendas} />
-        <Table
-          columns={columns}
-          dataSource={listaTiendas}
-          loading={load}
-          rowKey={"id"}
-          pagination={{ pageSize }}
-        />
-      </section>
-      <Modal
-        title="Actualizar Usuario"
-        centered
-        open={open}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-        okButtonProps={{
-          style: { backgroundColor: "blue", borderColor: "blue" },
-        }}
-        styles={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
-        mask={{ maxHeight: "70vh", overflowY: "auto" }}
+    <Modal
+      title="Crear Nuevo Usuario"
+      open={open}
+      onCancel={handleCancel}
+      footer={null}
+      width={800}
+    >
+      <Form
+        form={form}
+        name="create_user"
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
+        onFinish={onFinish}
+        autoComplete="off"
       >
-        <Form form={form} layout="vertical" name="userForm">
-          <Form.Item
-            name="name"
-            label="Propietario"
-            rules={[
-              {
-                required: true,
-                message: "Por favor introduce tu Propietario",
-                whitespace: true,
-              },
-            ]}
-          >
-            <Input_ant />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label="E-mail"
-            rules={[
-              { type: "email", message: "El email no es valido" },
-              { required: true, message: "Por favor introduce un email" },
-              { validator: validateEmail, message: "Email no es valido" },
-            ]}
-          >
-            <Input_ant />
-          </Form.Item>
-
-          <Form.Item name="logo" label="Logo" className="w-full">
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <Button type="default" size="large" onClick={handleUpload}>
-                <FileAddOutlined /> Logo
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item name="name" label="Propietario" rules={[{ required: true }]}>
+              <Input_ant autoComplete="off" />
+            </Form.Item>
+            <Form.Item name="email" label="E-mail" rules={[{ required: true, type: "email" }]}>
+              <Input_ant autoComplete="off" />
+            </Form.Item>
+            <Form.Item name="nif" label="NIF">
+              <Input_ant autoComplete="off" />
+            </Form.Item>
+            <Form.Item name="info1" label="Info1">
+              <Input_ant autoComplete="off" />
+            </Form.Item>
+            <Form.Item name="coefficient" label="Coeficiente" rules={[{ required: true }]}>
+              <Input_ant autoComplete="off" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item name="logo" label="Logo">
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <Button type="default" onClick={handleUpload}>
+                  <FileAddOutlined /> Logo
+                </Button>
+                {logoUrl && (
+                  <img
+                    src={logoUrl}
+                    alt="Logo"
+                    style={{ width: 100, height: 100, objectFit: "contain" }}
+                  />
+                )}
+              </div>
+            </Form.Item>
+            <Form.Item name="password" label="Contraseña" rules={[{ required: true }]}>
+              <Input_ant.Password autoComplete="new-password" />
+            </Form.Item>
+            <Form.Item name="role" label="Rol" rules={[{ required: true }]}>
+              <Select>
+                <Option value="admin">Administrador</Option>
+                <Option value="client">Cliente</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item name="coefficientVenta" label="Coef. Venta">
+              <Input_ant autoComplete="off" />
+            </Form.Item>
+            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+              <Button type="primary" htmlType="submit">
+                Crear Usuario
               </Button>
-              {logoUrl && (
-                <img
-                  src={logoUrl + `?${new Date().getTime()}`} // Forzar la recarga de la imagen
-                  alt="Logo"
-                  style={{ width: 150, height: 120, objectFit: 'contain'}}
-                />
-              )}
-            </div>
-          </Form.Item>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
+    </Modal>
+  );
+};
 
-          <Form.Item name="nif" label="NIF">
-            <Input_ant />
-          </Form.Item>
-          <Form.Item
-            name="info1"
-            label="Info1"
-            rules={[{ message: "Por favor introduce una localización" }]}
-          >
-            <Input_ant />
-          </Form.Item>
-          <Form.Item
-            name="info2"
-            label="Info2"
-            rules={[
-              {
-                message: "Introduce un número de teléfono correcto",
-              },
-            ]}
-          >
-            <Input_ant className="" />
-          </Form.Item>
-          <Form.Item name="info3" label="Info3">
-            <Input_ant />
-          </Form.Item>
-          <Form.Item
-            name="coefficient"
-            label="Coeficiente"
-            rules={[
-              {
-                required: true,
-                message: "Por favor introduce el coeficiente",
-              },
-            ]}
-          >
-            <Input_ant />
-          </Form.Item>
-          <Form.Item
-            name="coefficientVenta"
-            label="Coeficiente Venta"
-            rules={[
-              {
-                required: true,
-                message: "Por favor introduce el coeficiente",
-              },
-            ]}
-          >
-            <Input_ant />
-          </Form.Item>
+const Admin = () => {
+  const [listaTiendas, setListaTiendas] = useState([]);
+  const [load, setLoad] = useState(true);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [logoUrl, setLogoUrl] = useState("");
+  const [pageSize, setPageSize] = useState(6);
+  const [tableScrollX, setTableScrollX] = useState(1500);
+  const [form] = Form.useForm();
 
-          <Form.Item name="oldPassword" label="Contraseña antigua">
-            <Input_ant />
-          </Form.Item>
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoad(true);
+      try {
+        const result = await getUsers();
+        setListaTiendas(result);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoad(false);
+      }
+    };
+    fetchData();
+  }, []);
 
-          <Form.Item name="newPassword" label="Nueva contraseña">
-            <Input_ant />
-          </Form.Item>
+  useEffect(() => {
+    const updateTableDimensions = () => {
+      const windowHeight = window.innerHeight;
+      const windowWidth = window.innerWidth;
+      
+      const headerHeight = 65;
+      const buttonHeight = 42;
+      const paddingAndGaps = 32;
+      const paginationHeight = 55;
+      const availableHeight = windowHeight - headerHeight - buttonHeight - paddingAndGaps - paginationHeight;
+      const rowHeight = 122;
+      const calculatedPageSize = Math.max(1, Math.floor(availableHeight / rowHeight));
+      setPageSize(calculatedPageSize);
+
+      const totalColumnWidth = 150 + 200 + 120 + 100 + 100 + 100 + 100 + 200;
+      const minScrollX = 800;
+      const calculatedScrollX = Math.max(minScrollX, Math.min(totalColumnWidth, windowWidth - 32));
+      setTableScrollX(calculatedScrollX);
+    };
+
+    updateTableDimensions();
+    window.addEventListener("resize", updateTableDimensions);
+    return () => window.removeEventListener("resize", updateTableDimensions);
+  }, []);
+
+  const showEditModal = (user) => {
+    setSelectedUser(user);
+    setLogoUrl(user.logo || "");
+    form.setFieldsValue({
+      name: user.name,
+      email: user.email,
+      nif: user.nif,
+      info1: user.info1,
+      coefficient: user.coefficient,
+      info2: user.info2,
+      info3: user.info3,
+      coefficientVenta: user.coefficientVenta,
+      role: user.role,
+      password: "", // No cargamos la contraseña actual por seguridad
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEditOk = async () => {
+    try {
+      const values = await form.validateFields();
+      const updatedUserData = {
+        ...selectedUser,
+        ...values,
+        logo: logoUrl,
+      };
+      // Solo incluir password si se ingresó un valor
+      if (!values.password) {
+        delete updatedUserData.password; // Evitar enviar contraseña vacía
+      }
+      const updatedUser = await updateUser(updatedUserData);
+      
+      if (updatedUser) {
+        const tiendasTemporal = await getUsers(); // Recargar desde el servidor
+        setListaTiendas(tiendasTemporal);
+        setEditModalOpen(false);
+        setSelectedUser(null);
+        setLogoUrl("");
+        form.resetFields();
+        message.success("Usuario actualizado correctamente");
+      } else {
+        throw new Error("No se recibió respuesta válida del servidor");
+      }
+    } catch (error) {
+      console.error("Error al actualizar usuario:", error);
+      message.error("Error al actualizar usuario");
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditModalOpen(false);
+    form.resetFields();
+    setLogoUrl("");
+    setSelectedUser(null);
+  };
+
+  const onDelete = async (item) => {
+    try {
+      await deleteUser(item);
+      setListaTiendas(prev => prev.filter(user => user._id !== item._id));
+      message.success("Usuario eliminado correctamente");
+    } catch (error) {
+      message.error("Error al eliminar usuario");
+    }
+  };
+
+  const columns = [
+    { title: "Propietario", dataIndex: "name", key: "name", width: 150 },
+    { title: "Email", dataIndex: "email", key: "email", width: 200 },
+    { title: "NIF", dataIndex: "nif", key: "nif", width: 120 },
+    { title: "Rol", dataIndex: "role", key: "role", width: 100 },
+    { title: "Coeficiente", dataIndex: "coefficient", key: "coefficient", width: 100 },
+    { title: "Coef. Venta", dataIndex: "coefficientVenta", key: "coefficientVenta", width: 100 },
+    {
+      title: "Logo",
+      dataIndex: "logo",
+      key: "logo",
+      width: 100,
+      render: (text) => text && (
+        <img src={text} alt="logo" style={{ width: 50, height: 50, objectFit: "contain" }} />
+      ),
+    },
+    {
+      title: "Acción",
+      key: "action",
+      width: 200,
+      fixed: "right",
+      render: (_, record) => (
+        <Space>
+          <Button type="primary" onClick={() => showEditModal(record)}>
+            Editar
+          </Button>
+          <Popconfirm
+            title="¿Seguro que quieres eliminar este usuario?"
+            onConfirm={() => onDelete(record)}
+          >
+            <Button danger>Eliminar</Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  const handleUpload = () => {
+    const client = filestack.init("AXPWPBPSTvSKYoyHwByaaz");
+    const options = {
+      onUploadDone: async (file) => {
+        setLogoUrl(file.filesUploaded[0].url);
+      },
+    };
+    const picker = client.picker(options);
+    picker.open();
+  };
+
+  return (
+    <main className="px-4 py-4 flex flex-col gap-4 h-screen">
+      <Header actions={false} name={"Tiendas"} />
+      <Button 
+        type="primary" 
+        onClick={() => setCreateModalOpen(true)}
+        style={{ width: "200px" }}
+      >
+        Crear Nuevo Usuario
+      </Button>
+      
+      <Table
+        columns={columns}
+        dataSource={listaTiendas}
+        loading={load}
+        rowKey="_id"
+        pagination={{
+          pageSize: pageSize,
+          defaultPageSize: pageSize,
+          showSizeChanger: true,
+          pageSizeOptions: Array.from(
+            { length: 5 },
+            (_, i) => (i + 1) * Math.max(1, Math.floor(pageSize / 2))
+          ).map(String),
+          total: listaTiendas.length,
+          showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} usuarios`,
+          position: ['bottomRight'],
+        }}
+        scroll={{ x: tableScrollX }}
+      />
+
+      <ShopsForm 
+        setListaTiendas={setListaTiendas}
+        open={createModalOpen}
+        setOpen={setCreateModalOpen}
+      />
+      
+      <Modal
+        title="Editar Usuario"
+        open={editModalOpen}
+        onOk={handleEditOk}
+        onCancel={handleEditCancel}
+        width={800}
+      >
+        <Form form={form} layout="vertical">
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="name" label="Propietario" rules={[{ required: true }]}>
+                <Input_ant />
+              </Form.Item>
+              <Form.Item name="email" label="E-mail" rules={[{ required: true, type: "email" }]}>
+                <Input_ant />
+              </Form.Item>
+              <Form.Item name="nif" label="NIF">
+                <Input_ant />
+              </Form.Item>
+              <Form.Item name="info1" label="Info1">
+                <Input_ant />
+              </Form.Item>
+              <Form.Item name="coefficient" label="Coeficiente" rules={[{ required: true }]}>
+                <Input_ant />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="logo" label="Logo">
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <Button type="default" onClick={handleUpload}>
+                    <FileAddOutlined /> Logo
+                  </Button>
+                  {logoUrl && (
+                    <img
+                      src={logoUrl}
+                      alt="Logo"
+                      style={{ width: 100, height: 100, objectFit: "contain" }}
+                    />
+                  )}
+                </div>
+              </Form.Item>
+              <Form.Item name="password" label="Contraseña">
+                <Input_ant.Password autoComplete="new-password" placeholder="Nueva contraseña (opcional)" />
+              </Form.Item>
+              <Form.Item name="coefficientVenta" label="Coef. Venta">
+                <Input_ant />
+              </Form.Item>
+              <Form.Item name="role" label="Rol" rules={[{ required: true }]}>
+                <Select>
+                  <Option value="admin">Administrador</Option>
+                  <Option value="client">Cliente</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </main>

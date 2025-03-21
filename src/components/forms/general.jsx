@@ -204,8 +204,8 @@ const General = ({ getData, data }) => {
                   span={4}
                   customInput={
                     <Input
-                      // value={coefficient}
-                      onChange={(e) => setCoefficient(e.target.value)}
+                      value={data.coefficient}
+                      // onChange={(e) => setCoefficient(e.target.value)}
                       readOnly={!isCoefficientEditable}
                       onClick={unlockCoefficient}
                       style={
@@ -223,12 +223,13 @@ const General = ({ getData, data }) => {
               <>
                 <DividerSection title="Acerca de los Precios" />
                 <FormField
-                  label="Coeficiente Cliente"
+                  label="Coeficiente Venta Cliente"
                   span={4}
                   customInput={
                     <Input
                       value={data.userId.coefficient}
                       style={{ opacity: 0.7, cursor: "pointer" }}
+                      disabled
                     />
                   }
                 />
