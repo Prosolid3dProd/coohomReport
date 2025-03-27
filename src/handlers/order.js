@@ -483,6 +483,3 @@ export const setLocalOrder = async (params) => {
     resolve(getOrders()); // Asegura que getOrders() se ejecuta después de actualizar localStorage
   });
 };
-
-export const clearLocalOrder = () =>
-  localStorage.setItem("order", JSON.stringify([]));
