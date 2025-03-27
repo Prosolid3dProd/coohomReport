@@ -320,15 +320,12 @@ const getPrice = (parametros, tipo, materialCasco) => {
     );
 
     if (parametros.textureCustomCode === "C1") {
-      // Recorrer cada subModel y sumar sus Preciocostados
       price += parametros.subModels.reduce((sum, subModel) => {
         return sum + findPrice(subModel?.parameters || [], "PRECIOCOSTADOS");
       }, 0);
-    } else if (parametros.textureCustomCode === "PLAM") {
+    } else if (parametros.textureNumber === "111") {
       if (
-        materialCasco === "171-EUCALIPTO" ||
-        materialCasco === "172-ROBLE" ||
-        materialCasco === "169-NOGAL NATURAL"
+        ["171-EUCALIPTO", "172-ROBLE", "169-NOGAL NATURAL"].includes(materialCasco)
       ) {
         price += price * 0.1;
       } else if (intv) {
@@ -337,30 +334,36 @@ const getPrice = (parametros, tipo, materialCasco) => {
     }
 
     if (intv) {
-      if (
-        parametros.textureCustomCode === "ESTB" ||
-        parametros.textureCustomCode === "ESTF" ||
-        parametros.textureCustomCode === "ESTM"
-      ) {
-        price += price * 0.4;
-      } else if (
-        parametros.textureCustomCode === "NP300" ||
-        parametros.textureCustomCode === "NP200" ||
-        parametros.textureCustomCode === "P200L"
-      ) {
-        price += price * 0.6;
-      } else if (
-        parametros.textureCustomCode === "LACAM" ||
-        parametros.textureCustomCode === "LACAB"
-      ) {
-        price += price * 0.6;
-      } else if (parametros.textureCustomCode === "PANT") {
-        price += price * 0.35;
-      }
+      const textureAdjustments = {
+        ESTB: 0.4,
+        ESTF: 0.4,
+        ESTM: 0.4,
+        NP300: 0.6,
+        NP200: 0.6,
+        P200L: 0.6,
+        LACAM: 0.6,
+        LACAB: 0.6,
+        PANT: 0.35
+      };
+      price += price * (textureAdjustments[parametros.textureCustomCode] || 0);
     }
   }
+
+  // Aplicar Descuento o Incremento según los valores en arrParameters
+  const discountParam = arrParameters.find(p => p?.name?.toUpperCase() === "DESCUENTO");
+  const incrementParam = arrParameters.find(p => p?.name?.toUpperCase() === "INCREMENTO");
+
+  if (discountParam && !isNaN(parseFloat(discountParam.value))) {
+    price -= price * (parseFloat(discountParam.value) / 100);
+  }
+
+  if (incrementParam && !isNaN(parseFloat(incrementParam.value))) {
+    price += price * (parseFloat(incrementParam.value) / 100);
+  }
+
   return price;
 };
+
 
 const getRef = (parametros, reference) => {
   reference.ref = parametros.obsBrandGoodId;

@@ -39,24 +39,21 @@ const Report = () => {
 
   const updatedData = useMemo(() => {
     if (!data || !data.cabinets) return data;
-
+  
     const newData = JSON.parse(JSON.stringify(data));
     let coeficiente;
-
+  
     if (tabActivo === 0 || tabActivo === 1) {
-      coeficiente = data.userId.coefficient || 1;
-      newData.cabinets = newData.cabinets.map((item) => ({
-        ...item,
-        total: item.total * coeficiente,
-      }));
+      coeficiente = data.userId?.coefficient || 1;
     } else if (tabActivo === 2 || tabActivo === 3) {
       coeficiente = data.coefficient || 1;
-      newData.cabinets = newData.cabinets.map((item) => ({
-        ...item,
-        total: item.total * coeficiente,
-      }));
     }
-
+  
+    newData.cabinets = newData.cabinets.map((item) => ({
+      ...item,
+      total: String(item.customcode) === "3333" ? item.total : item.total * coeficiente,
+    }));
+    
     return newData;
   }, [data, tabActivo]);
 
