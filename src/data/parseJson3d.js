@@ -301,34 +301,40 @@ const getPrice = (parametros, tipo, materialCasco) => {
   let price = 0;
 
   const findPrice = (items, targetName = "PRICE") => {
-    const name = items?.some(item => item?.name?.toUpperCase() === "PTOTAL") 
-      ? "PTOTAL" 
+    const name = items?.some((item) => item?.name?.toUpperCase() === "PTOTAL")
+      ? "PTOTAL"
       : targetName;
-    return items?.reduce((sum, item) => 
-      item?.name?.toUpperCase() === name && !isNaN(parseFloat(item.value)) 
-        ? sum + parseFloat(item.value) 
-        : sum, 0) || 0;
+    return (
+      items?.reduce(
+        (sum, item) =>
+          item?.name?.toUpperCase() === name && !isNaN(parseFloat(item.value))
+            ? sum + parseFloat(item.value)
+            : sum,
+        0
+      ) || 0
+    );
   };
 
-  const arrParameters = [].concat(parametros?.parameters || [], parametros?.ignoreParameters || []);
+  const arrParameters = [].concat(
+    parametros?.parameters || [],
+    parametros?.ignoreParameters || []
+  );
 
   price = findPrice(arrParameters);
   if (isCabinet) {
     price = price || 10000;
-    const intv = arrParameters.some(p => 
-      p?.displayName?.toUpperCase() === "INTV" && parseFloat(p?.value) > 0
+    const intv = arrParameters.some(
+      (p) =>
+        p?.displayName?.toUpperCase() === "INTV" && parseFloat(p?.value) > 0
     );
 
     if (parametros.textureCustomCode === "C1") {
       price += parametros.subModels.reduce((sum, subModel) => {
         return sum + findPrice(subModel?.parameters || [], "PRECIOCOSTADOS");
       }, 0);
-    } else if (parametros.textureCustomCode === "PLAM") {
-      if (
-        ["171-EUCALIPTO", "172-ROBLE", "169-NOGAL NATURAL"].includes(materialCasco)
-      ) {
-        price += price * 0.1;
-      } else if (intv) {
+    } else if (parametros.textureNumber === "111") {
+      price += price * 0.1;
+      if (intv) {
         price += price * 0.25;
       }
     }
@@ -343,15 +349,19 @@ const getPrice = (parametros, tipo, materialCasco) => {
         P200L: 0.6,
         LACAM: 0.6,
         LACAB: 0.6,
-        PANT: 0.35
+        PANT: 0.35,
       };
       price += price * (textureAdjustments[parametros.textureCustomCode] || 0);
     }
   }
 
   // Aplicar Descuento o Incremento según los valores en arrParameters
-  const discountParam = arrParameters.find(p => p?.name?.toUpperCase() === "DESCUENTO");
-  const incrementParam = arrParameters.find(p => p?.name?.toUpperCase() === "INCREMENTO");
+  const discountParam = arrParameters.find(
+    (p) => p?.name?.toUpperCase() === "DESCUENTO"
+  );
+  const incrementParam = arrParameters.find(
+    (p) => p?.name?.toUpperCase() === "INCREMENTO"
+  );
 
   if (discountParam && !isNaN(parseFloat(discountParam.value))) {
     price -= price * (parseFloat(discountParam.value) / 100);
@@ -363,7 +373,6 @@ const getPrice = (parametros, tipo, materialCasco) => {
 
   return price;
 };
-
 
 const getRef = (parametros, reference) => {
   reference.ref = parametros.obsBrandGoodId;
@@ -808,7 +817,6 @@ const getPriceParameters = (param, ignoreParam, tipoMueble) => {
         precioVariant += itemValue;
       }
     }
-    
   });
   return parseFloat(precioVariant);
 };
