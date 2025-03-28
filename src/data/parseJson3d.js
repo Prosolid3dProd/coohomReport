@@ -323,7 +323,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
       price += parametros.subModels.reduce((sum, subModel) => {
         return sum + findPrice(subModel?.parameters || [], "PRECIOCOSTADOS");
       }, 0);
-    } else if (parametros.textureNumber === "111") {
+    } else if (parametros.textureCustomCode === "PLAM") {
       if (
         ["171-EUCALIPTO", "172-ROBLE", "169-NOGAL NATURAL"].includes(materialCasco)
       ) {
