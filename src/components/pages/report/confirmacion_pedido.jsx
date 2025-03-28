@@ -1020,7 +1020,7 @@ const Confirmacion_Pedido = ({
                       L:
                       {item.name.toLocaleUpperCase().includes("REGLETA")
                         ? 150
-                        : item.size.x}
+                        : item.size.x}{" "}
                        F: {item.size?.y} A: {item.size?.z}
                     </Text>
                     {item.opening && (
