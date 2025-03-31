@@ -1082,6 +1082,7 @@ export const parseJson3D = async (json) => {
           String(item.modelProductNumber).toLocaleUpperCase() === "COSTADOS"
         ) {
           materialCostado = item.textureName;
+          console.log(item)
         }
 
         if (
@@ -1807,9 +1808,6 @@ export const parseJson3D = async (json) => {
     const cabinetsUnicos = cabinets.reduce((resultado, item) => {
       const id = item.obsBrandGoodId;
 
-      if (item.tipo === "O") {
-        item.size.y -= 20;
-      }
       if (item.name.toLocaleUpperCase().includes("REGLETA")) {
         item.size.x = 150;
       }
