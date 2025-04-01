@@ -355,6 +355,15 @@ const getPrice = (parametros, tipo, materialCasco) => {
     }
   }
 
+  // Lógica para cajones
+  if (tipo !== undefined && tipo !== "cabinet") {
+    if (tipo >= 210) {
+      price = parseFloat(price) + 25;
+    } else {
+      price = parseFloat(price) + 15;
+    }
+  }
+
   // Aplicar Descuento o Incremento según los valores en arrParameters
   const discountParam = arrParameters.find(
     (p) => p?.name?.toUpperCase() === "DESCUENTO"
