@@ -295,7 +295,7 @@ const getFrente = (block) => {
   return { datos: {}, tipo: "" };
 };
 
-const getPrice = (parametros, tipo, materialCasco) => {
+const getPrice = (parametros, tipo) => {
   const isCabinet = tipo === "cabinet";
 
   let price = 0;
@@ -359,7 +359,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
   if (tipo !== undefined && tipo !== "cabinet") {
     if (tipo >= 210) {
       price = parseFloat(price) + 25;
-    } else {
+    } else if (tipo < 210) {
       price = parseFloat(price) + 15;
     }
   }
@@ -1091,7 +1091,6 @@ export const parseJson3D = async (json) => {
           String(item.modelProductNumber).toLocaleUpperCase() === "COSTADOS"
         ) {
           materialCostado = item.textureName;
-          console.log(item)
         }
 
         if (
