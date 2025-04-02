@@ -359,7 +359,7 @@ const getPrice = (parametros, tipo, materialCasco) => {
   if (tipo !== undefined && tipo !== "cabinet") {
     if (tipo >= 210) {
       price = parseFloat(price) + 25;
-    } else {
+    } else if(tipo < 210){
       price = parseFloat(price) + 15;
     }
   }
@@ -1595,7 +1595,6 @@ export const parseJson3D = async (json) => {
                   drawerPriceDetails,
                   drawerMaterialDetails,
                   material: item.textureName,
-                  variants: [],
                   designerName: json.partnerOrder?.designerName || "",
                   quantity: parseInt(itemx.quantity) || 1,
                   ...extra,
