@@ -80,15 +80,16 @@ const getPrice = (parametros, tipo) => {
 
     if (intv) {
       const textureAdjustments = {
-        ESTB: 0.4,
-        ESTF: 0.4,
-        ESTM: 0.4,
-        NP300: 0.6,
-        NP200: 0.6,
-        P200L: 0.6,
-        LACAM: 0.6,
-        LACAB: 0.6,
-        PANT: 0.35,
+        ESTB: 4,
+        ESTF: 4,
+        ESTM: 4,
+        NP300: 4.5,
+        NP200: 4.5,
+        P200L: 4.5,
+        LACAM: 4,
+        LACAB: 4,
+        PANT: 2,
+        PLAM: 2
       };
       price += price * (textureAdjustments[parametros.textureCustomCode] || 0);
     }
