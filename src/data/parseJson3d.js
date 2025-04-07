@@ -91,7 +91,7 @@ const getPrice = (parametros, tipo) => {
         PANT: 2,
         PLAM: 2
       };
-      price += price * (textureAdjustments[parametros.textureCustomCode] || 0);
+      price = price * (textureAdjustments[parametros.textureCustomCode] || 0);
     }
   }
 
