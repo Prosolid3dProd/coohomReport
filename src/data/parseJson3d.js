@@ -728,37 +728,6 @@ export const parseJson3D = async (json) => {
             referenceType.type
           ),
         });
-        // } else if (item["@type"] == "5") {
-        // arrZocalos.push(
-        //   zocalos(
-        //     {
-        //       material: item.textureName,
-        //       lineales: item.profileSegments,
-        //       customCode: item.textureCustomCode,
-        //       y: item.profileSegments[0].width,
-        //       height: item.size.z,
-        //       code:
-        //         "brandGoodCode" in item.profiles[0]
-        //           ? item.profiles[0].brandGoodCode
-        //           : null,
-        //     },
-        //   )
-        // );
-        // let pushTipo = zocalos({
-        //   tipo: "T",
-        //   tipo: "T",
-        //   material: item.textureName,
-        //   lineales: item.profileSegments,
-        //   customCode: item.textureCustomCode,
-        //   y: item.profileSegments[0].width,
-        //   height: item.size.z,
-        //   code:
-        //     "brandGoodCode" in item.profiles[0]
-        //       ? item.profiles[0].brandGoodCode
-        //       : null,
-        //   obsBrandGoodId: item.obsBrandGoodId,
-        //   customCode: item.textureCustomCode,
-        // });
       } else if (item["@type"] == "3") {
         item.subModels?.forEach((submodel) => {
           if (submodel.modelName == "Countertop Block") {
@@ -768,55 +737,18 @@ export const parseJson3D = async (json) => {
             });
           }
         });
-        // } else if (item["@type"] == 1) {
-        //   item.subModels
-        //     .filter((element) => String(element.modelTypeId) === "1")
-        //     .map((element) => {
-        //       if (
-        //         String(element.customCode).trim().substring(0, 2) ===
-        //         CONFIG.CUSTOMCODE.DOOR
-        //       ) {
-        //         element.subModels.map((el) => {
-        //           if (String(el.modelTypeId) === "2") {
-        //             tiradores.push({
-        //               name: el.modelBrandGoodName,
-        //               material: el.textureName,
-        //               price: el.modelCostInfo.unitCost,
-        //             });
-        //           }
-        //         });
-        //       }
-        //     });
       } else {
         referenceType = getRef(item, referenceType);
         opening = "";
-        // contador = contador + 1;
-        // let priceCabinet =
-        //   referenceType.type !== "A" ||
-        //   referenceType.type !== "B" ||
-        //   referenceType.type !== "M"
-        //     ? parseFloat(
-        //         item.parameters.find(
-        //           (item) => String(item.name).toUpperCase() === "PRICE"
-        //         )?.value
-        //       )
-        //     : getPrice(
-        //         item,
-        //         "cabinet",
-        //         item.textureName,
-        //         item.modelCostInfo.quotationRate
-        //       );
         let items = {
           id: `id_${contador}`,
           name: item.modelName,
-          // priceCabinet: priceCabinet,
           reference: referenceType.ref,
           tipo: referenceType.type,
           customcode: item.customCode || null,
           campana,
           priceCabinet: getPrice(
             item,
-            // "cabinet",
             referenceType.type === "A" ||
               referenceType.type === "B" ||
               referenceType.type === "M"
@@ -1090,29 +1022,6 @@ export const parseJson3D = async (json) => {
             }
           });
 
-          // console.log(item, "MUEBLE");
-          // const accesories = item.subModels
-          //   .filter(
-          //     (element) =>
-          //       String(element.modelTypeId) === "4"
-          //   )
-          //   .map((element) => {
-          //     console.log(element, "SUBMODELS")
-          //       return {
-          //         id: `id_${contador}_${contador2++}`,
-          //         name: element.modelBrandGoodName,
-          //         obsBrandGoodId2: element.obsBrandGoodId,
-          //         obsBrandGoodId: element.obsBrandGoodId,
-          //         reference: element.customCode,
-          //         width: item.boxSize.x,
-          //         height: element.boxSize.z,
-          //         depth: item.boxSize.y,
-          //         variants: [],
-          //         price: element.modelCostInfo.unitCost,
-          //         quantity: element.modelCostInfo.quantity || 1,
-          //       };
-          //   });
-
           const referenceTiradores = (item) => {
             for (const reference of item.ignoreParameters) {
               if (reference.name === "REF") {
@@ -1334,7 +1243,6 @@ export const parseJson3D = async (json) => {
                   drawerPriceDetails,
                   drawerMaterialDetails,
                   material: item.textureName,
-                  variants: [],
                   designerName: json.partnerOrder?.designerName || "",
                   quantity: parseInt(itemx.quantity) || 1,
                   ...extra,
@@ -1343,7 +1251,6 @@ export const parseJson3D = async (json) => {
 
               if (itemx.tirador === true) {
                 modelHandlerArray.push({
-                  // id: `id_${contador}`,
                   material: itemx.material,
                   total: parseFloat(itemx.total),
                   priceCabinet: parseFloat(itemx.priceCabinet),
@@ -1470,62 +1377,8 @@ export const parseJson3D = async (json) => {
             )
           );
       }
-
-      // const cantidad = item.parameters.find((c) => c.name === "Cantidad");
-      // const precio = item.parameters.find((p) => p.name === "price");
-      // for (const cabinet of cabinets) {
-      //   if (
-      //     String(cabinet.modelProductNumber).toLocaleUpperCase() ===
-      //       "COMPLEMENTOS" ||
-      //     String(cabinet.modelProductNumber).toLocaleUpperCase() ===
-      //       "ACCESORIOS"
-      //   ) {
-      //     console.log(cabinet, "CABINET");
-      //     if (cantidad && cabinet.quantity === undefined) {
-      //       console.log(cantidad, "CANTIDAD");
-      //       cabinet.quantity = parseFloat(cantidad.value);
-      //     }
-      //     if (precio && cabinet.total === undefined) {
-      //       cabinet.total = parseFloat(precio.value);
-      //     }
-      //   }
-      // }
-
-      // item.subModels
-      //   .filter((element) => String(element.modelTypeId) === "1")
-      //   .map((element) => {
-      //     console.log(element)
-      //     if (
-      //       String(element.customCode).trim().substring(0, 2) ===
-      //       CONFIG.CUSTOMCODE.DOOR
-      //     ) {
-      //       // console.log(element, "FUERA")
-      //       element.subModels?.map((el) => {
-      //         if (String(el.customCode).trim() === "1101") {
-      //           // console.log(element, "DENTRO")
-      //           modelHandlerArray.push({
-      //             material: el.textureName,
-      //             total: parseFloat(el.modelCostInfo.unitCost),
-      //             priceCabinet: parseFloat(el.modelCostInfo.unitCost),
-      //             tipo: "C",
-      //             material: el.textureName,
-      //             reference: referenceTiradores(el) || null,
-      //             customCode: null,
-      //             size: {
-      //               x: el.size.x,
-      //               y: el.size.y,
-      //               z: el.size.z,
-      //             },
-      //             name: el.modelName,
-      //             obsBrandGoodId: el.obsBrandGoodId,
-      //           });
-      //         }
-      //       });
-      //     }
-      //   });
     });
 
-    // contador = contador + 1;
     arrZocalos.filter((zoc) => {
       zoc.typeZocalo = "library";
       let zocNuevo = {
@@ -1534,11 +1387,6 @@ export const parseJson3D = async (json) => {
       };
       cabinets.push(zocNuevo);
     });
-
-    // modelHandlerArray.map((tirador) => {
-    //   tirador.id = `id_${contador++}`;
-    //   cabinets.push(tirador);
-    // });
 
     if (modelDrawer) {
       drawerTemp = modelDrawer[0].modelDrawer;
