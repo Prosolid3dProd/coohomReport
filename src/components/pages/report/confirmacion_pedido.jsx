@@ -19,7 +19,8 @@ const Confirmacion_Pedido = ({
   totalconDescuento,
   ivaCalculado,
   resultadoFinal,
-  importeTotal
+  importeTotal,
+  descuentoAplicado,
 }) => {
   let contador = 1;
   const [cabinets, setCabinets] = useState({
@@ -438,13 +439,11 @@ const Confirmacion_Pedido = ({
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {it.name}:
-                            {it.name === "PVA" ||
-                            it.name === "PVL" ||
-                            String(it.name).toUpperCase() === "ANCHO PUERTA"
-                              ? it.value
-                              : it.nameValue || it.description}
-                            {it.mcv ? "/" + it.mcv : ""}
+                            {`${it.name}: ${
+                              String(it.description).includes("$")
+                                ? it.value
+                                : it.description || it.nameValue
+                            }${it.mcv ? "/" + it.mcv : ""}`}
                           </Text>
                         ))}
                       </View>
@@ -682,13 +681,11 @@ const Confirmacion_Pedido = ({
                           <Text>Variantes: </Text>
                           {item.variants.map((it) => (
                             <Text>
-                              {it.name}:
-                              {it.name === "PVA" ||
-                              it.name === "PVL" ||
-                              String(it.name).toUpperCase() === "ANCHO PUERTA"
-                                ? it.value
-                                : it.nameValue || it.description}
-                              {it.mcv ? "/" + it.mcv : ""}
+                              {`${it.name}: ${
+                                String(it.description).includes("$")
+                                  ? it.value
+                                  : it.description || it.nameValue
+                              }${it.mcv ? "/" + it.mcv : ""}`}
                             </Text>
                           ))}
                         </View>
@@ -887,13 +884,11 @@ const Confirmacion_Pedido = ({
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {it.name}:
-                            {it.name === "PVA" ||
-                            it.name === "PVL" ||
-                            String(it.name).toUpperCase() === "ANCHO PUERTA"
-                              ? it.value
-                              : it.nameValue || it.description}
-                            {it.mcv ? "/" + it.mcv : ""}
+                            {`${it.name}: ${
+                              String(it.description).includes("$")
+                                ? it.value
+                                : it.description || it.nameValue
+                            }${it.mcv ? "/" + it.mcv : ""}`}
                           </Text>
                         ))}
                       </View>
@@ -1025,8 +1020,8 @@ const Confirmacion_Pedido = ({
                       L:
                       {item.name.toLocaleUpperCase().includes("REGLETA")
                         ? 150
-                        : item.size.x}
-                      F: {item.size?.y} A: {item.size?.z}
+                        : item.size.x}{" "}
+                       F: {item.size?.y} A: {item.size?.z}
                     </Text>
                     {item.opening && (
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
@@ -1057,13 +1052,11 @@ const Confirmacion_Pedido = ({
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {it.name}:
-                            {it.name === "PVA" ||
-                            it.name === "PVL" ||
-                            String(it.name).toUpperCase() === "ANCHO PUERTA"
-                              ? it.value
-                              : it.nameValue || it.description}
-                            {it.mcv ? "/" + it.mcv : ""}
+                            {`${it.name}: ${
+                              String(it.description).includes("$")
+                                ? it.value
+                                : it.description || it.nameValue
+                            }${it.mcv ? "/" + it.mcv : ""}`}
                           </Text>
                         ))}
                       </View>
@@ -1192,7 +1185,7 @@ const Confirmacion_Pedido = ({
                     </Text>
                     <Text style={{ fontFamily: CONFIG.BOLD }}>{item.name}</Text>
                     <Text style={{ fontSize: "8" }}>
-                      L: {item.size?.x} F: {item.size?.y + 20} A: {item.size?.z}
+                      L: {item.size?.x} F: {item.size?.y} A: {item.size?.z}
                     </Text>
                     {item.opening && (
                       <Text style={{ fontSize: "8" }}>M: {item?.opening}</Text>
@@ -1269,13 +1262,11 @@ const Confirmacion_Pedido = ({
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {it.name}:
-                            {it.name === "PVA" ||
-                            it.name === "PVL" ||
-                            String(it.name).toUpperCase() === "ANCHO PUERTA"
-                              ? it.value
-                              : it.nameValue || it.description}
-                            {it.mcv ? "/" + it.mcv : ""}
+                            {`${it.name}: ${
+                              String(it.description).includes("$")
+                                ? it.value
+                                : it.description || it.nameValue
+                            }${it.mcv ? "/" + it.mcv : ""}`}
                           </Text>
                         ))}
                       </View>
@@ -1507,16 +1498,9 @@ const Confirmacion_Pedido = ({
                           .map((it) => (
                             <Text key={it.name}>
                               {it.name}:
-                              {[
-                                "PVA",
-                                "PVL",
-                                "ANCHO PUERTA",
-                                "PIES",
-                                "VUELO IZQUIERDO",
-                                "VUELO DERECHO",
-                              ].includes(String(it.name).toUpperCase())
+                              {String(it.description).includes("$")
                                 ? it.value
-                                : it.nameValue || it.description}
+                                : it.description || it.nameValue}
                               {it.mcv ? "/" + it.mcv : ""}
                             </Text>
                           ))}
@@ -1673,13 +1657,11 @@ const Confirmacion_Pedido = ({
                         <Text>Variantes: </Text>
                         {item.variants.map((it) => (
                           <Text>
-                            {it.name}:
-                            {it.name === "PVA" ||
-                            it.name === "PVL" ||
-                            String(it.name).toUpperCase() === "ANCHO PUERTA"
-                              ? it.value
-                              : it.nameValue || it.description}
-                            {it.mcv ? "/" + it.mcv : ""}
+                            {`${it.name}: ${
+                              String(it.description).includes("$")
+                                ? it.value
+                                : it.description || it.nameValue
+                            }${it.mcv ? "/" + it.mcv : ""}`}
                           </Text>
                         ))}
                       </View>
@@ -1817,16 +1799,14 @@ const Confirmacion_Pedido = ({
                     >
                       <Text>Variantes: </Text>
                       {item.variants.map((it) => (
-                        <Text>
-                          {it.name}:
-                          {it.name === "PVA" ||
-                          it.name === "PVL" ||
-                          String(it.name).toUpperCase() === "ANCHO PUERTA"
-                            ? it.value
-                            : it.nameValue || it.description}
-                          {it.mcv ? "/" + it.mcv : ""}
-                        </Text>
-                      ))}
+                          <Text>
+                            {`${it.name}: ${
+                              String(it.description).includes("$")
+                                ? it.value
+                                : it.description || it.nameValue
+                            }${it.mcv ? "/" + it.mcv : ""}`}
+                          </Text>
+                        ))}
                     </View>
                   )}
                   {item?.observation !== undefined &&
@@ -1947,9 +1927,7 @@ const Confirmacion_Pedido = ({
                 <View>
                   {data?.discountCabinets > 0 && (
                     <View>
-                      <Text>
-                        {parseFloat(data.discountCabinetsPorcentaje).toFixed(2)}
-                      </Text>
+                      <Text>{parseFloat(descuentoAplicado).toFixed(2)}</Text>
                     </View>
                   )}
                 </View>

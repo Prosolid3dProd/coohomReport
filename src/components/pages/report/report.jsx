@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { General, Product, Profile } from "./../../index";
 import { Tabs, Card, Button, Space } from "antd";
@@ -36,25 +36,61 @@ const Report = () => {
   const [visible, setBtnVisible] = useState(false);
   const [tabActivo, setTabActivo] = useState(0);
   const [profile, setProfile] = useState(null);
-  const priceC = existePrecio(getPrecio("C"));
-  const priceP = existePrecio(getPrecio("P"));
-  const total_Encimeras = existeTotales(getTotales("Encimeras"));
-  const total_Equipamiento = existeTotales(getTotales("Equipamiento"));
-  const total_Electrodomesticos = existeTotales(
-    getTotales("Electrodomesticos")
-  );
-  const [totales, setTotales] = useState({
-    sumaTotal: 0,
-    totalZocalo: 0,
-    totalDescuentos: 0,
-    totalIva: 0,
-    resultadoFinal: {},
-  });
-  const handleTabChange = (key) => {
-    setTabActivo(parseInt(key));
-    localStorage.setItem("activeTab", key);
-  };
-  // useEffect que se ejecuta solo una vez cuando se monta el componente o cuando cambia el `orderId`
+
+  const updatedData = useMemo(() => {
+    if (!data || !data.cabinets) return data;
+  
+    const newData = JSON.parse(JSON.stringify(data));
+    let coeficiente;
+  
+    if (tabActivo === 0 || tabActivo === 1) {
+      coeficiente = data.userId?.coefficient || 1;
+    } else if (tabActivo === 2 || tabActivo === 3) {
+      coeficiente = data.coefficient || 1;
+    }
+  
+    newData.cabinets = newData.cabinets.map((item) => ({
+      ...item,
+      total: String(item.customcode) === "3333" ? item.total : item.total * coeficiente,
+    }));
+    
+    return newData;
+  }, [data, tabActivo]);
+
+  // Calcular totales con useMemo
+  const totales = useMemo(() => {
+    if (!updatedData || !updatedData.cabinets) {
+      return {
+        sumaTotal: 0,
+        totalZocalo: 0,
+        totalDescuentos: 0,
+        totalIva: 0,
+        resultadoFinal: { importeTotal: 0, descuentoAplicado: 0, totalConDescuento: 0, ivaCalculado: 0, totalFinal: 0 },
+      };
+    }
+
+    const sumaTotal = calcularSumaTotal(updatedData.cabinets, 1);
+    const totalZocalo = calcularTotalZocalo(updatedData.infoZocalos, 1);
+    const importeTotalLocal = sumaTotal + totalZocalo; // Renombramos para evitar conflictos
+    const totalDescuentos = calcularTotalDescuentos(updatedData, importeTotalLocal);
+    const resultado = calcularTotalConDescuentoEIVA(
+      updatedData.cabinets,
+      updatedData.infoZocalos,
+      totalDescuentos,
+      updatedData.ivaCabinets,
+      1
+    );
+    const totalIva = calcularTotalIva(resultado.totalConDescuento, updatedData.ivaCabinets);
+
+    return {
+      sumaTotal,
+      totalZocalo,
+      totalDescuentos,
+      totalIva,
+      resultadoFinal: resultado,
+    };
+  }, [updatedData]);
+
   useEffect(() => {
     const fetchData = async () => {
       if (orderId._id) {
@@ -71,20 +107,7 @@ const Report = () => {
       }
     };
     fetchData();
-  }, [tabActivo]); // Solo ejecutará cuando el `orderId` cambie
-
-  // useEffect que maneja el cambio de tabs. No realiza actualizaciones innecesarias.
-  useEffect(() => {
-    // Solo realiza la actualización de datos si el tabActivo cambia y no si `data` o `profile` no han cambiado
-    if (tabActivo <= 3 && orderId._id && data) {
-      // const updatedInfo = fixOrder(data, tabActivo);
-      const fetchProfile = async () => {
-        const profileData = await getProfile();
-        setProfile(profileData);
-      };
-      fetchProfile();
-    }
-  }, [tabActivo, data, orderId]); // Este efecto se ejecutará solo cuando `tabActivo` cambie, no por cambios de `data` innecesarios
+  }, [tabActivo]);
 
   useEffect(() => {
     if (main) {
@@ -95,46 +118,12 @@ const Report = () => {
           setBtnVisible(false);
         }
       };
-
       main.addEventListener("scroll", handleScroll);
       return () => main.removeEventListener("scroll", handleScroll);
     }
   }, [main]);
 
-  useEffect(() => {
-    // Determina si se debe aplicar el coeficiente (solo en los tabs 2 y 3)
-    const usarCoeficiente = tabActivo === 2 || tabActivo === 3;
-  
-    // Obtener el coeficiente desde donde lo tengas almacenado (ejemplo: localStorage o un contexto global)
-    const coeficiente = usarCoeficiente ? parseFloat(data.coefficient) : 1;
-
-    // Calcular las sumas y totales con el coeficiente aplicado correctamente
-    const sumaTotal = calcularSumaTotal(data.cabinets, coeficiente);
-    const totalZocalo = calcularTotalZocalo(data.infoZocalos, coeficiente);
-    const totalDescuentos = calcularTotalDescuentos(data, coeficiente);
-  
-    // Ahora el IVA también se basa en el total con coeficiente ya aplicado
-    const totalIva = calcularTotalIva(sumaTotal, data.ivaCabinets);
-  
-    const resultado = calcularTotalConDescuentoEIVA(
-      data.cabinets,
-      data.infoZocalos,
-      totalDescuentos,
-      data.ivaCabinets,
-      coeficiente
-    );
-  
-    setTotales({
-      sumaTotal,
-      totalZocalo,
-      totalDescuentos,
-      totalIva,
-      resultadoFinal: resultado,
-    });
-  }, [data, tabActivo]);
-
-  
-  const { totalConDescuento, totalFinal, importeTotal, ivaCalculado } = totales.resultadoFinal;
+  const { totalConDescuento, totalFinal, importeTotal, ivaCalculado } = totales.resultadoFinal || {};
 
   const tabs = [
     {
@@ -144,12 +133,13 @@ const Report = () => {
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
-              price={priceP}
-              data={data}
+              price={existePrecio(getPrecio("P"))}
+              data={updatedData}
               totalconDescuento={totalConDescuento}
               ivaCalculado={ivaCalculado}
               resultadoFinal={totalFinal}
               importeTotal={importeTotal}
+              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
               title="Confirmación de Pedido"
             />
           </PDFViewer>
@@ -163,13 +153,14 @@ const Report = () => {
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido
-              price={priceP}
-              data={data}
+              price={existePrecio(getPrecio("P"))}
+              data={updatedData}
               title="Presupuesto"
               totalconDescuento={totalConDescuento}
               ivaCalculado={ivaCalculado}
               resultadoFinal={totalFinal}
               importeTotal={importeTotal}
+              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
             />
           </PDFViewer>
         </div>
@@ -182,13 +173,14 @@ const Report = () => {
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Confirmacion_Pedido_Venta
-              data={data}
-              price={priceP}
+              data={updatedData}
+              price={existePrecio(getPrecio("P"))}
               title="Presupuesto Venta"
               totalconDescuento={totalConDescuento}
               ivaCalculado={ivaCalculado}
               resultadoFinal={totalFinal}
               importeTotal={importeTotal}
+              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
             />
           </PDFViewer>
         </div>
@@ -201,11 +193,16 @@ const Report = () => {
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Presupuesto_Cliente
-              totalEncimeras={total_Encimeras}
-              totalEquipamiento={total_Equipamiento}
-              totalElectrodomesticos={total_Electrodomesticos}
-              price={priceC}
-              data={data}
+              totalEncimeras={existeTotales(getTotales("Encimeras"))}
+              totalEquipamiento={existeTotales(getTotales("Equipamiento"))}
+              totalElectrodomesticos={existeTotales(getTotales("Electrodomesticos"))}
+              price={existePrecio(getPrecio("C"))}
+              totalconDescuento={totalConDescuento}
+              ivaCalculado={ivaCalculado}
+              resultadoFinal={totalFinal}
+              importeTotal={importeTotal}
+              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
+              data={updatedData}
             />
           </PDFViewer>
         </div>
@@ -216,7 +213,7 @@ const Report = () => {
       label: "Información General",
       component: (
         <div className="alturaPreview">
-          <General getData={setData} data={data} />
+          <General getData={setData} data={updatedData} />
         </div>
       ),
     },
@@ -234,7 +231,7 @@ const Report = () => {
       label: "Mi Perfil",
       component: (
         <div className="alturaPreview">
-          <Profile getData={setData} data={data} />
+          <Profile getData={setData} data={updatedData} />
         </div>
       ),
     },
@@ -290,17 +287,15 @@ const Report = () => {
             </Button>
           </header>
           <Tabs
-            onChange={handleTabChange}
+            onChange={(key) => setTabActivo(parseInt(key))}
             activeKey={tabActivo.toString()}
             centered
             defaultActiveKey="0"
-            items={tabs.map(({ key, label, component }) => {
-              return {
-                label,
-                key,
-                children: component,
-              };
-            })}
+            items={tabs.map(({ key, label, component }) => ({
+              label,
+              key,
+              children: component,
+            }))}
           />
         </Card>
       </main>

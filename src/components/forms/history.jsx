@@ -17,7 +17,6 @@ import {
   getOrderById,
   fixOrder,
   archivedOrder,
-  clearLocalOrder,
 } from "../../handlers/order"; // Importa los handlers para manejar peticiones relacionadas con órdenes.
 import { Header } from "../content"; // Componente de encabezado.
 
@@ -60,7 +59,6 @@ const History = () => {
         setData((prevData) =>
           prevData.filter((value) => value._id !== item._id)
         );
-        clearLocalOrder(); // Limpia el pedido local.
         message.success(`Pedido ${item.orderCode} eliminado correctamente`);
       } else {
         message.error(`Error al eliminar el pedido ${item.orderCode}`);

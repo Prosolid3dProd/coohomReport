@@ -16,18 +16,6 @@ const setUserData = (data) => JSON.parse(localStorage.setItem(userData, data))
 
 /**
  *
- *@returns {number} --> sección reporte en la que se encuentra
- */
-const getTabActual = () => JSON.parse(localStorage.getItem('tabActual'))
-/**
- *
- *
- * @param {number} tab --> tab activa (Report)
- */
-const setTabActual = (tab) => localStorage.setItem('tabActual', JSON.stringify(tab))
-
-/**
- *
  *
  * @param {string} presupuesto
  * @returns {boolean}
@@ -47,11 +35,6 @@ const setPrecio = (key, value) => {
     return value;
   };
 
-  const setTotales = (key, value) => {
-    localStorage.setItem(`Mostrar_Totales_${key}`, JSON.stringify(value));
-    return value;
-  };
-
 /**
  *
  *
@@ -68,12 +51,9 @@ const setLocalToken = (token) => localStorage.setItem('token', JSON.stringify(to
 export {
     getUserData,
     setUserData,
-    getTabActual,
-    setTabActual,
     getPrecio,
     setPrecio,
     getTotales,
-    setTotales,
     existePrecio,
     existeTotales,
     getLocalToken,

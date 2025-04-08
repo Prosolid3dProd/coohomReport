@@ -1,266 +1,5 @@
 import { CONFIG } from "../data/constants";
 
-// const zocalosw = [
-//   {
-//     ref: ["ESTM", "ESTF"], //estrato
-//     pMediaTira: 49,
-//     pTira: 77,
-//     anchoMaximo: 3000,
-//     descripcion: "Zócalo estratificado para h:",
-//     referencia: {
-//       M65: "ZE6.150B4",
-//       T65: "ZE6.300B4",
-//       M105: "ZE6.150B8",
-//       T105: "ZE6.300B8",
-//       M60: "ZE6.150",
-//       T60: "ZE6.300",
-//       M100: "ZE10.150",
-//       T100: "ZE10.300",
-//       M150: "ZE15.150",
-//       T150: "ZE15.300",
-//     },
-//   },
-//   {
-//     ref: ["PLAM"], //Melamina
-//     pMediaTira: 32,
-//     pTira: 59,
-//     anchoMaximo: 2750,
-//     descripcion: "Zócalo melamina para h:",
-//     referencia: {
-//       M65: "ZM6.140B4",
-//       T65: "ZM6.280B4",
-//       M105: "ZM10.140B8",
-//       T105: "ZM10.280B8",
-//       M60: "ZM6.140",
-//       T60: "ZM6.280",
-//       M100: "ZM10.140",
-//       T100: "ZM10.280",
-//       M150: "ZM15.140",
-//       T150: "ZM15.280",
-//     },
-//   },
-//   {
-//     ref: ["LACAM", "LACAB"], //Lacado
-//     pMediaTira: 59,
-//     pTira: 99,
-//     anchoMaximo: 2440,
-//     descripcion: "Zócalo dm lacado para h:",
-//     referencia: {
-//       M65: "ZL6.122B4",
-//       T65: "ZL6.244B4",
-//       M105: "ZL10.122B8",
-//       T105: "ZL10.244B8",
-//       M60: "ZL6.122",
-//       T60: "ZL6.244",
-//       M100: "ZL10.122",
-//       T100: "ZL10.244",
-//       M150: "ZL15.122",
-//       T150: "ZL15.244",
-//     },
-//   },
-//   {
-//     ref: ["NP200", "NP300", "NP200L"], //barnizado
-//     pMediaTira: 59,
-//     pTira: 99,
-//     anchoMaximo: 2440,
-//     descripcion: "Zócalo barnizado para h:",
-//     referencia: {
-//       M65: "ZB6.122B4",
-//       T65: "ZB6.244B4",
-//       M105: "ZB10.122B8",
-//       T105: "ZB10.244B8",
-//       M60: "ZB6.122",
-//       T60: "ZB6.244",
-//       M100: "ZB10.122",
-//       T100: "ZB10.244",
-//       M150: "ZB15.122",
-//       T150: "ZB15.244",
-//     },
-//   },
-//   {
-//     ref: ["ALU"], //aluminio
-//     pMediaTira: {
-//       M60: 38,
-//       M100: 38,
-//       M120: 47,
-//       M150: 47,
-//     },
-//     pTira: {
-//       T60: 70,
-//       T100: 70,
-//       T120: 85,
-//       T150: 85,
-//     },
-//     anchoMaximo: 4000,
-//     descripcion: "Zócalo aluminio mate para h:",
-//     referencia: {
-//       M60: "ZAM6.200",
-//       T60: "ZAM6.400",
-//       M100: "ZB10.ZAM10.200",
-//       T100: "ZAM10.400",
-//       M120: "ZAM12.200",
-//       T120: "ZAM12.400",
-//       M150: "ZAM15.200",
-//       T150: "ZAM15.400",
-//     },
-//   },
-
-//   {
-//     ref: ["ALUL"], //aluminio lacado
-//     pMediaTira: {
-//       M60: 58,
-//       M100: 58,
-//       M120: 66,
-//       M150: 66,
-//     },
-//     pTira: {
-//       T60: 94,
-//       T100: 94,
-//       T120: 110,
-//       T150: 110,
-//     },
-//     anchoMaximo: 4000,
-//     descripcion: "Zócalo aluminio lacado para h:",
-//     referencia: {
-//       M60: "ZAL6.200",
-//       T60: "ZAL6.400",
-//       M100: "ZAL10.200",
-//       T100: "ZAL10.400",
-//       M120: "ZAL12.200",
-//       T120: "ZAL12.400",
-//       M150: "ZAL15.200",
-//       T150: "ZAL15.400",
-//     },
-//   },
-// ];
-
-// const zocalos = (ite) => {
-//   // if (item.lineales !== undefined) {
-//   let footline = [];
-//   let calculo = 0;
-//   let division = "";
-//   let tiraFootline = 0;
-//   let mediatiraFootline = 0;
-//   let newFootline = [];
-
-//   if (ite !== undefined) {
-//     try {
-//       //recorremos los diferentes zocalos es decir vienen como un param model diferente
-//       const zoc = zocalosw.find((x) =>
-//         x.ref.includes(
-//           ite.code === "1000" && ite.customCode != "ALU"
-//             ? "ALUL"
-//             : ite.customCode
-//         )
-//       );
-//       tiraFootline = 0;
-//       mediatiraFootline = 0;
-//       ite.lineales.forEach((lineal) => {
-//         // recorremos los puntos de un zocalo
-//         calculo = lineal.lengthWithAllowance / zoc.anchoMaximo;
-//         division = calculo.toString().split(".");
-//         tiraFootline = tiraFootline + parseInt(division[0]);
-//         // const zoc = zocalosw.find(x => x.ref === "Z36");
-
-//         if (parseInt(String(division[1])[0]) < 5) {
-//           mediatiraFootline++;
-//         } else {
-//           tiraFootline++;
-//         }
-//       });
-
-//       if (tiraFootline > 0) {
-//         footline.push({
-//           tipo: "T",
-//           typeZocalo: "5",
-//           material: ite.material || null,
-//           customCode: ite.customCode,
-//           quantity: tiraFootline || null,
-//           priceCabinet:
-//             ite.code === "1000"
-//               ? zoc.pMediaTira["M" + ite.height.toString()]
-//               : zoc.pMediaTira,
-//           // mediaTira: mediatiraFootline,
-//           // precioTira:
-//           //   ite.code === "1000"
-//           //     ? zoc.pTira["T" + ite.height.toString()]
-//           //     : zoc.pTira, //*tiraFootline
-//           total:
-//             ite.code === "1000"
-//               ? zoc.pMediaTira["M" + ite.height.toString()]
-//               : zoc.pMediaTira, //*mediatiraFootline
-//           // referenciaMedia:
-//           //   zoc.referencia["M" + ite.height.toString()] || null,
-//           reference: zoc.referencia["T" + ite.height.toString()] || null,
-//           obsBrandGoodId: ite.obsBrandGoodId,
-//           name: zoc.descripcion + ite.height.toString(),
-//           size: {
-//             x: zoc.anchoMaximo,
-//             z: ite.height,
-//             y: ite.y,
-//           },
-//         });
-//       } else if (mediatiraFootline > 0) {
-//         footline.push({
-//           tipo: "T",
-//           typeZocalo: "5",
-//           material: ite.material || null,
-//           customCode: ite.customCode,
-//           // tira: tiraFootline || null,
-//           quantity: mediatiraFootline,
-//           priceCabinet:
-//             ite.code === "1000"
-//               ? zoc.pMediaTira["M" + ite.height.toString()]
-//               : zoc.pMediaTira,
-//           // precioTira:
-//           //   ite.code === "1000"
-//           //     ? zoc.pTira["T" + ite.height.toString()]
-//           //     : zoc.pTira, //*tiraFootline
-//           total:
-//             ite.code === "1000"
-//               ? zoc.pMediaTira["M" + ite.height.toString()]
-//               : zoc.pMediaTira, //*mediatiraFootline
-//           reference: zoc.referencia["M" + ite.height.toString()] || null,
-//           obsBrandGoodId: ite.obsBrandGoodId,
-//           // referenciaTira: zoc.referencia["T" + ite.height.toString()] || null,
-//           name: zoc.descripcion + ite.height.toString(),
-//           size: {
-//             x: zoc.anchoMaximo,
-//             z: ite.height,
-//             y: it.y,
-//           },
-//         });
-//       }
-
-//       //sumar los zocalos que son del mismo material(combinarlo)
-//       newFootline = [].concat(footline); //duplicamos el array de los zocalos a otro nuevo
-
-//       for (let tamano = 0; tamano < newFootline.length; tamano++) {
-//         newFootline.forEach((lineal, indice) => {
-//           if (
-//             lineal != undefined &&
-//             newFootline[tamano] != undefined &&
-//             newFootline[tamano].material === lineal.material &&
-//             tamano !== indice &&
-//             newFootline[tamano].altura === lineal.altura &&
-//             newFootline[tamano].reference === lineal.reference
-//           ) {
-//             newFootline[tamano].mediaTira += lineal.mediaTira;
-//             newFootline[tamano].tira += lineal.tira;
-//             newFootline[tamano].precioTira += lineal.precioTira;
-//             newFootline[tamano].precioMediaTira += lineal.precioMediaTira;
-//             delete newFootline[indice];
-//           }
-//         });
-//       }
-//     } catch (error) {
-//       console.log(error);
-//     }
-//     newFootline = newFootline.filter((x) => x != Empty);
-//   }
-//   return newFootline;
-// };
-
 const getFrente = (block) => {
   const FRENTE_FIJO = String(CONFIG.CUSTOMCODE.FRENTE_FIJO);
   const DOOR_PREFIX = String(CONFIG.CUSTOMCODE.DOOR);
@@ -295,75 +34,92 @@ const getFrente = (block) => {
   return { datos: {}, tipo: "" };
 };
 
-const getPrice = (parametros, tipo, materialCasco) => {
+const getPrice = (parametros, tipo) => {
   const isCabinet = tipo === "cabinet";
 
   let price = 0;
 
-  const findPrice = (items) => {
-    const name = items?.some(
-      (item) => item?.name && String(item.name).toUpperCase() === "PTOTAL"
-    )
+  const findPrice = (items, targetName = "PRICE") => {
+    const name = items?.some((item) => item?.name?.toUpperCase() === "PTOTAL")
       ? "PTOTAL"
-      : "PRICE";
-
-    const prices = items
-      ?.filter((item) => item?.name && String(item.name).toUpperCase() === name)
-      .map((item) => parseFloat(item.value))
-      .filter((value) => !isNaN(value));
-
-    return prices?.length > 0 ? prices.reduce((acc, curr) => acc + curr, 0) : 0;
+      : targetName;
+    return (
+      items?.reduce(
+        (sum, item) =>
+          item?.name?.toUpperCase() === name && !isNaN(parseFloat(item.value))
+            ? sum + parseFloat(item.value)
+            : sum,
+        0
+      ) || 0
+    );
   };
 
-  const arrParameters = parametros?.parameters?.concat(
-    parametros.ignoreParameters
+  const arrParameters = [].concat(
+    parametros?.parameters || [],
+    parametros?.ignoreParameters || []
   );
 
   price = findPrice(arrParameters);
   if (isCabinet) {
-    price == 0 ? price = 10000 : price;
-    const intv = arrParameters?.some(
-      (param) =>
-        param?.displayName?.toLocaleUpperCase() === "INTV" &&
-        parseFloat(param?.value) > 0
+    price = price || 10000;
+    const intv = arrParameters.some(
+      (p) =>
+        p?.displayName?.toUpperCase() === "INTV" && parseFloat(p?.value) > 0
     );
+
     if (parametros.textureCustomCode === "C1") {
-    } else if (parametros.textureCustomCode === "PLAM") {
-      if (
-        materialCasco === "171-EUCALIPTO" ||
-        materialCasco === "172-ROBLE" ||
-        materialCasco === "169-NOGAL NATURAL"
-      ) {
-        price += price * 0.1;
-      } else if (intv) {
+      price += parametros.subModels.reduce((sum, subModel) => {
+        return sum + findPrice(subModel?.parameters || [], "PRECIOCOSTADOS");
+      }, 0);
+    } else if (parametros.textureNumber === "111") {
+      price += price * 0.1;
+      if (intv) {
         price += price * 0.25;
       }
     }
+
     if (intv) {
-      if (
-        parametros.textureCustomCode === "ESTB" ||
-        parametros.textureCustomCode === "ESTF" ||
-        parametros.textureCustomCode === "ESTM"
-      ) {
-        price += price * 0.4;
-      } else if (
-        parametros.textureCustomCode === "NP300" ||
-        parametros.textureCustomCode === "NP200" ||
-        parametros.textureCustomCode === "P200L"
-      ) {
-        price += price * 0.6;
-      } else if (
-        parametros.textureCustomCode === "LACAM" ||
-        parametros.textureCustomCode === "LACAB"
-      ) {
-        price += price * 0.6;
-      } else if (parametros.textureCustomCode === "PANT") {
-        price += price * 0.35;
-      }
-    } /*else {
-      price += price * 0.1;
-    }*/
+      const textureAdjustments = {
+        ESTB: 4,
+        ESTF: 4,
+        ESTM: 4,
+        NP300: 4.5,
+        NP200: 4.5,
+        P200L: 4.5,
+        LACAM: 4,
+        LACAB: 4,
+        PANT: 2,
+        PLAM: 2
+      };
+      price = price * (textureAdjustments[parametros.textureCustomCode] || 0);
+    }
   }
+
+  // Lógica para cajones
+  if (tipo !== undefined && tipo !== "cabinet") {
+    if (tipo >= 210) {
+      price = parseFloat(price) + 25;
+    } else if (tipo < 210) {
+      price = parseFloat(price) + 15;
+    }
+  }
+
+  // Aplicar Descuento o Incremento según los valores en arrParameters
+  const discountParam = arrParameters.find(
+    (p) => p?.name?.toUpperCase() === "DESCUENTO"
+  );
+  const incrementParam = arrParameters.find(
+    (p) => p?.name?.toUpperCase() === "INCREMENTO"
+  );
+
+  if (discountParam && !isNaN(parseFloat(discountParam.value))) {
+    price -= price * (parseFloat(discountParam.value) / 100);
+  }
+
+  if (incrementParam && !isNaN(parseFloat(incrementParam.value))) {
+    price += price * (parseFloat(incrementParam.value) / 100);
+  }
+
   return price;
 };
 
@@ -693,7 +449,7 @@ const getParameters = (param, tipoMueble) => {
 const getExcludedNames = (tipoMueble) => [
   "ELEC",
   // "CVI",
-  "CPI",
+  // "CPI",
   ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
   ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
 ];
@@ -755,6 +511,7 @@ const chooseVuelo = (customCode, item, vueloValue) => {
   }
   return false;
 };
+
 const getDoorParameters = (param, op) => {
   param.subModels
     .filter((puertas) => puertas.customCode === "0301")
@@ -775,8 +532,8 @@ const getPriceParameters = (param, ignoreParam, tipoMueble) => {
   let precioVariant = 0;
   const excludedNames = [
     "ELEC",
-    "CVI",
-    "CPI",
+    // "CVI",
+    // "CPI",
     ...(tipoMueble === "B" ? ["ME", "MPF2P", "PE"] : []),
     ...(tipoMueble === "A" ? ["ME", "MPF2P", "PE", "MTCEC", "UM"] : []),
   ];
@@ -784,6 +541,7 @@ const getPriceParameters = (param, ignoreParam, tipoMueble) => {
 
   allParameters.forEach((item) => {
     const itemName = String(item.name);
+    const itemdescription = String(item.description);
 
     if (excludedNames.includes(itemName)) return;
 
@@ -792,7 +550,7 @@ const getPriceParameters = (param, ignoreParam, tipoMueble) => {
         precioVariant += 15;
       }
 
-      if (itemName === "AP" || itemName === "INTV") return;
+      if (itemdescription.includes("$") || itemName === "INTV") return;
 
       const itemValue =
         itemName === "PVA" || itemName === "PVL" ? 15 : parseFloat(item.value);
@@ -876,7 +634,6 @@ export const parseJson3D = async (json) => {
   try {
     let referenceTemp;
     let contador = 0;
-    let contador2 = 0;
     var cabinets = [];
     let door;
     let cabinet;
@@ -1799,9 +1556,6 @@ export const parseJson3D = async (json) => {
     const cabinetsUnicos = cabinets.reduce((resultado, item) => {
       const id = item.obsBrandGoodId;
 
-      if (item.tipo === "O") {
-        item.size.y -= 20;
-      }
       if (item.name.toLocaleUpperCase().includes("REGLETA")) {
         item.size.x = 150;
       }

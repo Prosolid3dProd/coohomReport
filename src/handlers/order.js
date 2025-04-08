@@ -30,7 +30,6 @@ export const axiosToken = axios.create({
 });
 
 export const createOrder = async (params) => {
-
   try {
     const data = await _AXIOS_.post(
       `${CONFIG.API.BACKEND_URL}/${CONFIG.API.ENDPOINT}`,
@@ -366,7 +365,7 @@ export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
     if (tab === 0 || tab === 1) {
       coefficient = order?.userId?.coefficient;
     } else if (tab === 2 || tab === 3) {
-      coefficient = order?.userId?.coefficientVentaTienda;
+      coefficient = order?.userId?.coefficientVenta;
     }
   }
 
@@ -479,9 +478,8 @@ export const getLocalOrder = () => {
 
 // Esta funcion es para guardar en localstorage
 export const setLocalOrder = async (params) => {
-  localStorage.setItem("order", JSON.stringify(params));
-  return getOrders();
+  return new Promise((resolve) => {
+    localStorage.setItem("order", JSON.stringify(params));
+    resolve(getOrders()); // Asegura que getOrders() se ejecuta después de actualizar localStorage
+  });
 };
-
-export const clearLocalOrder = () =>
-  localStorage.setItem("order", JSON.stringify([]));

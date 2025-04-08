@@ -54,6 +54,11 @@ const Presupuesto_Cliente = ({
   totalEncimeras,
   totalEquipamiento,
   totalElectrodomesticos,
+  totalconDescuento,
+  ivaCalculado,
+  resultadoFinal,
+  importeTotal,
+  descuentoAplicado,
 }) => {
   const [cabinets, setCabinets] = useState({
     decorativos: [],
@@ -104,7 +109,7 @@ const Presupuesto_Cliente = ({
   const calcularTotalDescuento = (imp, descuento, iva) => {
     const importe = parseFloat(calcularImporteDescuento(imp, descuento));
     const ivaCalculado = parseFloat(calcularIva(imp, descuento, iva));
-    const total = (importe + ivaCalculado);
+    const total = importe + ivaCalculado;
     return total.toFixed(2);
   };
 
@@ -121,10 +126,8 @@ const Presupuesto_Cliente = ({
     return parseFloat(total).toFixed(2);
   };
 
-  const Total2 = ({ descuento, importe, seccion, iva}) => {
-    const sumaImportes = parseFloat(
-      calcularTotal(importe, seccion)
-    );
+  const Total2 = ({ descuento, importe, seccion, iva }) => {
+    const sumaImportes = parseFloat(calcularTotal(importe, seccion));
     const ivaPorcentaje = parseFloat(iva || 21);
     return (
       <View
@@ -194,7 +197,7 @@ const Presupuesto_Cliente = ({
     );
   };
 
-  const importeCoe = data.importe * data.coefficient
+  const importeCoe = data.importe * data.coefficient;
 
   useEffect(() => {
     data &&
@@ -535,9 +538,7 @@ const Presupuesto_Cliente = ({
                     {price && (
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
-                        {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
-                        ).toFixed(2)}
+                        {parseFloat(item.total).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -587,9 +588,7 @@ const Presupuesto_Cliente = ({
                     {price && (
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
-                        {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
-                        ).toFixed(2)}
+                        {parseFloat(item.total).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -639,9 +638,7 @@ const Presupuesto_Cliente = ({
                     {price && (
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
-                        {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
-                        ).toFixed(2)}
+                        {parseFloat(item.total).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -691,9 +688,7 @@ const Presupuesto_Cliente = ({
                     {price && (
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
-                        {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
-                        ).toFixed(2)}
+                        {parseFloat(item.total).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -743,9 +738,7 @@ const Presupuesto_Cliente = ({
                     {price && (
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
-                        {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
-                        ).toFixed(2)}
+                        {parseFloat(item.total).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -795,9 +788,7 @@ const Presupuesto_Cliente = ({
                     {price && (
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
-                        {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
-                        ).toFixed(2)}
+                        {parseFloat(item.total).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -847,9 +838,7 @@ const Presupuesto_Cliente = ({
                     {price && (
                       <Text style={{ textAlign: "right" }}>
                         {/* {parseFloat(item.priceTotal).toFixed(2)} */}
-                        {(
-                          parseFloat(item.total) * parseFloat(data.coefficient)
-                        ).toFixed(2)}
+                        {parseFloat(item.total).toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -899,9 +888,7 @@ const Presupuesto_Cliente = ({
                   {price && (
                     <Text style={{ textAlign: "right" }}>
                       {/* {parseFloat(item.priceTotal).toFixed(2)} */}
-                      {(
-                        parseFloat(item.total) * parseFloat(data.coefficient)
-                      ).toFixed(2)}
+                      {parseFloat(item.total).toFixed(2)}
                     </Text>
                   )}
                 </View>
@@ -933,7 +920,7 @@ const Presupuesto_Cliente = ({
               )}
               <View>
                 <Text>
-                  I.V.A. ({data.ivaCabinets == "0" ? "21" : data.ivaCabinets}
+                  I.V.A. ({data.ivaCabinets}
                   %)
                 </Text>
               </View>
@@ -959,33 +946,20 @@ const Presupuesto_Cliente = ({
                   textAlign: "right",
                 }}
               >
-                <Text>{parseFloat(importeCoe).toFixed(2)}</Text>
+                <Text>{parseFloat(importeTotal).toFixed(2)}</Text>
               </View>
               {data?.discountCabinets && data?.discountCabinets != 0 && (
                 <View style={{ textAlign: "right", paddingLeft: "12" }}>
                   <View style={{ marginTop: "1", textAlign: "right" }}>
-                    <Text>
-                      {calcularDescuento(importeCoe, data.discountCabinets)}
-                    </Text>
+                    <Text>{parseFloat(descuentoAplicado).toFixed(2)}</Text>
                   </View>
                   <View style={{ marginTop: "1", textAlign: "right" }}>
-                    <Text>
-                      {calcularImporteDescuento(
-                        importeCoe,
-                        data.discountCabinets
-                      )}
-                    </Text>
+                    <Text>{parseFloat(totalconDescuento).toFixed(2)}</Text>
                   </View>
                 </View>
               )}
               <View>
-                <Text>
-                  {calcularIvaCabinets(
-                    importeCoe,
-                    data.discountCabinets,
-                    data.ivaCabinets == "0" ? 21 : data.ivaCabinets
-                  )}
-                </Text>
+                <Text>{parseFloat(ivaCalculado).toFixed(2)}</Text>
               </View>
               <View
                 style={{
@@ -994,13 +968,7 @@ const Presupuesto_Cliente = ({
                   marginTop: "1",
                 }}
               >
-                <Text>
-                  {calcularTotalDescuentoIvaCabinets(
-                    importeCoe,
-                    data.discountCabinets,
-                    data.ivaCabinets == "0" ? 21 : data.ivaCabinets
-                  )}
-                </Text>
+                <Text>{parseFloat(resultadoFinal).toFixed(2)}</Text>
               </View>
             </View>
           </View>
@@ -1009,374 +977,298 @@ const Presupuesto_Cliente = ({
           {filterData(data.details, "Encimera").length > 0 && (
             <View>
               <View style={{ marginBottom: totalEncimeras ? "0" : "20" }}>
-                {data.details &&
-                  filterData(data.details, "Encimera") !== "" && (
-                    <View>
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          borderTop: "1 solid #000000",
-                        }}
-                      >
-                        <View
-                          style={{
-                            width: "55",
-                            height: "22",
-                            backgroundColor: "#CFCFCF",
-                          }}
-                        ></View>
-                        <Text
-                          style={{
-                            fontFamily: "Helvetica-Bold",
-                            fontSize: "14",
-                            marginLeft: "1",
-                          }}
-                        >
-                          Encimera & Forrado pared
-                        </Text>
+                <View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      borderTop: "1 solid #000000",
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: "55",
+                        height: "22",
+                        backgroundColor: "#CFCFCF",
+                      }}
+                    ></View>
+                    <Text
+                      style={{
+                        fontFamily: "Helvetica-Bold",
+                        fontSize: "14",
+                        marginLeft: "1",
+                      }}
+                    >
+                      Encimera & Forrado pared
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      marginTop: "4",
+                      fontSize: "8",
+                      fontFamily: "Helvetica-Bold",
+                    }}
+                  >
+                    {[
+                      { label: "Ctd", width: "30" },
+                      { label: "Grosor", width: "40" },
+                      { label: "Marca", width: "70" },
+                      { label: "Descripción", width: "300" },
+                      ...(filterData(data.details, "Encimera").some(
+                        (item) => item.discount > 0
+                      )
+                        ? [{ label: "Desc(%)", width: "30" }]
+                        : []),
+                      { label: "Total", width: "100", textAlign: "right" },
+                    ].map(({ label, width, textAlign }) => (
+                      <View key={label} style={{ width, textAlign }}>
+                        <Text>{label}</Text>
                       </View>
-                      <View>
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            marginTop: "4",
-                            fontSize: "8",
-                            fontFamily: "Helvetica-Bold",
-                          }}
-                        >
-                          <View
-                            style={{
-                              width: "30",
-                            }}
-                          >
-                            <Text>Ctd</Text>
-                          </View>
-                          <View style={{ width: "40" }}>
-                            <Text>Grosor</Text>
-                          </View>
-                          <View style={{ width: "70" }}>
-                            <Text>Marca</Text>
-                          </View>
-                          <View style={{ width: "300" }}>
-                            <Text>Descripción</Text>
-                          </View>
-                          <View style={{ width: "30" }}>
-                            <Text>Desc(%)</Text>
-                          </View>
-                          <View style={{ width: "100", textAlign: "right" }}>
-                            <Text>Total</Text>
-                          </View>
-                        </View>
+                    ))}
+                  </View>
+                </View>
+                {filterData(data.details, "Encimera").map((item, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      fontSize: "8",
+                      marginTop: "1",
+                    }}
+                  >
+                    {[
+                      { value: item.qty, width: "30" },
+                      { value: item.grosor, width: "40" },
+                      { value: item.marca, width: "70" },
+                      { value: item.descripcion, width: "300" },
+                      ...(item.discount > 0
+                        ? [{ value: `${item.discount}%`, width: "30" }]
+                        : []),
+                      {
+                        value: parseFloat(item.total).toFixed(2),
+                        width: "100",
+                        textAlign: "right",
+                      },
+                    ].map(({ value, width, textAlign }, idx) => (
+                      <View key={idx} style={{ width, textAlign }}>
+                        <Text>{value}</Text>
                       </View>
-                    </View>
-                  )}
-                {data &&
-                  data.details &&
-                  filterData(data.details, "Encimera").map((item) => {
-                    const iva = calcularIva(item.total, data.discountEncimeras);
-                    // console.log(item)
-                    // const totalConIva =
-                    //   parseFloat(item.total) + parseFloat(iva);
-                    return (
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          fontSize: "8",
-                          marginTop: "1",
-                        }}
-                      >
-                        <View style={{ width: "30" }}>
-                          <Text>{item.qty}</Text>
-                        </View>
-                        <View style={{ width: "40" }}>
-                          <Text>{item.grosor}</Text>
-                        </View>
-                        <View style={{ width: "70" }}>
-                          <Text>{item.marca}</Text>
-                        </View>
-                        <View style={{ width: "300" }}>
-                          <Text>{item.descripcion}</Text>
-                        </View>
-                        <View style={{ width: "30" }}>
-                          <Text>{item.discount || 0}%</Text>
-                        </View>
-                        <View style={{ width: "100", textAlign: "right" }}>
-                          <Text>{parseFloat(item.total).toFixed(2)}</Text>
-                        </View>
-                      </View>
-                    );
-                  })}
+                    ))}
+                  </View>
+                ))}
               </View>
-              {data.details &&
-                totalEncimeras &&
-                filterData(data.details, "Encimera") !== "" && (
-                  <Total2
-                    descuento={data.discountEncimeras}
-                    importe={data.details}
-                    seccion={"Encimera"}
-                    iva={data.ivaEncimeras}
-                  />
-                )}
+              {totalEncimeras && (
+                <Total2
+                  descuento={data.discountEncimeras}
+                  importe={data.details}
+                  seccion={"Encimera"}
+                  iva={data.ivaEncimeras}
+                />
+              )}
             </View>
           )}
         </View>
+
+
         <View wrap={false}>
           {filterData(data.details, "Equipamiento").length > 0 && (
             <View>
               <View style={{ marginBottom: totalEquipamiento ? "0" : "20" }}>
                 <View>
-                  {data.details &&
-                    filterData(data.details, "Equipamiento") !== "" && (
-                      <View>
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            borderTop: "1 solid #000000",
-                          }}
-                        >
-                          <View
-                            style={{
-                              width: "55",
-                              height: "22",
-                              backgroundColor: "#CFCFCF",
-                            }}
-                          ></View>
-                          <Text
-                            style={{
-                              fontFamily: "Helvetica-Bold",
-                              fontSize: "14",
-                              marginLeft: "1",
-                            }}
-                          >
-                            Equipamiento
-                          </Text>
-                        </View>
-                        <View>
-                          <View
-                            style={{
-                              display: "flex",
-                              flexDirection: "row",
-                              fontSize: "8",
-                              marginTop: "4",
-                              fontFamily: "Helvetica-Bold",
-                            }}
-                          >
-                            <View
-                              style={{
-                                width: "30",
-                              }}
-                            >
-                              <Text>Ctd</Text>
-                            </View>
-                            <View
-                              style={{
-                                width: "100",
-                              }}
-                            >
-                              <Text>Referencia</Text>
-                            </View>
-                            <View style={{ width: "300" }}>
-                              <Text>Descripción</Text>
-                            </View>
-                            <View style={{ width: "30" }}>
-                              <Text>Desc(%)</Text>
-                            </View>
-                            <View style={{ width: "100", textAlign: "right" }}>
-                              <Text>Total</Text>
-                            </View>
-                          </View>
-                        </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      borderTop: "1 solid #000000",
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: "55",
+                        height: "22",
+                        backgroundColor: "#CFCFCF",
+                      }}
+                    ></View>
+                    <Text
+                      style={{
+                        fontFamily: "Helvetica-Bold",
+                        fontSize: "14",
+                        marginLeft: "1",
+                      }}
+                    >
+                      Equipamiento
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      marginTop: "4",
+                      fontSize: "8",
+                      fontFamily: "Helvetica-Bold",
+                    }}
+                  >
+                    {[
+                      { label: "Ctd", width: "100" },
+                      { label: "Referencia", width: "100" },
+                      { label: "Descripción", width: "300" },
+                      ...(filterData(data.details, "Equipamiento").some(
+                        (item) => item.discount > 0
+                      )
+                        ? [{ label: "Desc(%)", width: "30" }]
+                        : []),
+                      { label: "Total", width: "100", textAlign: "right" },
+                    ].map(({ label, width, textAlign }) => (
+                      <View key={label} style={{ width, textAlign }}>
+                        <Text>{label}</Text>
                       </View>
-                    )}
-                  {data &&
-                    data.details &&
-                    filterData(data.details, "Equipamiento").map((item) => {
-                      const iva = calcularIva(
-                        item.total,
-                        data.discountEncimeras
-                      );
-                      // const totalConIva =
-                      //   parseFloat(item.total) + parseFloat(iva);
-                      return (
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            fontSize: "8",
-                            marginTop: "1",
-                          }}
-                        >
-                          <View style={{ width: "30" }}>
-                            <Text>{item.qty}</Text>
-                          </View>
-                          <View
-                            style={{
-                              width: "100",
-                            }}
-                          >
-                            <Text>{item.referencia}</Text>
-                          </View>
-                          <View style={{ width: "300" }}>
-                            <Text>{item.descripcion}</Text>
-                          </View>
-                          <View style={{ width: "30" }}>
-                            <Text>{item.discount || 0}%</Text>
-                          </View>
-                          <View style={{ width: "100", textAlign: "right" }}>
-                            <Text>{parseFloat(item.total).toFixed(2)}</Text>
-                          </View>
-                        </View>
-                      );
-                    })}
+                    ))}
+                  </View>
                 </View>
+                {filterData(data.details, "Equipamiento").map((item, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      fontSize: "8",
+                      marginTop: "1",
+                    }}
+                  >
+                    {[
+                      { value: item.qty, width: "100" },
+                      { value: item.referencia, width: "100" },
+                      { value: item.descripcion, width: "300" },
+                      ...(item.discount > 0
+                        ? [{ value: `${item.discount}%`, width: "30" }]
+                        : []),
+                      {
+                        value: parseFloat(item.total).toFixed(2),
+                        width: "100",
+                        textAlign: "right",
+                      },
+                    ].map(({ value, width, textAlign }, idx) => (
+                      <View key={idx} style={{ width, textAlign }}>
+                        <Text>{value}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ))}
               </View>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
-                  fontSize: "8",
-                }}
-                className="flex justify-end flex-row mt-20 mr-12"
-              >
-                {data.details &&
-                  totalEquipamiento &&
-                  filterData(data.details, "Equipamiento") !== "" && (
-                    <Total2
-                      descuento={data.discountEquipamientos}
-                      importe={data.details}
-                      seccion={"Equipamiento"}
-                      iva={data.ivaEquipamientos}
-                    />
-                  )}
-              </View>
+              {totalEquipamiento && (
+                <Total2
+                  descuento={data.discountEquipamientos}
+                  importe={data.details}
+                  seccion={"Equipamiento"}
+                  iva={data.ivaEquipamientos}
+                />
+              )}
             </View>
           )}
         </View>
+
         <View wrap={false}>
           {filterData(data.details, "Electrodomestico").length > 0 && (
             <View>
-              <View
-                style={{ marginBottom: totalElectrodomesticos ? "0" : "20" }}
-              >
-                {data.details &&
-                  filterData(data.details, "Electrodomestico") !== "" && (
-                    <View>
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          borderTop: "1 solid #000000",
-                        }}
-                      >
-                        <View
-                          style={{
-                            width: "55",
-                            height: "22",
-                            backgroundColor: "#CFCFCF",
-                          }}
-                        ></View>
-                        <Text
-                          style={{
-                            fontFamily: "Helvetica-Bold",
-                            fontSize: "14",
-                            marginLeft: "1",
-                          }}
-                        >
-                          Electrodomésticos y Otros
-                        </Text>
+              <View style={{ marginBottom: totalElectrodomesticos ? "0" : "20" }}>
+                <View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      borderTop: "1 solid #000000",
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: "55",
+                        height: "22",
+                        backgroundColor: "#CFCFCF",
+                      }}
+                    ></View>
+                    <Text
+                      style={{
+                        fontFamily: "Helvetica-Bold",
+                        fontSize: "14",
+                        marginLeft: "1",
+                      }}
+                    >
+                      Electrodomésticos y Otros
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      marginTop: "4",
+                      fontSize: "8",
+                      fontFamily: "Helvetica-Bold",
+                    }}
+                  >
+                    {[
+                      { label: "Ctd", width: "30" },
+                      { label: "Referencia", width: "70" },
+                      { label: "Marca", width: "70" },
+                      { label: "Descripción", width: "300" },
+                      ...(filterData(data.details, "Electrodomestico").some(
+                        (item) => item.discount > 0
+                      )
+                        ? [{ label: "Desc(%)", width: "30" }]
+                        : []),
+                      { label: "Total", width: "100", textAlign: "right" },
+                    ].map(({ label, width, textAlign }) => (
+                      <View key={label} style={{ width, textAlign }}>
+                        <Text>{label}</Text>
                       </View>
-                      <View>
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            fontSize: "8",
-                            marginTop: "4",
-                            fontFamily: "Helvetica-Bold",
-                          }}
-                        >
-                          <View style={{ width: "30" }}>
-                            <Text>Ctd</Text>
-                          </View>
-                          <View style={{ width: "70" }}>
-                            <Text>Referencia</Text>
-                          </View>
-                          <View style={{ width: "70" }}>
-                            <Text>Marca</Text>
-                          </View>
-                          <View style={{ width: "300" }}>
-                            <Text>Descripción</Text>
-                          </View>
-                          <View style={{ width: "30" }}>
-                            <Text>Desc(%)</Text>
-                          </View>
-                          <View style={{ width: "100", textAlign: "right" }}>
-                            <Text>Total</Text>
-                          </View>
-                        </View>
+                    ))}
+                  </View>
+                </View>
+                {filterData(data.details, "Electrodomestico").map((item, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      fontSize: "8",
+                      marginTop: "1",
+                    }}
+                  >
+                    {[
+                      { value: item.qty, width: "30" },
+                      { value: item.referencia, width: "70" },
+                      { value: item.marca, width: "70" },
+                      { value: item.descripcion, width: "300" },
+                      ...(item.discount > 0
+                        ? [{ value: `${item.discount}%`, width: "30" }]
+                        : []),
+                      {
+                        value: parseFloat(item.total).toFixed(2),
+                        width: "100",
+                        textAlign: "right",
+                      },
+                    ].map(({ value, width, textAlign }, idx) => (
+                      <View key={idx} style={{ width, textAlign }}>
+                        <Text>{value}</Text>
                       </View>
-                    </View>
-                  )}
-                {data &&
-                  data.details &&
-                  filterData(data.details, "Electrodomestico").map((item) => {
-                    const iva = calcularIva(item.total, data.discountEncimeras);
-                    // const totalConIva =
-                    //   parseFloat(item.total) + parseFloat(iva);
-                    return (
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          fontSize: "8",
-                          marginTop: "5",
-                          textAlign: "left",
-                        }}
-                      >
-                        <View style={{ width: "30" }}>
-                          <Text>{item.qty}</Text>
-                        </View>
-                        <View
-                          style={{
-                            width: "70",
-                          }}
-                        >
-                          <Text>{item.referencia}</Text>
-                        </View>
-                        <View style={{ width: "70" }}>
-                          <Text>{item.marca}</Text>
-                        </View>
-                        <View style={{ width: "300" }}>
-                          <Text>{item.descripcion}</Text>
-                        </View>
-                        <View style={{ width: "30" }}>
-                          <Text>{item.discount || 0}%</Text>
-                        </View>
-                        <View style={{ width: "100", textAlign: "right" }}>
-                          <Text>{parseFloat(item.total).toFixed(2)}</Text>
-                        </View>
-                      </View>
-                    );
-                  })}
+                    ))}
+                  </View>
+                ))}
               </View>
-              {data.details &&
-                totalElectrodomesticos &&
-                filterData(data.details, "Electrodomestico") !== "" && (
-                  <Total2
-                    descuento={data.discountElectrodomesticos}
-                    importe={data.details}
-                    seccion={"Electrodomestico"}
-                    iva={data.ivaElectrodomesticos}
-                  />
-                )}
+              {totalElectrodomesticos && (
+                <Total2
+                  descuento={data.discountElectrodomesticos}
+                  importe={data.details}
+                  seccion={"Electrodomestico"}
+                  iva={data.ivaElectrodomesticos}
+                />
+              )}
             </View>
           )}
         </View>
+
         <View wrap={false}>
           <View style={{ paddingTop: "20" }}>
             <Text
