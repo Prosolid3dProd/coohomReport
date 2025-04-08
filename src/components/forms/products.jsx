@@ -190,6 +190,14 @@ const Product = ({ getData }) => {
     }
   };
 
+  function encontrarIdEnDetalles(values, detalles) {
+    let match = detalles.find(det => 
+      det.referencia === values.referencia
+    );
+  
+    return match ? match.id : null;
+  }
+
   const onEditFinish = async (values) => {
     try {
       const parsedUnidad = parseFloat(values.unidad) || 0;
@@ -199,10 +207,15 @@ const Product = ({ getData }) => {
       const discountedPrice = parsedUnidad - (parsedDiscount / 100) * parsedUnidad;
       const updatedTotal = discountedPrice * parsedQty;
 
+      let parseOrder = JSON.parse(localStorage.getItem("order"));
+      let idEncontrado = encontrarIdEnDetalles(values, parseOrder.details);
+
+
       const updatedValues = {
+        id: idEncontrado,
         ...values,
-        unidad: parsedUnidad.toFixed(2),
-        total: updatedTotal.toFixed(2),
+        unidad: parsedUnidad.toFixed(2), // Mantener el precio unitario original (sin descuento)
+        total: updatedTotal.toFixed(2), // Total calculado con descuento
       };
 
       // console.log("Valores antes de actualizar:", updatedValues);
@@ -444,7 +457,7 @@ const Product = ({ getData }) => {
       >
         <Form layout="horizontal" form={editForm} onFinish={onEditFinish}>
           <Form.Item label="Codigo" name="referencia">
-            <Input />
+            <Input disabled  />
           </Form.Item>
           <Form.Item label="Descripcion" name="descripcion">
             <Input />
