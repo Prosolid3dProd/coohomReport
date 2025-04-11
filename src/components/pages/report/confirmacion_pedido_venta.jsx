@@ -432,14 +432,6 @@ const Confirmacion_Pedido = ({
                     {formatNumber(item.priceDoor, coeficiente) > 0 && (
                       <Text>
                         - Puertas:
-                        <Text
-                          style={{
-                            fontFamily: CONFIG.BOLD,
-                            fontSize: "8",
-                          }}
-                        >
-                          {/* {formatNumber(item.priceDoor)} */}
-                        </Text>
                         {`${
                           item.doors.name?.toLocaleUpperCase() +
                           "-" +
@@ -632,14 +624,6 @@ const Confirmacion_Pedido = ({
                       {formatNumber(item.priceDoor, coeficiente) > 0 && (
                         <Text>
                           - Puertas:
-                          <Text
-                            style={{
-                              fontFamily: CONFIG.BOLD,
-                              fontSize: "8",
-                            }}
-                          >
-                            {/* {formatNumber(item.priceDoor)} */}
-                          </Text>
                           {` ${
                             item?.doors?.name?.toLocaleUpperCase() +
                             "-" +
@@ -875,13 +859,6 @@ const Confirmacion_Pedido = ({
                         }}
                       >
                         <Text>- Puertas: </Text>
-                        <Text
-                          style={{
-                            fontSize: "8",
-                          }}
-                        >
-                          {formatNumber(item.priceDoor, coeficiente) + " "}
-                        </Text>
                         <Text
                           style={{
                             fontSize: "8",
@@ -1231,13 +1208,6 @@ const Confirmacion_Pedido = ({
                             fontSize: "8",
                           }}
                         >
-                          {formatNumber(item.priceDoor, coeficiente) + " "}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: "8",
-                          }}
-                        >
                           {item.modelDoor || ""} {item.modelDoor ? "/" : " "}
                           {item.materialDoor || ""}
                         </Text>
@@ -1254,13 +1224,6 @@ const Confirmacion_Pedido = ({
                         }}
                       >
                         <Text>- Puertas: </Text>
-                        <Text
-                          style={{
-                            fontSize: "8",
-                          }}
-                        >
-                          {formatNumber(item.priceDoor, coeficiente) + " "}
-                        </Text>
                         <Text
                           style={{
                             fontSize: "8",
@@ -1442,14 +1405,6 @@ const Confirmacion_Pedido = ({
                         }}
                       >
                         <Text>- Puertas: </Text>
-                        <Text
-                          style={{
-                            fontFamily: CONFIG.BOLD,
-                            fontSize: "8",
-                          }}
-                        >
-                          {formatNumber(item.priceDoor, coeficiente) + " "}
-                        </Text>
                         <Text
                           style={{
                             fontFamily: CONFIG.BOLD,

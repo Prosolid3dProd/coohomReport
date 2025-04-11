@@ -95,7 +95,7 @@ const Confirmacion_Pedido = ({
         ),
         murales: data.cabinets.filter(
           (item2) =>
-            item2.tipo === CONFIG.MODELNAME.MURALES.CODE ||
+            item2.ti0po === CONFIG.MODELNAME.MURALES.CODE ||
             item2.tipo === CONFIG.MODELNAME.SOBREENCIMERAS.CODE
         ),
         regletas: data.cabinets.filter(
@@ -852,13 +852,6 @@ const Confirmacion_Pedido = ({
                             fontSize: "8",
                           }}
                         >
-                          {formatNumber(item.priceDoor) + " "}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: "8",
-                          }}
-                        >
                           {item.modelDoor || ""} {item.modelDoor ? "/" : " "}
                           {item.materialDoor || ""}
                         </Text>
@@ -1203,13 +1196,6 @@ const Confirmacion_Pedido = ({
                             fontSize: "8",
                           }}
                         >
-                          {formatNumber(item.priceDoor) + " "}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: "8",
-                          }}
-                        >
                           {item.modelDoor || ""} {item.modelDoor ? "/" : " "}
                           {item.materialDoor || ""}
                         </Text>
@@ -1226,13 +1212,6 @@ const Confirmacion_Pedido = ({
                         }}
                       >
                         <Text>- Puertas: </Text>
-                        <Text
-                          style={{
-                            fontSize: "8",
-                          }}
-                        >
-                          {formatNumber(item.priceDoor) + " "}
-                        </Text>
                         <Text
                           style={{
                             fontSize: "8",
@@ -1414,14 +1393,6 @@ const Confirmacion_Pedido = ({
                         }}
                       >
                         <Text>- Puertas: </Text>
-                        <Text
-                          style={{
-                            fontFamily: CONFIG.BOLD,
-                            fontSize: "8",
-                          }}
-                        >
-                          {formatNumber(item.priceDoor) + " "}
-                        </Text>
                         <Text
                           style={{
                             fontFamily: CONFIG.BOLD,
