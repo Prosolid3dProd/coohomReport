@@ -99,7 +99,8 @@ const getPrice = (parametros, tipo) => {
   if (tipo !== undefined && tipo !== "cabinet") {
     if (tipo >= 210) {
       price = parseFloat(price) + 25;
-    } else if (tipo < 210) {
+    } else if (tipo < 210 && parametros.customCode !== "7070") {
+      console.log(parametros, tipo)
       price = parseFloat(price) + 15;
     }
   }
