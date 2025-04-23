@@ -95,7 +95,7 @@ const Confirmacion_Pedido = ({
         ),
         murales: data.cabinets.filter(
           (item2) =>
-            item2.ti0po === CONFIG.MODELNAME.MURALES.CODE ||
+            item2.tipo === CONFIG.MODELNAME.MURALES.CODE ||
             item2.tipo === CONFIG.MODELNAME.SOBREENCIMERAS.CODE
         ),
         regletas: data.cabinets.filter(
