@@ -39,20 +39,31 @@ const getPrice = (parametros, tipo) => {
 
   let price = 0;
 
-  const findPrice = (items, targetName = "PRICE") => {
-    const name = items?.some((item) => item?.name?.toUpperCase() === "PTOTAL")
-      ? "PTOTAL"
-      : targetName;
-    return (
-      items?.reduce(
-        (sum, item) =>
-          item?.name?.toUpperCase() === name && !isNaN(parseFloat(item.value))
-            ? sum + parseFloat(item.value)
-            : sum,
-        0
-      ) || 0
-    );
+  const findSpecificPrice = (items = [], targetName) => {
+    const upperTarget = targetName.toUpperCase();
+    return items
+      .filter(item =>
+        item?.name?.toUpperCase() === upperTarget &&
+        !isNaN(parseFloat(item?.value))
+      )
+      .reduce((sum, item) => sum + parseFloat(item.value), 0);
   };
+  
+
+  const findPrice = (items = [], targetName = "PRICE") => {
+    const upperTarget = targetName.toUpperCase();
+    const keyName = items.some(item => item?.name?.toUpperCase() === "PTOTAL")
+      ? "PTOTAL"
+      : upperTarget;
+  
+    return items
+      .filter(item =>
+        item?.name?.toUpperCase() === keyName &&
+        !isNaN(parseFloat(item?.value))
+      )
+      .reduce((sum, item) => sum + parseFloat(item.value), 0);
+  };
+  
 
   const arrParameters = [].concat(
     parametros?.parameters || [],
@@ -67,10 +78,16 @@ const getPrice = (parametros, tipo) => {
         p?.displayName?.toUpperCase() === "INTV" && parseFloat(p?.value) > 0
     );
 
-    if (parametros.textureCustomCode === "C1") {
-      price += parametros.subModels.reduce((sum, subModel) => {
-        return sum + findPrice(subModel?.parameters || [], "PRECIOCOSTADOS");
+    const getSubModelSidesPrice = (subModels = []) => {
+      return subModels.reduce((sum, subModel) => {
+        const sidePrice = findSpecificPrice(subModel?.parameters, "PRECIOCOSTADOS");
+        return sum + (parseFloat(sidePrice) > 0 ? parseFloat(sidePrice) : 0);
       }, 0);
+    };
+    
+     
+    if (parametros.textureCustomCode === "C1") {
+      price += getSubModelSidesPrice(parametros.subModels, findPrice)
     } else if (parametros.textureNumber === "111") {
       price += price * 0.1;
       if (intv) {
@@ -94,7 +111,6 @@ const getPrice = (parametros, tipo) => {
       price = price * (textureAdjustments[parametros.textureCustomCode] || 0);
     }
   }
-
   // Lógica para cajones
   if (tipo !== undefined && tipo !== "cabinet") {
     if (tipo >= 210) {
@@ -119,7 +135,6 @@ const getPrice = (parametros, tipo) => {
   if (incrementParam && !isNaN(parseFloat(incrementParam.value))) {
     price += price * (parseFloat(incrementParam.value) / 100);
   }
-
   return price;
 };
 
