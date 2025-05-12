@@ -84,26 +84,26 @@ const Product = ({ getData }) => {
     form.setFieldsValue({ unidad: unidadConDescuento.toFixed(2) }); // Actualizar visualmente
   }, [form.getFieldValue("discount")]);
 
-  const updateLocalOrderData = useCallback(
-    (updatedDetails) => {
-      const updatedData = {
-        ...state.data,
-        details: state.data.details.map((detail) =>
-          detail.referencia === updatedDetails.referencia
-            ? { ...detail, ...updatedDetails } // Solo actualiza el que coincide
-            : detail
-        ),
-      };
+  // const updateLocalOrderData = useCallback(
+  //   (updatedDetails) => {
+  //     const updatedData = {
+  //       ...state.data,
+  //       details: state.data.details.map((detail) =>
+  //         detail.referencia === updatedDetails.referencia
+  //           ? { ...detail, ...updatedDetails } // Solo actualiza el que coincide
+  //           : detail
+  //       ),
+  //     };
 
-      // Actualizar el estado global
-      setState((prev) => ({ ...prev, data: updatedData }));
+  //     // Actualizar el estado global
+  //     setState((prev) => ({ ...prev, data: updatedData }));
 
-      setLocalOrder(updatedData).then(() => {
-        getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
-      });
-    },
-    [state.data, getData]
-  );
+  //     setLocalOrder(updatedData).then(() => {
+  //       getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
+  //     });
+  //   },
+  //   [state.data, getData]
+  // );
 
   const onFinish = async (values) => {
     try {
