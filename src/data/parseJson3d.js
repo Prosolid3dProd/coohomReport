@@ -850,6 +850,7 @@ export const parseJson3D = async (json) => {
 
             subModels.forEach((model) => {
               if (model.customCode === "202" || model.customCode === "203") {
+                console.log("subModels", model);
                 const referencia = model?.ignoreParameters
                   .filter(
                     (ref) =>
@@ -879,10 +880,6 @@ export const parseJson3D = async (json) => {
                     z: model.size.z,
                   },
                 });
-              }
-              // Búsqueda recursiva en submodelos anidados
-              if (model.subModels) {
-                buscarTiradores(model.subModels);
               }
             });
           }
