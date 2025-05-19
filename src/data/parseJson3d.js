@@ -850,7 +850,6 @@ export const parseJson3D = async (json) => {
 
             subModels.forEach((model) => {
               if (model.customCode === "202" || model.customCode === "203") {
-                console.log("subModels", model);
                 const referencia = model?.ignoreParameters
                   .filter(
                     (ref) =>
