@@ -36,34 +36,33 @@ const getFrente = (block) => {
 
 const getPrice = (parametros, tipo) => {
   const isCabinet = tipo === "cabinet";
-
   let price = 0;
 
   const findSpecificPrice = (items = [], targetName) => {
     const upperTarget = targetName.toUpperCase();
     return items
-      .filter(item =>
-        item?.name?.toUpperCase() === upperTarget &&
-        !isNaN(parseFloat(item?.value))
+      .filter(
+        (item) =>
+          item?.name?.toUpperCase() === upperTarget &&
+          !isNaN(parseFloat(item?.value))
       )
       .reduce((sum, item) => sum + parseFloat(item.value), 0);
   };
-  
 
   const findPrice = (items = [], targetName = "PRICE") => {
     const upperTarget = targetName.toUpperCase();
-    const keyName = items.some(item => item?.name?.toUpperCase() === "PTOTAL")
+    const keyName = items.some((item) => item?.name?.toUpperCase() === "PTOTAL")
       ? "PTOTAL"
       : upperTarget;
-  
+
     return items
-      .filter(item =>
-        item?.name?.toUpperCase() === keyName &&
-        !isNaN(parseFloat(item?.value))
+      .filter(
+        (item) =>
+          item?.name?.toUpperCase() === keyName &&
+          !isNaN(parseFloat(item?.value))
       )
       .reduce((sum, item) => sum + parseFloat(item.value), 0);
   };
-  
 
   const arrParameters = [].concat(
     parametros?.parameters || [],
@@ -80,14 +79,16 @@ const getPrice = (parametros, tipo) => {
 
     const getSubModelSidesPrice = (subModels = []) => {
       return subModels.reduce((sum, subModel) => {
-        const sidePrice = findSpecificPrice(subModel?.parameters, "PRECIOCOSTADOS");
+        const sidePrice = findSpecificPrice(
+          subModel?.parameters,
+          "PRECIOCOSTADOS"
+        );
         return sum + (parseFloat(sidePrice) > 0 ? parseFloat(sidePrice) : 0);
       }, 0);
     };
-    
-     
+
     if (parametros.textureCustomCode === "C1") {
-      price += getSubModelSidesPrice(parametros.subModels, findPrice)
+      price += getSubModelSidesPrice(parametros.subModels, findPrice);
     } else if (parametros.textureNumber === "111") {
       price += price * 0.1;
       if (intv) {
@@ -106,7 +107,7 @@ const getPrice = (parametros, tipo) => {
         LACAM: 4,
         LACAB: 4,
         PANT: 2,
-        PLAM: 2
+        PLAM: 2,
       };
       price = price * (textureAdjustments[parametros.textureCustomCode] || 0);
     }

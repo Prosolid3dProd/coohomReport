@@ -17,142 +17,145 @@ import {
   getOrderById,
   fixOrder,
   archivedOrder,
-} from "../../handlers/order"; // Importa los handlers para manejar peticiones relacionadas con órdenes.
-import { Header } from "../content"; // Componente de encabezado.
+} from "../../handlers/order"; 
+import { Header } from "../content"; 
 
 const getDiferenciaDias = (creacionPresupuesto) => {
-  if (!creacionPresupuesto) return [0, false]; // Evita valores inválidos
-
+  if (!creacionPresupuesto) return [0, false];
   const creationalDate = new Date(creacionPresupuesto);
-  if (isNaN(creationalDate)) return [0, false]; // Evita cálculos con fechas inválidas
-
+  if (isNaN(creationalDate)) return [0, false];
   const actualDate = new Date();
-
-  const esMismoDia = (date1, date2) =>
-    date1.getDate() === date2.getDate() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getFullYear() === date2.getFullYear();
-
+  const esMismoDia = (d1, d2) =>
+    d1.getDate() === d2.getDate() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getFullYear() === d2.getFullYear();
   const creadoHoy = esMismoDia(actualDate, creationalDate);
   const diffTiempo = creadoHoy
     ? 0
     : Math.ceil(Math.abs(actualDate - creationalDate) / (1000 * 3600 * 24));
-
   return [diffTiempo, creadoHoy];
 };
 
-
 const History = () => {
-  const [data, setData] = useState([]); // Estado para almacenar los datos mostrados en la tabla.
-  const [originalData, setOriginalData] = useState([]); // Almacena todos los datos originales.
-  const [load, setLoad] = useState(true); // Controla el estado de carga.
-  const [pageSize, setPageSize] = useState(5); // Tamaño de la paginación.
-  const navigate = useNavigate(); // Hook de navegación.
+  const [data, setData] = useState([]);
+  const [load, setLoad] = useState(true);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+  const navigate = useNavigate();
 
-  // Elimina un pedido específico.
+  // eliminar
   const onDelete = async (item) => {
-    setLoad(true); // Activa el estado de carga.
+    setLoad(true);
     try {
-      const result = await archivedOrder(item); // Llama al handler para archivar el pedido.
+      const result = await archivedOrder(item);
       if (result) {
-        // Actualiza el estado eliminando el elemento correspondiente.
-        setData((prevData) =>
-          prevData.filter((value) => value._id !== item._id)
-        );
         message.success(`Pedido ${item.orderCode} eliminado correctamente`);
+        fetchData(pagination.current, pagination.pageSize); // recargar la página actual
       } else {
         message.error(`Error al eliminar el pedido ${item.orderCode}`);
       }
     } catch (e) {
       message.error(`Error al eliminar el pedido ${item.orderCode}`);
     } finally {
-      setLoad(false); // Desactiva el estado de carga.
+      setLoad(false);
     }
   };
 
-  // Navega a otra página con la información del pedido.
+  // navegar
   const onNavigate = async (item) => {
     try {
-      const result = await getOrderById({ _id: item._id }); // Obtiene el pedido por su ID.
+      const result = await getOrderById({ _id: item._id });
       fixOrder(result, 0, () => {
-        navigate("/Dashboard/Report/", { replace: true }); // Navega a la página del reporte.
+        navigate("/Dashboard/Report/", { replace: true });
       });
     } catch (e) {
       console.log(e);
     }
   };
 
-  // Efecto para cargar datos iniciales.
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoad(true);
-        const result = await getOrders({}); // Obtiene todos los pedidos.
-        if (Array.isArray(result)) {
-          result.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)); // Ordena los pedidos por fecha de actualización.
-          setData(result);
-          setOriginalData(result); // Guarda los datos originales.
-        } else {
-          console.error("Error: getOrders() did not return an array.");
-        }
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setLoad(false); // Desactiva el estado de carga.
-      }
-    };
+ // función que calcula pageSize dinámico
+// calcula el número de filas visibles según la pantalla
+const calculatePageSize = () => {
+  const windowHeight = window.innerHeight;
 
-    fetchData();
-  }, []);
+  // margen reservado para header, paddings, etc.
+  const reservedSpace = 250; 
 
-  // Efecto para manejar el tamaño de paginación según el tamaño de la ventana.
-  useEffect(() => {
-    const handleResize = () => {
-      const windowHeight = window.innerHeight;
-      const newRowHeight = 100;
-      let newPageSize = Math.floor((windowHeight - 200) / newRowHeight);
-    
-      if (isNaN(newPageSize) || newPageSize <= 0) {
-        newPageSize = 5; // Valor por defecto en caso de error
-      }
-      setPageSize(newPageSize);
-    };    
+  // alto estimado de cada fila de la tabla (ajústalo a tu diseño)
+  const rowHeight = 80; 
 
-    handleResize(); // Ajusta el tamaño inicial.
-    window.addEventListener("resize", handleResize); // Añade un listener para cambios de tamaño.
-    return () => {
-      window.removeEventListener("resize", handleResize); // Limpia el listener.
-    };
-  }, []);
+  let newPageSize = Math.floor((windowHeight - reservedSpace) / rowHeight);
 
-  // Filtra los datos según un término de búsqueda.
+  // asegurar que nunca se queda demasiado pequeño
+  if (isNaN(newPageSize) || newPageSize < 5) {
+    newPageSize = 5;
+  }
+
+  return newPageSize;
+};
+
+
+const fetchData = async (page = 1, pageSize = pagination.pageSize) => {
+  try {
+    setLoad(true);
+    const result = await getOrders({ page, limit: pageSize });
+    if (result?.data) {
+      setData(result.data);
+      setPagination({
+        current: result.page,
+        pageSize: pageSize, // usamos el dinámico
+        total: result.total,
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+  } finally {
+    setLoad(false);
+  }
+};
+
+useEffect(() => {
+  const handleResize = () => {
+    const newPageSize = calculatePageSize();
+    setPagination({pagesize:newPageSize});
+
+    // opcional: recargar datos con el nuevo pageSize
+    fetchData(1, newPageSize);
+  };
+
+  handleResize(); // inicial
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
+
+  // buscador (ahora también debería ir al backend idealmente)
   const getFilterComplements = async (params) => {
     try {
       setLoad(true);
-      const searchTerm = (params && params.text && typeof params.text === "string")
-        ? params.text.toLowerCase()
-        : "";
+      const searchTerm =
+        params && params.text && typeof params.text === "string"
+          ? params.text.toLowerCase()
+          : "";
 
-      if (searchTerm === "") {
-        setData(originalData); // Restablece los datos originales.
-      } else {
-        const filteredData = originalData.filter((order) =>
-          order.customerName?.toLowerCase().includes(searchTerm)
+      await fetchData(1, pagination.pageSize); // siempre recargar desde el backend
+      if (searchTerm) {
+        setData((prev) =>
+          prev.filter((order) =>
+            order.customerName?.toLowerCase().includes(searchTerm)
+          )
         );
-        if (filteredData.length > 0) {
-          setData(filteredData); // Actualiza con los datos filtrados.
-        } else {
-          message.error("No se encontraron resultados");
-        }
       }
     } catch (error) {
       console.error("Error filtrando las órdenes:", error);
     } finally {
-      setLoad(false); // Desactiva el estado de carga.
+      setLoad(false);
     }
   };
 
-  // Configuración de columnas para la tabla.
   const columns = [
     {
       title: "Ordén",
@@ -255,9 +258,7 @@ const History = () => {
           data={data}
           input={true}
           getFilter={getFilterComplements}
-          addFile={(e) => {
-            return e;
-          }}
+          addFile={(e) => e}
         />
       </div>
       <article className="border-none rounded-none relative overflow-x-hidden">
@@ -271,8 +272,13 @@ const History = () => {
             loading={load}
             dataSource={Array.isArray(data) ? data : []}
             columns={columns}
-            rowKey={"_id"}
-            pagination={{ pageSize: Number(pageSize) || 5 }} 
+            rowKey="_id"
+            pagination={{
+              ...pagination,
+              onChange: (page, pageSize) => {
+                fetchData(page, pageSize);
+              },
+            }}
           />
         </Card>
       </article>
