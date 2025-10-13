@@ -132,29 +132,38 @@ useEffect(() => {
 }, []);
 
 
-  // buscador (ahora también debería ir al backend idealmente)
-  const getFilterComplements = async (params) => {
-    try {
-      setLoad(true);
-      const searchTerm =
-        params && params.text && typeof params.text === "string"
-          ? params.text.toLowerCase()
-          : "";
+ const getFilterComplements = async (params) => {
+  try {
+    setLoad(true);
+    const searchTerm =
+      params && params.text && typeof params.text === "string"
+        ? params.text.trim()
+        : "";
 
-      await fetchData(1, pagination.pageSize); // siempre recargar desde el backend
-      if (searchTerm) {
-        setData((prev) =>
-          prev.filter((order) =>
-            order.customerName?.toLowerCase().includes(searchTerm)
-          )
-        );
-      }
-    } catch (error) {
-      console.error("Error filtrando las órdenes:", error);
-    } finally {
-      setLoad(false);
+    // 👇 le pasamos el término de búsqueda al backend
+    const result = await getOrders({
+      page: 1,
+      limit: pagination.pageSize,
+      search: searchTerm,
+    });
+
+    if (result?.data) {
+      setData(result.data);
+      setPagination({
+        current: result.page,
+        pageSize: pagination.pageSize,
+        total: result.total,
+      });
+    } else {
+      setData([]);
+      message.warning("No se encontraron resultados");
     }
-  };
+  } catch (error) {
+    console.error("Error filtrando las órdenes:", error);
+  } finally {
+    setLoad(false);
+  }
+};
 
   const columns = [
     {
