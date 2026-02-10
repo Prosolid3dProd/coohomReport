@@ -1,305 +1,166 @@
 import { useEffect, useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
-import { General, Product, Profile } from "./../../index";
-import { Tabs, Card, Button, Space } from "antd";
+import { General, Product, Muebles } from "./../../index";
+import { Tabs, Card } from "antd";
 import { PDFViewer } from "@react-pdf/renderer";
-import Confirmacion_Pedido from "./confirmacion_pedido";
-import { Presupuesto_Cliente } from "./index";
-import LogoERP from "../../../assets/logoERP.png";
-import Confirmacion_Pedido_Venta from "./confirmacion_pedido_venta";
+import Confirmacion_Pedido from "../../pdf/confirmacion_pedido";
+import Presupuesto_Cliente from "../../pdf/presupuesto_cliente";
+import Confirmacion_Pedido_Venta from "../../pdf/confirmacion_pedido_venta";
 import {
   getOrders,
-  getLocalOrder,
   getOrderById,
   fixOrder,
   getProfile,
 } from "../../../handlers/order";
-import {
-  existePrecio,
-  existeTotales,
-  getPrecio,
-  getTotales,
-} from "../../../data/localStorage";
+import { useOrder } from "../../../context/OrderContext";
+import { useReportCalculations } from "../../../hooks/useReportCalculations";
+import ExportArdisButton from "../../common/ExportArdisButton";
 import "./report.css";
-import {
-  calcularTotalIva,
-  calcularSumaTotal,
-  calcularTotalZocalo,
-  calcularTotalDescuentos,
-  calcularTotalConDescuentoEIVA,
-} from "./operaciones";
 
 const Report = () => {
-  const [main, setMain] = useState(null);
-  const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
-  const [orderId, setOrderId] = useState(getLocalOrder());
-  const [visible, setBtnVisible] = useState(false);
+  const { order, setOrder, preferences } = useOrder();
   const [tabActivo, setTabActivo] = useState(0);
   const [profile, setProfile] = useState(null);
 
-  const updatedData = useMemo(() => {
-    if (!data || !data.cabinets) return data;
-  
-    const newData = JSON.parse(JSON.stringify(data));
-    let coeficiente;
-  
-    if (tabActivo === 0 || tabActivo === 1) {
-      coeficiente = data.userId?.coefficient || 1;
-    } else if (tabActivo === 2 || tabActivo === 3) {
-      coeficiente = data.coefficient || 1;
-    }
-  
-    newData.cabinets = newData.cabinets.map((item) => ({
-      ...item,
-      total: String(item.customcode) === "3333" ? item.total : item.total * coeficiente,
-    }));
-    
-    return newData;
-  }, [data, tabActivo]);
-
-  // Calcular totales con useMemo
-  const totales = useMemo(() => {
-    if (!updatedData || !updatedData.cabinets) {
-      return {
-        sumaTotal: 0,
-        totalZocalo: 0,
-        totalDescuentos: 0,
-        totalIva: 0,
-        resultadoFinal: { importeTotal: 0, descuentoAplicado: 0, totalConDescuento: 0, ivaCalculado: 0, totalFinal: 0 },
-      };
-    }
-
-    const sumaTotal = calcularSumaTotal(updatedData.cabinets, 1);
-    const totalZocalo = calcularTotalZocalo(updatedData.infoZocalos, 1);
-    const importeTotalLocal = sumaTotal + totalZocalo; // Renombramos para evitar conflictos
-    const totalDescuentos = calcularTotalDescuentos(updatedData, importeTotalLocal);
-    const resultado = calcularTotalConDescuentoEIVA(
-      updatedData.cabinets,
-      updatedData.infoZocalos,
-      totalDescuentos,
-      updatedData.ivaCabinets,
-      1
-    );
-    const totalIva = calcularTotalIva(resultado.totalConDescuento, updatedData.ivaCabinets);
-
-    return {
-      sumaTotal,
-      totalZocalo,
-      totalDescuentos,
-      totalIva,
-      resultadoFinal: resultado,
-    };
-  }, [updatedData]);
+  const { updatedData, totales, filteredCabinets } = useReportCalculations(order, tabActivo);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (orderId._id) {
+      if (order && order._id && !profile) {
         try {
-          const result = await getOrderById({ _id: orderId._id });
+          const result = await getOrderById({ _id: order._id });
           const profileData = await getProfile();
           const updatedInfo = fixOrder(result);
           setProfile(profileData);
-          setData({ ...updatedInfo, profile: profileData });
-          getOrders({ ...updatedInfo, profile: profileData });
+          setOrder({ ...updatedInfo, profile: profileData });
+          // getOrders call might be redundant if we just fetched by ID, usually getOrders fetches list
         } catch (error) {
-          console.error(error);
+          console.error("Error fetching order data:", error);
         }
       }
     };
     fetchData();
-  }, [tabActivo]);
-
-  useEffect(() => {
-    if (main) {
-      const handleScroll = () => {
-        if (main.scrollTop > 100) {
-          setBtnVisible(true);
-        } else {
-          setBtnVisible(false);
-        }
-      };
-      main.addEventListener("scroll", handleScroll);
-      return () => main.removeEventListener("scroll", handleScroll);
-    }
-  }, [main]);
+  }, [order?._id, profile, setOrder]);
 
   const { totalConDescuento, totalFinal, importeTotal, ivaCalculado } = totales.resultadoFinal || {};
 
-  const tabs = [
+  const commonProps = useMemo(() => ({
+    totalconDescuento: totalConDescuento,
+    ivaCalculado,
+    resultadoFinal: totalFinal,
+    importeTotal,
+    descuentoAplicado: totales.resultadoFinal?.descuentoAplicado,
+  }), [totalConDescuento, ivaCalculado, totalFinal, importeTotal, totales.resultadoFinal?.descuentoAplicado]);
+
+  const PdfTab = ({ Component, title, price, ...extraProps }) => (
+    <div style={{ flex: 1, display: "flex", height: "100%" }}>
+      <PDFViewer style={{ height: "100%", width: "100%" }}>
+        <Component
+          price={price}
+          data={updatedData}
+          filteredCabinets={filteredCabinets}
+          title={title}
+          {...commonProps}
+          {...extraProps}
+        />
+      </PDFViewer>
+    </div>
+  );
+
+  const items = useMemo(() => [
     {
       key: "0",
       label: "Confirmación de Pedido",
-      component: (
-        <div className="alturaPreview-presu">
-          <PDFViewer className="h-full w-full">
-            <Confirmacion_Pedido
-              price={existePrecio(getPrecio("P"))}
-              data={updatedData}
-              totalconDescuento={totalConDescuento}
-              ivaCalculado={ivaCalculado}
-              resultadoFinal={totalFinal}
-              importeTotal={importeTotal}
-              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
-              title="Confirmación de Pedido"
-            />
-          </PDFViewer>
-        </div>
-      ),
+      children: <PdfTab Component={Confirmacion_Pedido} title="Confirmación de Pedido" price={preferences.showPrices.P} />
     },
     {
       key: "1",
       label: "Presupuesto",
-      component: (
-        <div className="alturaPreview-presu">
-          <PDFViewer className="h-full w-full">
-            <Confirmacion_Pedido
-              price={existePrecio(getPrecio("P"))}
-              data={updatedData}
-              title="Presupuesto"
-              totalconDescuento={totalConDescuento}
-              ivaCalculado={ivaCalculado}
-              resultadoFinal={totalFinal}
-              importeTotal={importeTotal}
-              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
-            />
-          </PDFViewer>
-        </div>
-      ),
+      children: <PdfTab Component={Confirmacion_Pedido} title="Presupuesto" price={preferences.showPrices.P} />
     },
     {
       key: "2",
       label: "Presupuesto Venta Detallado",
-      component: (
-        <div className="alturaPreview-presu">
-          <PDFViewer className="h-full w-full">
-            <Confirmacion_Pedido_Venta
-              data={updatedData}
-              price={existePrecio(getPrecio("P"))}
-              title="Presupuesto Venta"
-              totalconDescuento={totalConDescuento}
-              ivaCalculado={ivaCalculado}
-              resultadoFinal={totalFinal}
-              importeTotal={importeTotal}
-              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
-            />
-          </PDFViewer>
-        </div>
-      ),
+      children: <PdfTab Component={Confirmacion_Pedido_Venta} title="Presupuesto Venta" price={preferences.showPrices.P} />
     },
     {
       key: "3",
       label: "Presupuesto Venta Simplificado",
-      component: (
-        <div className="alturaPreview-presu">
-          <PDFViewer className="h-full w-full">
-            <Presupuesto_Cliente
-              totalEncimeras={existeTotales(getTotales("Encimeras"))}
-              totalEquipamiento={existeTotales(getTotales("Equipamiento"))}
-              totalElectrodomesticos={existeTotales(getTotales("Electrodomesticos"))}
-              price={existePrecio(getPrecio("C"))}
-              totalconDescuento={totalConDescuento}
-              ivaCalculado={ivaCalculado}
-              resultadoFinal={totalFinal}
-              importeTotal={importeTotal}
-              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
-              data={updatedData}
-            />
-          </PDFViewer>
-        </div>
-      ),
+      children: (
+        <PdfTab
+          Component={Presupuesto_Cliente}
+          price={preferences.showPrices.C}
+          totalEncimeras={preferences.showTotals.Encimeras}
+          totalEquipamiento={preferences.showTotals.Equipamiento}
+          totalElectrodomesticos={preferences.showTotals.Electrodomesticos}
+        />
+      )
     },
     {
       key: "4",
-      label: "Información General",
-      component: (
-        <div className="alturaPreview">
-          <General getData={setData} data={updatedData} />
-        </div>
-      ),
+      label: "Muebles",
+      children: <div style={{ flex: 1, overflow: "auto", height: "100%" }}><Muebles /></div>
     },
     {
       key: "5",
-      label: "Complementos",
-      component: (
-        <div className="alturaPreview">
-          <Product getData={setData} />
-        </div>
-      ),
+      label: "Información General",
+      children: <div style={{ flex: 1, overflow: "auto", height: "100%" }}><General /></div>
     },
     {
       key: "6",
-      label: "Mi Perfil",
-      component: (
-        <div className="alturaPreview">
-          <Profile getData={setData} data={updatedData} />
-        </div>
-      ),
+      label: "Complementos",
+      children: <div style={{ flex: 1, overflow: "auto", height: "100%" }}><Product /></div>
     },
-  ];
+  ], [updatedData, filteredCabinets, commonProps, preferences]);
+
+
+  if (!order || !order._id) return null;
 
   return (
-    data &&
-    data._id && (
-      <main className="flex flex-col" id="main">
-        <Card className="rounded-none m-0 pt-0 border-0">
-          <header
-            className="border border-border bg-gray py-4"
-            style={{ padding: 20 }}
-          >
-            <h1 className="text-sv p-2 inline">
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", padding: "16px", overflow: "hidden" }}>
+      <div style={{ flex: "0 0 auto" }}>
+        <Card
+          style={{ borderRadius: 0, margin: 0, border: "none" }}
+          styles={{ body: { padding: "1rem 20px" } }}
+        >
+          <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h1 style={{ fontSize: "24px", margin: 0 }}>
               Ordén
               <NavLink
                 to="/Dashboard/Presupuestos"
-                className="italic font-bold hover:underline hover:text-blue"
+                style={{
+                  fontStyle: "italic",
+                  fontWeight: "bold",
+                  marginLeft: "0.5rem",
+                  color: "#1677ff",
+                  textDecoration: "none",
+                }}
               >
-                #{data?.orderCode || "Sin especificar"}
+                #{order?.orderCode || "Sin especificar"}
               </NavLink>
             </h1>
-            <Button
-              style={{ float: "right", width: 150 }}
-              type="default"
-              onClick={() => {
-                const contenidoJSON = JSON.stringify(
-                  JSON.parse(localStorage.getItem("order")),
-                  null,
-                  2
-                );
-                const blob = new Blob([contenidoJSON], {
-                  type: "application/json",
-                });
-                const url = URL.createObjectURL(blob);
-                const enlace = document.createElement("a");
-                enlace.href = url;
-                enlace.download = `${
-                  JSON.parse(localStorage.getItem("order")).storeName +
-                  " " +
-                  JSON.parse(localStorage.getItem("order")).customerName
-                }.json`;
-                document.body.appendChild(enlace);
-                enlace.click();
-                document.body.removeChild(enlace);
-                URL.revokeObjectURL(url);
-              }}
-            >
-              <Space>
-                <img width={20} src={LogoERP} /> Export Ardis
-              </Space>
-            </Button>
+            <ExportArdisButton />
           </header>
+        </Card>
+      </div>
+
+      <div style={{ flex: "1 1 auto", overflow: "hidden", marginTop: "16px" }}>
+        <Card
+          style={{ borderRadius: 0, boxShadow: "none", height: "100%", border: "none" }}
+          styles={{ body: { padding: 0, height: "100%", display: "flex", flexDirection: "column" } }}
+        >
           <Tabs
             onChange={(key) => setTabActivo(parseInt(key))}
             activeKey={tabActivo.toString()}
             centered
             defaultActiveKey="0"
-            items={tabs.map(({ key, label, component }) => ({
-              label,
-              key,
-              children: component,
-            }))}
+            style={{ height: "100%", display: "flex", flexDirection: "column" }}
+            styles={{ content: { flex: 1, height: "100%" } }}
+            items={items}
           />
         </Card>
-      </main>
-    )
+      </div>
+    </div>
   );
 };
 

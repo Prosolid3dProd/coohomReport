@@ -1,171 +1,128 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Button,
-  Input,
   Form,
-  Card,
-  Row,
-  Col,
   message,
-  Divider,
   Space,
 } from "antd";
+import {
+  SaveOutlined,
+} from "@ant-design/icons";
 import { updateProfile } from "../../handlers/order";
 import { getUsers } from "../../handlers/user";
+import { useOrder } from "../../context/OrderContext";
+import { useFloatingButton } from "../../hooks/useFloatingButton";
+import FloatingSaveButton from "../common/FloatingSaveButton";
 
-const General = ({ data }) => {
+// Import new sub-components
+import StoreInfo from "./profile/StoreInfo";
+import CoefficientInfo from "./profile/CoefficientInfo";
+import Observations from "./profile/Observations";
+
+export const Profile = () => {
+  const { order, setOrder } = useOrder();
   const [form] = Form.useForm();
-  const [initialValues, setInitialValues] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  // Use custom hook for floating button logic
+  const {
+    showFloatingButton,
+    mainButtonRef,
+    containerRef,
+    containerStyle,
+    scrollableStyle
+  } = useFloatingButton();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const users = await getUsers();
-        const currentUser = users.find(
-          (user) => user.email === data.profile.email
-        );
-        if (currentUser) {
-          const updatedValues = {
-            email: currentUser.email,
-            info2: currentUser.info2,
-            info1: currentUser.info1,
-            info3: currentUser.info3,
-            logo: currentUser.logo,
-            coefficient: currentUser.coefficient,
-            observacion1: currentUser.observacion1,
-            observacion2: currentUser.observacion2,
-            observacion3: currentUser.observacion3,
-            observacion4: currentUser.observacion4,
-            observacion5: currentUser.observacion5,
-          };
-          setInitialValues(updatedValues);
-          form.setFieldsValue(updatedValues);
+        if (order?.profile?.email) {
+          const users = await getUsers();
+          const currentUser = users.find((user) => user.email === order.profile.email);
+
+          if (currentUser) {
+            const updatedValues = {
+              email: currentUser.email || "",
+              info1: currentUser.info1 || "",
+              info2: currentUser.info2 || "",
+              info3: currentUser.info3 || "",
+              logo: currentUser.logo || "",
+              coefficient: currentUser.coefficient || "",
+              observacion1: currentUser.observacion1 || "",
+              observacion2: currentUser.observacion2 || "",
+              observacion3: currentUser.observacion3 || "",
+              observacion4: currentUser.observacion4 || "",
+              observacion5: currentUser.observacion5 || "",
+            };
+            form.setFieldsValue(updatedValues);
+          }
         }
       } catch (error) {
+        console.error("Error al cargar datos:", error);
         message.error("Error al cargar los datos del usuario");
       }
     };
     fetchUserData();
-  }, [data, form]);
+  }, [order, form]);
 
-  const onFinish = async (values) => {
+  const onFinish = useCallback(async (values) => {
     try {
-      if (data._id) {
-        const result = await updateProfile({ ...values });
-        if (result) {
-          message.success("Se ha actualizado correctamente");
-          setTimeout(() => {
-            location.reload();
-          }, 1000);
-        }
+      if (!order?._id) {
+        message.error("No se encontró el pedido");
+        return;
+      }
+
+      setLoading(true);
+      const result = await updateProfile({ ...values, _id: order._id });
+
+      if (result) {
+        message.success("Perfil actualizado correctamente");
+        setOrder(result);
       }
     } catch (error) {
+      console.error("Error al actualizar:", error);
       message.error("Error al actualizar el perfil");
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [order, setOrder]);
 
   return (
-    <Card className="rounded-none bg-gray border border-border">
-      <Form
-        layout="vertical"
-        form={form}
-        initialValues={initialValues}
-        onFinish={onFinish}
-      >
-        <Row gutter={16}>
-          <Col xs={24}>
-            <Divider orientation="left">
-              <p className="uppercase">
-                <b>Mi perfil de tienda</b>
-              </p>
-            </Divider>
-          </Col>
+    <div style={containerStyle}>
+      <div ref={containerRef} style={scrollableStyle(showFloatingButton)}>
+        <Form layout="vertical" form={form} onFinish={onFinish}>
+          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
 
-          <Col xs={24} md={8}>
-            <Form.Item label="Email" name="email">
-              <Input placeholder="" maxLength="100" />
-            </Form.Item>
-          </Col>
+            <StoreInfo />
 
-          <Col xs={24} md={8}>
-            <Form.Item label="Info1" name="info1">
-              <Input placeholder="" />
-            </Form.Item>
-          </Col>
+            <CoefficientInfo role={order?.profile?.role} />
 
-          <Col xs={24} md={8}>
-            <Form.Item label="Info2" name="info2">
-              <Input placeholder="" />
-            </Form.Item>
-          </Col>
+            <Observations />
 
-          <Col xs={24} md={8}>
-            <Form.Item label="Info3" name="info3">
-              <Input placeholder="" maxLength="100" />
-            </Form.Item>
-          </Col>
-
-          <Col xs={24}>
-            <Divider orientation="left">
-              <p className="uppercase">
-                <b>Acerca de los Precios</b>
-              </p>
-            </Divider>
-          </Col>
-
-          <Col xs={24} md={4}>
-            <Form.Item label="Punto de Compra" name="coefficient">
-              <Input
-                placeholder=""
-                maxLength="5"
-                max={10}
-                min={0}
-                disabled={data.profile?.role === "client"}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col xs={24}>
-            <Divider orientation="left">
-              <b className="uppercase">Observaciones</b>
-              <span className="italic text-slate-400">(%)</span>
-            </Divider>
-          </Col>
-
-          {[...Array(5)].map((_, index) => (
-            <Col key={index} xs={24}>
-              <Form.Item
-                label={`Observación Linea ${index + 1}`}
-                name={`observacion${index + 1}`}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-          ))}
-
-          <Col xs={24}>
-            <Space>
+            {/* Botón Guardar */}
+            <div ref={mainButtonRef} style={{ display: 'flex', justifyContent: 'center', paddingTop: 16 }}>
               <Button
                 htmlType="submit"
                 type="primary"
-                className="flex justify-center items-center"
-                style={{
-                  height: 50,
-                  width: 150,
-                  marginTop: 30,
-                  padding: "5px 20px",
-                  background: "#1a7af8",
-                  color: "#fff",
-                }}
+                icon={<SaveOutlined />}
+                size="large"
+                loading={loading}
+                style={{ width: '90%', maxWidth: 800, height: 50, fontSize: 16 }}
               >
                 Guardar Cambios
               </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Form>
-    </Card>
+            </div>
+          </Space>
+        </Form>
+      </div>
+
+      <FloatingSaveButton
+        visible={showFloatingButton}
+        onClick={() => form.submit()}
+        loading={loading}
+      />
+    </div>
   );
 };
 
-export default General;
+export default Profile;

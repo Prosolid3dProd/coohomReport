@@ -1,4 +1,4 @@
-import { Config, Encimera, Tiendas, List } from "../../icons";
+import { Encimera, Tiendas, List, User } from "../../icons";
 
 export const lista = [
   {
@@ -16,6 +16,11 @@ export const lista = [
     name: "Tiendas",
     icon: Tiendas,
   },
+  {
+    id: 4,
+    name: "Perfil",
+    icon: User,
+  },
   // {
   //   name: "Config",
   //   icon: Config,
@@ -30,5 +35,9 @@ export const listaCliente = [
   {
     name: "Biblioteca",
     icon: Encimera,
+  },
+  {
+    name: "Perfil",
+    icon: User,
   },
 ];

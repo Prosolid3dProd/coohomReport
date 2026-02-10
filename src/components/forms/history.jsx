@@ -17,8 +17,9 @@ import {
   getOrderById,
   fixOrder,
   archivedOrder,
-} from "../../handlers/order"; 
-import { Header } from "../content"; 
+} from "../../handlers/order";
+import { Header } from "../content";
+import { useOrder } from "../../context/OrderContext";
 
 const getDiferenciaDias = (creacionPresupuesto) => {
   if (!creacionPresupuesto) return [0, false];
@@ -44,7 +45,11 @@ const History = () => {
     pageSize: 10,
     total: 0,
   });
+  const { setOrder } = useOrder();
   const navigate = useNavigate();
+
+  // Dynamic scroll height state
+  const [scrollY, setScrollY] = useState(500);
 
   // eliminar
   const onDelete = async (item) => {
@@ -69,6 +74,7 @@ const History = () => {
     try {
       const result = await getOrderById({ _id: item._id });
       fixOrder(result, 0, () => {
+        setOrder(result); // Update context
         navigate("/Dashboard/Report/", { replace: true });
       });
     } catch (e) {
@@ -76,94 +82,77 @@ const History = () => {
     }
   };
 
- // función que calcula pageSize dinámico
-// calcula el número de filas visibles según la pantalla
-const calculatePageSize = () => {
-  const windowHeight = window.innerHeight;
 
-  // margen reservado para header, paddings, etc.
-  const reservedSpace = 250; 
-
-  // alto estimado de cada fila de la tabla (ajústalo a tu diseño)
-  const rowHeight = 80; 
-
-  let newPageSize = Math.floor((windowHeight - reservedSpace) / rowHeight);
-
-  // asegurar que nunca se queda demasiado pequeño
-  if (isNaN(newPageSize) || newPageSize < 5) {
-    newPageSize = 5;
-  }
-
-  return newPageSize;
-};
-
-
-const fetchData = async (page = 1, pageSize = pagination.pageSize) => {
-  try {
-    setLoad(true);
-    const result = await getOrders({ page, limit: pageSize });
-    if (result?.data) {
-      setData(result.data);
-      setPagination({
-        current: result.page,
-        pageSize: pageSize, // usamos el dinámico
-        total: result.total,
-      });
+  const fetchData = async (page = 1, pageSize = 10) => {
+    try {
+      setLoad(true);
+      const result = await getOrders({ page, limit: pageSize });
+      if (result?.data) {
+        setData(result.data);
+        setPagination({
+          current: result.page,
+          pageSize: pageSize,
+          total: result.total,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoad(false);
     }
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-  } finally {
-    setLoad(false);
-  }
-};
-
-useEffect(() => {
-  const handleResize = () => {
-    const newPageSize = calculatePageSize();
-    setPagination({pagesize:newPageSize});
-
-    // opcional: recargar datos con el nuevo pageSize
-    fetchData(1, newPageSize);
   };
 
-  handleResize(); // inicial
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+  useEffect(() => {
+    fetchData(1, 10);
+  }, []);
+
+  // Calculate dynamic height
+  useEffect(() => {
+    const calculateHeight = () => {
+      // Window height - Header(64) - Approx Custom Header(150) - Padding - TableHeader
+      // Using 230 as a tight offset to minimize bottom gap
+      const availableHeight = window.innerHeight - 300;
+      setScrollY(availableHeight > 200 ? availableHeight : 200);
+    };
+
+    calculateHeight();
+    window.addEventListener('resize', calculateHeight);
+    return () => window.removeEventListener('resize', calculateHeight);
+  }, []);
 
 
- const getFilterComplements = async (params) => {
-  try {
-    setLoad(true);
-    const searchTerm =
-      params && params.text && typeof params.text === "string"
-        ? params.text.trim()
-        : "";
+  const getFilterComplements = async (params) => {
+    try {
+      setLoad(true);
+      const searchTerm =
+        params && params.text && typeof params.text === "string"
+          ? params.text.trim()
+          : "";
 
-    // 👇 le pasamos el término de búsqueda al backend
-    const result = await getOrders({
-      page: 1,
-      limit: pagination.pageSize,
-      search: searchTerm,
-    });
-
-    if (result?.data) {
-      setData(result.data);
-      setPagination({
-        current: result.page,
-        pageSize: pagination.pageSize,
-        total: result.total,
+      // 👇 le pasamos el término de búsqueda al backend
+      const result = await getOrders({
+        page: 1,
+        limit: pagination.pageSize,
+        search: searchTerm,
       });
-    } else {
-      setData([]);
-      message.warning("No se encontraron resultados");
+
+      if (result?.data) {
+        setData(result.data);
+        setPagination({
+          current: result.page,
+          pageSize: pagination.pageSize,
+          total: result.total,
+        });
+      } else {
+        setData([]);
+        message.warning("No se encontraron resultados");
+      }
+    } catch (error) {
+      console.error("Error filtrando las órdenes:", error);
+    } finally {
+      setLoad(false);
     }
-  } catch (error) {
-    console.error("Error filtrando las órdenes:", error);
-  } finally {
-    setLoad(false);
-  }
-};
+  };
 
   const columns = [
     {
@@ -176,7 +165,7 @@ useEffect(() => {
           <Button type="link" style={{ marginTop: 10 }}>
             <Typography.Link onClick={() => onNavigate(record)}>
               <Tag color="blue">
-                <span className="hover:underline text-smd lg:text-md">
+                <span>
                   {text || "Sin especificar"}
                 </span>
               </Tag>
@@ -257,8 +246,8 @@ useEffect(() => {
   ];
 
   return (
-    <div className="flex flex-col ">
-      <div className="px-4">
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", padding: "16px", overflow: "hidden" }}>
+      <div style={{ flex: "0 0 auto" }}>
         <Header
           actions={true}
           name={"Listado"}
@@ -270,27 +259,36 @@ useEffect(() => {
           addFile={(e) => e}
         />
       </div>
-      <article className="border-none rounded-none relative overflow-x-hidden">
-        <Card className="border-none">
+      <div style={{ flex: "1 1 auto", overflow: "hidden", marginTop: "16px" }}>
+        <Card
+          style={{
+            borderRadius: "0",
+            boxShadow: "none",
+            height: "100%"
+          }}
+          styles={{ body: { padding: 0, height: "100%" } }}
+          variant="borderless"
+        >
           <Table
-            style={{
-              borderBottom: "1px solid #e8e8e8",
-              borderLeft: "1px solid #e8e8e8",
-              borderRight: "1px solid #e8e8e8",
-            }}
+            bordered
             loading={load}
             dataSource={Array.isArray(data) ? data : []}
             columns={columns}
             rowKey="_id"
             pagination={{
               ...pagination,
+              pageSizeOptions: ['10', '20', '50'],
+              showSizeChanger: true,
               onChange: (page, pageSize) => {
                 fetchData(page, pageSize);
               },
+              position: ['bottomCenter'],
+              style: { marginTop: 16, marginBottom: 0 }
             }}
+            scroll={{ y: scrollY, x: 'max-content' }}
           />
         </Card>
-      </article>
+      </div>
     </div>
   );
 };

@@ -1,11 +1,19 @@
-import { parseJson3D } from './parseJson3d'
+import { parseJson3D } from './parser/index'
 import {
-    getUserData,
-    setUserData,
+    getPrecio,
+    setPrecio,
+    getTotales,
+    setTotales,
+    getLocalToken,
+    setLocalToken
 } from './localStorage'
 
 export {
     parseJson3D,
-    getUserData,
-    setUserData,
+    getPrecio,
+    setPrecio,
+    getTotales,
+    setTotales,
+    getLocalToken,
+    setLocalToken
 }

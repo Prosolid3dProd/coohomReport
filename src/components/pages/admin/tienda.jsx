@@ -1,186 +1,174 @@
-// import React, { useEffect, useState } from "react";
-// import "../../../index.css";
+import {
+    message,
+    Row,
+    Col,
+    Empty,
+    Spin,
+} from "antd";
+import React, { useEffect, useState, useCallback } from "react";
+import { getUsers, deleteUser, createUser, updateUser } from "../../../handlers/user";
+import { Header } from "../../content";
+import UserCard from "./components/UserCard";
+import UserForm from "./components/UserForm";
 
-// import {
-//   Button,
-//   Divider,
-//   Form,
-//   Input as Input_ant,
-//   message,
-//   Modal,
-// } from "antd";
+const Tiendas = () => {
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-// import { createUser, getUsers } from "../../../handlers/user";
+    // Modal State
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
-// const { success, info, error } = message;
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const result = await getUsers();
+            setData(Array.isArray(result) ? result : []);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            setData([]);
+            message.error("Error al obtener usuarios");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-// const MENSAJES = {
-//   SUCCESS: () => success("Se ha actualizado Correctamente"),
-//   INFO: (nombreTienda) => info(`Nueva Tienda: ${nombreTienda}`),
-//   ERROR: (problema) => error(`Error: ${problema}`),
-//   DELETE: (nombreTienda) => info(`Se ha eliminado la Tienda: ${nombreTienda}`),
-// };
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
-// const ModalTienda = (tiendaData) => {
-//   const [form] = Form.useForm();
-//   const [data, setData] = useState(tiendaData);
+    const getFilterUsers = useCallback(async (params) => {
+        setLoading(true);
+        try {
+            const searchTerm = params?.text?.trim() || "";
+            const result = await getUsers({ search: searchTerm });
 
-//   const [listaTiendas, setListaTiendas] = useState([]);
+            if (Array.isArray(result)) {
+                setData(result);
+            } else {
+                setData([]);
+                message.warning("No se encontraron resultados");
+            }
+        } catch (error) {
+            console.error("Error filtrando usuarios:", error);
+            message.error("Error al filtrar");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-//   const onFinish = async (values) => {
-//     /** @type {<{phone: string, name: string, email: string, observation: string, password: string}>} */
-//     const nuevaTienda = await createUser({
-//       phone: `${values.prefix}${values.phone}`,
-//       tienda: values.tienda,
-//       name: values.propietario,
-//       email: values.email,
-//       observation: values.intro,
-//       gender: values.gender,
-//       password: values.password,
-//     });
+    const handleDelete = useCallback(async (item) => {
+        setLoading(true);
+        try {
+            const result = await deleteUser({ _id: item._id });
+            if (result) {
+                setData(prev => prev.filter(u => u._id !== item._id));
+                message.success(`${item.name} eliminado correctamente`);
+            } else {
+                message.error(`Error al eliminar ${item.name}`);
+            }
+        } catch (error) {
+            console.error("Error al eliminar usuario:", error);
+            message.error(`Error al eliminar ${item.name}`);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-//     const tiendasTemporal = await getUsers();
-//     setListaTiendas(tiendasTemporal);
-//     console.log(tiendasTemporal)
+    // Handlers for Form
+    const handleCreate = useCallback(() => {
+        setSelectedUser(null);
+        setModalOpen(true);
+    }, []);
 
-//     if (!nuevaTienda) return MENSAJES.ERROR("Conexión Base de Datos");
+    const handleEdit = useCallback((user) => {
+        setSelectedUser(user);
+        setModalOpen(true);
+    }, []);
 
-//     // IMPORTANTE! --> Cambiar LocalStorage por Base de Datos
+    const handleFormFinish = async (values) => {
+        try {
+            if (selectedUser) {
+                // Update
+                const updatedUserData = { ...selectedUser, ...values };
+                const result = await updateUser(updatedUserData);
+                if (result) {
+                    message.success("Usuario actualizado correctamente");
+                } else {
+                    throw new Error("Update failed");
+                }
+            } else {
+                // Create
+                const result = await createUser(values);
+                if (result.response?.data?.message === "Usuario ya existe") {
+                    message.error("Usuario ya existe");
+                    return;
+                }
+                if (result) {
+                    message.success(`Usuario creado: ${values.name}`);
+                } else {
+                    throw new Error("Create failed");
+                }
+            }
 
-//     /** @type {Array.<{phone: string, name: string, email: string, observation: string, password: string}>} */
+            await fetchData();
+            setModalOpen(false);
+            setSelectedUser(null);
 
-//     let tiendas = JSON.parse(localStorage.getItem("Tiendas")) || [];
-//     tiendas = [...tiendas, nuevaTienda];
+        } catch (error) {
+            console.error("Error in form submit:", error);
+            message.error("Error al guardar usuario");
+        }
+    };
 
-//     localStorage.setItem("Tiendas", JSON.stringify(tiendas));
-//     setData((data) => (data = JSON.parse(localStorage.getItem("Tiendas"))));
+    return (
+        <div style={{ height: "100%", display: "flex", flexDirection: "column", padding: "16px", overflow: "hidden" }}>
+            <div style={{ flex: "0 0 auto" }}>
+                <Header
+                    name="Tiendas"
+                    input
+                    getFilter={getFilterUsers}
+                    setLoading={setLoading}
+                    setData={setData}
+                    data={data}
+                    funcion={handleCreate}
+                    buttonText="Crear Usuario"
+                />
+            </div>
 
-//     console.log(values)
-//     MENSAJES.INFO(nuevaTienda.name);
+            <div style={{ flex: "1 1 auto", overflow: "auto", marginTop: "16px", padding: "8px" }}>
+                {loading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                        <Spin size="large" />
+                    </div>
+                ) : data.length === 0 ? (
+                    <Empty description="No hay usuarios" />
+                ) : (
+                    <Row gutter={[16, 16]}>
+                        {data.map(user => (
+                            <Col xs={24} sm={12} md={8} lg={6} xl={6} key={user._id}>
+                                <UserCard
+                                    user={user}
+                                    onDelete={handleDelete}
+                                    onEdit={handleEdit}
+                                />
+                            </Col>
+                        ))}
+                    </Row>
+                )}
+            </div>
 
-//     setTimeout(() => form.resetFields(), 500);
-//   };
+            <UserForm
+                open={modalOpen}
+                onCancel={() => {
+                    setModalOpen(false);
+                    setSelectedUser(null);
+                }}
+                onFinish={handleFormFinish}
+                initialValues={selectedUser}
+            />
+        </div>
+    );
+};
 
-//   return (
-//     <Modal
-//       title="Basic Modal"
-//       open={() => {}}
-//       onOk={{}}
-//       onCancel={{}}
-//       destroyOnClose
-//       footer={false}
-//     >
-//       <Form
-//         id="form2"
-//         form={form}
-//         name="register"
-//         onFinish={onFinish}
-//         scrollToFirstError
-//         className="w-full gap-1 flex flex-col bg-gray border-border border px-8 py-4 transition-all duration-150"
-//       >
-//         <Form.Item
-//           name="propietario"
-//           label={<span className="">Propietario</span>}
-//           className="w-full  p-4 flex items-center  m-0"
-//           rules={[
-//             {
-//               required: true,
-//               message: "Porfavor introduce tu Propietario",
-//               whitespace: true,
-//             },
-//           ]}
-//         >
-//           <Input className="" />
-//         </Form.Item>
-//         <Form.Item
-//           name="tienda"
-//           label={<span className="">Tienda</span>}
-//           className="w-full  p-4 flex items-center  m-0"
-//           onChange={(e) => e.target.value}
-//           rules={[
-//             {
-//               required: true,
-//               message: "Porfavor introduce tu Tienda",
-//               whitespace: true,
-//             },
-//           ]}
-//         >
-//           <Input className="" />
-//         </Form.Item>
-//         <Form.Item
-//           name="email"
-//           label={<span className="">E-mail</span>}
-//           className="w-full  p-4 flex items-center  m-0"
-//           rules={[
-//             {
-//               type: "email",
-//               message: "El email no es valido",
-//             },
-//             {
-//               required: true,
-//               message: "Porfavor introduce un email",
-//             },
-//           ]}
-//         >
-//           <Input className="" />
-//         </Form.Item>
-
-//         <Form.Item
-//           name="phone"
-//           className="w-full  p-4 flex items-center  m-0"
-//           label={<span className="">Teléfono</span>}
-//           rules={[
-//             {
-//               max: 9,
-//               min: 9,
-//               required: true,
-//               message: "Introduce un número de teléfono correcto",
-//             },
-//           ]}
-//         >
-//           <Input className="" />
-//         </Form.Item>
-//         <Form.Item
-//           name="password"
-//           className="w-full p-4 flex items-center  m-0"
-//           label={<span className="">Contraseña</span>}
-//           rules={[
-//             {
-//               required: true,
-//               whitespace: true,
-//               type: "password",
-//             },
-//           ]}
-//         >
-//           <Input_ant className="" />
-//         </Form.Item>
-//         <Divider className="text-border" orientation="left">
-//           No obligatorios
-//         </Divider>
-//         <Form.Item
-//           name="intro"
-//           className="pl-4"
-//           label={<span className="italic">Comentario</span>}
-//         >
-//           <Input_ant.TextArea
-//             showCount
-//             maxLength={100}
-//             className="lg:w-[200px] h-[100px]"
-//             placeholder="Añada información más allá de los campos requeridos."
-//           />
-//         </Form.Item>
-//         <Form.Item className="flex justify-end  m-0">
-//           <Button
-//             className="border border-blue text-blue hover:bg-blue flex items-center justify-center w-[75px] h-[50px] "
-//             type="primary"
-//             htmlType="submit"
-//           >
-//             Registrar
-//           </Button>
-//         </Form.Item>
-//       </Form>
-//     </Modal>
-//   );
-// };
-
-// export default ModalTienda;
+export default Tiendas;

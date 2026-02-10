@@ -8,10 +8,8 @@ import { getLocalToken } from '../../../data/localStorage';
  * @return {boolean} 
  */
 const authLogin = () => {
-    /** @type {object.<login, string>} */
-    const userAuth = getLocalToken() // useContext(userContext)
-    if (userAuth && userAuth?.user) return true
-    return false
+    const token = getLocalToken();
+    return !!token;
 }
 
 /**

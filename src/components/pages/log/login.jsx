@@ -1,155 +1,167 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router";
-
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { LockOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, message } from "antd";
-import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 
 import { login } from "../../../handlers/user";
 import { getLocalToken, setLocalToken } from "../../../data/localStorage";
 
 const Login = () => {
-  window.onload = () => {
-    // setLocalToken({})
-    if (getLocalToken) setLocalToken({});
-  };
-
-  const mensajeBienvenida = (email) => {
-    message.success(`Bienvenido ${email}!`);
-  };
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("campaign", null);
+    setLocalToken(null);
     localStorage.removeItem("campaign");
+    localStorage.removeItem("init");
   }, []);
 
-  /**
-   *
-   *
-   * @param {object} values
-   * @return {Component} --> mensaje error | fin de programa
-   */
   const onFinish = async (values) => {
-    
-    const result = await login({
-      email: values.email,
-      password: values.password,
-    });
-    const { ok, message } = result;
+    setLoading(true);
+    try {
+      const result = await login({
+        email: values.email,
+        password: values.password,
+      });
+      const { ok, message: msg } = result;
 
-    if (!ok) return onFailed(message);
+      if (!ok) {
+        message.error(msg || "Credenciales incorrectas");
+        return;
+      }
 
-    mensajeBienvenida(result?.user?.name || "Compañero");
-    localStorage.setItem("token", JSON.stringify(result));
-    localStorage.removeItem("init");
+      message.success(`Bienvenido ${result?.user?.name || "Compañero"}!`);
+      // setLocalToken handles cookie setting
+      setLocalToken(result.token);
 
-    window.location.reload();
-    window.location.href = "/Dashboard/Presupuestos";
+      navigate("/Dashboard/Presupuestos", { replace: true });
+    } catch (error) {
+      console.error("Login error:", error);
+      message.error("Error al iniciar sesión");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  /**
-   *
-   *
-   * @param {object} values --> objeto BD con las credenciales
-   * @param {string} mensaje --> Mensaje Error
-   */
-  const onFailed = (values, mensaje = "Credenciales incorrectas") => {
-    console.error("Error", values);
-    message.error(`Error : ${mensaje}`);
+  const onFinishFailed = (errorInfo) => {
+    console.error("Failed:", errorInfo);
+    message.error("Por favor completa los campos requeridos");
   };
 
-  const validateMessages = {
-    min: "La contraseña debe tener al menos 8 caracteres",
+  const styles = {
+    container: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+      height: "100vh",
+      backgroundColor: "#f0f2f5",
+    },
+    panel: {
+      backgroundColor: "white",
+      borderRadius: "0.75rem",
+      width: "610px",
+      minHeight: "440px",
+      display: "flex",
+      flexDirection: "row",
+      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      overflow: "hidden"
+    },
+    logoSection: {
+      width: "200px",
+      backgroundColor: "#f0f2f5",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      fontSize: "70px",
+      fontWeight: 500,
+      color: "#1a7af8"
+    },
+    formSection: {
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "40px 20px"
+    },
+    title: {
+      fontWeight: 600,
+      fontSize: "24px",
+      marginBottom: "30px",
+      fontFamily: "sans-serif"
+    },
+    form: {
+      width: "100%",
+      maxWidth: "300px",
+      display: "flex",
+      flexDirection: "column",
+    },
+    input: {
+      height: "40px"
+    },
+    submitButton: {
+      backgroundColor: "#1a7af8",
+      height: "40px",
+      width: "100%",
+      fontSize: "16px"
+    }
   };
 
   return (
-    <div
-      id="pantalla"
-      className="col-span-2 row-span-2 flex items-center justify-center"
-    >
-      <div
-        id="panel"
-        className="bg-white rounded-xl w-[610px] h-[439px] grid grid-cols-[200px_1fr]"
-      >
-        <h1 className="h-full flex justify-center self-center bg-bckLogin rounded-l-xl font-medium text-[70px] items-center">
+    <div style={styles.container}>
+      <div style={styles.panel}>
+        <div style={styles.logoSection}>
           C
-        </h1>
-        <div id="info" className="flex flex-col items-center justify-around">
-          <h1 className="font-semibold font-login text-[24px]">
-            Iniciar sesión
-          </h1>
+        </div>
+        <div style={styles.formSection}>
+          <h1 style={styles.title}>Iniciar sesión</h1>
           <Form
             name="normal_login"
-            className="login-form"
-            initialValues={{
-              remember: true,
-            }}
+            initialValues={{ remember: true }}
             onFinish={onFinish}
-            onFinishFailed={onFailed}
+            onFinishFailed={onFinishFailed}
+            layout="vertical"
+            style={styles.form}
           >
             <Form.Item
-              className="mb-12"
               name="email"
-              rules={[
-                {
-                  required: true,
-                  message: "El email no es válido",
-                },
-              ]}
+              rules={[{ required: true, message: "El email es requerido" }]}
             >
               <Input
-                className="h-10 w-80"
-                prefix={<UserOutlined className="site-form-item-icon" />}
+                prefix={<UserOutlined />}
                 placeholder="Email"
+                style={styles.input}
               />
             </Form.Item>
 
             <Form.Item
               name="password"
-              validateMessages={validateMessages}
               rules={[
-                {
-                  // pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]/,
-                  message: "Al menos 1 Mayúscula y un signo especial",
-                },
-                {
-                  // min: 8,
-                  message: "Debe tener al menos 8 carácteres!",
-                },
-                {
-                  required: true,
-                  message: "Introduce la contraseña!",
-                },
+                { required: true, message: "La contraseña es requerida" },
+                { min: 6, message: "Mínimo 6 caracteres" }
               ]}
             >
               <Input.Password
-                className="h-10 w-80"
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                type="password"
+                prefix={<LockOutlined />}
                 placeholder="Contraseña"
+                style={styles.input}
                 iconRender={(visible) =>
                   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
                 }
               />
             </Form.Item>
-            <Form.Item>
-              <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox>Recuerdame</Checkbox>
-              </Form.Item>
+
+            <Form.Item name="remember" valuePropName="checked">
+              <Checkbox>Recuérdame</Checkbox>
             </Form.Item>
-            <Form.Item className="flex justify-center">
+
+            <Form.Item>
               <Button
-                style={{
-                  backgroundColor: "#1a7af8",
-                  width: "160px",
-                  height: "40px",
-                }}
                 type="primary"
                 htmlType="submit"
-                onClick={() => {
-                  window.reload;
-                }}
-                className="login-form-button"
+                loading={loading}
+                style={styles.submitButton}
               >
                 Acceder
               </Button>

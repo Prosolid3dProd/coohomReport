@@ -1,93 +1,102 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Button,
-  Input,
   Form,
   Card,
-  Row,
-  Col,
+  Input,
   message,
-  Divider,
-  Checkbox,
   Modal,
+  Space,
+  Typography,
 } from "antd";
-import { updateOrder, setLocalOrder } from "../../handlers/order";
 import {
-  existePrecio,
-  getPrecio,
-  setPrecio,
-  getTotales,
-  existeTotales,
-} from "../../data/localStorage";
+  SaveOutlined,
+  LockOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
+import { updateOrder } from "../../handlers/order";
+import { useOrder } from "../../context/OrderContext";
+import { useFloatingButton } from "../../hooks/useFloatingButton";
+import FloatingSaveButton from "../common/FloatingSaveButton";
 
-const General = ({ getData, data }) => {
+// Import new sub-components
+import ClientInfo from "./general/ClientInfo";
+import FurnitureSpecs from "./general/FurnitureSpecs";
+import FinancialDetails from "./general/FinancialDetails";
+import Preferences from "./general/Preferences";
+
+const { Text } = Typography;
+
+export const General = () => {
+  const { order, setOrder, preferences, updatePreference } = useOrder();
   const [form] = Form.useForm();
-  const role = data?.profile?.role || "";
+
+  const role = order?.profile?.role || "";
   const isClient = role === "client";
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCoefficientEditable, setIsCoefficientEditable] = useState(!isClient);
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState({});
 
-  const [precios, setPrecios] = useState({
-    C: existePrecio(getPrecio("C")),
-    F: existePrecio(getPrecio("F")),
-    P: existePrecio(getPrecio("P")),
-  });
+  // Use custom hook for floating button logic
+  const {
+    showFloatingButton,
+    mainButtonRef,
+    containerRef,
+    containerStyle,
+    scrollableStyle
+  } = useFloatingButton();
 
-  const [totales, setTotales] = useState({
-    Encimeras: existeTotales(getTotales("Encimeras")),
-    Equipamiento: existeTotales(getTotales("Equipamiento")),
-    Electrodomesticos: existeTotales(getTotales("Electrodomesticos")),
-  });
+  useEffect(() => {
+    if (order) {
+      const values = {
+        ...order,
+        observation: order?.observation?.includes("null") ? "" : order?.observation || "",
+        fecha: order?.fecha?.split(" ")[0] || "",
+        fechaEntrega: order?.fechaEntrega?.split(" ")[0] || "",
+        coefficient: order?.coefficient || "",
+        drawer: `${order?.modelDrawer || ""}${order?.materialDrawer || ""}`,
+        discountEncimeras: order?.discountEncimeras || "",
+        discountCabinets: order?.discountCabinets || "",
+        discountElectrodomesticos: order?.discountElectrodomesticos || "",
+        discountEquipamientos: order?.discountEquipamientos || "",
+        modelHandler: order?.modelHandler || "",
+        semanaEntrega: order?.semanaEntrega || "",
+        customerName: order?.customerName || "",
+        phone: order?.phone || "",
+        location: order?.location || "",
+        modelDoor: order?.modelDoor || "",
+        materialDoor: order?.materialDoor || "",
+        materialCabinet: order?.materialCabinet || "",
+        ivaEncimeras: order?.ivaEncimeras || "",
+        ivaCabinets: order?.ivaCabinets || "",
+        ivaElectrodomesticos: order?.ivaElectrodomesticos || "",
+        ivaEquipamientos: order?.ivaEquipamientos || "",
+      };
+      setInitialValues(values);
+      form.setFieldsValue(values);
 
-  const initialValues = {
-    ...data,
-    observation: data?.observation?.includes("null")
-      ? ""
-      : data?.observation || "",
-    fecha: data?.fecha?.split(" ")[0] || "",
-    fechaEntrega: data?.fechaEntrega?.split(" ")[0] || "",
-    coefficient: data?.coefficient || "",
-    drawer: `${data?.modelDrawer || ""}${data?.materialDrawer || ""}`,
-    discountEncimeras: data?.discountEncimeras || "",
-    discountCabinets: data?.discountCabinets || "",
-    discountElectrodomesticos: data?.discountElectrodomesticos || "",
-    discountEquipamientos: data?.discountEquipamientos || "",
-    modelHandler: data?.modelHandler || "",
-    semanaEntrega: data?.semanaEntrega || "",
-    customerName: data?.customerName || "",
-    phone: data?.phone || "",
-    location: data?.location || "",
-    modelDoor: data?.modelDoor || "",
-    materialDoor: data?.materialDoor || "",
-    materialCabinet: data?.materialCabinet || "",
-    ivaEncimeras: data?.ivaEncimeras || "",
-    ivaCabinets: data?.ivaCabinets || "",
-    ivaElectrodomesticos: data?.ivaElectrodomesticos || "",
-    ivaEquipamientos: data?.ivaEquipamientos || "",
-  };
+      if (order?.profile?.role !== "client") {
+        setIsCoefficientEditable(true);
+      }
+    }
+  }, [order, form]);
 
-  const handlePrecioChange = (key) => {
-    setPrecios((prev) => {
-      const newValue = !prev[key];
-      setPrecio(key, newValue);
-      return { ...prev, [key]: newValue };
-    });
-  };
+  const handlePrecioChange = useCallback((key) => {
+    updatePreference('showPrices', key, !preferences.showPrices[key]);
+  }, [preferences.showPrices, updatePreference]);
 
-  const handleTotalesChange = (key) => {
-    setTotales((prev) => {
-      const newValue = !prev[key];
-      setTotales(key, newValue);
-      return { ...prev, [key]: newValue };
-    });
-  };
+  const handleTotalesChange = useCallback((key) => {
+    updatePreference('showTotals', key, !preferences.showTotals[key]);
+  }, [preferences.showTotals, updatePreference]);
 
-  const unlockCoefficient = () => {
+  const unlockCoefficient = useCallback(() => {
     if (isClient && !isCoefficientEditable) setIsModalOpen(true);
-  };
+  }, [isClient, isCoefficientEditable]);
 
-  const handleModalOk = () => {
+  const handleModalOk = useCallback(() => {
     if (password === "1234") {
       setIsCoefficientEditable(true);
       message.success("Coeficiente desbloqueado");
@@ -96,336 +105,156 @@ const General = ({ getData, data }) => {
     }
     setIsModalOpen(false);
     setPassword("");
-  };
+  }, [password]);
 
-  const handleModalCancel = () => {
+  const handleModalCancel = useCallback(() => {
     setIsModalOpen(false);
     setPassword("");
-  };
+  }, []);
 
   const onFinish = async (values) => {
-    if (!data?._id) {
+    if (!order?._id) {
       message.error("No se encontró el ID del pedido");
       return;
     }
 
     try {
-      const updatedOrder = { ...data, ...values, _id: data._id };
+      setLoading(true);
+      const updatedOrderData = { ...order, ...values, _id: order._id };
+      const result = await updateOrder(updatedOrderData);
 
-      const result = await updateOrder(updatedOrder);
-
-      if (result && result.order && result.order._id) { // Verificamos la estructura correcta
+      if (result?.order?._id) {
         const updatedData = {
-          ...result.order, // Usamos result.order como base
-          profile: data.profile, // Preservamos profile del data original
+          ...result.order,
+          profile: order.profile,
         };
-        getData(updatedData); // Propagamos al padre
-        setLocalOrder(updatedData);
-        message.success("Se ha actualizado correctamente");
-        form.setFieldsValue(updatedData); // Actualizamos el formulario
+        setOrder(updatedData);
+        message.success("Cambios guardados correctamente");
+        form.setFieldsValue(updatedData);
       } else {
-        throw new Error("La respuesta de updateOrder no contiene un order válido");
+        throw new Error("Respuesta inválida del servidor");
       }
     } catch (error) {
-      console.error("Error en onFinish:", error);
-      message.error("Error al guardar los cambios: " + error.message);
-      form.setFieldsValue(initialValues); // Restauramos los valores originales
+      console.error("Error al guardar:", error);
+      message.error("Error al guardar los cambios");
+      form.setFieldsValue(initialValues);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!data) {
-    return <div>No hay datos disponibles para mostrar.</div>;
+  if (!order) {
+    return (
+      <div style={{ padding: '40px', textAlign: 'center' }}>
+        <Text type="secondary">No hay datos disponibles para mostrar.</Text>
+      </div>
+    );
   }
 
   return (
-    <Card className="rounded-none bg-gray border border-border">
-      <div style={{ maxHeight: "70vh", overflowY: "auto", padding: "0 16px" }}>
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={initialValues}
-          onFinish={onFinish}
-        >
-          <Row gutter={16}>
-            <DividerSection title="Acerca del Cliente" />
-            <FormField
-              label="Fecha Confirmación"
-              name="fecha"
-              type="date"
-              span={4}
-            />
-            <FormField
-              label="Envio Mercancia"
-              name="fechaEntrega"
-              type="date"
-              span={4}
-            />
-            <FormField
-              label="Semana de Entrega"
-              name="semanaEntrega"
-              span={4}
-            />
-            <FormField
-              label="Nombre Cliente"
-              name="customerName"
-              maxLength={100}
-              span={5}
-            />
-            <FormField label="Teléfono" name="phone" maxLength={15} span={3} />
-            <FormField
-              label="Localización"
-              name="location"
-              maxLength={100}
-              span={4}
-            />
+    <div style={containerStyle}>
+      <div ref={containerRef} style={scrollableStyle(showFloatingButton)}>
+        <Form form={form} layout="vertical" initialValues={initialValues} onFinish={onFinish}>
+          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
 
-            <DividerSection title="Acerca del Mueble" />
-            <FormField
-              label="Modelo"
-              name="modelDoor"
-              maxLength={50}
-              span={5}
-            />
-            <FormField
-              label="Acabado"
-              name="materialDoor"
-              maxLength={200}
-              span={5}
-            />
-            <FormField
-              label="Tirador"
-              name="modelHandler"
-              maxLength={200}
-              span={5}
-            />
-            <FormField label="Cajon" name="drawer" maxLength={200} span={5} />
-            <FormField
-              label="Armazón"
-              name="materialCabinet"
-              maxLength={200}
-              span={4}
-            />
-            <FormField
-              label="Observaciones"
-              name="observation"
-              type="textarea"
-              span={24}
-            />
+            <ClientInfo />
 
+            <FurnitureSpecs />
+
+            {/* Coeficiente Logic (Kept inline as it has local state specific to this form) */}
             {role === "client" && (
-              <>
-                <DividerSection title="Acerca de los Precios" />
-                <FormField
-                  label="Coeficiente de Venta"
-                  name="coefficient"
-                  span={4}
-                  customInput={
-                    <Input
-                      value={data.coefficient}
-                      readOnly={!isCoefficientEditable}
-                      onClick={unlockCoefficient}
-                      style={
-                        !isCoefficientEditable
-                          ? { opacity: 0.7, cursor: "pointer" }
-                          : {}
-                      }
-                    />
-                  }
-                />
-              </>
+              <Card
+                title={
+                  <Space>
+                    <LockOutlined />
+                    <span>Coeficiente de Venta</span>
+                  </Space>
+                }
+                size="small"
+              >
+                <Form.Item label="Coeficiente" name="coefficient">
+                  <Input
+                    readOnly={!isCoefficientEditable}
+                    onClick={unlockCoefficient}
+                    placeholder="Coeficiente de venta"
+                    suffix={!isCoefficientEditable && <LockOutlined style={{ color: '#999' }} />}
+                    style={!isCoefficientEditable ? { cursor: "pointer" } : {}}
+                  />
+                </Form.Item>
+              </Card>
             )}
 
             {role === "admin" && (
-              <>
-                <DividerSection title="Acerca de los Precios" />
-                <FormField
-                  label="Coeficiente Venta Cliente"
-                  span={4}
-                  customInput={
-                    <Input
-                      value={data.userId?.coefficient || ""}
-                      style={{ opacity: 0.7, cursor: "pointer" }}
-                      disabled
-                    />
-                  }
-                />
-              </>
+              <Card
+                title={
+                  <Space>
+                    <FileTextOutlined />
+                    <span>Información de Coeficiente</span>
+                  </Space>
+                }
+                size="small"
+              >
+                <Form.Item label="Coeficiente Venta Cliente">
+                  <Input
+                    value={order.userId?.coefficient || "N/A"}
+                    disabled
+                    style={{ backgroundColor: '#f5f5f5' }}
+                  />
+                </Form.Item>
+              </Card>
             )}
 
-            <DividerSection title="Descuentos" />
-            <FormField
-              label="Encimeras"
-              name="discountEncimeras"
-              maxLength={50}
-              span={4}
-            />
-            <FormField
-              label="Muebles"
-              name="discountCabinets"
-              maxLength={50}
-              span={4}
-            />
-            <FormField
-              label="Electrodomésticos"
-              name="discountElectrodomesticos"
-              maxLength={50}
-              span={4}
-            />
-            <FormField
-              label="Equipamientos"
-              name="discountEquipamientos"
-              maxLength={50}
-              span={4}
+            <FinancialDetails />
+
+            <Preferences
+              preferences={preferences}
+              handlePrecioChange={handlePrecioChange}
+              handleTotalesChange={handleTotalesChange}
             />
 
-            <DividerSection title="IVA" />
-            <FormField
-              label="Encimeras"
-              name="ivaEncimeras"
-              maxLength={50}
-              span={4}
-            />
-            <FormField
-              label="Muebles"
-              name="ivaCabinets"
-              maxLength={50}
-              span={4}
-            />
-            <FormField
-              label="Electrodomésticos"
-              name="ivaElectrodomesticos"
-              maxLength={50}
-              span={4}
-            />
-            <FormField
-              label="Equipamientos"
-              name="ivaEquipamientos"
-              maxLength={50}
-              span={4}
-            />
-
-            <Col span={24}>
-              <CheckboxGroup
-                title="Mostrar Precios"
-                options={[
-                  {
-                    label: "Clientes",
-                    key: "C",
-                    checked: precios.C,
-                    onChange: handlePrecioChange,
-                  },
-                  {
-                    label: "Fabrica",
-                    key: "F",
-                    checked: precios.F,
-                    onChange: handlePrecioChange,
-                  },
-                  {
-                    label: "Confirmación Pedido",
-                    key: "P",
-                    checked: precios.P,
-                    onChange: handlePrecioChange,
-                  },
-                ]}
-              />
-              <CheckboxGroup
-                title="Mostrar Totales"
-                options={[
-                  {
-                    label: "Encimeras",
-                    key: "Encimeras",
-                    checked: totales.Encimeras,
-                    onChange: handleTotalesChange,
-                  },
-                  {
-                    label: "Equipamiento",
-                    key: "Equipamiento",
-                    checked: totales.Equipamiento,
-                    onChange: handleTotalesChange,
-                  },
-                  {
-                    label: "Electrodomesticos",
-                    key: "Electrodomesticos",
-                    checked: totales.Electrodomesticos,
-                    onChange: handleTotalesChange,
-                  },
-                ]}
-              />
+            {/* Botón Guardar */}
+            <div ref={mainButtonRef} style={{ display: 'flex', justifyContent: 'center', paddingTop: 16 }}>
               <Button
                 type="primary"
                 htmlType="submit"
-                style={{
-                  height: 50,
-                  width: 150,
-                  marginTop: 30,
-                  background: "#1a7af8",
-                }}
+                icon={<SaveOutlined />}
+                size="large"
+                loading={loading}
+                style={{ width: '90%', maxWidth: 800, height: 50, fontSize: 16 }}
               >
-                Guardar
+                Guardar Cambios
               </Button>
-            </Col>
-          </Row>
+            </div>
+          </Space>
         </Form>
       </div>
 
+      <FloatingSaveButton
+        visible={showFloatingButton}
+        onClick={() => form.submit()}
+        loading={loading}
+      />
+
+      {/* Modal de contraseña */}
       <Modal
-        title="Introduce la contraseña"
+        title="Desbloquear Coeficiente"
         open={isModalOpen}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
-        okText="Guardar"
+        okText="Desbloquear"
+        cancelText="Cancelar"
       >
-        <Input.Password
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <Form.Item label="Contraseña">
+          <Input.Password
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Introduce la contraseña"
+            onPressEnter={handleModalOk}
+          />
+        </Form.Item>
       </Modal>
-    </Card>
+    </div>
   );
 };
-
-// Componentes reutilizables
-const DividerSection = ({ title }) => (
-  <Col span={24}>
-    <Divider orientation="left">
-      <p className="uppercase">
-        <b>{title}</b>
-      </p>
-    </Divider>
-  </Col>
-);
-
-const FormField = ({
-  label,
-  name,
-  span,
-  type = "text",
-  maxLength,
-  customInput,
-}) => (
-  <Col xs={24} sm={24} md={span}>
-    <Form.Item label={label} name={name}>
-      {customInput ||
-        (type === "textarea" ? (
-          <Input.TextArea cols={4} />
-        ) : (
-          <Input type={type} maxLength={maxLength} />
-        ))}
-    </Form.Item>
-  </Col>
-);
-
-const CheckboxGroup = ({ title, options }) => (
-  <Row>
-    <DividerSection title={title} />
-    <div className="flex flex-col">
-      {options.map(({ label, key, checked, onChange }) => (
-        <Checkbox key={key} checked={checked} onChange={() => onChange(key)}>
-          Mostrar {label}
-        </Checkbox>
-      ))}
-    </div>
-  </Row>
-);
 
 export default General;

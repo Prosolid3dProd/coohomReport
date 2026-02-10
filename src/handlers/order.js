@@ -1,485 +1,239 @@
-import axios from "axios";
-import Cookies from "js-cookie";
-
+import api from "./api";
 import { CONFIG } from "../data/constants";
+import { getEffectiveCoefficient, getRole } from "../utils/roleLogic";
+import {
+  formatNumber
+} from "../utils/operaciones";
 
-const Settings = {
-  // BACKEND_URL: "http://localhost:3007",
-  // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
-  BACKEND_URL: "https://api.simulhome.com/coohomReport",
-  ENDPOINT: "reportCoohom",
-  TOKEN: "Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH",
-};
-
-let _AXIOS_ = axios.create({
-  headers: {
-    Authorization: CONFIG.API.TOKEN,
-  },
-});
-
-const tokenLocal = () => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("token");
-  }
-};
-
-export const axiosToken = axios.create({
-  headers: {
-    Authorization: Cookies.get("token") || tokenLocal(),
-  },
-});
+// ---- LLAMADAS API ----
 
 export const createOrder = async (params) => {
   try {
-    const data = await _AXIOS_.post(
-      `${CONFIG.API.BACKEND_URL}/${CONFIG.API.ENDPOINT}`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    // console.log(data.data.result, "createOrder");
-
-    return data.data;
+    return await api.post(`/${CONFIG.API.ENDPOINT}`, params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const createCabinetByUser = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomCabinetCreate`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    return await api.post("/reportCoohomCabinetCreate", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const updateOrder = async (params) => {
   try {
-    const data = await _AXIOS_.put(
-      `${CONFIG.API.BACKEND_URL}/${Settings.ENDPOINT}`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    // console.log(data.data, "updateOrder");
-    return data.data;
+    return await api.put(`/${CONFIG.API.ENDPOINT}`, params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const updateProfile = async (params) => {
   try {
-    const data = await _AXIOS_.put(`${CONFIG.API.BACKEND_URL}/profileUpdate`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
-    return data.data;
+    return await api.put("/profileUpdate", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const getOrders = async (params) => {
   try {
-    const data = await _AXIOS_.post(`${CONFIG.API.BACKEND_URL}/reportsCoohom`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
-    return data?.data;
+    return await api.post("/reportsCoohom", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const getComplements = async (params) => {
   try {
-    const data = await _AXIOS_.get(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomComplements`,
-      // "http://localhost:3000/verTodosComplementos2",
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    return await api.get("/reportCoohomComplements", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const getComplementsByText = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomComplementsbyText`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    return await api.post("/reportCoohomComplementsbyText", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
-/*
-export const updateCabinet = async (params) => {
-  try {
-    const data = await axios.put(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomComplements`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
-  } catch (error) {
-    console.log(error);
-    return false;
-  }
-};*/
-
 export const getOrderById = async (params) => {
   try {
-    const data = await _AXIOS_.post(`${CONFIG.API.BACKEND_URL}/reporthomById`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
-    localStorage.setItem("order", JSON.stringify(data.data));
-
-    // console.log(data.data, "getOrderById");
-    return data.data;
+    const response = await api.post("/reporthomById", params);
+    // Guardamos en local para persistencia rápida
+    localStorage.setItem("order", JSON.stringify(response));
+    return response;
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const getProfile = async (params) => {
   try {
-    const data = await _AXIOS_.post(`${CONFIG.API.BACKEND_URL}/getProfile`, {
-      ...params,
-    });
-    return data.data;
+    return await api.post("/getProfile", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const CreateOrderDetails = async (params) => {
   try {
-    const data = await _AXIOS_.post(
-      `${CONFIG.API.BACKEND_URL}/reporthomDetails`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    return await api.post("/reporthomDetails", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const updateOrderDetails = async (params) => {
   try {
-    const data = await _AXIOS_.put(
-      `${CONFIG.API.BACKEND_URL}/reporthomDetails`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    return await api.put("/reporthomDetails", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const updateCabinetsOrder = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/reporthomUpdateCabinets`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    return await api.post("/reporthomUpdateCabinets", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const archivedOrderDetails = async (params) => {
   try {
-    const data = await axios.put(`${CONFIG.API.BACKEND_URL}/reporthomDetails`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
-    return data.data;
+    return await api.put("/reporthomDetails", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const handleArchivedOrderDetails = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/reporthomComplementDetailsDelete`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    return await api.post("/reporthomComplementDetailsDelete", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const updateCabinet = async (params) => {
   try {
-    const data = await axios.put(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomCabinets`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    return await api.put("/reportCoohomCabinets", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const archivedOrder = async (params) => {
   try {
-    const data = await axios.put(
-      `${CONFIG.API.BACKEND_URL}/archivedReportCoohom`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    return await api.put("/archivedReportCoohom", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
-// export const deleteComplements = async (params) => {
-//   const formData = new URLSearchParams();
-//   formData.append('code', params.code);
-//   formData.append('token', Settings.TOKEN);
-
-//   try {
-//     const response = await axios.put(
-//       `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`,
-//       formData.toString(),
-//       {
-//         headers: {
-//           'Content-Type': 'application/x-www-form-urlencoded'
-//         }
-//       }
-//     );
-
-//     return response.data;
-//   } catch (error) {
-//     console.error(error);
-//     return false;
-//   }
-// };
-
 export const deleteComplements = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`,
-      params
-    );
-    return data;
+    return await api.post("/eliminarPorCodigo", params);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const importLibrary = async (formData) => {
   try {
-    await axios.post(
-      `${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        ...formData,
-        token: Settings.TOKEN,
-      }
-    );
+    await api.upload("/cargarNuevoXlsxSola", formData);
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error("Error al subir archivo:", error);
   }
 };
 
-export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
-  let total = 0;
-  let priceTotal = 0;
-  let cabinetsArray = [];
-  const role = JSON.parse(localStorage.getItem("token")).user.role;
+// ---- FUNCIONES LOCALES Y HELPERS ----
 
-  let coefficient;
-
-  if (role === "admin") {
-    if (tab === 0 || tab === 1) {
-      coefficient = order?.userId?.coefficient;
-    } else if (tab === 2 || tab === 3) {
-      coefficient = order?.coefficient;
-    }
-  } else if (role === "client") {
-    if (tab === 0 || tab === 1) {
-      coefficient = order?.userId?.coefficient;
-    } else if (tab === 2 || tab === 3) {
-      coefficient = order?.userId?.coefficientVenta;
-    }
-  }
-
-  if (order) {
-    order.cabinets.forEach((item) => {
-      let totalVariants = 0;
-      priceTotal = parseFloat(item.total) * parseFloat(coefficient);
-      total += priceTotal;
-
-      item.variants?.forEach((variant) => {
-        totalVariants += parseFloat(variant.value) * parseFloat(coefficient);
-      });
-      cabinetsArray.push({
-        ...item,
-        priceTotal,
-        priceVariants: totalVariants,
-      });
-    });
-
-    let discountEncimerasPorcentaje = 0;
-    let discountCabinetsPorcentaje = 0;
-    let discountElectrodomesticosPorcentaje = 0;
-    let discountEquipamientosPorcentaje = 0;
-
-    let ivaEncimerasPorcentaje = 0;
-    let ivaCabinetsPorcentaje = 0;
-    let ivaElectrodomesticosPorcentaje = 0;
-    let ivaEquipamientosPorcentaje = 0;
-
-    // Calculando los descuentos individuales
-    if (parseFloat(order.discountEncimeras) > 0) {
-      discountEncimerasPorcentaje =
-        parseFloat(total) * (parseFloat(order.discountEncimeras) / 100);
-    }
-
-    if (parseFloat(order.discountCabinets) > 0) {
-      discountCabinetsPorcentaje =
-        parseFloat(total) * (parseFloat(order.discountCabinets) / 100);
-    }
-
-    if (parseFloat(order.discountElectrodomesticos) > 0) {
-      discountElectrodomesticosPorcentaje =
-        parseFloat(total) * (parseFloat(order.discountElectrodomesticos) / 100);
-    }
-
-    if (parseFloat(order.discountEquipamientos) > 0) {
-      discountEquipamientosPorcentaje =
-        parseFloat(total) * (parseFloat(order.discountEquipamientos) / 100);
-    }
-
-    // Calculando los IVA individuales
-    if (parseFloat(order.ivaEncimeras) > 0) {
-      ivaEncimerasPorcentaje =
-        (parseFloat(total) * parseFloat(order.ivaEncimeras)) / 100;
-    }
-
-    if (parseFloat(order.ivaCabinets) > 0) {
-      ivaCabinetsPorcentaje =
-        (parseFloat(total) * parseFloat(order.ivaCabinets)) / 100;
-    }
-
-    if (parseFloat(order.ivaElectrodomesticos) > 0) {
-      ivaElectrodomesticosPorcentaje =
-        (parseFloat(total) * parseFloat(order.ivaElectrodomesticos)) / 100;
-    }
-
-    if (parseFloat(order.ivaEquipamientos) > 0) {
-      ivaEquipamientosPorcentaje =
-        (parseFloat(total) * parseFloat(order.ivaEquipamientos)) / 100;
-    }
-
-    const iva =
-      ivaEncimerasPorcentaje +
-      ivaCabinetsPorcentaje +
-      ivaElectrodomesticosPorcentaje +
-      ivaEquipamientosPorcentaje;
-
-    const orderJson = {
-      ...order,
-      importe: parseFloat(total),
-      iva: parseFloat(iva),
-      total:
-        parseFloat(total) -
-          discountEncimerasPorcentaje -
-          discountCabinetsPorcentaje -
-          discountElectrodomesticosPorcentaje -
-          discountEquipamientosPorcentaje +
-          parseFloat(iva) || 0,
-      cabinets: cabinetsArray,
-      discountEncimerasPorcentaje,
-      discountCabinetsPorcentaje,
-      discountElectrodomesticosPorcentaje,
-      discountEquipamientosPorcentaje,
-      ivaEncimerasPorcentaje,
-      ivaCabinetsPorcentaje,
-      ivaElectrodomesticosPorcentaje,
-      ivaEquipamientosPorcentaje,
-    };
-
-    setLocalOrder(orderJson);
-    onSuccess();
-    return orderJson;
-  }
-};
-
-// Esta funcion es para obtener en localstorage
 export const getLocalOrder = () => {
-  return JSON.parse(localStorage.getItem("order"));
+  try {
+    const str = localStorage.getItem("order");
+    return str ? JSON.parse(str) : null;
+  } catch (e) {
+    return null;
+  }
 };
 
-// Esta funcion es para guardar en localstorage
 export const setLocalOrder = async (params) => {
   return new Promise((resolve) => {
     localStorage.setItem("order", JSON.stringify(params));
-    resolve(getOrders()); // Asegura que getOrders() se ejecuta después de actualizar localStorage
+    resolve(params);
   });
+};
+
+// Lógica central para recalcular precios y coeficientes
+export const fixOrder = (order, tab = 0, onSuccess = () => { }) => {
+  if (!order) return null;
+
+  let total = 0;
+  let priceTotal = 0;
+  let cabinetsArray = [];
+
+  const role = getRole();
+  const coefficient = getEffectiveCoefficient(order, tab, role);
+
+  // Recalcular precios de gabinetes y variantes
+  order.cabinets.forEach((item) => {
+    let totalVariants = 0;
+
+    priceTotal = formatNumber(item.total, coefficient);
+    total += priceTotal;
+
+    item.variants?.forEach((variant) => {
+      totalVariants += formatNumber(variant.value, coefficient);
+    });
+    cabinetsArray.push({
+      ...item,
+      priceTotal,
+      priceVariants: totalVariants,
+    });
+  });
+
+  // Helper para calcular porcentajes de descuento/IVA
+  const calculatePart = (total, percentage) =>
+    percentage > 0 ? total * (percentage / 100) : 0;
+
+  const discountEncimerasPorcentaje = calculatePart(total, parseFloat(order.discountEncimeras));
+  const discountCabinetsPorcentaje = calculatePart(total, parseFloat(order.discountCabinets));
+  const discountElectrodomesticosPorcentaje = calculatePart(total, parseFloat(order.discountElectrodomesticos));
+  const discountEquipamientosPorcentaje = calculatePart(total, parseFloat(order.discountEquipamientos));
+
+  const ivaEncimerasPorcentaje = calculatePart(total, parseFloat(order.ivaEncimeras));
+  const ivaCabinetsPorcentaje = calculatePart(total, parseFloat(order.ivaCabinets));
+  const ivaElectrodomesticosPorcentaje = calculatePart(total, parseFloat(order.ivaElectrodomesticos));
+  const ivaEquipamientosPorcentaje = calculatePart(total, parseFloat(order.ivaEquipamientos));
+
+  const iva = ivaEncimerasPorcentaje + ivaCabinetsPorcentaje + ivaElectrodomesticosPorcentaje + ivaEquipamientosPorcentaje;
+  const totalDiscounts = discountEncimerasPorcentaje + discountCabinetsPorcentaje + discountElectrodomesticosPorcentaje + discountEquipamientosPorcentaje;
+
+  const orderJson = {
+    ...order,
+    importe: parseFloat(total),
+    iva: parseFloat(iva),
+    total: parseFloat(total) - totalDiscounts + parseFloat(iva) || 0,
+    cabinets: cabinetsArray,
+    discountEncimerasPorcentaje,
+    discountCabinetsPorcentaje,
+    discountElectrodomesticosPorcentaje,
+    discountEquipamientosPorcentaje,
+    ivaEncimerasPorcentaje,
+    ivaCabinetsPorcentaje,
+    ivaElectrodomesticosPorcentaje,
+    ivaEquipamientosPorcentaje,
+  };
+
+  setLocalOrder(orderJson);
+  onSuccess();
+  return orderJson;
 };

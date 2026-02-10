@@ -1,134 +1,109 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   Button,
-  Input,
-  Form,
   Card,
-  Row,
-  Col,
-  Select,
-  Divider,
   message,
   Space,
   Modal,
-  Table,
   Typography,
+  Form
 } from "antd";
+import {
+  SearchOutlined,
+  AppstoreAddOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
 import {
   CreateOrderDetails,
   updateOrderDetails,
   handleArchivedOrderDetails,
-  getLocalOrder,
-  setLocalOrder,
+  getOrderById,
+  fixOrder,
 } from "../../handlers/order";
 import EncimerasModal from "../pages/Encimeras/encimerasModal";
+import { useOrder } from "../../context/OrderContext";
+import { useFloatingButton } from "../../hooks/useFloatingButton";
+import FloatingSaveButton from "../common/FloatingSaveButton";
+import ProductTable from "./products/ProductTable";
+import AddProductForm from "./products/AddProductForm";
+import EditProductForm from "./products/EditProductForm";
 
-const Product = ({ getData }) => {
+const { Text } = Typography;
+
+export const Product = () => {
+  const { order, setOrder } = useOrder();
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
-  const [state, setState] = useState({
-    data: getLocalOrder(),
+
+  const [uiState, setUiState] = useState({
     type: null,
-    encimera: null,
-    isUpdate: null,
-    modals: {
-      isModalOpen: false,
-      isEditModalOpen: false,
-    },
+    isModalOpen: false,
+    isEditModalOpen: false,
   });
 
-  // Manejo de estados relacionados con los formularios y cálculos
-  const [formValues, setFormValues] = useState({
-    cantidad: 0,
-    unidad: 0,
-    total: 0,
-  });
+  // Use custom hook for floating button logic
+  const {
+    showFloatingButton,
+    mainButtonRef,
+    containerRef,
+    containerStyle,
+    scrollableStyle
+  } = useFloatingButton();
 
-  // Actualiza el estado de modales
-  const updateModals = (modals) => {
-    setState((prev) => ({ ...prev, modals: { ...prev.modals, ...modals } }));
-  };
+  const toggleModal = useCallback((modalName, isOpen) => {
+    setUiState((prev) => ({ ...prev, [modalName]: isOpen }));
+  }, []);
 
-  // Dentro de tu componente
-  const setType = (type) => {
-    setState((prev) => ({ ...prev, type }));
-  };
+  const setType = useCallback((type) => {
+    setUiState((prev) => ({ ...prev, type }));
+    form.setFieldValue('type', type);
+  }, [form]);
 
-  // Maneja los campos de encimera seleccionada
-  useEffect(() => {
-    if (state.encimera) {
+  const handleEncimeraSelect = useCallback((encimera) => {
+    if (encimera) {
+      const initialUnit = parseFloat(encimera?.price || 0);
       form.setFieldsValue({
-        descripcion: state.encimera?.name,
-        marca: state.encimera?.marca,
-        unidad: parseFloat(state.encimera?.price).toFixed(2),
-        referencia: state.encimera?.code,
+        descripcion: encimera?.name,
+        marca: encimera?.marca,
+        unidad: initialUnit.toFixed(2),
+        referencia: encimera?.code,
         qty: 1,
+        discount: 0,
       });
-      setState((prev) => ({ ...prev, isUpdate: null }));
-      updateModals({ isModalOpen: false });
+      setUiState((prev) => ({ ...prev, isModalOpen: false }));
     }
-  }, [state.encimera, form]);
-
-  // Calcula el total dinámicamente
-  useEffect(() => {
-    const { cantidad, unidad } = formValues;
-    const descuento = form.getFieldValue("discount") || 0; // Obtener el descuento del formulario
-    const unidadConDescuento = unidad - (descuento / 100) * unidad; // Aplicar descuento
-
-    const total =
-      !isNaN(cantidad) && !isNaN(unidadConDescuento)
-        ? cantidad * unidadConDescuento
-        : 0;
-
-    setFormValues((prev) => ({ ...prev, unidad: unidadConDescuento, total }));
-    form.setFieldsValue({ unidad: unidadConDescuento.toFixed(2) }); // Actualizar visualmente
-  }, [form.getFieldValue("discount")]);
-
-  // const updateLocalOrderData = useCallback(
-  //   (updatedDetails) => {
-  //     const updatedData = {
-  //       ...state.data,
-  //       details: state.data.details.map((detail) =>
-  //         detail.referencia === updatedDetails.referencia
-  //           ? { ...detail, ...updatedDetails } // Solo actualiza el que coincide
-  //           : detail
-  //       ),
-  //     };
-
-  //     // Actualizar el estado global
-  //     setState((prev) => ({ ...prev, data: updatedData }));
-
-  //     setLocalOrder(updatedData).then(() => {
-  //       getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
-  //     });
-  //   },
-  //   [state.data, getData]
-  // );
+  }, [form]);
 
   const onFinish = async (values) => {
     try {
-      const parsedUnidad = parseFloat(values.unidad || 0);
-      const descuento = parseFloat(values.discount || 0);
-      const unidadConDescuento =
-        parsedUnidad - (descuento / 100) * parsedUnidad;
-      const qtyNueva = parseFloat(values.qty || 1);
-
-      if (!values.type) {
-        message.error("Por favor seleccione un TIPO DE COMPONENTE");
+      if (!uiState.type) {
+        message.error("Por favor seleccione un tipo de componente");
         return;
       }
 
-      if (!state.data?._id) return;
+      if (!order?._id) {
+        message.error("No se encontró el pedido");
+        return;
+      }
 
-      const existingDetailIndex = state.data.details.findIndex(
-        (detail) => detail.referencia === values.referencia
-      );
+      setLoading(true);
+
+      const parsedUnidad = parseFloat(values.unidad || 0);
+      const descuento = parseFloat(values.discount || 0);
+      const qtyNueva = parseFloat(values.qty || 1);
+
+      const unidadConDescuento = parsedUnidad - (descuento / 100) * parsedUnidad;
+      const total = qtyNueva * unidadConDescuento;
+
+      const existingDetailIndex = order.details
+        ? order.details.findIndex((detail) => detail.referencia === values.referencia)
+        : -1;
 
       let updatedDetails;
-      let updatedData;
 
       if (existingDetailIndex !== -1) {
-        const existingDetail = state.data.details[existingDetailIndex];
+        const existingDetail = order.details[existingDetailIndex];
         const nuevaCantidad = parseFloat(existingDetail.qty) + qtyNueva;
         const nuevoTotal = nuevaCantidad * unidadConDescuento;
 
@@ -140,66 +115,56 @@ const Product = ({ getData }) => {
           discount: descuento,
         };
 
-        const newDetails = [...state.data.details];
+        const newDetails = [...order.details];
         newDetails[existingDetailIndex] = updatedDetails;
-
-        updatedData = { ...state.data, details: newDetails };
 
         const result = await updateOrderDetails({
           details: updatedDetails,
           isUpdate: true,
-          _id: state.data._id,
+          _id: order._id,
         });
 
         if (result) {
-          setState((prev) => ({ ...prev, data: updatedData }));
-          setLocalOrder(updatedData).then(() => {
-            getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
-          });
-          message.success(
-            "Se ha actualizado la cantidad del elemento existente"
-          );
+          const updatedData = { ...order, details: newDetails };
+          setOrder(updatedData);
+          message.success("Cantidad actualizada correctamente");
         }
       } else {
         updatedDetails = {
           ...values,
+          type: uiState.type,
           unidad: unidadConDescuento.toFixed(2),
-          total: (qtyNueva * unidadConDescuento).toFixed(2),
+          total: total.toFixed(2),
         };
 
         const result = await CreateOrderDetails({
           details: updatedDetails,
-          isUpdate: state.isUpdate,
-          _id: state.data._id,
+          isUpdate: false,
+          _id: order._id,
         });
 
         if (result) {
-          updatedData = { ...state.data, details: result.details };
-          setState((prev) => ({ ...prev, data: updatedData }));
-          setLocalOrder(updatedData).then(() => {
-            getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
-          });
-          message.success("Se ha añadido un nuevo elemento");
+          const freshOrder = await getOrderById({ _id: order._id });
+          if (freshOrder) {
+            const fixedOrder = fixOrder(freshOrder);
+            setOrder(fixedOrder);
+          }
+          message.success("Componente agregado correctamente");
+          form.resetFields();
+          setUiState((prev) => ({ ...prev, type: null }));
         }
       }
-
-      form.resetFields();
     } catch (error) {
-      console.error("Error al guardar los detalles:", error);
-      message.error("Hubo un error al procesar el elemento");
+      console.error("Error al guardar:", error);
+      message.error("Error al procesar el componente");
+    } finally {
+      setLoading(false);
     }
   };
 
-  function encontrarIdEnDetalles(values, detalles) {
-    let match = detalles.find(det => 
-      det.referencia === values.referencia
-    );
-  
-    return match ? match.id : null;
-  }
-
   const onEditFinish = async (values) => {
     try {
+      setLoading(true);
       const parsedUnidad = parseFloat(values.unidad) || 0;
       const parsedDiscount = parseFloat(values.discount) || 0;
       const parsedQty = parseFloat(values.qty) || 1;
@@ -207,293 +172,162 @@ const Product = ({ getData }) => {
       const discountedPrice = parsedUnidad - (parsedDiscount / 100) * parsedUnidad;
       const updatedTotal = discountedPrice * parsedQty;
 
-      let parseOrder = JSON.parse(localStorage.getItem("order"));
-      let idEncontrado = encontrarIdEnDetalles(values, parseOrder.details);
-
+      const idEncontrado = order.details.find(
+        (det) => det.referencia === values.referencia
+      )?.id;
 
       const updatedValues = {
         id: idEncontrado,
         ...values,
-        unidad: parsedUnidad.toFixed(2), // Mantener el precio unitario original (sin descuento)
-        total: updatedTotal.toFixed(2), // Total calculado con descuento
+        unidad: parsedUnidad.toFixed(2),
+        total: updatedTotal.toFixed(2),
       };
 
-      // console.log("Valores antes de actualizar:", updatedValues);
-
-      // ✅ CORRECCIÓN: Mantener todos los detalles al actualizar
-      const updatedDetails = state.data.details.map(detail =>
-          detail.referencia === values.referencia ? updatedValues : detail
-      );
-
-      // console.log("Detalles actualizados a enviar:", updatedDetails); // <-- Nuevo log
-
       const result = await updateOrderDetails({
-        details: updatedDetails, // ✅ Ahora enviamos TODA la lista de detalles
-        isUpdate: state.isUpdate,
-        _id: state.data._id,
+        details: updatedValues,
+        isUpdate: true,
+        _id: order._id,
       });
 
-      // console.log("Respuesta de updateOrderDetails:", result);
-
       if (result) {
-        const updatedData = { ...state.data, details: updatedDetails };
-
-        setState((prev) => ({ ...prev, data: updatedData }));
-        setLocalOrder(updatedData).then(() => {
-          getData(updatedData);
-        });
-
-        message.success("Producto actualizado correctamente");
-        updateModals({ isEditModalOpen: false });
+        const freshOrder = await getOrderById({ _id: order._id });
+        if (freshOrder) {
+          const fixedOrder = fixOrder(freshOrder);
+          setOrder(fixedOrder);
+        }
+        message.success("Componente actualizado correctamente");
+        toggleModal("isEditModalOpen", false);
       }
     } catch (error) {
-      console.error("Error al actualizar detalles:", error);
+      console.error("Error al actualizar:", error);
+      message.error("Error al actualizar el componente");
+    } finally {
+      setLoading(false);
     }
   };
 
-
-  const [loading, setLoading] = useState(false); // Estado de carga para la tabla
-
   const archivedComplementDetails = async (details) => {
     try {
-      setLoading(true); // Activar el loading antes de eliminar
-
-      // Llamada a la API para archivar/eliminar el complemento
+      setLoading(true);
       const result = await handleArchivedOrderDetails({
-        _id: state.data._id,
+        _id: order._id,
         details,
       });
 
       if (result) {
-        // Filtrar los detalles para eliminar solo el elemento correcto
-        const updatedDetails = state.data.details.filter(
-          (detail) => detail.referencia !== details.referencia
-        );
-
-        // Crear un nuevo objeto de datos actualizado
-        const updatedData = { ...state.data, details: updatedDetails };
-
-        // Actualizar el estado de forma inmutable
-        setState((prev) => ({ ...prev, data: updatedData }));
-
-        // Sincronizar con el almacenamiento local y propagar los datos
-        setLocalOrder(updatedData).then(() => {
-          getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
-        });
-
-        message.success("Se ha eliminado el complemento");
+        const freshOrder = await getOrderById({ _id: order._id });
+        if (freshOrder) {
+          const fixedOrder = fixOrder(freshOrder);
+          setOrder(fixedOrder);
+        }
+        message.success("Componente eliminado correctamente");
       }
     } catch (error) {
-      console.error("Error al eliminar detalles:", error);
-      message.error("Hubo un error al eliminar el complemento");
+      console.error("Error al eliminar:", error);
+      message.error("Error al eliminar el componente");
     } finally {
-      setLoading(false); // Desactivar el loading cuando termine
+      setLoading(false);
     }
   };
 
-  const columns = [
-    { title: "Codigo", dataIndex: "referencia", key: "referencia" },
-    { title: "Descripción", dataIndex: "descripcion", key: "descripcion" },
-    { title: "Marca", dataIndex: "marca", key: "marca" },
-    { title: "Tipo", dataIndex: "type", key: "type" },
-    { title: "Grosor", dataIndex: "grosor", key: "grosor" },
-    { title: "Cantidad", dataIndex: "qty", key: "qty" },
-    { title: "Descuento", dataIndex: "discount", key: "discount" },
-    {
-      title: "Total",
-      dataIndex: "total",
-      key: "total",
-      render: (text) => `${text}€`,
-    },
-    {
-      title: "Acciones",
-      key: "actions",
-      render: (_, record) => (
-        <>
-          <Typography.Link onClick={() => archivedComplementDetails(record)}>
-            Eliminar
-          </Typography.Link>
-          <Divider type="vertical" />
-          <Typography.Link
-            onClick={() => {
-              editForm.setFieldsValue(record);
-              updateModals({ isEditModalOpen: true });
-            }}
-          >
-            Editar
-          </Typography.Link>
-        </>
-      ),
-    },
-  ];
-
   return (
-    <Card className="rounded-none bg-gray border border-border">
-      <Form layout="vertical" form={form} onFinish={onFinish}>
-        <Divider orientation="left">
-          <b>Agregar Componentes</b>
-        </Divider>
-        <Row gutter={16}>
-          <Col xs={24} md={8}>
-            <Form.Item label="Tipo de componente" name="type">
-              <Select placeholder="Seleccione" onChange={setType}>
-                <Select.Option value="Encimera">Encimera</Select.Option>
-                <Select.Option value="Equipamiento">Equipamiento</Select.Option>
-                <Select.Option value="Electrodomestico">
-                  Electrodomésticos
-                </Select.Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={8}>
-            <Form.Item
-              label="Descripcion"
-              name="descripcion"
-              rules={[
-                { required: true, message: "Por favor complete este campo" },
-              ]}
-            >
-              <Input placeholder={`Descripción ${state.type || ""}`} />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={8}>
-            <Form.Item
-              label="Referencia"
-              name="referencia"
-              rules={[
-                { required: true, message: "Por favor complete este campo" },
-              ]}
-            >
-              <Input maxLength={60} />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={4}>
-            <Form.Item label="Cantidad" name="qty">
-              <Input
-                type="number"
-                min={0}
-                onChange={(e) =>
-                  setFormValues({ cantidad: e.target.value || 0 })
-                }
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={6}>
-            <Form.Item label="Marca" name="marca">
-              <Input maxLength={60} />
-            </Form.Item>
-          </Col>
-          {state.type === "Encimera" && (
-            <Col xs={24} md={4}>
-              <Form.Item label="Grosor" name="grosor">
-                <Input maxLength={60} />
-              </Form.Item>
-            </Col>
-          )}
-          <Col xs={24} md={6}>
-            <Form.Item label="Precio Unidad" name="unidad">
-              <Input
-                type="number"
-                onChange={(e) => setFormValues({ unidad: e.target.value || 0 })}
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={4}>
-            <Form.Item label="Descuento(%)" name="discount" initialValue={0}>
-              <Input type="number" />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={24}>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                Guardar
-              </Button>
+    <div style={containerStyle}>
+      <div ref={containerRef} style={scrollableStyle(showFloatingButton)}>
+        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+          {/* Form para agregar componentes */}
+          <Card
+            title={
+              <Space>
+                <AppstoreAddOutlined />
+                <span>Agregar Componente</span>
+              </Space>
+            }
+            size="small"
+            extra={
               <Button
-                type="link"
+                icon={<SearchOutlined />}
                 onClick={() => {
-                  if (!state.type) {
-                    message.warning(
-                      "Por favor seleccione un TIPO DE COMPONENTE antes de buscar."
-                    );
+                  if (!uiState.type) {
+                    message.warning("Seleccione un tipo de componente primero");
                     return;
                   }
-                  updateModals({ isModalOpen: true });
+                  toggleModal("isModalOpen", true);
                 }}
               >
-                Buscar más elementos
+                Buscar en catálogo
               </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Form>
-      <Divider />
-      <Table
-        dataSource={state.data?.details || []}
-        columns={columns}
+            }
+          >
+            <AddProductForm
+              form={form}
+              onFinish={onFinish}
+              loading={loading}
+              setType={setType}
+              type={uiState.type}
+              mainButtonRef={mainButtonRef}
+            />
+          </Card>
+
+          {/* Tabla de componentes */}
+          <Card
+            title={
+              <Space>
+                <Text strong>Componentes del Pedido</Text>
+                {order?.details?.length > 0 && (
+                  <Text type="secondary">({order.details.length} items)</Text>
+                )}
+              </Space>
+            }
+            size="small"
+          >
+            <ProductTable
+              dataSource={order?.details || []}
+              loading={loading}
+              onEdit={(record) => {
+                editForm.setFieldsValue(record);
+                toggleModal("isEditModalOpen", true);
+              }}
+              onDelete={archivedComplementDetails}
+            />
+          </Card>
+        </Space>
+      </div>
+
+      <FloatingSaveButton
+        visible={showFloatingButton}
+        onClick={() => form.submit()}
         loading={loading}
-        rowKey="referencia"
+        icon={<PlusOutlined />}
+        text="Agregar Componente"
       />
+
+      {/* Modal de búsqueda */}
       <Modal
-        title="Seleccionar Complemento"
-        open={state.modals.isModalOpen}
-        width={1000}
-        onCancel={() => updateModals({ isModalOpen: false })}
+        title="Buscar en Catálogo"
+        open={uiState.isModalOpen}
+        width={1400}
+        onCancel={() => toggleModal("isModalOpen", false)}
         footer={null}
       >
-        <EncimerasModal
-          title={"Complementos"}
-          setEncimera={(encimera) =>
-            setState((prev) => ({ ...prev, encimera }))
-          }
+        <EncimerasModal title="Catálogo de Componentes" setEncimera={handleEncimeraSelect} />
+      </Modal>
+
+      {/* Modal de edición */}
+      <Modal
+        title="Editar Componente"
+        open={uiState.isEditModalOpen}
+        onCancel={() => toggleModal("isEditModalOpen", false)}
+        footer={null}
+        width={600}
+      >
+        <EditProductForm
+          form={editForm}
+          onFinish={onEditFinish}
+          onCancel={() => toggleModal("isEditModalOpen", false)}
+          loading={loading}
         />
       </Modal>
-      <Modal
-        title="Editar Complemento"
-        open={state.modals.isEditModalOpen}
-        onCancel={() => updateModals({ isEditModalOpen: false })}
-        footer={null}
-      >
-        <Form layout="horizontal" form={editForm} onFinish={onEditFinish}>
-          <Form.Item label="Codigo" name="referencia">
-            <Input disabled  />
-          </Form.Item>
-          <Form.Item label="Descripcion" name="descripcion">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Marca" name="marca">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Tipo" name="type">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Grosor" name="grosor">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Cantidad" name="qty">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Descuento" name="discount">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Total" name="unidad">
-            <Input />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Guardar
-            </Button>
-            <Button
-              onClick={() => updateModals({ isEditModalOpen: false })}
-              style={{ marginLeft: 8 }}
-            >
-              Cancelar
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </Card>
+    </div>
   );
 };
 

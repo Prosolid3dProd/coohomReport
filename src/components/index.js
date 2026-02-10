@@ -1,5 +1,5 @@
 import { Muebles } from "../components/content/index";
-import { Menu, Nav } from "../components/interfaces/index";
+import { Nav } from "../components/interfaces/index";
 import {
   Config,
   Report,
@@ -9,12 +9,11 @@ import {
   RedirectLogin,
   Error,
 } from "../components/pages";
-import { Admin } from "../components/pages";
+import { Tiendas } from "../components/pages";
 import { History, Product, General, Profile } from "./forms/index";
 
 export {
   Config,
-  Menu,
   Muebles,
   Nav,
   Report,
@@ -27,7 +26,7 @@ export {
   Profile,
   Product,
   General,
-  Admin,
+  Tiendas,
 };
 
 //Archivo barril Principal --> Components
