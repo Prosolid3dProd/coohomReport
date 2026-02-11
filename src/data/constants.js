@@ -11,6 +11,7 @@ export const CONFIG = {
     // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
     BACKEND_URL: "https://api.simulhome.com/coohomReport",
     ENDPOINT: "reportCoohom",
+    TOKEN: "Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH",
     // Token is handled dynamically by api.js interceptor
   },
   BOLD: "Helvetica-Bold",

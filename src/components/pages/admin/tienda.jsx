@@ -10,8 +10,10 @@ import { getUsers, deleteUser, createUser, updateUser } from "../../../handlers/
 import { Header } from "../../content";
 import UserCard from "./components/UserCard";
 import UserForm from "./components/UserForm";
+import { useUser } from "../../../context/UserContext";
 
 const Tiendas = () => {
+    const { user: currentUser, refreshUser } = useUser();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -94,6 +96,10 @@ const Tiendas = () => {
                 const result = await updateUser(updatedUserData);
                 if (result) {
                     message.success("Usuario actualizado correctamente");
+                    // If we updated ourselves, refresh the global context
+                    if (currentUser && currentUser._id === updatedUserData._id) {
+                        await refreshUser();
+                    }
                 } else {
                     throw new Error("Update failed");
                 }

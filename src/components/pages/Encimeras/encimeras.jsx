@@ -182,7 +182,7 @@ const Encimeras = () => {
               pageSize: 10,
               pageSizeOptions: ['10', '20', '50'],
               showSizeChanger: true,
-              position: ['bottomCenter'],
+              placement: ['bottomCenter'],
               style: { marginTop: 16, marginBottom: 0 }
             }}
             scroll={{ y: scrollY, x: 'max-content' }}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { General, Product, Muebles } from "./../../index";
 import { Tabs, Card } from "antd";

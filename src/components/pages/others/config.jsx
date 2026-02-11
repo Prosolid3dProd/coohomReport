@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Tabs, Card, Typography, Space, Input, Button, Row, Col, Divider } from 'antd';
+import { Card, Typography, Space, Flex, Input, Button, Row, Col, Divider, message, Spin } from 'antd';
 import { FileAddOutlined, EyeTwoTone, EyeInvisibleOutlined } from '@ant-design/icons';
+// import { jwtDecode } from "jwt-decode"; // No longer needed directly here
 
 import { Info, Exit } from '../../icons';
-import { getValue, setValue } from '../../../data/session';
+// import { getLocalToken } from '../../../data/localStorage'; // No longer needed
+// import { getUsers, updateUser } from '../../../handlers/user'; // updateUser used via context
+import { useUser } from '../../../context/UserContext';
 
 const Title = ({ name }) => (
     <>
@@ -16,36 +19,43 @@ const Title = ({ name }) => (
     </>
 );
 
-const NavConfig = () => {
-    const items = [
-        {
-            label: 'Perfil',
-            key: '1',
-            children: <Perfil />,
-        },
-        {
-            label: 'Detalles',
-            key: '2',
-            children: <Detalles />,
-        }
-    ];
+const Config = () => {
+    const { user, loading, updateUser } = useUser();
+
+    // Wrapper to match previous signature if needed, or pass updateUser directly
+    const handleUpdate = async (field, value) => {
+        await updateUser({ [field]: value });
+    };
 
     return (
-        <Tabs
-            defaultActiveKey='1'
-            size='large'
-            centered
-            items={items}
-        />
-    )
-}
+        <div style={{ height: '100%', overflowY: 'auto' }}>
+            <Title name={'Settings'} />
+            {loading ? (
+                <Flex justify="center" align="center" style={{ padding: 40 }}>
+                    <Spin size="large" />
+                </Flex>
+            ) : (
+                <Perfil user={user || {}} onUpdate={handleUpdate} />
+            )}
+            <Outlet />
+        </div>
+    );
+};
 
-const Perfil = () => {
+const Perfil = ({ user, onUpdate }) => {
     const [botonSave, setBotonSave] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const [imgWidth, setImgWidth] = useState(500);
-    const [img, setImg] = useState(getValue('Img') || `https://placehold.co/${imgWidth}X250`);
+    const [img, setImg] = useState(user?.logo || `https://placehold.co/${imgWidth}X250`);
     const imgRef = useRef(null);
+
+    useEffect(() => {
+        if (user?.logo) {
+            setImg(user.logo);
+        } else {
+            setImg(`https://placehold.co/${imgWidth}X250`);
+        }
+    }, [user, imgWidth]);
 
     useEffect(() => {
         const updateWidth = () => {
@@ -60,15 +70,6 @@ const Perfil = () => {
 
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
-
-    useEffect(() => {
-        const savedImg = getValue('Img');
-        if (savedImg) {
-            setImg(savedImg);
-        } else {
-            setImg(`https://placehold.co/${imgWidth}X250`);
-        }
-    }, [imgWidth]);
 
     const handleFileChange = (e) => {
         const files = e.target.files;
@@ -85,22 +86,21 @@ const Perfil = () => {
         }
     };
 
-    const handleSave = () => {
-        setValue('Img', img);
+    const handleSaveLogo = () => {
+        onUpdate('logo', img);
         setDisabled(false);
         setBotonSave(false);
     };
 
-    const handleCancel = () => {
-        const savedImg = getValue('Img');
-        setImg(savedImg || `https://placehold.co/${imgWidth}X250`);
+    const handleCancelLogo = () => {
+        setImg(user?.logo || `https://placehold.co/${imgWidth}X250`);
         setDisabled(false);
         setBotonSave(false);
     };
 
     return (
         <div style={{ padding: 24, maxWidth: 1000, margin: '0 auto' }}>
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Flex vertical gap="large" style={{ width: '100%' }}>
                 <Card>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
                         <div style={{ width: '100%', maxWidth: 500 }} ref={imgRef}>
@@ -115,8 +115,8 @@ const Perfil = () => {
                             <Space>
                                 {botonSave && (
                                     <>
-                                        <Button danger onClick={handleCancel}>Cancel</Button>
-                                        <Button type="primary" onClick={handleSave}>Save</Button>
+                                        <Button danger onClick={handleCancelLogo}>Cancel</Button>
+                                        <Button type="primary" onClick={handleSaveLogo}>Save</Button>
                                     </>
                                 )}
                                 <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -143,39 +143,79 @@ const Perfil = () => {
                 </Card>
 
                 <Section text="User">
-                    <EditableArticle text='Nombre' />
-                    <EditableArticle text='Apellido' />
-                    <EditableArticle text='Dirección' />
+                    <EditableArticle
+                        text='Nombre'
+                        field='name'
+                        valueProp={user?.name}
+                        onSave={onUpdate}
+                    />
+                    <EditableArticle
+                        text='NIF'
+                        field='nif'
+                        valueProp={user?.nif}
+                        onSave={onUpdate}
+                    />
+                    <EditableArticle
+                        text='Rol'
+                        valueProp={user?.role}
+                        input={false}
+                    />
                 </Section>
 
                 <Section text="Privacidad">
-                    <EditableArticle text='Contraseña' isPassword={true} />
-                    <EditableArticle text='Teléfono' />
+                    <EditableArticle
+                        text='Contraseña'
+                        field='password'
+                        isPassword={true}
+                        onSave={onUpdate}
+                        placeholder="Nueva contraseña"
+                    />
+                </Section>
+
+                <Section text="Configuración Venta">
+                    <EditableArticle
+                        text='Coef. Venta'
+                        field='coefficientVenta'
+                        valueProp={user?.coefficientVenta}
+                        onSave={onUpdate}
+                    />
                 </Section>
 
                 <Card>
                     <NavLink to={'/Login'}>
-                        <Button danger icon={<Exit />}>Exit</Button>
+                        <Button danger icon={<Exit />}>Logout</Button>
                     </NavLink>
                 </Card>
-            </Space>
+            </Flex>
         </div>
     )
 };
 
 
-const EditableArticle = ({ text, isPassword = false, input = true }) => {
+const EditableArticle = ({ text, field, isPassword = false, input = true, valueProp = '', onSave, placeholder }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [value, setLocalValue] = useState(getValue(text));
+    const [value, setLocalValue] = useState(valueProp);
+
+    useEffect(() => {
+        setLocalValue(valueProp);
+    }, [valueProp]);
 
     const handleEditToggle = () => {
         if (isEditing) {
-            setValue(text, value);
+            // Save logic
+            if (onSave && field) {
+                onSave(field, value);
+            }
             setIsEditing(false);
         } else {
             setIsEditing(true);
+            // If password, maybe clear it? For now keep empty if undefined
+            if (isPassword) setLocalValue('');
         }
     };
+
+    // For password, we don't start with the hash, typically empty
+    const displayValue = isPassword && !isEditing ? '********' : value;
 
     return (
         <Row align="middle" gutter={[16, 16]} style={{ padding: '12px 0', borderBottom: '1px solid #f0f0f0' }}>
@@ -185,13 +225,13 @@ const EditableArticle = ({ text, isPassword = false, input = true }) => {
             <Col xs={24} md={20}>
                 <Row gutter={8} align="middle">
                     <Col flex="auto">
-                        {input && (
+                        {input ? (
                             isPassword ? (
                                 <Input.Password
                                     value={value || ""}
                                     onChange={(e) => setLocalValue(e.target.value)}
                                     disabled={!isEditing}
-                                    placeholder={text}
+                                    placeholder={placeholder || text}
                                     iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                                 />
                             ) : (
@@ -199,19 +239,23 @@ const EditableArticle = ({ text, isPassword = false, input = true }) => {
                                     value={value || ""}
                                     onChange={(e) => setLocalValue(e.target.value)}
                                     disabled={!isEditing}
-                                    placeholder={text}
+                                    placeholder={placeholder || text}
                                 />
                             )
+                        ) : (
+                            <Typography.Text>{displayValue || "N/A"}</Typography.Text>
                         )}
                     </Col>
-                    <Col>
-                        <Button
-                            type={isEditing ? "primary" : "default"}
-                            onClick={handleEditToggle}
-                        >
-                            {isEditing ? 'Save' : 'Editar'}
-                        </Button>
-                    </Col>
+                    {input && (
+                        <Col>
+                            <Button
+                                type={isEditing ? "primary" : "default"}
+                                onClick={handleEditToggle}
+                            >
+                                {isEditing ? 'Save' : 'Editar'}
+                            </Button>
+                        </Col>
+                    )}
                 </Row>
             </Col>
         </Row>
@@ -226,26 +270,7 @@ const Section = ({ text, children }) => {
     )
 }
 
-const Detalles = () => {
-    return (
-        <div style={{ padding: 24, maxWidth: 1000, margin: '0 auto' }}>
-            <Section text="Detalles">
-                <EditableArticle text={'Coeficiente'} />
-            </Section>
-        </div>
-    )
-}
-
-const Config = () => (
-    <div style={{ height: '100%', overflowY: 'auto' }}>
-        <Title name={'Settings'} />
-        <NavConfig />
-        <Outlet />
-    </div>
-)
-
 export {
     Config,
-    Perfil,
-    Detalles,
+    Perfil
 }

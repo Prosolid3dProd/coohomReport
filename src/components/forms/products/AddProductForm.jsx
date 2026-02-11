@@ -77,17 +77,22 @@ export const AddProductForm = ({
                 </Col>
                 <Col xs={12} sm={6} md={4}>
                     <Form.Item label="Precio Unit." name="unidad" initialValue={0}>
-                        <InputNumber
-                            min={0}
-                            step={0.01}
-                            style={{ width: "100%" }}
-                            addonAfter="€"
-                        />
+                        <Space.Compact style={{ width: '100%' }}>
+                            <InputNumber
+                                min={0}
+                                step={0.01}
+                                style={{ width: "calc(100% - 40px)" }}
+                            />
+                            <Input style={{ width: "40px", textAlign: "center", color: "rgba(0, 0, 0, 0.45)", backgroundColor: "#fafafa", pointerEvents: "none" }} placeholder="€" disabled />
+                        </Space.Compact>
                     </Form.Item>
                 </Col>
                 <Col xs={12} sm={6} md={4}>
                     <Form.Item label="Descuento" name="discount" initialValue={0}>
-                        <InputNumber min={0} max={100} style={{ width: "100%" }} addonAfter="%" />
+                        <Space.Compact style={{ width: '100%' }}>
+                            <InputNumber min={0} max={100} style={{ width: "calc(100% - 40px)" }} />
+                            <Input style={{ width: "40px", textAlign: "center", color: "rgba(0, 0, 0, 0.45)", backgroundColor: "#fafafa", pointerEvents: "none" }} placeholder="%" disabled />
+                        </Space.Compact>
                     </Form.Item>
                 </Col>
                 <Col xs={12} sm={6} md={4}>

@@ -282,7 +282,7 @@ const History = () => {
               onChange: (page, pageSize) => {
                 fetchData(page, pageSize);
               },
-              position: ['bottomCenter'],
+              placement: ['bottomCenter'],
               style: { marginTop: 16, marginBottom: 0 }
             }}
             scroll={{ y: scrollY, x: 'max-content' }}

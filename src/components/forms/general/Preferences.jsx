@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Row, Col, Space, Checkbox, Typography } from "antd";
+import { Card, Row, Col, Space, Flex, Checkbox, Typography } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
@@ -18,7 +18,7 @@ export const Preferences = ({ preferences, handlePrecioChange, handleTotalesChan
       <Row gutter={[24, 16]}>
         <Col xs={24} md={12}>
           <Text strong style={{ display: 'block', marginBottom: 12 }}>Mostrar Precios</Text>
-          <Space direction="vertical">
+          <Flex vertical>
             <Checkbox
               checked={preferences.showPrices.C}
               onChange={() => handlePrecioChange('C')}
@@ -37,11 +37,11 @@ export const Preferences = ({ preferences, handlePrecioChange, handleTotalesChan
             >
               Confirmación Pedido
             </Checkbox>
-          </Space>
+          </Flex>
         </Col>
         <Col xs={24} md={12}>
           <Text strong style={{ display: 'block', marginBottom: 12 }}>Mostrar Totales</Text>
-          <Space direction="vertical">
+          <Flex vertical>
             <Checkbox
               checked={preferences.showTotals.Encimeras}
               onChange={() => handleTotalesChange('Encimeras')}
@@ -60,7 +60,7 @@ export const Preferences = ({ preferences, handlePrecioChange, handleTotalesChan
             >
               Electrodomésticos
             </Checkbox>
-          </Space>
+          </Flex>
         </Col>
       </Row>
     </Card>

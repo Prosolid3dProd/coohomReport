@@ -3,22 +3,13 @@ import { NavLink } from "react-router-dom";
 import AppButton from "../../common/AppButton";
 import { message, Typography, Space, Button, Row, Col, Avatar } from "antd";
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
-import { jwtDecode } from "jwt-decode";
-import { getLocalToken } from "../../../data/localStorage";
+import { useUser } from "../../../context/UserContext";
 
 const { Text } = Typography;
 
 const UserInfo = () => {
-  let userName = "Usuario";
-  try {
-    const token = getLocalToken();
-    if (token) {
-      const decoded = jwtDecode(token);
-      userName = decoded?.usuario?.name || "Usuario";
-    }
-  } catch (e) {
-    console.warn("Error decoding token for user info", e);
-  }
+  const { user } = useUser();
+  const userName = user?.name || "Usuario";
 
   return (
     <Space align="center" size="small">

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { getLocalOrder, setLocalOrder as setLocalOrderHandler } from '../handlers/order';
+import { getLocalOrder, setLocalOrder as setLocalOrderHandler, getOrderById } from '../handlers/order';
 
 const OrderContext = createContext();
 
@@ -48,21 +48,35 @@ export const OrderProvider = ({ children }) => {
         }
     };
 
-    // Load order from localStorage on mount
+    // Load order from localStorage (cache) and refresh from DB
     useEffect(() => {
-        const loadOrder = () => {
+        const initOrder = async () => {
+            setLoading(true);
             try {
+                // 1. Load from LocalStorage (Cache/Draft)
                 const localOrder = getLocalOrder();
                 if (localOrder) {
-                    setOrderState(localOrder);
+                    setOrderState(localOrder); // Show cached data immediately
+
+                    // 2. Validate/Refresh from DB if it has an ID
+                    if (localOrder._id) {
+                        // Assuming the API expects { id: ... } or { _id: ... }
+                        // Based on standard practices, sending valid params object.
+                        const dbOrder = await getOrderById({ id: localOrder._id });
+                        if (dbOrder) {
+                            setOrderState(dbOrder);
+                            // Handler already updates localStorage
+                        }
+                    }
                 }
             } catch (error) {
-                console.error("Failed to load order from localStorage:", error);
+                console.error("Failed to load/refresh order:", error);
             } finally {
                 setLoading(false);
             }
         };
-        loadOrder();
+
+        initOrder();
     }, []);
 
     // Wrapper to update state and localStorage

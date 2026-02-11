@@ -8,6 +8,7 @@ import {
   Modal,
   Space,
   Typography,
+  Flex,
 } from "antd";
 import {
   SaveOutlined,
@@ -57,7 +58,7 @@ export const General = () => {
         fecha: order?.fecha?.split(" ")[0] || "",
         fechaEntrega: order?.fechaEntrega?.split(" ")[0] || "",
         coefficient: order?.coefficient || "",
-        drawer: `${order?.modelDrawer || ""}${order?.materialDrawer || ""}`,
+        drawer: `${order?.modelDrawer || ""}${order?.materialDrawer || ""} `,
         discountEncimeras: order?.discountEncimeras || "",
         discountCabinets: order?.discountCabinets || "",
         discountElectrodomesticos: order?.discountElectrodomesticos || "",
@@ -155,7 +156,7 @@ export const General = () => {
     <div style={containerStyle}>
       <div ref={containerRef} style={scrollableStyle(showFloatingButton)}>
         <Form form={form} layout="vertical" initialValues={initialValues} onFinish={onFinish}>
-          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+          <Flex vertical gap="middle" style={{ width: "100%" }}>
 
             <ClientInfo />
 
@@ -215,8 +216,8 @@ export const General = () => {
             {/* Botón Guardar */}
             <div ref={mainButtonRef} style={{ display: 'flex', justifyContent: 'center', paddingTop: 16 }}>
               <Button
-                type="primary"
                 htmlType="submit"
+                type="primary"
                 icon={<SaveOutlined />}
                 size="large"
                 loading={loading}
@@ -225,7 +226,7 @@ export const General = () => {
                 Guardar Cambios
               </Button>
             </div>
-          </Space>
+          </Flex>
         </Form>
       </div>
 

@@ -4,9 +4,10 @@ import { Layout, Menu, theme, Typography } from "antd";
 import { Nav } from "../interfaces";
 import { lista, listaCliente } from "../interfaces/menu/menuData";
 import { CONFIG } from "../../data/constants";
-import Icon, { LogoutOutlined } from '@ant-design/icons';
+import Icon, { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 
 const { Header, Content, Sider } = Layout;
+
 const Logo = () => (
   <NavLink
     to={`/Dashboard/Presupuestos`}
@@ -19,7 +20,6 @@ const Logo = () => (
       borderRadius: "6px",
       backgroundColor: "#1677ff", // Ant Design Blue
       textDecoration: "none",
-      marginRight: "8px"
     }}
   >
     <span style={{ color: "white", fontSize: "20px", fontWeight: "bold", lineHeight: 1 }}>S</span>
@@ -46,12 +46,22 @@ const Dashboard = () => {
           ? listaCliente
           : [];
 
-    return roleItems.map((item) => ({
+    const items = roleItems.map((item) => ({
       key: item.name, // Ensure 'name' matches path segments or define specific keys
       icon: <Icon component={item.icon} />,
       label: item.name,
       onClick: () => navigate(`/Dashboard/${item.name}`)
     }));
+
+    // Add Config option
+    items.push({
+      key: 'Config',
+      icon: <SettingOutlined />,
+      label: 'Configuración',
+      onClick: () => navigate('/Dashboard/Config')
+    });
+
+    return items;
   }, [navigate]);
 
   useEffect(() => {
@@ -72,7 +82,12 @@ const Dashboard = () => {
       boxShadow: '2px 0 8px 0 rgba(29,35,41,.05)',
       zIndex: 10
     },
-    logoContainer: { textAlign: 'center', alignItems: 'center', justifyContent: 'center' },
+    logoContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '20px 0'
+    },
     logoText: { margin: 0, color: '#1a7af8', display: collapsed ? 'none' : 'block' },
     menu: { borderRight: 0 },
     mainLayout: { height: "100vh", display: "flex", flexDirection: "column" },
@@ -95,6 +110,28 @@ const Dashboard = () => {
     }
   };
 
+  // Logout Button Component for Hover Handling
+  const LogoutButton = () => {
+    const [isHovered, setIsHovered] = useState(false);
+    return (
+      <a
+        href={CONFIG.URLS.LOGIN}
+        style={{ color: 'inherit', display: 'flex', justifyContent: 'center', width: '100%', padding: '10px 0' }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <LogoutOutlined
+          style={{
+            fontSize: '24px',
+            color: isHovered ? '#ff4d4f' : 'rgba(0, 0, 0, 0.45)',
+            cursor: 'pointer',
+            transition: 'color 0.3s'
+          }}
+        />
+      </a>
+    );
+  };
+
   return (
     <Layout style={styles.layout}>
       <Sider
@@ -102,35 +139,36 @@ const Dashboard = () => {
         collapsed={true}
         trigger={null}
         theme="light"
-        width={100} // Ajustamos ancho si fuera necesario, pero collapsed width manda
+        width={100}
         collapsedWidth={100}
         style={styles.sider}
       >
-        <div style={styles.logoContainer}>
-          <Logo />
-        </div>
-        <Menu
-          theme="light"
-          mode="inline"
-          selectedKeys={selectedKeys}
-          style={{
-            ...styles.menu,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '16px', // Espacio entre iconos
-            marginTop: '20px'
-          }}
-          items={menuItems.map(item => ({
-            ...item,
-            icon: React.cloneElement(item.icon, { style: { fontSize: '24px' } })
-          }))}
-        />
-        <div style={{ marginTop: 'auto', marginBottom: '20px', textAlign: 'center' }}>
-          <a href={CONFIG.URLS.LOGIN} style={{ color: 'inherit' }}>
-            <LogoutOutlined style={{ fontSize: '24px', color: '#ff4d4f', cursor: 'pointer' }} />
-          </a>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={styles.logoContainer}>
+            <Logo />
+          </div>
+          <Menu
+            theme="light"
+            mode="inline"
+            selectedKeys={selectedKeys}
+            style={{
+              ...styles.menu,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: '16px',
+              marginTop: '20px',
+              flex: 1 // Push subsequent items down
+            }}
+            items={menuItems.map(item => ({
+              ...item,
+              icon: React.cloneElement(item.icon, { style: { fontSize: '24px' } })
+            }))}
+          />
+          <div style={{ marginBottom: '20px', width: '100%' }}>
+            <LogoutButton />
+          </div>
         </div>
       </Sider>
       <Layout style={styles.mainLayout}>

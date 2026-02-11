@@ -32,14 +32,14 @@ axiosInstance.interceptors.request.use(
             config.headers.Authorization = activeToken;
         }
 
-        // Inyectar token en Params (para GET)
+        // Inyectar token en Params (SOLO para GET o si no hay body)
         if (!config.params) config.params = {};
-        if (activeToken && !config.params.token) {
+        if (activeToken && config.method === 'get' && !config.params.token) {
             config.params.token = activeToken;
         }
 
         // Inyectar token en Body (para POST/PUT) - soporte legacy
-        if (config.data && typeof config.data === "object") {
+        if (config.data && typeof config.data === "object" && (config.method === 'post' || config.method === 'put')) {
             if (activeToken && !config.data.token) {
                 config.data.token = activeToken;
             }

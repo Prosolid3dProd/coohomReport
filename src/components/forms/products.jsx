@@ -4,6 +4,7 @@ import {
   Card,
   message,
   Space,
+  Flex,
   Modal,
   Typography,
   Form
@@ -233,7 +234,7 @@ export const Product = () => {
   return (
     <div style={containerStyle}>
       <div ref={containerRef} style={scrollableStyle(showFloatingButton)}>
-        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+        <Flex vertical gap="middle" style={{ width: "100%" }}>
           {/* Form para agregar componentes */}
           <Card
             title={
@@ -290,7 +291,7 @@ export const Product = () => {
               onDelete={archivedComplementDetails}
             />
           </Card>
-        </Space>
+        </Flex>
       </div>
 
       <FloatingSaveButton

@@ -3,23 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { LockOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, message } from "antd";
 
-import { login } from "../../../handlers/user";
-import { getLocalToken, setLocalToken } from "../../../data/localStorage";
+import { login as loginHandler } from "../../../handlers/user";
+import { useUser } from "../../../context/UserContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useUser();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLocalToken(null);
+    // Clear legacy storage. Context handles its own state but we clear items just in case.
     localStorage.removeItem("campaign");
-    localStorage.removeItem("init");
   }, []);
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const result = await login({
+      const result = await loginHandler({
         email: values.email,
         password: values.password,
       });
@@ -31,8 +31,9 @@ const Login = () => {
       }
 
       message.success(`Bienvenido ${result?.user?.name || "Compañero"}!`);
-      // setLocalToken handles cookie setting
-      setLocalToken(result.token);
+
+      // Update Global Context and Cookies
+      login(result.token);
 
       navigate("/Dashboard/Presupuestos", { replace: true });
     } catch (error) {
@@ -112,7 +113,7 @@ const Login = () => {
     <div style={styles.container}>
       <div style={styles.panel}>
         <div style={styles.logoSection}>
-          C
+          S
         </div>
         <div style={styles.formSection}>
           <h1 style={styles.title}>Iniciar sesión</h1>

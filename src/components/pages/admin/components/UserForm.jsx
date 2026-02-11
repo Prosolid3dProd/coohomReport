@@ -8,6 +8,7 @@ import {
     Row,
     Col,
     Space,
+    Flex,
     Card,
     message,
     Tag
@@ -105,12 +106,12 @@ const UserForm = ({ open, onCancel, onFinish, initialValues, title = "Usuario" }
                 <Row gutter={24}>
                     <Col span={8}>
                         <Card size="small" title="Logo" styles={{ body: { textAlign: 'center' } }}>
-                            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                            <Flex vertical gap="middle" style={{ width: '100%' }}>
                                 {logoPreview}
                                 <Button icon={<FileAddOutlined />} onClick={handleUpload} block>
                                     {logoUrl ? 'Cambiar Logo' : 'Subir Logo'}
                                 </Button>
-                            </Space>
+                            </Flex>
                         </Card>
                     </Col>
                     <Col span={16}>

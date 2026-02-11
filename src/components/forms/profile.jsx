@@ -4,6 +4,7 @@ import {
   Form,
   message,
   Space,
+  Flex,
 } from "antd";
 import {
   SaveOutlined,
@@ -11,6 +12,7 @@ import {
 import { updateProfile } from "../../handlers/order";
 import { getUsers } from "../../handlers/user";
 import { useOrder } from "../../context/OrderContext";
+import { useUser } from "../../context/UserContext";
 import { useFloatingButton } from "../../hooks/useFloatingButton";
 import FloatingSaveButton from "../common/FloatingSaveButton";
 
@@ -21,6 +23,7 @@ import Observations from "./profile/Observations";
 
 export const Profile = () => {
   const { order, setOrder } = useOrder();
+  const { user: contextUser, refreshUser } = useUser();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -37,8 +40,16 @@ export const Profile = () => {
     const fetchUserData = async () => {
       try {
         if (order?.profile?.email) {
-          const users = await getUsers();
-          const currentUser = users.find((user) => user.email === order.profile.email);
+          let currentUser = null;
+
+          // 1. Try to use Context User (Optimized)
+          if (contextUser && contextUser.email === order.profile.email) {
+            currentUser = contextUser;
+          } else {
+            // 2. Fallback to API Fetch
+            const users = await getUsers();
+            currentUser = users.find((user) => user.email === order.profile.email);
+          }
 
           if (currentUser) {
             const updatedValues = {
@@ -63,7 +74,7 @@ export const Profile = () => {
       }
     };
     fetchUserData();
-  }, [order, form]);
+  }, [order, form, contextUser]);
 
   const onFinish = useCallback(async (values) => {
     try {
@@ -78,6 +89,8 @@ export const Profile = () => {
       if (result) {
         message.success("Perfil actualizado correctamente");
         setOrder(result);
+        // Propagate changes globally
+        await refreshUser();
       }
     } catch (error) {
       console.error("Error al actualizar:", error);
@@ -85,13 +98,13 @@ export const Profile = () => {
     } finally {
       setLoading(false);
     }
-  }, [order, setOrder]);
+  }, [order, setOrder, refreshUser]);
 
   return (
     <div style={containerStyle}>
       <div ref={containerRef} style={scrollableStyle(showFloatingButton)}>
         <Form layout="vertical" form={form} onFinish={onFinish}>
-          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+          <Flex vertical gap="middle" style={{ width: "100%" }}>
 
             <StoreInfo />
 
@@ -112,7 +125,7 @@ export const Profile = () => {
                 Guardar Cambios
               </Button>
             </div>
-          </Space>
+          </Flex>
         </Form>
       </div>
 
