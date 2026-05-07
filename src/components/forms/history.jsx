@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { getDiferenciaDias } from "../../data/dateUtils";
+import { useOrder } from "../../context";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import "./../../index.css";
 import { useNavigate } from "react-router-dom";
@@ -14,27 +16,10 @@ import {
 } from "antd";
 import {
   getOrders,
-  getOrderById,
-  fixOrder,
   archivedOrder,
-} from "../../handlers/order"; 
+} from "../../handlers/order";
 import { Header } from "../content"; 
 
-const getDiferenciaDias = (creacionPresupuesto) => {
-  if (!creacionPresupuesto) return [0, false];
-  const creationalDate = new Date(creacionPresupuesto);
-  if (isNaN(creationalDate)) return [0, false];
-  const actualDate = new Date();
-  const esMismoDia = (d1, d2) =>
-    d1.getDate() === d2.getDate() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getFullYear() === d2.getFullYear();
-  const creadoHoy = esMismoDia(actualDate, creationalDate);
-  const diffTiempo = creadoHoy
-    ? 0
-    : Math.ceil(Math.abs(actualDate - creationalDate) / (1000 * 3600 * 24));
-  return [diffTiempo, creadoHoy];
-};
 
 const History = () => {
   const [data, setData] = useState([]);
@@ -45,15 +30,15 @@ const History = () => {
     total: 0,
   });
   const navigate = useNavigate();
+  const { setActiveOrder } = useOrder();
 
-  // eliminar
   const onDelete = async (item) => {
     setLoad(true);
     try {
       const result = await archivedOrder(item);
       if (result) {
         message.success(`Pedido ${item.orderCode} eliminado correctamente`);
-        fetchData(pagination.current, pagination.pageSize); // recargar la página actual
+        fetchData(pagination.current, pagination.pageSize);
       } else {
         message.error(`Error al eliminar el pedido ${item.orderCode}`);
       }
@@ -64,15 +49,12 @@ const History = () => {
     }
   };
 
-  // navegar
   const onNavigate = async (item) => {
     try {
-      const result = await getOrderById({ _id: item._id });
-      fixOrder(result, 0, () => {
-        navigate("/Dashboard/Report/", { replace: true });
-      });
+      await setActiveOrder(item._id);
+      navigate("/Dashboard/Report/", { replace: true });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 

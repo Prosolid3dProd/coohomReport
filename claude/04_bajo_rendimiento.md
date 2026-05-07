@@ -1,6 +1,6 @@
-# 04 — Mejoras Menores y Configuración
+# 04 — Rendimiento y Configuración
 
-Categoría: `package.json` · alias de Vite · timeout de axios · `tailwind.config.js` · `jsconfig.json` · `console.log` en producción
+Categoría: `package.json` · alias de Vite · timeout de axios · `tailwind.config.js` · `jsconfig.json` · `console.log` en producción · code-splitting · caché en `encimerasModal`
 
 ---
 
@@ -377,14 +377,141 @@ Con esta configuración, `npm run build` elimina todos los `console.*` y `debugg
 
 ---
 
+## 7. Code-splitting de rutas pesadas
+
+**Problema:** `report.jsx` importa `@react-pdf/renderer` (~500KB en el bundle de producción). `admin.jsx` importa `filestack-js`. Ambos se cargan en el bundle inicial aunque el usuario nunca visite esas páginas. Tiempo hasta interactivo (TTI) afectado en login y dashboard.
+
+**Solución:** convertir esas dos rutas en `React.lazy` con `Suspense`, así Vite genera chunks separados que solo se descargan cuando el usuario navega allí.
+
+**Archivo:** `src/App.jsx`
+
+**ANTES (imports y rutas):**
+```javascript
+import {
+  Config,
+  Report,
+  Dashboard,
+  Login,
+  Encimeras,
+  RedirectLogin,
+  Error,
+  History,
+  Admin,
+} from "./components/index";
+
+// ...
+
+<Route path="Tiendas" element={<Admin />} />
+<Route path="Report" element={<Report />} />
+```
+
+**DESPUÉS:**
+```javascript
+import React, { useState, lazy, Suspense } from "react";
+import {
+  Config,
+  Dashboard,
+  Login,
+  Encimeras,
+  RedirectLogin,
+  Error,
+  History,
+} from "./components/index";
+
+const Report = lazy(() => import("./components/pages/report/report"));
+const Admin = lazy(() => import("./components/pages/admin/admin"));
+
+// ...
+
+const Loading = () => <div className="p-8 text-center">Cargando...</div>;
+
+// dentro del JSX:
+<Route path="Tiendas" element={
+  <Suspense fallback={<Loading />}>
+    <Admin />
+  </Suspense>
+} />
+<Route path="Report" element={
+  <Suspense fallback={<Loading />}>
+    <Report />
+  </Suspense>
+} />
+```
+
+> Si los componentes `Report` y `Admin` se exportan como `export default` desde sus archivos, `lazy(() => import("./..."))` funciona directamente. Si solo tienen `export const`, hay que adaptar el import: `lazy(() => import("./..").then(m => ({ default: m.Report })))`.
+
+**Verificar resultado:** tras `npm run build`, en `dist/assets/` deben aparecer chunks separados (`report-XXXX.js`, `admin-XXXX.js`). El bundle principal (`index-XXXX.js`) baja en tamaño.
+
+---
+
+## 8. Caché y debounce en `encimerasModal`
+
+**Problema:** `src/components/pages/Encimeras/encimerasModal.jsx` líneas 59-77 hacen un fetch a `/reportCoohomComplements` (o similar) en cada cambio de filtro sin debounce ni caché. Si el usuario teclea "encimera" carácter a carácter, se lanzan 8 peticiones consecutivas. Si vuelve a un filtro previo, refetchea.
+
+**Solución mínima:** debounce de 300ms + caché en `Map` por query.
+
+### 8.1 Hook nuevo `src/hooks/useDebouncedValue.js`
+
+```javascript
+import { useEffect, useState } from "react";
+
+export const useDebouncedValue = (value, delay = 300) => {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+};
+```
+
+### 8.2 Caché simple a nivel de módulo
+
+Dentro de `encimerasModal.jsx` (o en un archivo `src/data/encimerasCache.js`):
+
+```javascript
+const cache = new Map();
+
+export const fetchEncimerasFiltered = async (query) => {
+  if (cache.has(query)) return cache.get(query);
+  const result = await getComplementsByText({ text: query });
+  cache.set(query, result);
+  return result;
+};
+```
+
+### 8.3 Uso en el componente
+
+```javascript
+const [filter, setFilter] = useState("");
+const debouncedFilter = useDebouncedValue(filter, 300);
+const [items, setItems] = useState([]);
+
+useEffect(() => {
+  let cancelado = false;
+  fetchEncimerasFiltered(debouncedFilter).then((res) => {
+    if (!cancelado) setItems(res);
+  });
+  return () => { cancelado = true; };
+}, [debouncedFilter]);
+```
+
+> Para invalidar la caché tras crear/borrar un complemento, exponer `cache.clear()` y llamarlo desde el handler que crea/borra. La caché vive solo en memoria del navegador y se reinicia al recargar — suficiente para el caso de uso.
+
+---
+
 ## Pasos de ejecución en orden
 
 1. **`package.json`** — Eliminar `@uidotdev/usehooks` y `caniuse-lite` de `dependencies`. Mover `json-server` a `devDependencies`. Eliminar `esm` de `devDependencies`. Ejecutar `npm install`.
 2. **`vite.config.js`** — Añadir `import path from 'path'` y el bloque `resolve.alias`. Opcionalmente, convertir a función `defineConfig(({ mode }) => ...)` para el `esbuild.drop`.
-3. **`handlers/order.js`** — Añadir `timeout: 15000` en la instancia `_AXIOS_`. Añadir `axios.defaults.timeout = 15000` para las llamadas directas.
-4. **`handlers/user.js`** — Añadir `axios.defaults.timeout = 15000` justo después de `axios.defaults.baseURL`.
-5. **`tailwind.config.js`** — Quitar el `;` del string `"Helvetica Neue,sans-serif;"`.
-6. **`jsconfig.json`** — Añadir `"baseUrl": "."` y `"paths": { "@/*": ["src/*"] }`.
-7. **`console.log` en producción** — Elegir una de las dos estrategias: (a) condicionar cada `console.log` con `import.meta.env.DEV`, o (b) configurar `esbuild.drop` en `vite.config.js` para eliminarlos automáticamente en build.
-8. Ejecutar `npm run build` y verificar que el build completa sin errores.
-9. Ejecutar `npm run preview` para probar el bundle de producción localmente y confirmar que los colores de los botones se ven correctamente (mejora del documento 03) y que no hay `console.log` visibles en la consola del navegador.
+3. **`handlers/order.js`** — `timeout: 15000` en la instancia compartida (ya cubierto en doc 03 sección 5.1 si se hizo el refactor de `axiosInstance.js`).
+4. **`tailwind.config.js`** — Quitar el `;` del string `"Helvetica Neue,sans-serif;"`.
+5. **`jsconfig.json`** — Añadir `"baseUrl": "."` y `"paths": { "@/*": ["src/*"] }`.
+6. **`console.log` en producción** — Configurar `esbuild.drop` en `vite.config.js` para eliminarlos automáticamente en build.
+7. **`App.jsx`** — Convertir `Report` y `Admin` a `React.lazy` con `<Suspense>`.
+8. **`encimerasModal.jsx`** — Crear `useDebouncedValue` y caché en `Map`. Adaptar el `useEffect` de fetch.
+9. Ejecutar `npm run build` y verificar:
+   - El build completa sin errores.
+   - `dist/assets/` tiene chunks separados para `report` y `admin`.
+   - El bundle principal baja de tamaño respecto al build anterior.
+10. Ejecutar `npm run preview` y comprobar que los colores de los botones se ven correctamente (doc 03), no hay `console.log` en consola, y la búsqueda en el modal de encimeras no satura la red.

@@ -1,4 +1,4 @@
 import Menu from "./menu/menu";
-import Nav from "../interfaces/nav/nav";
+import Nav from "./nav/nav";
 
 export { Menu, Nav };

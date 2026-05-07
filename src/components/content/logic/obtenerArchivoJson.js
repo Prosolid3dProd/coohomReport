@@ -45,13 +45,6 @@ const exportarArchivo = (data) => {
         Tipo: obj.type,
         Marca: obj.marca,
         Precio: parseFloat(obj.price).toFixed(2),
-        // width: obj.width,
-        // height: obj.height,
-        // archived: obj.archived,
-        // id: obj._id,
-        // fecha1: obj.createdAt,
-        // fecha2: obj.updatedAt,
-        // v: obj.__v,
       };
     })
     .filter((obj) => obj !== null);

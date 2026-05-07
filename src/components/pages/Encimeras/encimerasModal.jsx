@@ -3,6 +3,15 @@ import { Table, message, Typography, Select, Button } from "antd";
 import { getComplements, getComplementsByText } from "../../../handlers/order";
 import { Header } from "../../content";
 
+const searchCache = new Map();
+
+const fetchEncimerasFiltered = async (query) => {
+  if (searchCache.has(query)) return searchCache.get(query);
+  const result = await getComplementsByText(query);
+  searchCache.set(query, result);
+  return result;
+};
+
 const { Option } = Select;
 
 const Encimeras = ({ title, setEncimera }) => {
@@ -84,7 +93,7 @@ const Encimeras = ({ title, setEncimera }) => {
 
   const handleSearch = async (searchTerm) => {
     try {
-      const results = await getComplementsByText(searchTerm);
+      const results = await fetchEncimerasFiltered(searchTerm);
       if (results && results.length) {
         setAllData(results);
         setData(results);

@@ -16,10 +16,11 @@ export const lista = [
     name: "Tiendas",
     icon: Tiendas,
   },
-  // {
-  //   name: "Config",
-  //   icon: Config,
-  // },
+  {
+    id: 4,
+    name: "Config",
+    icon: Config,
+  },
 ];
 
 export const listaCliente = [

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Input,
@@ -18,16 +18,15 @@ import {
   CreateOrderDetails,
   updateOrderDetails,
   handleArchivedOrderDetails,
-  getLocalOrder,
-  setLocalOrder,
 } from "../../handlers/order";
-import EncimerasModal from "../pages/Encimeras/encimerasModal";
+import { useOrder } from "../../context";
+import EncimerasModal from "../pages/encimeras/encimerasModal";
 
-const Product = ({ getData }) => {
+const Product = () => {
+  const { order, refreshOrder } = useOrder();
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
   const [state, setState] = useState({
-    data: getLocalOrder(),
     type: null,
     encimera: null,
     isUpdate: null,
@@ -37,24 +36,20 @@ const Product = ({ getData }) => {
     },
   });
 
-  // Manejo de estados relacionados con los formularios y cálculos
   const [formValues, setFormValues] = useState({
     cantidad: 0,
     unidad: 0,
     total: 0,
   });
 
-  // Actualiza el estado de modales
   const updateModals = (modals) => {
     setState((prev) => ({ ...prev, modals: { ...prev.modals, ...modals } }));
   };
 
-  // Dentro de tu componente
   const setType = (type) => {
     setState((prev) => ({ ...prev, type }));
   };
 
-  // Maneja los campos de encimera seleccionada
   useEffect(() => {
     if (state.encimera) {
       form.setFieldsValue({
@@ -69,11 +64,10 @@ const Product = ({ getData }) => {
     }
   }, [state.encimera, form]);
 
-  // Calcula el total dinámicamente
   useEffect(() => {
     const { cantidad, unidad } = formValues;
-    const descuento = form.getFieldValue("discount") || 0; // Obtener el descuento del formulario
-    const unidadConDescuento = unidad - (descuento / 100) * unidad; // Aplicar descuento
+    const descuento = form.getFieldValue("discount") || 0;
+    const unidadConDescuento = unidad - (descuento / 100) * unidad;
 
     const total =
       !isNaN(cantidad) && !isNaN(unidadConDescuento)
@@ -81,29 +75,8 @@ const Product = ({ getData }) => {
         : 0;
 
     setFormValues((prev) => ({ ...prev, unidad: unidadConDescuento, total }));
-    form.setFieldsValue({ unidad: unidadConDescuento.toFixed(2) }); // Actualizar visualmente
+    form.setFieldsValue({ unidad: unidadConDescuento.toFixed(2) });
   }, [form.getFieldValue("discount")]);
-
-  // const updateLocalOrderData = useCallback(
-  //   (updatedDetails) => {
-  //     const updatedData = {
-  //       ...state.data,
-  //       details: state.data.details.map((detail) =>
-  //         detail.referencia === updatedDetails.referencia
-  //           ? { ...detail, ...updatedDetails } // Solo actualiza el que coincide
-  //           : detail
-  //       ),
-  //     };
-
-  //     // Actualizar el estado global
-  //     setState((prev) => ({ ...prev, data: updatedData }));
-
-  //     setLocalOrder(updatedData).then(() => {
-  //       getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
-  //     });
-  //   },
-  //   [state.data, getData]
-  // );
 
   const onFinish = async (values) => {
     try {
@@ -118,21 +91,18 @@ const Product = ({ getData }) => {
         return;
       }
 
-      if (!state.data?._id) return;
+      if (!order?._id) return;
 
-      const existingDetailIndex = state.data.details.findIndex(
+      const existingDetailIndex = order.details.findIndex(
         (detail) => detail.referencia === values.referencia
       );
 
-      let updatedDetails;
-      let updatedData;
-
       if (existingDetailIndex !== -1) {
-        const existingDetail = state.data.details[existingDetailIndex];
+        const existingDetail = order.details[existingDetailIndex];
         const nuevaCantidad = parseFloat(existingDetail.qty) + qtyNueva;
         const nuevoTotal = nuevaCantidad * unidadConDescuento;
 
-        updatedDetails = {
+        const updatedDetails = {
           ...existingDetail,
           qty: nuevaCantidad,
           unidad: unidadConDescuento.toFixed(2),
@@ -140,28 +110,18 @@ const Product = ({ getData }) => {
           discount: descuento,
         };
 
-        const newDetails = [...state.data.details];
-        newDetails[existingDetailIndex] = updatedDetails;
-
-        updatedData = { ...state.data, details: newDetails };
-
         const result = await updateOrderDetails({
           details: updatedDetails,
           isUpdate: true,
-          _id: state.data._id,
+          _id: order._id,
         });
 
         if (result) {
-          setState((prev) => ({ ...prev, data: updatedData }));
-          setLocalOrder(updatedData).then(() => {
-            getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
-          });
-          message.success(
-            "Se ha actualizado la cantidad del elemento existente"
-          );
+          await refreshOrder();
+          message.success("Se ha actualizado la cantidad del elemento existente");
         }
       } else {
-        updatedDetails = {
+        const updatedDetails = {
           ...values,
           unidad: unidadConDescuento.toFixed(2),
           total: (qtyNueva * unidadConDescuento).toFixed(2),
@@ -170,15 +130,11 @@ const Product = ({ getData }) => {
         const result = await CreateOrderDetails({
           details: updatedDetails,
           isUpdate: state.isUpdate,
-          _id: state.data._id,
+          _id: order._id,
         });
 
         if (result) {
-          updatedData = { ...state.data, details: result.details };
-          setState((prev) => ({ ...prev, data: updatedData }));
-          setLocalOrder(updatedData).then(() => {
-            getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
-          });
+          await refreshOrder();
           message.success("Se ha añadido un nuevo elemento");
         }
       }
@@ -207,42 +163,28 @@ const Product = ({ getData }) => {
       const discountedPrice = parsedUnidad - (parsedDiscount / 100) * parsedUnidad;
       const updatedTotal = discountedPrice * parsedQty;
 
-      let parseOrder = JSON.parse(localStorage.getItem("order"));
-      let idEncontrado = encontrarIdEnDetalles(values, parseOrder.details);
+      let idEncontrado = encontrarIdEnDetalles(values, order.details);
 
 
       const updatedValues = {
         id: idEncontrado,
         ...values,
-        unidad: parsedUnidad.toFixed(2), // Mantener el precio unitario original (sin descuento)
-        total: updatedTotal.toFixed(2), // Total calculado con descuento
+        unidad: parsedUnidad.toFixed(2),
+        total: updatedTotal.toFixed(2),
       };
 
-      // console.log("Valores antes de actualizar:", updatedValues);
-
-      // ✅ CORRECCIÓN: Mantener todos los detalles al actualizar
-      const updatedDetails = state.data.details.map(detail =>
-          detail.referencia === values.referencia ? updatedValues : detail
+      const updatedDetails = order.details.map(detail =>
+        detail.referencia === values.referencia ? updatedValues : detail
       );
 
-      // console.log("Detalles actualizados a enviar:", updatedDetails); // <-- Nuevo log
-
       const result = await updateOrderDetails({
-        details: updatedDetails, // ✅ Ahora enviamos TODA la lista de detalles
+        details: updatedDetails,
         isUpdate: state.isUpdate,
-        _id: state.data._id,
+        _id: order._id,
       });
 
-      // console.log("Respuesta de updateOrderDetails:", result);
-
       if (result) {
-        const updatedData = { ...state.data, details: updatedDetails };
-
-        setState((prev) => ({ ...prev, data: updatedData }));
-        setLocalOrder(updatedData).then(() => {
-          getData(updatedData);
-        });
-
+        await refreshOrder();
         message.success("Producto actualizado correctamente");
         updateModals({ isEditModalOpen: false });
       }
@@ -252,42 +194,25 @@ const Product = ({ getData }) => {
   };
 
 
-  const [loading, setLoading] = useState(false); // Estado de carga para la tabla
+  const [loading, setLoading] = useState(false);
 
   const archivedComplementDetails = async (details) => {
     try {
-      setLoading(true); // Activar el loading antes de eliminar
-
-      // Llamada a la API para archivar/eliminar el complemento
+      setLoading(true);
       const result = await handleArchivedOrderDetails({
-        _id: state.data._id,
+        _id: order._id,
         details,
       });
 
       if (result) {
-        // Filtrar los detalles para eliminar solo el elemento correcto
-        const updatedDetails = state.data.details.filter(
-          (detail) => detail.referencia !== details.referencia
-        );
-
-        // Crear un nuevo objeto de datos actualizado
-        const updatedData = { ...state.data, details: updatedDetails };
-
-        // Actualizar el estado de forma inmutable
-        setState((prev) => ({ ...prev, data: updatedData }));
-
-        // Sincronizar con el almacenamiento local y propagar los datos
-        setLocalOrder(updatedData).then(() => {
-          getData(updatedData); // Ahora se ejecuta solo después de actualizar localStorage
-        });
-
+        await refreshOrder();
         message.success("Se ha eliminado el complemento");
       }
     } catch (error) {
       console.error("Error al eliminar detalles:", error);
       message.error("Hubo un error al eliminar el complemento");
     } finally {
-      setLoading(false); // Desactivar el loading cuando termine
+      setLoading(false);
     }
   };
 
@@ -430,7 +355,7 @@ const Product = ({ getData }) => {
       </Form>
       <Divider />
       <Table
-        dataSource={state.data?.details || []}
+        dataSource={order?.details || []}
         columns={columns}
         loading={loading}
         rowKey="referencia"

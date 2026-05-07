@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { Tabs } from 'antd'
 
@@ -47,60 +47,46 @@ const NavConfig = () => {
 }
 
 const Perfil = () => {
+    const imgRef = useRef(null)
 
     const [botonSave, setBotonSave] = useState(false)
     const [disabled, setDisabled] = useState(false)
     const [color, setColor] = useState('#1a7af8')
-    const [imgWidth, setImgWidth] = useState(document.getElementById('img'))
-    const [img, setImg] = useState(getValue('Img') || `https://placehold.co/${imgWidth || '500'}X250`)
+    const [img, setImg] = useState(getValue('Img') || 'https://placehold.co/500X250')
 
-    useEffect(() => {
-        setImgWidth(img => img = document.getElementById('img')?.width)
-        setImg(img => img = `https://placehold.co/${imgWidth || '500'}X250`)
-    }, [window.location])
-
-    useEffect(() => {
-        setImgWidth(img => img = document.getElementById('img')?.width)
-    })
-
-
-    const changeImg = (event) => {
-        setImgWidth(img => img = document.getElementById('img')?.width)
-
-        if (event < 1024) {//Lg Breakpoint
-            setImg(img => img = getValue('Img') || `https://placehold.co/${imgWidth}X250`)
+    const changeImg = (windowWidth) => {
+        const width = imgRef.current?.offsetWidth || 500
+        if (windowWidth < 1024) {
+            setImg(getValue('Img') || `https://placehold.co/${width}X250`)
             return
         }
-
-        setImg(img => img = getValue('Img') || `https://placehold.co/500X250`)
+        setImg(getValue('Img') || 'https://placehold.co/500X250')
     }
 
     useEffect(() => {
-        window.onload = () => {
-            changeImg(window.innerWidth)
-        }
-        window.onresize = () => {
-            changeImg(window.innerWidth)
-        }
-    })
+        changeImg(window.innerWidth)
+        const handleResize = () => changeImg(window.innerWidth)
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     const onClick = () => {
-        const imgSrc = document.getElementById('img').src
-        setImg(img => img = imgSrc)
-        setColor(c => c = '#1a7af8')
-        setDisabled(d => d = false)
-        setBotonSave(bool => bool = false)
+        const imgSrc = imgRef.current?.src || img
+        setImg(imgSrc)
+        setColor('#1a7af8')
+        setDisabled(false)
+        setBotonSave(false)
         setValue('Img', imgSrc)
     }
 
     const cancel = () => {
-        document.getElementById('img').src = getValue('Img')
-        const imgSrc = document.getElementById('img').src
-        setValue('Img', imgSrc)
-
-        setColor(c => c = '#1a7af8')
-        setDisabled(d => d = false)
-        setBotonSave(btn => btn = false)
+        const savedImg = getValue('Img')
+        if (imgRef.current) imgRef.current.src = savedImg
+        setImg(savedImg)
+        setValue('Img', savedImg)
+        setColor('#1a7af8')
+        setDisabled(false)
+        setBotonSave(false)
     }
 
     return (
@@ -109,7 +95,7 @@ const Perfil = () => {
                 <>
                     <article className='h-[400px] py-4 flex flex-col items-center gap-4 w-full'>
                         <div className='w-full lg:w-[500px] flex flex-col items-center justify-center gap-4 flex-1 mr-l '>
-                            <img className='w-full h-[250px] bg-gray object-cover' id='img' src={img} />
+                            <img ref={imgRef} className='w-full h-[250px] bg-gray object-cover' src={img} />
                         </div>
                         <header className='flex flex-row h-[85px] items-center justify-between w-full p-8'>
                             <h2 className='font-semibold '>Banner</h2>
@@ -131,26 +117,21 @@ const Perfil = () => {
                                             className="hidden"
                                             disabled={disabled}
                                             onChange={(e) => {
-
                                                 const files = e.target.files
                                                 const fileUpload = files[0]
                                                 const fileRead = new FileReader()
 
                                                 if (files && files.length) {
-
                                                     fileRead.onload = () => {
                                                         const fileContent = fileRead.result;
-                                                        document.getElementById('img').src = fileContent
+                                                        if (imgRef.current) imgRef.current.src = fileContent
                                                     };
-
                                                     fileRead.readAsDataURL(fileUpload);
-
-                                                    setDisabled(d => d = true)
-                                                    setColor(color => color = '#CFCFCF')
-                                                    setBotonSave(bool => bool = true)
+                                                    setDisabled(true)
+                                                    setColor('#CFCFCF')
+                                                    setBotonSave(true)
                                                 }
                                             }}
-
                                         />
                                         <p>Change</p>
                                     </>
@@ -189,6 +170,7 @@ const Perfil = () => {
 
 
 const EditableArticle = ({ text, extraBtn = false, action, input = true }) => {
+    const inputRef = useRef(null)
 
     const [showPassword, setShowPassword] = useState(false);
     const [modoEditar, setModoEditar] = useState(false)
@@ -196,22 +178,22 @@ const EditableArticle = ({ text, extraBtn = false, action, input = true }) => {
     const [value, setVal] = useState(getValue(text))
 
     const editInput = () => {
-        const input = document.getElementById(`${text}`)
+        const el = inputRef.current
+        if (!el) return
 
         if (!modoEditar) {
-            setModoEditar(editar => editar = true)
-            setTextoBtn(texto => texto = 'Save')
-            input.disabled = false
-            input.classList.add('inputAble')
+            setModoEditar(true)
+            setTextoBtn('Save')
+            el.disabled = false
+            el.classList.add('inputAble')
             return
         }
 
-        setModoEditar(editar => editar = false)
-        setTextoBtn(texto => texto = 'Editar')
-        input.classList.remove('inputAble')
-
-        input.disabled = true
-        setValue(text, input.value)
+        setModoEditar(false)
+        setTextoBtn('Editar')
+        el.classList.remove('inputAble')
+        el.disabled = true
+        setValue(text, el.value)
     }
 
     return (
@@ -225,7 +207,7 @@ const EditableArticle = ({ text, extraBtn = false, action, input = true }) => {
                         input
                         && (
                             <>
-                                <input id={text} type={showPassword ? 'password' : 'text'}
+                                <input ref={inputRef} type={showPassword ? 'password' : 'text'}
                                     className={`self-start bg-transparent w-full h-full focus:outline-none text-start pl-4`}
                                     placeholder={text}
                                     defaultValue={value || text}

@@ -1,357 +1,179 @@
-import axios from "axios";
-import Cookies from "js-cookie";
+import apiClient, { handleApiError, API_TOKEN } from "./axiosInstance";
+import { parseJson3D } from "../data";
 
-import { CONFIG } from "../data/constants";
-
-const Settings = {
-  // BACKEND_URL: "http://localhost:3007",
-  // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
-  BACKEND_URL: "https://api.simulhome.com/coohomReport",
-  ENDPOINT: "reportCoohom",
-  TOKEN: "Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH",
-};
-
-let _AXIOS_ = axios.create({
-  headers: {
-    Authorization: CONFIG.API.TOKEN,
-  },
-});
-
-const tokenLocal = () => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("token");
-  }
-};
-
-export const axiosToken = axios.create({
-  headers: {
-    Authorization: Cookies.get("token") || tokenLocal(),
-  },
-});
+const ENDPOINT = "reportCoohom";
 
 export const createOrder = async (params) => {
   try {
-    const data = await _AXIOS_.post(
-      `${CONFIG.API.BACKEND_URL}/${CONFIG.API.ENDPOINT}`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    // console.log(data.data.result, "createOrder");
-
-    return data.data;
+    const { data } = await apiClient.post(`/${ENDPOINT}`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "crear orden");
   }
 };
 
 export const createCabinetByUser = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomCabinetCreate`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    const { data } = await apiClient.post(`/reportCoohomCabinetCreate`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "crear gabinete");
   }
 };
 
 export const updateOrder = async (params) => {
   try {
-    const data = await _AXIOS_.put(
-      `${CONFIG.API.BACKEND_URL}/${Settings.ENDPOINT}`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    // console.log(data.data, "updateOrder");
-    return data.data;
+    const { data } = await apiClient.put(`/${ENDPOINT}`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "actualizar orden");
   }
 };
 
 export const updateProfile = async (params) => {
   try {
-    const data = await _AXIOS_.put(`${CONFIG.API.BACKEND_URL}/profileUpdate`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
-    return data.data;
+    const { data } = await apiClient.put(`/profileUpdate`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "actualizar perfil");
   }
 };
 
 export const getOrders = async (params) => {
   try {
-    const data = await _AXIOS_.post(`${CONFIG.API.BACKEND_URL}/reportsCoohom`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
-    return data?.data;
+    const { data } = await apiClient.post(`/reportsCoohom`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "obtener órdenes");
   }
 };
 
 export const getComplements = async (params) => {
   try {
-    const data = await _AXIOS_.get(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomComplements`,
-      // "http://localhost:3000/verTodosComplementos2",
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
+    const { data } = await apiClient.get(`/reportCoohomComplements`, { params });
     return data.data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "obtener complementos");
   }
 };
 
 export const getComplementsByText = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomComplementsbyText`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    const { data } = await apiClient.post(`/reportCoohomComplementsbyText`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "buscar complementos");
   }
 };
 
-/*
-export const updateCabinet = async (params) => {
-  try {
-    const data = await axios.put(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomComplements`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
-  } catch (error) {
-    console.log(error);
-    return false;
-  }
-};*/
-
 export const getOrderById = async (params) => {
   try {
-    const data = await _AXIOS_.post(`${CONFIG.API.BACKEND_URL}/reporthomById`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
-    localStorage.setItem("order", JSON.stringify(data.data));
-
-    // console.log(data.data, "getOrderById");
-    return data.data;
+    const { data } = await apiClient.post(`/reporthomById`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "obtener orden por ID");
   }
 };
 
 export const getProfile = async (params) => {
   try {
-    const data = await _AXIOS_.post(`${CONFIG.API.BACKEND_URL}/getProfile`, {
-      ...params,
-    });
-    return data.data;
+    const { data } = await apiClient.post(`/getProfile`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "obtener perfil");
   }
 };
 
 export const CreateOrderDetails = async (params) => {
   try {
-    const data = await _AXIOS_.post(
-      `${CONFIG.API.BACKEND_URL}/reporthomDetails`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    const { data } = await apiClient.post(`/reporthomDetails`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "crear detalles de orden");
   }
 };
 
 export const updateOrderDetails = async (params) => {
   try {
-    const data = await _AXIOS_.put(
-      `${CONFIG.API.BACKEND_URL}/reporthomDetails`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    const { data } = await apiClient.put(`/reporthomDetails`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "actualizar detalles de orden");
   }
 };
 
+// EXCEPCIÓN: /reporthomUpdateCabinets valida API_TOKEN en body, no Bearer JWT.
 export const updateCabinetsOrder = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/reporthomUpdateCabinets`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    const { data } = await apiClient.post(`/reporthomUpdateCabinets`, {
+      ...params,
+      token: API_TOKEN,
+    });
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "actualizar gabinetes");
   }
 };
 
 export const archivedOrderDetails = async (params) => {
   try {
-    const data = await axios.put(`${CONFIG.API.BACKEND_URL}/reporthomDetails`, {
-      ...params,
-      token: Settings.TOKEN,
-    });
-    return data.data;
+    const { data } = await apiClient.put(`/reporthomDetails`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "archivar detalles");
   }
 };
 
 export const handleArchivedOrderDetails = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/reporthomComplementDetailsDelete`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    const { data } = await apiClient.post(`/reporthomComplementDetailsDelete`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "eliminar detalle de complemento");
   }
 };
 
 export const updateCabinet = async (params) => {
   try {
-    const data = await axios.put(
-      `${CONFIG.API.BACKEND_URL}/reportCoohomCabinets`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    const { data } = await apiClient.put(`/reportCoohomCabinets`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "actualizar gabinete");
   }
 };
 
 export const archivedOrder = async (params) => {
   try {
-    const data = await axios.put(
-      `${CONFIG.API.BACKEND_URL}/archivedReportCoohom`,
-      {
-        ...params,
-        token: Settings.TOKEN,
-      }
-    );
-    return data.data;
+    const { data } = await apiClient.put(`/archivedReportCoohom`, params);
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "archivar orden");
   }
 };
 
-// export const deleteComplements = async (params) => {
-//   const formData = new URLSearchParams();
-//   formData.append('code', params.code);
-//   formData.append('token', Settings.TOKEN);
-
-//   try {
-//     const response = await axios.put(
-//       `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`,
-//       formData.toString(),
-//       {
-//         headers: {
-//           'Content-Type': 'application/x-www-form-urlencoded'
-//         }
-//       }
-//     );
-
-//     return response.data;
-//   } catch (error) {
-//     console.error(error);
-//     return false;
-//   }
-// };
-
 export const deleteComplements = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/eliminarPorCodigo`,
-      params
-    );
+    const { data } = await apiClient.post(`/eliminarPorCodigo`, params);
     return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "eliminar complemento");
   }
 };
 
 export const importLibrary = async (formData) => {
   try {
-    await axios.post(
-      `${CONFIG.API.BACKEND_URL}/cargarNuevoXlsxSola`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        ...formData,
-        token: Settings.TOKEN,
-      }
-    );
+    await apiClient.post(`/cargarNuevoXlsxSola`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   } catch (error) {
-    console.error("Error uploading file:", error);
+    handleApiError(error, "importar librería");
   }
 };
 
-export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
+export const fixOrder = (order, tab = 0, role = "client", onSuccess = () => {}) => {
   let total = 0;
   let priceTotal = 0;
   let cabinetsArray = [];
-  const role = JSON.parse(localStorage.getItem("token")).user.role;
 
   let coefficient;
 
@@ -395,7 +217,6 @@ export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
     let ivaElectrodomesticosPorcentaje = 0;
     let ivaEquipamientosPorcentaje = 0;
 
-    // Calculando los descuentos individuales
     if (parseFloat(order.discountEncimeras) > 0) {
       discountEncimerasPorcentaje =
         parseFloat(total) * (parseFloat(order.discountEncimeras) / 100);
@@ -416,7 +237,6 @@ export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
         parseFloat(total) * (parseFloat(order.discountEquipamientos) / 100);
     }
 
-    // Calculando los IVA individuales
     if (parseFloat(order.ivaEncimeras) > 0) {
       ivaEncimerasPorcentaje =
         (parseFloat(total) * parseFloat(order.ivaEncimeras)) / 100;
@@ -465,21 +285,20 @@ export const fixOrder = (order, tab = 0, onSuccess = () => {}) => {
       ivaEquipamientosPorcentaje,
     };
 
-    setLocalOrder(orderJson);
     onSuccess();
     return orderJson;
   }
 };
 
-// Esta funcion es para obtener en localstorage
-export const getLocalOrder = () => {
-  return JSON.parse(localStorage.getItem("order"));
-};
-
-// Esta funcion es para guardar en localstorage
-export const setLocalOrder = async (params) => {
-  return new Promise((resolve) => {
-    localStorage.setItem("order", JSON.stringify(params));
-    resolve(getOrders()); // Asegura que getOrders() se ejecuta después de actualizar localStorage
-  });
+export const mergeAndUpdateOrder = async (json, existingOrders) => {
+  const newData = await parseJson3D(json);
+  const existingIndex = existingOrders.findIndex(
+    (item) => item.orderCode === newData.orderCode
+  );
+  if (existingIndex !== -1) {
+    const upData = await createOrder(newData);
+    return { type: "update", result: upData.result, index: existingIndex };
+  }
+  const order = await createOrder(newData);
+  return { type: "create", result: order.result };
 };

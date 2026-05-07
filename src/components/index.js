@@ -1,15 +1,14 @@
-import { Muebles } from "../components/content/index";
-import { Menu, Nav } from "../components/interfaces/index";
+import { Muebles } from "./content/index";
+import { Menu, Nav } from "./layout/index";
 import {
   Config,
-  Report,
   Dashboard,
   Login,
   Encimeras,
   RedirectLogin,
   Error,
-} from "../components/pages";
-import { Admin } from "../components/pages";
+} from "./pages";
+import { Admin } from "./pages";
 import { History, Product, General, Profile } from "./forms/index";
 
 export {
@@ -17,7 +16,6 @@ export {
   Menu,
   Muebles,
   Nav,
-  Report,
   Dashboard,
   Login,
   Encimeras,
@@ -29,5 +27,3 @@ export {
   General,
   Admin,
 };
-
-//Archivo barril Principal --> Components

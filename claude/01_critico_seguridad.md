@@ -1,23 +1,22 @@
 # 01 — Seguridad Crítica
 
-Categoría: Secretos y variables de entorno · Protección de rutas por rol
+Categoría: Variables de entorno · Migración a JWT Bearer · API_TOKEN selectivo · Filestack · Role guard · CORS
 
-Los problemas de esta categoría deben corregirse **antes** de cualquier despliegue o push a un repositorio público. Incluyen un token de API hardcodeado en código fuente, URLs de backend embebidas en tres archivos distintos y la ausencia de verificación de rol en la ruta `/Dashboard/Tiendas`.
+Estos cambios son prerrequisito de cualquier despliegue. El backend ya migró a `.env`, JWT Bearer y CORS por whitelist (ver `analisis_general.md` sección 0). El frontend tiene que alinearse.
 
 ---
 
-## 1. Crear `.env.local` con la URL del backend y el token de API
-
-**Problema:** La URL `https://api.simulhome.com/coohomReport` y el token `Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH` están escritos literalmente en `handlers/order.js`, `handlers/user.js` y `data/constants.js`. Cualquier persona con acceso al repositorio los ve de inmediato.
+## 1. Crear `.env.local` con la configuración de cliente
 
 **Archivo a crear:** `C:\Users\alvar\WebstormProjects\coohomReport\.env.local`
 
 ```ini
 VITE_API_URL=https://api.simulhome.com/coohomReport
 VITE_API_TOKEN=Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH
+VITE_FILESTACK_KEY=AXPWPBPSTvSKYoyHwByaaz
 ```
 
-> Vite solo expone al cliente las variables que empiezan con `VITE_`. Las variables sin ese prefijo quedan invisibles en el bundle. `.env.local` nunca se sube a git (ver paso 2).
+> Vite solo expone al cliente las variables que empiezan con `VITE_`. `.env.local` no se sube a git (ver paso 2). Aunque las claves del bundle frontend son inevitablemente visibles tras el build, sacarlas del repo evita que aparezcan en `git log` y bloqueos automáticos por leak detection.
 
 ---
 
@@ -25,7 +24,7 @@ VITE_API_TOKEN=Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH
 
 **Archivo:** `C:\Users\alvar\WebstormProjects\coohomReport\.gitignore`
 
-El archivo ya existe. Añadir al final:
+El archivo ya tiene `*.local` (cubre `.env.local`). Añadir explícitamente para claridad:
 
 **ANTES (final del archivo):**
 ```
@@ -37,6 +36,7 @@ El archivo ya existe. Añadir al final:
 *.sw?
 
 # Variables de entorno locales — nunca subir al repositorio
+.env
 .env.local
 .env.*.local
 ```
@@ -44,8 +44,6 @@ El archivo ya existe. Añadir al final:
 ---
 
 ## 3. Modificar `src/data/constants.js` para usar variables de entorno
-
-**Problema:** La URL del backend está hardcodeada en la línea 9 con tres URLs comentadas encima (desarrollo, staging y producción). Cambiar de entorno requiere modificar el código.
 
 **Archivo:** `src/data/constants.js`
 
@@ -61,7 +59,7 @@ export const CONFIG = {
     // BACKEND_URL: "https://octopus-app-dgmcr.ondigitalocean.app",
     BACKEND_URL: "https://api.simulhome.com/coohomReport",
     ENDPOINT: "reportCoohom",
-    TOKEN: JSON.parse(localStorage.getItem("token"))?.token || null,
+    TOKEN: JSON.parse(localStorage.getItem("token"))?.token || null, //"Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH" ,
   },
 ```
 
@@ -75,19 +73,29 @@ export const CONFIG = {
   API: {
     BACKEND_URL: import.meta.env.VITE_API_URL,
     ENDPOINT: "reportCoohom",
-    TOKEN: JSON.parse(localStorage.getItem("token"))?.token || null,
+    // JWT del usuario, se lee al construir el axios instance.
+    // Para acceso síncrono fuera de React: getLocalToken()?.token
+    TOKEN: JSON.parse(localStorage.getItem("token") || "null")?.token || null,
   },
 ```
 
+> Se quita el comentario con el token literal y se añade un fallback robusto a `JSON.parse` (el actual lanzaba excepción si `token` era `null`).
+
 ---
 
-## 4. Modificar `src/handlers/order.js` — quitar token y URL hardcodeados
+## 4. Migrar `src/handlers/order.js` a JWT Bearer + API_TOKEN selectivo
 
-**Problema:** El objeto `Settings` en las líneas 6-12 contiene la URL del backend (con tres URLs comentadas) y el token de API literal. Ese token se pasa en el body de **cada llamada** a la API.
+### 4.1 Cambio de filosofía
 
-**Archivo:** `src/handlers/order.js`
+El backend ahora valida JWT en `Authorization: Bearer <token>` para casi todos los endpoints. Solo `POST /reporthomUpdateCabinets` (y por contrato similar `POST /signinReporthom` + `POST /resetPasswordUserCoohom`, que viven en `user.js`) siguen aceptando el `token` en el body.
 
-**ANTES (líneas 1-18):**
+Por tanto en `order.js` hay que:
+- Eliminar el objeto `Settings` (URL + TOKEN literales).
+- Construir la instancia axios con baseURL desde env y un interceptor que inyecte `Bearer ${jwt}` en cada request.
+- Eliminar `{ token: Settings.TOKEN, ... }` del body de **todas** las funciones excepto `updateCabinetsInternal` (la que llama a `POST /reporthomUpdateCabinets`).
+
+### 4.2 ANTES (líneas 1-30 de `src/handlers/order.js`)
+
 ```javascript
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -107,38 +115,136 @@ let _AXIOS_ = axios.create({
     Authorization: CONFIG.API.TOKEN,
   },
 });
+
+const tokenLocal = () => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("token");
+  }
+};
+
+export const axiosToken = axios.create({
+  headers: {
+    Authorization: Cookies.get("token") || tokenLocal(),
+  },
+});
 ```
 
-**DESPUÉS:**
+### 4.3 DESPUÉS
+
 ```javascript
 import axios from "axios";
 import Cookies from "js-cookie";
 
 import { CONFIG } from "../data/constants";
+import { getLocalToken } from "../data/localStorage";
 
-const Settings = {
-  ENDPOINT: "reportCoohom",
-  TOKEN: import.meta.env.VITE_API_TOKEN,
-};
+const ENDPOINT = "reportCoohom";
 
-let _AXIOS_ = axios.create({
-  headers: {
-    Authorization: CONFIG.API.TOKEN,
-  },
+// Token de API solo se necesita en POST /reporthomUpdateCabinets.
+// El resto de endpoints valida JWT en el header Authorization.
+const API_TOKEN = import.meta.env.VITE_API_TOKEN;
+
+const _AXIOS_ = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 15000,
 });
+
+_AXIOS_.interceptors.request.use((config) => {
+  const jwt = Cookies.get("token") || getLocalToken()?.token;
+  if (jwt) config.headers.Authorization = `Bearer ${jwt}`;
+  return config;
+});
+
+// Para llamadas que necesiten también el JWT pero como instancia separada
+export const axiosToken = _AXIOS_;
 ```
 
-> `CONFIG.API.BACKEND_URL` ya lee de `VITE_API_URL` tras el cambio del paso 3, por lo que todas las funciones que usan `CONFIG.API.BACKEND_URL` quedan automáticamente corregidas (`createOrder`, `updateOrder`, `getOrders`, etc.).
+### 4.4 Adaptar cada función — eliminar `token` del body
+
+Patrón general:
+
+**ANTES:**
+```javascript
+export const createOrder = async (params) => {
+  try {
+    const data = await _AXIOS_.post(
+      `${CONFIG.API.BACKEND_URL}/${CONFIG.API.ENDPOINT}`,
+      {
+        ...params,
+        token: Settings.TOKEN,
+      }
+    );
+    return data.data;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+```
+
+**DESPUÉS:**
+```javascript
+export const createOrder = async (params) => {
+  try {
+    const { data } = await _AXIOS_.post(`/${ENDPOINT}`, params);
+    return data;
+  } catch (error) {
+    return handleOrderError(error, "crear orden");
+  }
+};
+```
+
+`handleOrderError` se define en el documento `02_alto_validacion_errores.md` sección 3.
+
+### 4.5 Funciones que cambian (eliminan `token: Settings.TOKEN` del body)
+
+Aplicar el patrón a las siguientes funciones de `handlers/order.js`:
+
+| Función | Endpoint que llama |
+|---|---|
+| `createOrder` | POST /reportCoohom |
+| `updateOrder` | PUT /reportCoohom |
+| `getOrders` | POST /reportsCoohom |
+| `getOrderById` | POST /reporthomById |
+| `getComplements` | GET /reportCoohomComplements |
+| `getComplementsByText` | POST /reportCoohomComplementsbyText |
+| `archivedOrder` | PUT /archivedReportCoohom |
+| `deleteComplements` | POST /eliminarPorCodigo |
+| `CreateOrderDetails` | POST /reporthomDetails |
+| `updateOrderDetails` | PUT /reporthomDetails |
+| `archivedOrderDetails` | POST /reporthomComplementDetailsDelete |
+| `createCabinetByUser` | POST /reportCoohomCabinetCreate |
+| `updateCabinetsOrder` | PUT /reportCoohomCabinets |
+| `updateCabinet` | PUT /reportCoohomCabinets |
+
+### 4.6 Excepción — `updateCabinetsInternal` (POST /reporthomUpdateCabinets)
+
+Esta función SÍ debe seguir enviando `token` en el body, ya que el backend lo valida con `requireApiToken` inline en el controller (no por middleware):
+
+```javascript
+// Variante interna: el backend exige API_TOKEN en body, no Bearer
+export const updateCabinetsInternal = async (params) => {
+  try {
+    const { data } = await _AXIOS_.post("/reporthomUpdateCabinets", {
+      ...params,
+      token: API_TOKEN,
+    });
+    return data;
+  } catch (error) {
+    return handleOrderError(error, "actualizar gabinetes (internal)");
+  }
+};
+```
+
+> Si el frontend no necesita ya el endpoint interno (todas las llamadas están cubiertas por `updateCabinetsOrder` con Bearer), eliminar esta función. Verificar antes de borrar.
 
 ---
 
-## 5. Modificar `src/handlers/user.js` — quitar token y URL hardcodeados
+## 5. Migrar `src/handlers/user.js` a JWT Bearer + API_TOKEN selectivo
 
-**Problema:** Las líneas 5-10 tienen la misma URL triplicada (comentadas) y el token literal. Además, `axios.defaults.baseURL` se asigna con la URL hardcodeada, lo que afecta a **todas** las instancias de axios en la aplicación.
+### 5.1 Cambio en la cabecera + interceptor
 
-**Archivo:** `src/handlers/user.js`
-
-**ANTES (líneas 1-21):**
+**ANTES (líneas 1-21 de `src/handlers/user.js`):**
 ```javascript
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -168,41 +274,98 @@ axios.interceptors.request.use(
 import axios from "axios";
 import Cookies from "js-cookie";
 import { CONFIG } from "../data/constants";
+import { getLocalToken } from "../data/localStorage";
 
-const token = import.meta.env.VITE_API_TOKEN;
+// API_TOKEN solo se envía en body para /signinReporthom y /resetPasswordUserCoohom.
+const API_TOKEN = import.meta.env.VITE_API_TOKEN;
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+axios.defaults.timeout = 15000;
 
 axios.interceptors.request.use(
   (config) => {
-    const authToken = Cookies.get("token") || token;
-    config.headers.Authorization = authToken;
+    const jwt = Cookies.get("token") || getLocalToken()?.token;
+    if (jwt) config.headers.Authorization = `Bearer ${jwt}`;
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
+```
+
+### 5.2 Funciones que SIGUEN enviando `token` en body (excepción)
+
+Solo dos funciones de `user.js` necesitan el `token` en el body porque el backend las valida con `requireApiToken`:
+
+```javascript
+export const login = async (params) => {
+  try {
+    const { data } = await axios.post("/signinReporthom", {
+      ...params,
+      token: API_TOKEN,
+    });
+    return data;
+  } catch (error) {
+    handleAxiosError(error);
+    return error.response?.data || { ok: false, message: "Error de red" };
+  }
+};
+
+export const resetPassword = async (params) => {
+  try {
+    const { data } = await axios.post("/resetPasswordUserCoohom", {
+      ...params,
+      token: API_TOKEN,
+    });
+    return data;
+  } catch (error) {
+    handleAxiosError(error);
+    return error.response?.data || { ok: false, message: "Error de red" };
+  }
+};
+```
+
+### 5.3 Funciones que dejan de enviar `token` (envían solo Bearer)
+
+`createUser`, `editUser`, `deleteUser`, `getUsers`, `getProfile`, `updateProfile`. Eliminar `token,` del body en cada una. El interceptor ya inyecta `Bearer ${jwt}` automáticamente.
+
+Ejemplo `createUser`:
+
+**ANTES:**
+```javascript
+export const createUser = async (params) => {
+  try {
+    const { data } = await axios.post("/createUserCoohom", {
+      ...params,
+      token,
+    });
+    return data;
+  } catch (error) {
+    handleAxiosError(error);
+    return error;
+  }
+};
+```
+
+**DESPUÉS:**
+```javascript
+export const createUser = async (params) => {
+  try {
+    const { data } = await axios.post("/createUserCoohom", params);
+    return data;
+  } catch (error) {
+    handleAxiosError(error);
+    return error.response?.data || { ok: false, message: "Error de red" };
+  }
+};
 ```
 
 ---
 
-## 6. Añadir guard de rol para `/Dashboard/Tiendas` en `src/App.jsx`
+## 6. Añadir guard de rol para `/Dashboard/Tiendas`
 
-**Problema:** La ruta `/Dashboard/Tiendas` renderiza `<Admin />` sin verificar que el usuario tenga rol `admin`. El guard existente (`guard.jsx`) solo comprueba si hay un token, no el rol.
+**Problema:** `/Dashboard/Tiendas` renderiza `<Admin />` sin verificar rol. El guard actual (`guard.jsx`) solo comprueba si hay token. Un usuario `client` que edite manualmente `localStorage.campaign` accede al panel de admin.
 
-**Cómo está guardado el rol:** En `handlers/user.js` función `login()` (línea 97), después de un login exitoso se hace:
-```javascript
-localStorage.setItem(
-  "campaign",
-  data.user.role === "admin" ? CONFIG.ROLE.ADMIN : CONFIG.ROLE.CLIENT
-);
-```
-`CONFIG.ROLE.ADMIN = "E567890KMNGYCTDR6TYUJ067T8NIHUGVTFT67T87Y9HOJG"`. Por tanto la comprobación de rol debe leer `localStorage.getItem("campaign")` y compararlo con `CONFIG.ROLE.ADMIN`.
-
-También existe `getLocalToken()` en `data/localStorage.js` que devuelve el objeto completo del token, donde `getLocalToken()?.user?.role === "admin"` es igualmente válido.
-
-**Paso 1 — Crear el componente `RoleGuard` en `src/components/pages/log/guard.jsx`**
+### 6.1 Crear `AdminGuard` en `src/components/pages/log/guard.jsx`
 
 **ANTES (archivo completo):**
 ```javascript
@@ -245,13 +408,10 @@ const RedirectLogin = () => {
     return user ? <Outlet /> : <Navigate to={'/Login'} />
 }
 
-/**
- * Guard de rol: solo deja pasar si el usuario tiene rol "admin".
- * Redirige a /Dashboard/Presupuestos si el rol no coincide.
- */
 const AdminGuard = () => {
+    const role = getLocalToken()?.user?.role
     const campaign = localStorage.getItem('campaign')
-    const isAdmin = campaign === CONFIG.ROLE.ADMIN
+    const isAdmin = role === 'admin' || campaign === CONFIG.ROLE.ADMIN
     return isAdmin ? <Outlet /> : <Navigate to={'/Dashboard/Presupuestos'} replace />
 }
 
@@ -262,38 +422,12 @@ export {
 }
 ```
 
-**Paso 2 — Usar `AdminGuard` en `src/App.jsx`**
+> El guard valida tanto `getLocalToken()?.user?.role` como `localStorage.getItem('campaign')`. Cubre los dos formatos por compatibilidad. Tras la migración a JWT Bearer y la confianza en el `role` del token decodificado, se puede simplificar.
 
-**ANTES (líneas 1-55):**
+### 6.2 Envolver la ruta `Tiendas` en `src/App.jsx`
+
+**ANTES (líneas 28-46):**
 ```javascript
-import React, { useState } from "react";
-import { Route, Routes } from "react-router-dom";
-
-import {
-  Config,
-  Report,
-  Dashboard,
-  Login,
-  Encimeras,
-  RedirectLogin,
-  Error,
-  History,
-  Admin,
-} from "./components/index";
-
-import { getLocalToken } from "./data/localStorage";
-import './index.css'
-
-export const userContext = React.createContext();
-
-// const ReDirect = () => {
-//   const location = useLocation();
-//   if (location && location.pathname === "/")
-//     return <Navigate to={`Dashboard/Presupuestos`} replace />;
-
-//   return;
-// };
-
 const App = () => {
   const [users, setUsers] = useState(getLocalToken());
 
@@ -318,32 +452,12 @@ const App = () => {
     </>
   );
 };
-
-export default App;
 ```
 
 **DESPUÉS:**
 ```javascript
-import React, { useState } from "react";
-import { Route, Routes } from "react-router-dom";
-
-import {
-  Config,
-  Report,
-  Dashboard,
-  Login,
-  Encimeras,
-  RedirectLogin,
-  Error,
-  History,
-  Admin,
-} from "./components/index";
-
 import { AdminGuard } from "./components/pages/log/guard";
-import { getLocalToken } from "./data/localStorage";
-import './index.css'
-
-export const userContext = React.createContext();
+// ... resto de imports
 
 const App = () => {
   const [users, setUsers] = useState(getLocalToken());
@@ -356,7 +470,6 @@ const App = () => {
           <Route element={<RedirectLogin />}>
             <Route path="/" element={<Login />} />
             <Route path="/Dashboard" element={<Dashboard />}>
-              {/* Ruta protegida por rol: solo admins */}
               <Route element={<AdminGuard />}>
                 <Route path="Tiendas" element={<Admin />} />
               </Route>
@@ -372,26 +485,63 @@ const App = () => {
     </>
   );
 };
-
-export default App;
 ```
 
-> `AdminGuard` también hay que exportarlo desde `src/components/index.js` si se quiere importar desde el barrel, pero como se importa directamente desde su ruta, no hace falta.
+---
+
+## 7. Mover Filestack key a variable de entorno
+
+**Archivo:** `src/components/pages/admin/admin.jsx` línea 43
+
+**ANTES:**
+```javascript
+filestack.init("AXPWPBPSTvSKYoyHwByaaz")
+```
+
+**DESPUÉS:**
+```javascript
+filestack.init(import.meta.env.VITE_FILESTACK_KEY)
+```
+
+> La key sigue siendo visible en el bundle de producción (es inevitable en frontend), pero al menos no aparece en `git log` ni en buscadores de leaks como GitGuardian. Si se ha filtrado en commits previos, también hay que rotarla en la consola de Filestack.
+
+---
+
+## 8. Registrar dominio del frontend en `ALLOWED_ORIGINS` del backend
+
+**No es código del frontend, pero es prerrequisito para que el frontend desplegado funcione.**
+
+El backend ahora rechaza cualquier petición con un origen no incluido en `ALLOWED_ORIGINS`. Antes del deploy de producción:
+
+1. Editar `backend-coohomReport/.env`:
+   ```ini
+   ALLOWED_ORIGINS=http://localhost:5173,https://simulhome.com,https://<dominio-real-frontend>
+   ```
+2. Reiniciar el proceso del backend para que recargue `.env`.
+3. Verificar desde el navegador en el origen real: hacer una petición y comprobar en DevTools → Network que el response tiene `Access-Control-Allow-Origin: <origen>` y no aparecen errores CORS.
+
+> Si el frontend se sirve desde el mismo dominio que el backend (proxy reverso, mismo host), la entrada de CORS sigue siendo necesaria — el navegador compara el origen del documento con el origen de la API.
 
 ---
 
 ## Pasos de ejecución en orden
 
-1. Crear el archivo `.env.local` en la raíz del proyecto con las dos variables `VITE_API_URL` y `VITE_API_TOKEN`.
-2. Añadir `.env.local` y `.env.*.local` al `.gitignore`.
-3. Aplicar el cambio en `src/data/constants.js` (reemplazar URL literal por `import.meta.env.VITE_API_URL`).
-4. Aplicar el cambio en `src/handlers/order.js` (eliminar objeto `Settings` con URL y reemplazar `TOKEN` por `import.meta.env.VITE_API_TOKEN`).
-5. Aplicar el cambio en `src/handlers/user.js` (reemplazar `backendUrl` literal y `token` literal por `import.meta.env.*`).
-6. Añadir `AdminGuard` al final de `src/components/pages/log/guard.jsx`.
-7. Importar y usar `AdminGuard` en `src/App.jsx` envolviendo la ruta `Tiendas`.
-8. Ejecutar `npm run dev` y verificar que la app arranca correctamente.
-9. Iniciar sesión como usuario `client` e intentar navegar a `/Dashboard/Tiendas` — debe redirigir a `/Dashboard/Presupuestos`.
-10. Iniciar sesión como usuario `admin` — debe poder acceder a `/Dashboard/Tiendas` sin problemas.
-11. Ejecutar `npm run build` y verificar que `VITE_API_URL` aparece en el bundle (es normal, es frontend) pero el token no aparece en texto claro en `Settings` del código fuente.
-
-> **Nota de seguridad adicional:** En `src/components/pages/admin/admin.jsx` (línea 43) hay una API key de Filestack hardcodeada: `filestack.init("AXPWPBPSTvSKYoyHwByaaz")`. Añadir también `VITE_FILESTACK_KEY` al `.env.local` y reemplazarla con `import.meta.env.VITE_FILESTACK_KEY`.
+1. Crear `.env.local` con `VITE_API_URL`, `VITE_API_TOKEN`, `VITE_FILESTACK_KEY`.
+2. Actualizar `.gitignore` con `.env`, `.env.local`, `.env.*.local`.
+3. Editar `src/data/constants.js` para usar `import.meta.env.VITE_API_URL` y endurecer `JSON.parse` con fallback `"null"`.
+4. Reescribir cabecera + interceptor de `src/handlers/order.js` (eliminar `Settings`, añadir Bearer, añadir timeout).
+5. Adaptar todas las funciones de `order.js` listadas en 4.5 para quitar `token` del body. Mantener excepción de `updateCabinetsInternal`.
+6. Reescribir cabecera + interceptor de `src/handlers/user.js` (Bearer + timeout).
+7. Mantener `token: API_TOKEN` en body solo en `login` y `resetPassword`. Quitarlo del resto.
+8. Añadir `AdminGuard` en `src/components/pages/log/guard.jsx` y exportarlo.
+9. Envolver `<Route path="Tiendas">` con `<AdminGuard />` en `src/App.jsx`.
+10. Reemplazar `filestack.init("...")` por `import.meta.env.VITE_FILESTACK_KEY` en `pages/admin/admin.jsx`.
+11. (Backend) Añadir el dominio real del frontend a `ALLOWED_ORIGINS` y reiniciar.
+12. `npm run dev` y probar:
+    - Login normal funciona.
+    - DevTools → Network: las peticiones llevan `Authorization: Bearer ...` (no el API_TOKEN crudo).
+    - Solo `signinReporthom`, `resetPasswordUserCoohom` y `reporthomUpdateCabinets` llevan `token` en el body.
+    - Como usuario `client`, navegar a `/Dashboard/Tiendas` → redirige a Presupuestos.
+    - Como `admin` → entra sin problemas.
+    - Crear/editar mueble → funciona contra los endpoints reactivados.
+13. `npm run build` y comprobar que no hay strings literales del token API en el bundle (`grep` sobre `dist/`).

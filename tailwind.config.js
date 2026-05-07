@@ -3,7 +3,7 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     fontFamily: {
-      default: "Helvetica Neue,sans-serif;",
+      default: "Helvetica Neue,sans-serif",
       login: "Muli,sans-serif",
     },
     fontSize: {

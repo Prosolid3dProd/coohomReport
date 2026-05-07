@@ -1,7 +1,7 @@
 import { lista as items } from "./menuData";
 import { listaCliente as itemsCliente } from "./menuData";
 import { NavLink } from "react-router-dom";
-import { CONFIG } from "../../../data/constants";
+import { useUser } from "../../../context";
 
 const Item = ({ name, Icon, textShown }) => (
   <NavLink
@@ -16,13 +16,8 @@ const Item = ({ name, Icon, textShown }) => (
 );
 
 const Lista = ({ change, textShown }) => {
-  const campaign = localStorage.getItem("campaign");
-  const roleItems =
-    campaign === CONFIG.ROLE.ADMIN
-      ? items
-      : campaign === CONFIG.ROLE.CLIENT
-      ? itemsCliente
-      : [];
+  const { user } = useUser();
+  const roleItems = user?.role === "admin" ? items : user?.role === "client" ? itemsCliente : [];
 
   return (
     <ul className="flex items-center h-full w-full flex-col pt-4 list-disc relative">

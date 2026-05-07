@@ -1,116 +1,55 @@
-import axios from "axios";
-import Cookies from "js-cookie";
-import { CONFIG } from "../data/constants";
-
-// const backendUrl = "http://localhost:3007";
-// const backendUrl = "https://octopus-app-dgmcr.ondigitalocean.app";
-const backendUrl = "https://api.simulhome.com/coohomReport"
-const token = "Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH";
-
-axios.defaults.baseURL = backendUrl;
-
-axios.interceptors.request.use(
-  (config) => {
-    const authToken = Cookies.get("token") || token;
-    config.headers.Authorization = authToken;
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+import apiClient, { handleApiError, API_TOKEN } from "./axiosInstance";
 
 export const createUser = async (params) => {
   try {
-    const { data } = await axios.post("/createUserCoohom", {
-      ...params,
-      token,
-    });
+    const { data } = await apiClient.post("/createUserCoohom", { ...params, token: API_TOKEN });
     return data;
   } catch (error) {
-    handleAxiosError(error);
-    return error;
+    return handleApiError(error, "crear usuario");
   }
 };
 
 export const resetPassword = async (params) => {
   try {
-    const { data } = await axios.post("/resetPasswordUserCoohom", {
-      ...params,
-    });
+    const { data } = await apiClient.post("/resetPasswordUserCoohom", { ...params, token: API_TOKEN });
     return data;
   } catch (error) {
-    handleAxiosError(error);
-    return error;
+    return handleApiError(error, "restablecer contraseña");
   }
 };
 
 export const deleteUser = async (params) => {
   try {
-    const data = await axios.post(
-      `${CONFIG.API.BACKEND_URL}/deleteUserCoohom`,
-      {
-        ...params,
-        token,
-      }
-    );
-    return data.data;
+    const { data } = await apiClient.post("/deleteUserCoohom", { ...params, token: API_TOKEN });
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "eliminar usuario");
   }
 };
 
 export const getUsers = async (params) => {
   try {
-    const { data } = await axios.post("/reportCoohomUserLists", {
-      ...params,
-      token,
-    });
-    // console.log(data)
-    return data;
+    const { data } = await apiClient.post("/reportCoohomUserLists", { ...params, token: API_TOKEN });
+    return data.data;
   } catch (error) {
-    handleAxiosError(error);
-    return false;
+    return handleApiError(error, "obtener usuarios");
   }
 };
 
 export const updateUser = async (params) => {
   try {
-    const data = await axios.post(`${CONFIG.API.BACKEND_URL}/editUserCoohom`, {
-      ...params,
-      token,
-    });
-    return data.data;
+    const { data } = await apiClient.post("/editUserCoohom", { ...params, token: API_TOKEN });
+    return data;
   } catch (error) {
-    console.log(error);
-    return false;
+    return handleApiError(error, "editar usuario");
   }
 };
 
 export const login = async (params) => {
   try {
-    const { data } = await axios.post("/signinReporthom", { ...params, token });
-    if (data.ok && data.user) {
-      localStorage.setItem(
-        "campaign",
-        data.user.role === "admin" ? CONFIG.ROLE.ADMIN : CONFIG.ROLE.CLIENT
-      );
-    }
+    const { data } = await apiClient.post("/signinReporthom", { ...params, token: API_TOKEN });
     return data;
   } catch (error) {
-    handleAxiosError(error);
-    return false;
-  }
-};
-
-const handleAxiosError = (error) => {
-  if (error.response) {
-    console.log(error.response.data);
-    console.log(error.response.status);
-  } else if (error.request) {
-    console.log(error.request);
-  } else {
-    console.log("Error", error.message);
+    return { ok: false, message: error?.response?.data?.message || "Error de conexión" };
   }
 };

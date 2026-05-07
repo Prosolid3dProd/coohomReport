@@ -11,16 +11,19 @@ import {
   Checkbox,
   Modal,
 } from "antd";
-import { updateOrder, setLocalOrder } from "../../handlers/order";
+import { updateOrder } from "../../handlers/order";
+import { useOrder } from "../../context";
 import {
   existePrecio,
   getPrecio,
   setPrecio,
   getTotales,
+  setTotales,
   existeTotales,
 } from "../../data/localStorage";
 
-const General = ({ getData, data }) => {
+const General = ({ data }) => {
+  const { refreshOrder } = useOrder();
   const [form] = Form.useForm();
   const role = data?.profile?.role || "";
   const isClient = role === "client";
@@ -34,7 +37,7 @@ const General = ({ getData, data }) => {
     P: existePrecio(getPrecio("P")),
   });
 
-  const [totales, setTotales] = useState({
+  const [totales, setTotalesState] = useState({
     Encimeras: existeTotales(getTotales("Encimeras")),
     Equipamiento: existeTotales(getTotales("Equipamiento")),
     Electrodomesticos: existeTotales(getTotales("Electrodomesticos")),
@@ -76,7 +79,7 @@ const General = ({ getData, data }) => {
   };
 
   const handleTotalesChange = (key) => {
-    setTotales((prev) => {
+    setTotalesState((prev) => {
       const newValue = !prev[key];
       setTotales(key, newValue);
       return { ...prev, [key]: newValue };
@@ -114,15 +117,9 @@ const General = ({ getData, data }) => {
 
       const result = await updateOrder(updatedOrder);
 
-      if (result && result.order && result.order._id) { // Verificamos la estructura correcta
-        const updatedData = {
-          ...result.order, // Usamos result.order como base
-          profile: data.profile, // Preservamos profile del data original
-        };
-        getData(updatedData); // Propagamos al padre
-        setLocalOrder(updatedData);
+      if (result && result.order && result.order._id) {
+        await refreshOrder();
         message.success("Se ha actualizado correctamente");
-        form.setFieldsValue(updatedData); // Actualizamos el formulario
       } else {
         throw new Error("La respuesta de updateOrder no contiene un order válido");
       }

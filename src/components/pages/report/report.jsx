@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useReportTotals } from "../../../hooks/useReportTotals";
 import { NavLink } from "react-router-dom";
 import { General, Product, Profile } from "./../../index";
 import { Tabs, Card, Button, Space } from "antd";
@@ -7,107 +8,52 @@ import Confirmacion_Pedido from "./confirmacion_pedido";
 import { Presupuesto_Cliente } from "./index";
 import LogoERP from "../../../assets/logoERP.png";
 import Confirmacion_Pedido_Venta from "./confirmacion_pedido_venta";
-import {
-  getOrders,
-  getLocalOrder,
-  getOrderById,
-  fixOrder,
-  getProfile,
-} from "../../../handlers/order";
+import { getProfile } from "../../../handlers/order";
 import {
   existePrecio,
   existeTotales,
   getPrecio,
   getTotales,
 } from "../../../data/localStorage";
+import { useOrder } from "../../../context";
 import "./report.css";
-import {
-  calcularTotalIva,
-  calcularSumaTotal,
-  calcularTotalZocalo,
-  calcularTotalDescuentos,
-  calcularTotalConDescuentoEIVA,
-} from "./operaciones";
 
 const Report = () => {
+  const { order, refreshOrder } = useOrder();
   const [main, setMain] = useState(null);
-  const [data, setData] = useState(JSON.parse(localStorage.getItem("order")));
-  const [orderId, setOrderId] = useState(getLocalOrder());
   const [visible, setBtnVisible] = useState(false);
   const [tabActivo, setTabActivo] = useState(0);
   const [profile, setProfile] = useState(null);
 
+  useEffect(() => {
+    getProfile().then(setProfile);
+  }, []);
+
+  useEffect(() => {
+    refreshOrder();
+  }, [tabActivo]);
+
   const updatedData = useMemo(() => {
-    if (!data || !data.cabinets) return data;
-  
-    const newData = JSON.parse(JSON.stringify(data));
+    if (!order || !order.cabinets) return order;
+
+    const newData = JSON.parse(JSON.stringify(order));
     let coeficiente;
-  
+
     if (tabActivo === 0 || tabActivo === 1) {
-      coeficiente = data.userId?.coefficient || 1;
+      coeficiente = order.userId?.coefficient || 1;
     } else if (tabActivo === 2 || tabActivo === 3) {
-      coeficiente = data.coefficient || 1;
+      coeficiente = order.coefficient || 1;
     }
-  
+
     newData.cabinets = newData.cabinets.map((item) => ({
       ...item,
       total: String(item.customcode) === "3333" ? item.total : item.total * coeficiente,
     }));
-    
-    return newData;
-  }, [data, tabActivo]);
 
-  // Calcular totales con useMemo
-  const totales = useMemo(() => {
-    if (!updatedData || !updatedData.cabinets) {
-      return {
-        sumaTotal: 0,
-        totalZocalo: 0,
-        totalDescuentos: 0,
-        totalIva: 0,
-        resultadoFinal: { importeTotal: 0, descuentoAplicado: 0, totalConDescuento: 0, ivaCalculado: 0, totalFinal: 0 },
-      };
-    }
+    return { ...newData, profile };
+  }, [order, tabActivo, profile]);
 
-    const sumaTotal = calcularSumaTotal(updatedData.cabinets, 1);
-    const totalZocalo = calcularTotalZocalo(updatedData.infoZocalos, 1);
-    const importeTotalLocal = sumaTotal + totalZocalo; // Renombramos para evitar conflictos
-    const totalDescuentos = calcularTotalDescuentos(updatedData, importeTotalLocal);
-    const resultado = calcularTotalConDescuentoEIVA(
-      updatedData.cabinets,
-      updatedData.infoZocalos,
-      totalDescuentos,
-      updatedData.ivaCabinets,
-      1
-    );
-    const totalIva = calcularTotalIva(resultado.totalConDescuento, updatedData.ivaCabinets);
-
-    return {
-      sumaTotal,
-      totalZocalo,
-      totalDescuentos,
-      totalIva,
-      resultadoFinal: resultado,
-    };
-  }, [updatedData]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (orderId._id) {
-        try {
-          const result = await getOrderById({ _id: orderId._id });
-          const profileData = await getProfile();
-          const updatedInfo = fixOrder(result);
-          setProfile(profileData);
-          setData({ ...updatedInfo, profile: profileData });
-          getOrders({ ...updatedInfo, profile: profileData });
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    };
-    fetchData();
-  }, [tabActivo]);
+  const totales = useReportTotals(updatedData);
 
   useEffect(() => {
     if (main) {
@@ -213,7 +159,7 @@ const Report = () => {
       label: "Información General",
       component: (
         <div className="alturaPreview">
-          <General getData={setData} data={updatedData} />
+          <General data={updatedData} />
         </div>
       ),
     },
@@ -222,7 +168,7 @@ const Report = () => {
       label: "Complementos",
       component: (
         <div className="alturaPreview">
-          <Product getData={setData} />
+          <Product />
         </div>
       ),
     },
@@ -231,15 +177,15 @@ const Report = () => {
       label: "Mi Perfil",
       component: (
         <div className="alturaPreview">
-          <Profile getData={setData} data={updatedData} />
+          <Profile data={updatedData} />
         </div>
       ),
     },
   ];
 
   return (
-    data &&
-    data._id && (
+    order &&
+    order._id && (
       <main className="flex flex-col" id="main">
         <Card className="rounded-none m-0 pt-0 border-0">
           <header
@@ -252,29 +198,21 @@ const Report = () => {
                 to="/Dashboard/Presupuestos"
                 className="italic font-bold hover:underline hover:text-blue"
               >
-                #{data?.orderCode || "Sin especificar"}
+                #{order?.orderCode || "Sin especificar"}
               </NavLink>
             </h1>
             <Button
               style={{ float: "right", width: 150 }}
               type="default"
               onClick={() => {
-                const contenidoJSON = JSON.stringify(
-                  JSON.parse(localStorage.getItem("order")),
-                  null,
-                  2
-                );
+                const contenidoJSON = JSON.stringify(order, null, 2);
                 const blob = new Blob([contenidoJSON], {
                   type: "application/json",
                 });
                 const url = URL.createObjectURL(blob);
                 const enlace = document.createElement("a");
                 enlace.href = url;
-                enlace.download = `${
-                  JSON.parse(localStorage.getItem("order")).storeName +
-                  " " +
-                  JSON.parse(localStorage.getItem("order")).customerName
-                }.json`;
+                enlace.download = `${order.storeName} ${order.customerName}.json`;
                 document.body.appendChild(enlace);
                 enlace.click();
                 document.body.removeChild(enlace);

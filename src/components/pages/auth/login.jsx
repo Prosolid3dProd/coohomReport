@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router";
 
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
@@ -6,56 +6,33 @@ import { Button, Checkbox, Form, Input, message } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 
 import { login } from "../../../handlers/user";
-import { getLocalToken, setLocalToken } from "../../../data/localStorage";
+import { useUser } from "../../../context";
 
 const Login = () => {
-  window.onload = () => {
-    // setLocalToken({})
-    if (getLocalToken) setLocalToken({});
+  const navigate = useNavigate();
+  const { login: loginUser } = useUser();
+
+  const mensajeBienvenida = (name) => {
+    message.success(`Bienvenido ${name}!`);
   };
 
-  const mensajeBienvenida = (email) => {
-    message.success(`Bienvenido ${email}!`);
-  };
-
-  useEffect(() => {
-    localStorage.setItem("campaign", null);
-    localStorage.removeItem("campaign");
-  }, []);
-
-  /**
-   *
-   *
-   * @param {object} values
-   * @return {Component} --> mensaje error | fin de programa
-   */
   const onFinish = async (values) => {
-    
     const result = await login({
       email: values.email,
       password: values.password,
     });
-    const { ok, message } = result;
 
-    if (!ok) return onFailed(message);
+    if (!result.ok) return onFailed(null, result.message);
 
     mensajeBienvenida(result?.user?.name || "Compañero");
-    localStorage.setItem("token", JSON.stringify(result));
-    localStorage.removeItem("init");
+    loginUser(result);
 
-    window.location.reload();
-    window.location.href = "/Dashboard/Presupuestos";
+    navigate("/Dashboard/Presupuestos");
   };
 
-  /**
-   *
-   *
-   * @param {object} values --> objeto BD con las credenciales
-   * @param {string} mensaje --> Mensaje Error
-   */
   const onFailed = (values, mensaje = "Credenciales incorrectas") => {
     console.error("Error", values);
-    message.error(`Error : ${mensaje}`);
+    message.error(`Error: ${mensaje}`);
   };
 
   const validateMessages = {
@@ -109,11 +86,9 @@ const Login = () => {
               validateMessages={validateMessages}
               rules={[
                 {
-                  // pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]/,
                   message: "Al menos 1 Mayúscula y un signo especial",
                 },
                 {
-                  // min: 8,
                   message: "Debe tener al menos 8 carácteres!",
                 },
                 {
@@ -146,9 +121,6 @@ const Login = () => {
                 }}
                 type="primary"
                 htmlType="submit"
-                onClick={() => {
-                  window.reload;
-                }}
                 className="login-form-button"
               >
                 Acceder

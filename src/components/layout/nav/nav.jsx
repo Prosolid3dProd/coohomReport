@@ -1,6 +1,8 @@
 import { NavLink } from "react-router-dom";
 import { BtnReport } from "../../utils";
 import { message, Typography } from "antd";
+import { useUser } from "../../../context";
+import { useOrder } from "../../../context";
 
 const Icono = () => (
   <NavLink
@@ -11,30 +13,33 @@ const Icono = () => (
   </NavLink>
 );
 
-const Header = () => (
-  <header className="col-start-1 flex flex-row justify-start items-center ml-4">
-    <Icono />
-    <h1 style={{ color: "#000" }}>
-      <b> {JSON.parse(localStorage.getItem("token")).user?.name}</b>
-    </h1>
-    &nbsp; &nbsp; &nbsp;
-    <Typography.Link href="https://coohom-report.vercel.app/Login">
-      Cerrar Sesión
-    </Typography.Link>
-  </header>
-);
+const Header = () => {
+  const { user } = useUser();
+  return (
+    <header className="col-start-1 flex flex-row justify-start items-center ml-4">
+      <Icono />
+      <h1 style={{ color: "#000" }}>
+        <b> {user?.name}</b>
+      </h1>
+      &nbsp; &nbsp; &nbsp;
+      <Typography.Link href="https://coohom-report.vercel.app/Login">
+        Cerrar Sesión
+      </Typography.Link>
+    </header>
+  );
+};
 
 const Boton = () => {
-  const order = localStorage.getItem("order");
+  const { order } = useOrder();
+  const hasOrder = Boolean(order?._id);
+  const ruta = hasOrder ? "/Dashboard/Report" : "/Dashboard/Presupuestos";
 
   const handleClick = (e) => {
-    if (!order || order !== "true") { // Verifica si no existe o no es "true"
-      e.preventDefault(); // Evita la navegación
+    if (!hasOrder) {
+      e.preventDefault();
       message.warning("No hay ningún presupuesto cargado");
     }
   };
-
-  const ruta = order === "true" ? "/Dashboard/Report" : "/Dashboard/Presupuestos";
 
   return (
     <NavLink to={ruta} onClick={handleClick}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Button,
   Input,
@@ -17,36 +17,37 @@ const General = ({ data }) => {
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({});
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const users = await getUsers();
-        const currentUser = users.find(
-          (user) => user.email === data.profile.email
-        );
-        if (currentUser) {
-          const updatedValues = {
-            email: currentUser.email,
-            info2: currentUser.info2,
-            info1: currentUser.info1,
-            info3: currentUser.info3,
-            logo: currentUser.logo,
-            coefficient: currentUser.coefficient,
-            observacion1: currentUser.observacion1,
-            observacion2: currentUser.observacion2,
-            observacion3: currentUser.observacion3,
-            observacion4: currentUser.observacion4,
-            observacion5: currentUser.observacion5,
-          };
-          setInitialValues(updatedValues);
-          form.setFieldsValue(updatedValues);
-        }
-      } catch (error) {
-        message.error("Error al cargar los datos del usuario");
+  const fetchUserData = useCallback(async () => {
+    try {
+      const users = await getUsers();
+      const currentUser = users?.find(
+        (user) => user.email === data?.profile?.email
+      );
+      if (currentUser) {
+        const values = {
+          email: currentUser.email,
+          info1: currentUser.info1,
+          info2: currentUser.info2,
+          info3: currentUser.info3,
+          logo: currentUser.logo,
+          coefficient: currentUser.coefficient,
+          observacion1: currentUser.observacion1,
+          observacion2: currentUser.observacion2,
+          observacion3: currentUser.observacion3,
+          observacion4: currentUser.observacion4,
+          observacion5: currentUser.observacion5,
+        };
+        setInitialValues(values);
+        form.setFieldsValue(values);
       }
-    };
+    } catch {
+      message.error("Error al cargar los datos del usuario");
+    }
+  }, [data?.profile?.email, form]);
+
+  useEffect(() => {
     fetchUserData();
-  }, [data, form]);
+  }, [fetchUserData]);
 
   const onFinish = async (values) => {
     try {
@@ -54,12 +55,10 @@ const General = ({ data }) => {
         const result = await updateProfile({ ...values });
         if (result) {
           message.success("Se ha actualizado correctamente");
-          setTimeout(() => {
-            location.reload();
-          }, 1000);
+          await fetchUserData();
         }
       }
-    } catch (error) {
+    } catch {
       message.error("Error al actualizar el perfil");
     }
   };

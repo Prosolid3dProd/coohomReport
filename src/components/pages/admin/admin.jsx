@@ -40,7 +40,7 @@ const ShopsForm = ({ setListaTiendas, open, setOpen }) => {
   const [form] = Form.useForm();
 
   const handleUpload = () => {
-    const client = filestack.init("AXPWPBPSTvSKYoyHwByaaz");
+    const client = filestack.init(import.meta.env.VITE_FILESTACK_KEY);
     const options = {
       onUploadDone: async (file) => {
         const uploadedUrl = file.filesUploaded[0].url;
@@ -316,7 +316,7 @@ const Admin = () => {
   ];
 
   const handleUpload = () => {
-    const client = filestack.init("AXPWPBPSTvSKYoyHwByaaz");
+    const client = filestack.init(import.meta.env.VITE_FILESTACK_KEY);
     const options = {
       onUploadDone: async (file) => {
         setLogoUrl(file.filesUploaded[0].url);

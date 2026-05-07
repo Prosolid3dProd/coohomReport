@@ -1,10 +1,73 @@
 # INFORME TÉCNICO DE ANÁLISIS - COOHOM REPORT (Frontend)
 
-**Fecha**: 6 de Mayo de 2026
+**Fecha**: 7 de Mayo de 2026 (actualizado tras refactor del backend del 6 de Mayo)
 **Proyecto**: CoohomReport — Frontend React + Vite + Tailwind CSS
 **Ubicación**: `C:\Users\alvar\WebstormProjects\coohomReport`
 **Backend asociado**: `C:\Users\alvar\WebstormProjects\backend-coohomReport` (Node.js + Express + MongoDB, puerto 3007)
-**Objetivo**: Análisis exhaustivo de estructura, componentes obsoletos, problemas de seguridad y dependencias.
+**Objetivo**: Análisis exhaustivo + plan de refactor alineado con el contrato actual del backend.
+
+---
+
+## 0. CAMBIO DE CONTRATO DEL BACKEND (2026-05-06)
+
+El backend pasó por un refactor profundo que modifica varios contratos que el frontend consume. Toda recomendación de los siguientes documentos parte de este nuevo estado.
+
+### 0.1 Reestructuración de archivos en backend
+
+`sola.js` (1410 líneas, monolítico) se ha dividido en:
+
+```
+backend-coohomReport/src/
+├── controllers/    (auth, cabinets, complements, details, profile, reports, users)
+├── routes/         (index + 1 archivo por dominio)
+├── middlewares/    (autenticacion, errorHandler, requireApiToken)
+├── utils/          (asyncHandler, isValidObjectId, sanitizeRegex, token)
+├── models/         (Reporthom, ReporthomComplements, reporthomUser, db) [Instance.js eliminado]
+└── config/config.js (lee dotenv, valida vars al arrancar)
+```
+
+### 0.2 Modelo de autenticación nuevo
+
+| Mecanismo | Cómo se envía | Endpoints que lo usan |
+|---|---|---|
+| **JWT Bearer** | Header `Authorization: Bearer <jwt>` | Todos los endpoints protegidos por `verificarTokenExpress` |
+| **API_TOKEN** en body (campo `token`) | `{ token: VITE_API_TOKEN, ... }` | `POST /signinReporthom`, `POST /resetPasswordUserCoohom`, `POST /reporthomUpdateCabinets` |
+| **API_TOKEN** en header | `Authorization: <api_token>` | Alternativa aceptada por `requireApiToken` |
+| **Sin auth** | — | `GET /` (healthcheck) |
+
+El token de API `Bc8V2Gb8D6KI6pA0Swheudblx1igSyqH` sigue siendo el mismo valor pero ahora vive en el `.env` del backend (variable `API_TOKEN`). El frontend debe replicar el valor en `VITE_API_TOKEN` solo para los 3 endpoints que lo exigen en body.
+
+### 0.3 CORS restringido
+
+Backend pasó de `Access-Control-Allow-Origin: *` a una whitelist leída desde `ALLOWED_ORIGINS` del `.env`. Valor actual:
+
+```
+ALLOWED_ORIGINS=http://localhost:5173,https://simulhome.com
+```
+
+**Implicación crítica para el frontend**: el dominio donde se despliegue el frontend en producción debe estar en esa whitelist o el navegador bloqueará todas las peticiones. Si la app se sirve desde otro origen distinto a `https://simulhome.com`, hay que ampliar la lista en el backend.
+
+### 0.4 Formato de errores estandarizado
+
+Todos los errores que devuelve el backend pasan por `middlewares/errorHandler.js`. Forma:
+
+```json
+{ "ok": false, "message": "Texto humano del error" }
+```
+
+El frontend, en su `handleOrderError`, debe leer `error.response.data.message` y mostrarlo al usuario antes de caer al mensaje genérico por status code.
+
+### 0.5 Endpoints de cabinet activos
+
+Los 3 endpoints que antes estaban comentados en `sola.js` y devolvían 404 ahora están implementados en `controllers/cabinets.controller.js`:
+
+| Método + Ruta | Auth | Notas |
+|---|---|---|
+| `POST /reportCoohomCabinetCreate` | JWT Bearer | `addCabinet` — añade un cabinet a una orden existente |
+| `PUT /reportCoohomCabinets` | JWT Bearer | `replaceCabinets` — reemplaza el array `cabinets` completo |
+| `POST /reporthomUpdateCabinets` | API_TOKEN en body | `replaceCabinetsInternal` — variante interna sin JWT, valida `req.body.token` contra `process.env.API_TOKEN` |
+
+El frontend ya tiene en `handlers/order.js` funciones que apuntan a estos endpoints (`createCabinetByUser`, `updateCabinetsOrder`, etc.) — antes producían 404, ahora deben funcionar tras alinear el envío de auth.
 
 ---
 
@@ -260,36 +323,36 @@ El estado se gestiona mediante una combinación de:
 
 ### 5.1 Endpoints consumidos (desde handlers/) — estado en backend
 
-El backend correcto es `backend-coohomReport`. El análisis cruzado revela que 3 de los 24 endpoints que consume el frontend **no están implementados en el backend** (están comentados en `routes/sola.js`):
+Tras el refactor del backend, los **24 de 24 endpoints** que consume el frontend están implementados. La columna "Auth" indica el mecanismo que el backend espera (importante para alinear el cliente — ver doc 01).
 
-| Endpoint | Estado en backend |
-|---|---|
-| POST /signinReporthom | ✓ Implementado |
-| POST /createUserCoohom | ✓ Implementado |
-| POST /reportCoohomUserLists | ✓ Implementado |
-| POST /editUserCoohom | ✓ Implementado |
-| POST /deleteUserCoohom | ✓ Implementado |
-| POST /reportCoohom | ✓ Implementado |
-| PUT /reportCoohom | ✓ Implementado |
-| POST /reportsCoohom | ✓ Implementado |
-| POST /reporthomById | ✓ Implementado |
-| GET /reportCoohomComplements | ✓ Implementado |
-| POST /reportCoohomComplementsbyText | ✓ Implementado |
-| **POST /reportCoohomCabinetCreate** | **✗ COMENTADO en backend — 404** |
-| **PUT /reportCoohomCabinets** | **✗ COMENTADO en backend — 404** |
-| POST /reporthomDetails | ✓ Implementado |
-| PUT /reporthomDetails | ✓ Implementado |
-| POST /reporthomComplementDetailsDelete | ✓ Implementado |
-| **POST /reporthomUpdateCabinets** | **✗ COMENTADO en backend — 404** |
-| PUT /archivedReportCoohom | ✓ Implementado |
-| POST /cargarNuevoXlsxSola | ✓ Implementado |
-| POST /eliminarComplementsXlsxSola | ✓ Implementado |
-| POST /resetPasswordUserCoohom | ✓ Implementado |
-| POST /getProfile | ✓ Implementado |
-| PUT /profileUpdate | ✓ Implementado |
-| POST /eliminarPorCodigo | ✓ Implementado |
+| Endpoint | Auth backend | Estado |
+|---|---|---|
+| POST /signinReporthom | API_TOKEN en body | ✓ |
+| POST /resetPasswordUserCoohom | API_TOKEN en body | ✓ |
+| POST /reporthomUpdateCabinets | API_TOKEN en body | ✓ (antes 404) |
+| POST /createUserCoohom | JWT Bearer | ✓ |
+| POST /editUserCoohom | JWT Bearer | ✓ |
+| POST /deleteUserCoohom | JWT Bearer | ✓ |
+| POST /reportCoohomUserLists | JWT Bearer | ✓ |
+| POST /reportCoohom | JWT Bearer | ✓ |
+| PUT /reportCoohom | JWT Bearer | ✓ |
+| POST /reportsCoohom | JWT Bearer | ✓ |
+| POST /reporthomById | JWT Bearer | ✓ |
+| GET /reportCoohomComplements | JWT Bearer | ✓ |
+| POST /reportCoohomComplementsbyText | JWT Bearer | ✓ |
+| POST /reportCoohomCabinetCreate | JWT Bearer | ✓ (antes 404) |
+| PUT /reportCoohomCabinets | JWT Bearer | ✓ (antes 404) |
+| POST /reporthomDetails | JWT Bearer | ✓ |
+| PUT /reporthomDetails | JWT Bearer | ✓ |
+| POST /reporthomComplementDetailsDelete | JWT Bearer | ✓ |
+| PUT /archivedReportCoohom | JWT Bearer | ✓ |
+| POST /cargarNuevoXlsxSola | JWT Bearer | ✓ |
+| POST /eliminarComplementsXlsxSola | JWT Bearer | ✓ |
+| POST /eliminarPorCodigo | JWT Bearer | ✓ |
+| POST /getProfile | JWT Bearer | ✓ |
+| PUT /profileUpdate | JWT Bearer | ✓ |
 
-Los 3 endpoints faltantes corresponden a operaciones de gabinetes individuales. Si el frontend los llama, recibirá un 404 silencioso (el backend devuelve false, no un error claro).
+Los 3 endpoints de cabinet que antes eran 404 (`reportCoohomCabinetCreate`, `reportCoohomCabinets`, `reporthomUpdateCabinets`) ya están activos. Las llamadas del frontend desde `handlers/order.js` deben funcionar tras alinear el formato de auth (Bearer en header en lugar de `token` en body, salvo en `reporthomUpdateCabinets`).
 
 ### 5.2 Problemas en handlers/
 
@@ -391,41 +454,49 @@ Solución: usar `useRef` y `useEffect` con cleanup.
 
 ---
 
-## 9. RESUMEN EJECUTIVO
+## 9. RESUMEN EJECUTIVO Y PLAN DE REFACTOR
 
-### Críticos (acción inmediata)
+Cada bloque referencia el documento de detalle dentro de esta misma carpeta.
 
-1. **Token hardcodeado** — Rotar y mover a variable de entorno del servidor.
-2. **URLs de backend hardcodeadas** — Crear `.env.local` con `VITE_API_URL`.
-3. **Sin guard de rol en /Tiendas** — Cualquier usuario autenticado puede acceder al panel de admin.
-4. **Filestack key en código fuente** — Mover a variable de entorno.
+### Críticos — doc `01_critico_seguridad.md`
 
-### Altos (corregir pronto)
+1. **Variables de entorno** — Crear `.env.local` con `VITE_API_URL`, `VITE_API_TOKEN`, `VITE_FILESTACK_KEY`. Eliminar URL y token literales en `data/constants.js`, `handlers/order.js`, `handlers/user.js`, `pages/admin/admin.jsx`.
+2. **Migración a JWT Bearer** — `axios.interceptors` debe enviar `Authorization: Bearer ${jwt}`. Eliminar el envío de `token` en body excepto en las 3 llamadas que el backend exige (`login`, `resetPassword`, `replaceCabinetsInternal`).
+3. **Guard de rol en /Tiendas** — Crear `AdminGuard` en `guard.jsx` y envolver la ruta `Tiendas` en `App.jsx`.
+4. **Registrar dominio del frontend en `ALLOWED_ORIGINS`** del backend tras desplegar.
 
-5. **Token inconsistente** — Unificar uso de token entre `order.js` y `user.js`.
-6. **console.log() en producción** — Eliminar o condicionar a `import.meta.env.DEV`.
-7. **window.location.reload()** — Reemplazar con `navigate()` o actualización de estado.
-8. **Sin manejo de errores diferenciado** — Distinguir tipos de error en handlers.
-9. **useEffect sin cleanup** — Añadir return de cleanup en fetches dentro de useEffect.
+### Altos — doc `02_alto_validacion_errores.md`
 
-### Medios (refactorizar)
+5. **`window.location.reload()`** — Reemplazar por `navigate()` (`login.jsx`) o por `getDataOrden()` (`muebles.jsx`). Eliminar typo `window.reload;` en el botón Acceder.
+6. **`handleOrderError` helper** — Centralizar el manejo de errores en `handlers/order.js`. Leer `error.response.data.message` (formato `{ ok, message }` del backend) antes del fallback genérico.
+7. **`useEffect` sin cleanup** — Añadir flag `cancelado` en el fetch inicial de `general.jsx`.
+8. **`setLocalOrder` con Promise innecesaria** — Convertir en función síncrona.
+9. **Validar respuestas del backend** — Comprobar `result.ok === true` antes de seguir, usar `result.message` en `message.error()`.
 
-10. **localStorage como source of truth** — Evaluar React Query o SWR para caché sincronizada.
-11. **Lógica de negocio en UI** — Mover cálculos complejos a handlers o hooks personalizados.
-12. **Código comentado** — Eliminar bloques de código comentado (7 archivos afectados).
-13. **Clases Tailwind dinámicas** — Reemplazar por `style={{}}` o clases predefinidas.
-14. **document.getElementById** — Reemplazar por `useRef`.
-15. **Listeners en render** — Mover `window.onload/resize` a `useEffect` con cleanup.
+### Medios — doc `03_medio_refactorizacion.md`
 
-### Bajos
+10. **Centralizar instancia axios** — Crear `src/handlers/axiosInstance.js` con baseURL e interceptor único; eliminar duplicación entre `order.js` y `user.js`.
+11. **Lógica de negocio en UI** — Mover cálculos de `report.jsx`, `history.jsx` y `title.jsx` a hooks o handlers.
+12. **Código comentado** — Eliminar 11 bloques en `App.jsx`, `muebles.jsx`, `title.jsx`, `order.js`, `user.js`, `products.jsx`, `obtenerArchivoJson.js`, `menuData.js`.
+13. **Clases Tailwind dinámicas** — Reemplazar template strings de `btnAction.jsx` por `style={{}}`.
+14. **`document.getElementById`** — Reemplazar por `useRef` en `config.jsx` y `title.jsx`.
+15. **`window.onresize` en render** — Mover a `useEffect` con cleanup en `title.jsx` (3 componentes).
 
-16. **Número mágico "3333"** — Crear constante con nombre en `constants.js`.
-17. **json-server en dependencies** — Mover a devDependencies o eliminar.
-18. **@uidotdev/usehooks no usado** — Eliminar si no se usa.
-19. **Archivos HTML en assets/** — Eliminar snapshots históricos de `src/assets/`.
-20. **Alias en vite.config.js** — Añadir alias para simplificar imports relativos.
+### Bajos — doc `04_bajo_rendimiento.md`
+
+16. **`package.json`** — Quitar `json-server`, `@uidotdev/usehooks`, `caniuse-lite`, `esm`. Mover `json-server` a `devDependencies` si se sigue usando.
+17. **Alias `@`** — Añadir en `vite.config.js` y `jsconfig.json`.
+18. **Timeout axios** — `axios.defaults.timeout = 15000`.
+19. **`tailwind.config.js`** — Quitar `;` del `fontFamily.default`.
+20. **`console.log` en producción** — `esbuild.drop` en build.
+21. **Code-splitting** — `React.lazy` para `report.jsx` y `admin.jsx`.
+22. **Caché en `encimerasModal`** — Debounce + Map en memoria por query.
+
+### Pendientes futuros — doc `05_pendientes_futuros.md`
+
+Items que requieren decisión arquitectónica: react-query/SWR, error boundary, telemetría, tests con Vitest, migración opcional a TS, dividir `handlers/order.js` (486 líneas) en archivos por dominio espejando el backend.
 
 ---
 
-*Documento generado por Claude Code — 6 de Mayo de 2026*
-*Solo análisis. No se modificó ningún archivo de código.*
+*Documento generado por Claude Code — 7 de Mayo de 2026*
+*Solo análisis y planificación. No se modificó código de `src/` en esta iteración.*

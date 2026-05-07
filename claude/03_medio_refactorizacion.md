@@ -715,11 +715,157 @@ import { useState, useEffect } from "react";
 
 ---
 
+## 5. Centralizar la instancia de axios
+
+**Problema:** `handlers/order.js` y `handlers/user.js` configuran axios por separado. Cada uno crea su propia baseURL, su propio interceptor y su propio manejo del token. Cualquier cambio (timeout, header global, retry) se duplica. Tras la migración a Bearer del doc 01, el código del interceptor es prácticamente idéntico en ambos archivos.
+
+**Solución:** crear `src/handlers/axiosInstance.js` con una sola instancia que ambos handlers importen.
+
+### 5.1 Archivo nuevo `src/handlers/axiosInstance.js`
+
+```javascript
+import axios from "axios";
+import Cookies from "js-cookie";
+import { message } from "antd";
+import { getLocalToken } from "../data/localStorage";
+
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 15000,
+});
+
+apiClient.interceptors.request.use((config) => {
+  const jwt = Cookies.get("token") || getLocalToken()?.token;
+  if (jwt) config.headers.Authorization = `Bearer ${jwt}`;
+  return config;
+});
+
+/**
+ * Helper compartido por order.js y user.js.
+ * Lee el mensaje del backend ({ ok, message }) y muestra message.error.
+ */
+export const handleApiError = (error, contexto = "la operación") => {
+  const backendMessage = error?.response?.data?.message;
+  let texto;
+
+  if (backendMessage) texto = backendMessage;
+  else if (error.response) {
+    const status = error.response.status;
+    if (status === 401) texto = "Sesión expirada. Por favor, vuelve a iniciar sesión.";
+    else if (status === 403) texto = "No tienes permisos para esta operación.";
+    else if (status === 404) texto = `Recurso no encontrado al ejecutar ${contexto}.`;
+    else if (status >= 500) texto = `Error del servidor (${status}) en ${contexto}.`;
+    else texto = `Error ${status} en ${contexto}.`;
+  } else if (error.request) texto = "Sin respuesta del servidor. Verifica tu conexión.";
+  else texto = `Error inesperado en ${contexto}: ${error.message}`;
+
+  message.error(texto);
+  return { ok: false, message: texto };
+};
+
+export const API_TOKEN = import.meta.env.VITE_API_TOKEN;
+
+export default apiClient;
+```
+
+### 5.2 `handlers/order.js` queda
+
+```javascript
+import apiClient, { handleApiError, API_TOKEN } from "./axiosInstance";
+
+const ENDPOINT = "reportCoohom";
+
+export const createOrder = async (params) => {
+  try {
+    const { data } = await apiClient.post(`/${ENDPOINT}`, params);
+    return data;
+  } catch (error) {
+    return handleApiError(error, "crear orden");
+  }
+};
+
+// resto de funciones idénticas pero usando apiClient e import de API_TOKEN solo
+// para updateCabinetsInternal (única que envía token en body)
+```
+
+### 5.3 `handlers/user.js` queda
+
+```javascript
+import apiClient, { handleApiError, API_TOKEN } from "./axiosInstance";
+
+export const login = async (params) => {
+  try {
+    const { data } = await apiClient.post("/signinReporthom", { ...params, token: API_TOKEN });
+    return data;
+  } catch (error) {
+    return handleApiError(error, "iniciar sesión");
+  }
+};
+
+// resto de funciones sin "token: ..." en body, usando apiClient
+```
+
+> Tras este refactor, la lista de archivos que cambian si hay que actualizar la baseURL, el header de auth o el timeout es **un solo archivo**.
+
+---
+
+## 6. Mover lógica de negocio fuera de los componentes UI
+
+**Problema:** Varios componentes contienen cálculos de negocio que deberían vivir en hooks o handlers separados. Esto los hace imposibles de testear sin renderizar el componente y dificulta su reuso.
+
+### 6.1 `report.jsx` — totales en `useMemo`
+
+**Líneas 40-92** contienen el cálculo de totales (subtotales por categoría, descuentos, IVA, total final) dentro de un `useMemo`. Mover a `src/hooks/useReportTotals.js`:
+
+```javascript
+import { useMemo } from "react";
+
+export const useReportTotals = (data) => {
+  return useMemo(() => {
+    if (!data) return null;
+    // ... lógica actualmente en report.jsx líneas 40-92
+    return { subtotales, descuentos, iva, total };
+  }, [data]);
+};
+```
+
+`report.jsx` queda:
+```javascript
+const totales = useReportTotals(data);
+```
+
+### 6.2 `history.jsx` — cálculo de días
+
+**Líneas 23-37** calculan el número de días entre fechas (`fecha`, `fechaEntrega`). Es una función pura sin estado de React. Mover a `src/data/dateUtils.js`:
+
+```javascript
+export const diasEntreFechas = (inicio, fin) => {
+  if (!inicio || !fin) return null;
+  const ms = new Date(fin) - new Date(inicio);
+  return Math.ceil(ms / (1000 * 60 * 60 * 24));
+};
+```
+
+### 6.3 `title.jsx` — actualización de orden
+
+**Líneas 92-122** tienen lógica de actualización de orden (parsear JSON, fusionar con la orden existente, llamar a `updateOrder`). Mover a `handlers/order.js` como `mergeAndUpdateOrder(jsonData, existingOrder)`. El componente solo invoca el handler.
+
+### 6.4 Beneficios
+
+- Los cálculos quedan testeables sin Testing Library (vitest puede importar la función pura).
+- Los componentes son solo vista, lo que simplifica re-renders y memoización.
+- La regla "Lógica fuera de UI" es la base para meter tests unitarios después (ver `05_pendientes_futuros.md`).
+
+---
+
 ## Pasos de ejecución en orden
 
 1. **Código comentado** — Recorrer los 11 bloques listados en el punto 1 y eliminarlos uno por uno. Usar el buscador del editor con los fragmentos textuales mostrados para localizarlos con exactitud.
 2. **`btnAction.jsx`** — Reemplazar los cuatro componentes (`ButtonAction`, `ButtonForm`, `LabelForm`, `LabelAction`) con las versiones que usan `style={{}}`. El archivo completo queda sin template strings en `className`.
 3. **`config.jsx`** — Añadir `useRef` al import. Reemplazar el componente `Perfil` completo con la versión corregida. Verificar que el `<img>` ahora tiene `ref={imgRef}` y no `id='img'`.
 4. **`title.jsx`** — Añadir `useEffect` al import de React. Reemplazar los tres `window.onresize = ...` por `useEffect` con `addEventListener`/`removeEventListener`.
-5. Ejecutar `npm run build` y verificar que no hay errores de compilación.
-6. Abrir el build en un navegador y comprobar que los botones de `btnAction.jsx` muestran sus colores correctamente (antes estaban transparentes en producción).
+5. **`axiosInstance.js`** — Crear el archivo nuevo con la instancia compartida y el helper `handleApiError`.
+6. **`order.js` y `user.js`** — Migrar a `apiClient` importado del nuevo archivo. Eliminar la creación duplicada de instancias y los interceptors propios.
+7. **Hooks/utils** — Crear `src/hooks/useReportTotals.js` y `src/data/dateUtils.js`. Adaptar `report.jsx` y `history.jsx`. Mover `mergeAndUpdateOrder` a `handlers/order.js`.
+8. Ejecutar `npm run build` y verificar que no hay errores de compilación.
+9. Abrir el build en un navegador y comprobar que los botones de `btnAction.jsx` muestran sus colores correctamente (antes estaban transparentes en producción).

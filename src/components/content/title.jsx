@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, message, Upload, Input, Tooltip } from "antd";
 import { File } from "../icons";
 import { LabelAction } from "../utils";
@@ -6,10 +6,10 @@ import { ButtonAction } from "../utils/btnAction";
 import { FiDownload } from "../icons";
 import { DeleteOutlined, DownloadOutlined, UploadOutlined } from "@ant-design/icons";
 import { breakPointMD, breakpoint, typeOfText as type } from "./logic/btnLogic";
-import { fetchData } from "../pages/Encimeras/encimeras";
-import { parseJson3D } from "../../data";
-import { createOrder } from "../../handlers/order";
+import { fetchData } from "../pages/encimeras/encimeras";
+import { mergeAndUpdateOrder } from "../../handlers/order";
 import { procesarArchivoXLSX } from "../content/logic/obtenerArchivoJson";
+import { useUser } from "../../context";
 
 /**
  *
@@ -53,66 +53,19 @@ const Actions = ({
     }
   };
 
-  //Esto deberia de ser asi, pero no actualiza el elemento desde el back y no se por que
-  // const handleChangeJSON = async (json) => {
-  //   setLoading(true);
-  //   try {
-  //     const newData = await parseJson3D(json);
-
-  //     const existingIndex = data.findIndex((item) => item.orderCode === newData.orderCode);
-
-  //     if (existingIndex !== -1) {
-  //       const existingItem = data[existingIndex];
-  //       const result = await updateOrder({ ...newData, _id: existingItem._id });
-
-  //       console.log(result)
-  //       if (result) {
-  //         setData((prevData) => {
-  //           const updatedData = prevData.map((item, index) =>
-  //             index === existingIndex ? result : item
-  //           );
-  //           return updatedData;
-  //         });
-  //         message.success(result.projectName + " actualizado correctamente");
-  //       } else {
-  //         message.error("Error al actualizar el pedido");
-  //       }
-  //     } else {
-  //       const order = await createOrder(newData);
-  //       setData((prevData) => [order.result, ...prevData]);
-  //       message.success(order.result.projectName + " agregado correctamente");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating data", error);
-  //     message.error("Error al actualizar los datos");
-  //   }
-  //   setLoading(false);
-  // };
 
   const handleChangeJSON = async (json) => {
     setLoading(true);
     try {
-      const newData = await parseJson3D(json);
-
-      const existingIndex = data.findIndex(
-        (item) => item.orderCode === newData.orderCode
-      );
-
-      if (existingIndex !== -1) {
-        const upData = await createOrder(newData);
-        setData((prevData) => {
-          const updatedData = prevData.map((item, index) =>
-            index === existingIndex ? upData.result : item
-          );
-          return updatedData;
-        });
-        message.success(
-          upData.result.projectName + " actualizado correctamente"
+      const outcome = await mergeAndUpdateOrder(json, data);
+      if (outcome.type === "update") {
+        setData((prevData) =>
+          prevData.map((item, i) => (i === outcome.index ? outcome.result : item))
         );
+        message.success(outcome.result.projectName + " actualizado correctamente");
       } else {
-        const order = await createOrder(newData);
-        setData((prevData) => [order.result, ...prevData]);
-        message.success(order.result.projectName + " agregado correctamente");
+        setData((prevData) => [outcome.result, ...prevData]);
+        message.success(outcome.result.projectName + " agregado correctamente");
       }
     } catch (error) {
       console.error("Error updating data", error);
@@ -132,31 +85,34 @@ const Actions = ({
     setLoading(false);
   };
 
+  const { token } = useUser();
+  const authHeader = token ? `Bearer ${token}` : "";
+
   const props1 = {
     name: "sampleFile",
-    // action: "http://localhost:3007/cargarNuevoXlsxSola",
-    // action: "https://octopus-app-dgmcr.ondigitalocean.app/cargarNuevoXlsxSola",
-    action:"https://api.simulhome.com/coohomReport/cargarNuevoXlsxSola",
+    action: `${import.meta.env.VITE_API_URL}/cargarNuevoXlsxSola`,
     method: "POST",
     headers: {
-      authorization: "authorization-text",
+      authorization: authHeader,
     },
     onChange: handleChange,
   };
 
   const props2 = {
     name: "sampleFile",
-    // action: "http://localhost:3007/eliminarComplementsXlsxSola",
-    // action: "https://octopus-app-dgmcr.ondigitalocean.app/eliminarComplementsXlsxSola",
-    action:"https://api.simulhome.com/coohomReport/eliminarComplementsXlsxSola",
+    action: `${import.meta.env.VITE_API_URL}/eliminarComplementsXlsxSola`,
     method: "POST",
     headers: {
-      authorization: "authorization-text",
+      authorization: authHeader,
     },
     onChange: handleChange,
   };
 
-  window.onresize = () => setScreenWidth(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="flex flex-row items-center mr-4 gap-2">
@@ -218,8 +174,11 @@ const Actions = ({
 const Exportar = ({ file }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
-  window.onresize = () =>
-    setScreenWidth((width) => (width = window.innerWidth));
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div>
@@ -248,8 +207,11 @@ const Exportar = ({ file }) => {
 };
 const AgregarMueble = ({ funcion }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  window.onresize = () =>
-    setScreenWidth((width) => (width = window.innerWidth));
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="flex flex-row items-center mr-4 gap-2">

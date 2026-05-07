@@ -9,13 +9,19 @@ const ButtonAction = ({
 }) => {
   return (
     <button
-      className={` rounded-md w-[75px] md:w-[100px] md:h-${altura} h-[50px] flex justify-center items-center transition-all ease-out duration-300 text-[${color}] bg-[${background}] outline outline-1 outline-[${color}] hover:bg-[${color}] hover:text-[${background}] hover:outline-[${color}]`}
+      className="rounded-md w-[75px] md:w-[100px] h-[50px] flex justify-center items-center transition-all ease-out duration-300 outline outline-1"
+      style={{
+        color: color,
+        backgroundColor: background,
+        outlineColor: color,
+      }}
       onClick={action}
     >
       {text}
     </button>
   );
 };
+
 const ButtonForm = ({
   text,
   color = "transparent",
@@ -27,7 +33,12 @@ const ButtonForm = ({
 }) => {
   return (
     <button
-      className={`w-[160px] md:w-[160px] md:h-${altura} h-[32px] rounded-lg flex justify-center items-center transition-all ease-out duration-300 text-[${color}] bg-[${background}] outline outline-1 outline-[${color}] hover:bg-[${color}] hover:text-[${background}] hover:outline-[${color}]`}
+      className="w-[160px] h-[32px] rounded-lg flex justify-center items-center transition-all ease-out duration-300 outline outline-1"
+      style={{
+        color: color,
+        backgroundColor: background,
+        outlineColor: color,
+      }}
       onClick={action}
     >
       {text}
@@ -43,7 +54,12 @@ const LabelForm = ({
 }) => {
   return (
     <label
-      className={`w-[75px] md:w-[100px] h-[50px] rounded-lg md:h-full flex justify-center items-center transition-all ease-out duration-300 text-[${color}] bg-[${background}] outline outline-1 outline-[${color}] hover:bg-[${color}] hover:text-[${background}] hover:outline-[${color}]`}
+      className="w-[75px] md:w-[100px] h-[50px] rounded-lg flex justify-center items-center transition-all ease-out duration-300 outline outline-1"
+      style={{
+        color: color,
+        backgroundColor: background,
+        outlineColor: color,
+      }}
       onClick={action}
     >
       {text}
@@ -59,7 +75,12 @@ const LabelAction = ({
 }) => {
   return (
     <label
-      className={` rounded-md w-[75px] md:w-[100px] h-[50px] md:h-full flex justify-center items-center transition-all ease-out duration-300 text-[${color}] bg-[${background}] outline outline-1 outline-[${color}] hover:bg-[${color}] hover:text-[${background}] hover:outline-[${color}]`}
+      className="rounded-md w-[75px] md:w-[100px] h-[50px] flex justify-center items-center transition-all ease-out duration-300 outline outline-1"
+      style={{
+        color: color,
+        backgroundColor: background,
+        outlineColor: color,
+      }}
       onClick={action}
     >
       {text}
