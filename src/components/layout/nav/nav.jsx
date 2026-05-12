@@ -1,31 +1,37 @@
-import { NavLink } from "react-router-dom";
-import { BtnReport } from "../../utils";
-import { message, Typography } from "antd";
+import { NavLink, useNavigate } from "react-router-dom";
+import BtnReport from "../../../shared/ui/ButtonReport";
+import { Layout, message, Typography } from "antd";
 import { useUser } from "../../../context";
 import { useOrder } from "../../../context";
 
 const Icono = () => (
   <NavLink
-    to={`/Dashboard/Presupuestos`}
-    className="flex justify-center items-center mr-3 w-[30px] h-[30px] text-[18px] rounded-md bg-blue-600 font-semibold transition ease-out duration-350"
+    to="/Dashboard/Presupuestos"
+    style={{
+      display: "flex", justifyContent: "center", alignItems: "center",
+      marginRight: 12, width: 30, height: 30, fontSize: 18,
+      borderRadius: 6, backgroundColor: "var(--color-primary)", fontWeight: 600,
+      textDecoration: "none",
+    }}
   >
-    <span className="text-white pt-0.5">C</span>
+    <span style={{ color: "white", paddingTop: 2 }}>C</span>
   </NavLink>
 );
 
-const Header = () => {
-  const { user } = useUser();
+const NavHeader = () => {
+  const { user, logout } = useUser();
+  const navigate = useNavigate();
   return (
-    <header className="col-start-1 flex flex-row justify-start items-center ml-4">
+    <div style={{ display: "flex", alignItems: "center" }}>
       <Icono />
-      <h1 style={{ color: "#000" }}>
-        <b> {user?.name}</b>
+      <h1 style={{ color: "#000", margin: 0 }}>
+        <b>{user?.name}</b>
       </h1>
-      &nbsp; &nbsp; &nbsp;
-      <Typography.Link href="https://coohom-report.vercel.app/Login">
+      &nbsp;&nbsp;&nbsp;
+      <Typography.Link onClick={() => { logout(); navigate("/Login"); }}>
         Cerrar Sesión
       </Typography.Link>
-    </header>
+    </div>
   );
 };
 
@@ -43,17 +49,27 @@ const Boton = () => {
 
   return (
     <NavLink to={ruta} onClick={handleClick}>
-      <BtnReport title={"Orden"} />
+      <BtnReport title="Orden" />
     </NavLink>
   );
 };
 
-
 const Nav = () => (
-  <nav className="col-span-12 row-start-1 row-span-1 flex flex-row justify-between border-b border-border bg-gray dark:bordes dark:bg-general">
-    <Header />
+  <Layout.Header
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "0 16px",
+      background: "var(--color-bg-layout)",
+      borderBottom: "1px solid var(--color-border)",
+      height: 56,
+      lineHeight: "56px",
+    }}
+  >
+    <NavHeader />
     <Boton />
-  </nav>
+  </Layout.Header>
 );
 
 export default Nav;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Input,
@@ -21,6 +21,14 @@ import {
 } from "../../handlers/order";
 import { useOrder } from "../../context";
 import EncimerasModal from "../pages/encimeras/encimerasModal";
+
+const applyDiscount = (basePrice, discountPct, qty) => {
+  const price = parseFloat(basePrice) || 0;
+  const discount = parseFloat(discountPct) || 0;
+  const quantity = parseFloat(qty) || 1;
+  const priceWithDiscount = price - (discount / 100) * price;
+  return { priceWithDiscount, total: +(priceWithDiscount * quantity).toFixed(2) };
+};
 
 const Product = () => {
   const { order, refreshOrder } = useOrder();
@@ -64,9 +72,11 @@ const Product = () => {
     }
   }, [state.encimera, form]);
 
+  const discount = Form.useWatch("discount", form);
+
   useEffect(() => {
     const { cantidad, unidad } = formValues;
-    const descuento = form.getFieldValue("discount") || 0;
+    const descuento = discount || 0;
     const unidadConDescuento = unidad - (descuento / 100) * unidad;
 
     const total =
@@ -76,15 +86,12 @@ const Product = () => {
 
     setFormValues((prev) => ({ ...prev, unidad: unidadConDescuento, total }));
     form.setFieldsValue({ unidad: unidadConDescuento.toFixed(2) });
-  }, [form.getFieldValue("discount")]);
+  }, [discount]);
 
   const onFinish = async (values) => {
     try {
-      const parsedUnidad = parseFloat(values.unidad || 0);
-      const descuento = parseFloat(values.discount || 0);
-      const unidadConDescuento =
-        parsedUnidad - (descuento / 100) * parsedUnidad;
       const qtyNueva = parseFloat(values.qty || 1);
+      const { priceWithDiscount: unidadConDescuento } = applyDiscount(values.unidad, values.discount, qtyNueva);
 
       if (!values.type) {
         message.error("Por favor seleccione un TIPO DE COMPONENTE");
@@ -107,7 +114,7 @@ const Product = () => {
           qty: nuevaCantidad,
           unidad: unidadConDescuento.toFixed(2),
           total: nuevoTotal.toFixed(2),
-          discount: descuento,
+          discount: values.discount,
         };
 
         const result = await updateOrderDetails({
@@ -121,14 +128,8 @@ const Product = () => {
           message.success("Se ha actualizado la cantidad del elemento existente");
         }
       } else {
-        const updatedDetails = {
-          ...values,
-          unidad: unidadConDescuento.toFixed(2),
-          total: (qtyNueva * unidadConDescuento).toFixed(2),
-        };
-
         const result = await CreateOrderDetails({
-          details: updatedDetails,
+          details: { ...values },
           isUpdate: state.isUpdate,
           _id: order._id,
         });
@@ -146,30 +147,18 @@ const Product = () => {
     }
   };
 
-  function encontrarIdEnDetalles(values, detalles) {
-    let match = detalles.find(det => 
-      det.referencia === values.referencia
-    );
-  
-    return match ? match.id : null;
-  }
-
   const onEditFinish = async (values) => {
     try {
-      const parsedUnidad = parseFloat(values.unidad) || 0;
-      const parsedDiscount = parseFloat(values.discount) || 0;
-      const parsedQty = parseFloat(values.qty) || 1;
+      const unidad = parseFloat(values.unidad) || 0;
+      const qty = parseFloat(values.qty) || 1;
+      const updatedTotal = +(unidad * qty).toFixed(2);
 
-      const discountedPrice = parsedUnidad - (parsedDiscount / 100) * parsedUnidad;
-      const updatedTotal = discountedPrice * parsedQty;
-
-      let idEncontrado = encontrarIdEnDetalles(values, order.details);
-
+      const idEncontrado = order.details.find((d) => d.referencia === values.referencia)?.id ?? null;
 
       const updatedValues = {
         id: idEncontrado,
         ...values,
-        unidad: parsedUnidad.toFixed(2),
+        unidad: unidad.toFixed(2),
         total: updatedTotal.toFixed(2),
       };
 
@@ -253,7 +242,7 @@ const Product = () => {
   ];
 
   return (
-    <Card className="rounded-none bg-gray border border-border">
+    <Card style={{ borderRadius: 0, background: "var(--color-bg-layout)", border: "1px solid var(--color-border)" }}>
       <Form layout="vertical" form={form} onFinish={onFinish}>
         <Divider orientation="left">
           <b>Agregar Componentes</b>
@@ -298,7 +287,7 @@ const Product = () => {
                 type="number"
                 min={0}
                 onChange={(e) =>
-                  setFormValues({ cantidad: e.target.value || 0 })
+                  setFormValues((prev) => ({ ...prev, cantidad: e.target.value || 0 }))
                 }
               />
             </Form.Item>
@@ -319,7 +308,7 @@ const Product = () => {
             <Form.Item label="Precio Unidad" name="unidad">
               <Input
                 type="number"
-                onChange={(e) => setFormValues({ unidad: e.target.value || 0 })}
+                onChange={(e) => setFormValues((prev) => ({ ...prev, unidad: e.target.value || 0 }))}
               />
             </Form.Item>
           </Col>

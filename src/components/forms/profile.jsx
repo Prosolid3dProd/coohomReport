@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Button,
   Input,
@@ -12,8 +12,10 @@ import {
 } from "antd";
 import { updateProfile } from "../../handlers/order";
 import { getUsers } from "../../handlers/user";
+import { useUser } from "../../context/UserContext";
 
-const General = ({ data }) => {
+const Profile = ({ data }) => {
+  const { user } = useUser();
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({});
 
@@ -51,7 +53,7 @@ const General = ({ data }) => {
 
   const onFinish = async (values) => {
     try {
-      if (data._id) {
+      if (data?._id) {
         const result = await updateProfile({ ...values });
         if (result) {
           message.success("Se ha actualizado correctamente");
@@ -64,17 +66,16 @@ const General = ({ data }) => {
   };
 
   return (
-    <Card className="rounded-none bg-gray border border-border">
+    <Card style={{ borderRadius: 0, background: "var(--color-bg-layout)", border: "1px solid var(--color-border)" }}>
       <Form
         layout="vertical"
         form={form}
-        initialValues={initialValues}
         onFinish={onFinish}
       >
         <Row gutter={16}>
           <Col xs={24}>
             <Divider orientation="left">
-              <p className="uppercase">
+              <p style={{ textTransform: "uppercase" }}>
                 <b>Mi perfil de tienda</b>
               </p>
             </Divider>
@@ -106,7 +107,7 @@ const General = ({ data }) => {
 
           <Col xs={24}>
             <Divider orientation="left">
-              <p className="uppercase">
+              <p style={{ textTransform: "uppercase" }}>
                 <b>Acerca de los Precios</b>
               </p>
             </Divider>
@@ -119,15 +120,15 @@ const General = ({ data }) => {
                 maxLength="5"
                 max={10}
                 min={0}
-                disabled={data.profile?.role === "client"}
+                disabled={user?.role === "client"}
               />
             </Form.Item>
           </Col>
 
           <Col xs={24}>
             <Divider orientation="left">
-              <b className="uppercase">Observaciones</b>
-              <span className="italic text-slate-400">(%)</span>
+              <b style={{ textTransform: "uppercase" }}>Observaciones</b>
+              <span style={{ fontStyle: "italic", color: "#94a3b8" }}>(%)</span>
             </Divider>
           </Col>
 
@@ -147,7 +148,6 @@ const General = ({ data }) => {
               <Button
                 htmlType="submit"
                 type="primary"
-                className="flex justify-center items-center"
                 style={{
                   height: 50,
                   width: 150,
@@ -167,4 +167,4 @@ const General = ({ data }) => {
   );
 };
 
-export default General;
+export default Profile;

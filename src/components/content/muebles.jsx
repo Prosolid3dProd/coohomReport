@@ -1,58 +1,60 @@
-import {
-  Button,
-  Popconfirm,
-  Table,
-  Typography,
-  Modal,
-  Row,
-  Col,
-  Form,
-  Input,
-  message,
-} from "antd";
-import React, { useEffect, useState } from "react";
+import { Button, Popconfirm, Table, Typography, Form, message } from "antd";
+import { useState } from "react";
 import { updateCabinetsOrder } from "../../handlers/order";
 import { useOrder } from "../../context";
 import { Header } from "./index";
+import MuebleModal from "./MuebleModal";
 
 const Muebles = () => {
   const { order, refreshOrder } = useOrder();
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const [selected, setSelected] = useState({});
+  const [isNew, setIsNew] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
-  useEffect(() => {
-    if (selected) {
-      form.setFieldsValue({
-        name: selected.name,
-        reference: selected.reference,
-        priceCabinet: selected.priceCabinet,
-        priceVariants: selected.priceVariants,
-        priceDrawers: selected.priceDrawers,
-        total: selected.total,
-        id: selected.id,
-      });
-    }
-  }, [selected]);
+  const openEdit = (row) => {
+    setIsNew(false);
+    setSelectedId(row.id);
+    form.setFieldsValue({
+      id: row.id,
+      name: row.name,
+      reference: row.reference,
+      priceCabinet: row.priceCabinet,
+      priceVariants: row.priceVariants,
+      priceDrawers: row.priceDrawers,
+      total: row.total,
+    });
+    setOpenModal(true);
+  };
 
-  const handleFinished = async () => {
+  const openNew = () => {
+    setIsNew(true);
+    setSelectedId(null);
+    form.resetFields();
+    setOpenModal(true);
+  };
+
+  const handleClose = () => {
+    setOpenModal(false);
+    form.resetFields();
+  };
+
+  const handleSave = async () => {
     const fields = form.getFieldsValue();
-    const cabinetFields =
-      selected.mode === "edit"
-        ? order.cabinets.filter((cabinet) => cabinet.id !== selected.id)
-        : order.cabinets;
-    const allFields = [...cabinetFields, fields];
+    const filteredCabinets = isNew
+      ? order.cabinets
+      : order.cabinets.filter((c) => c.id !== selectedId);
+    const updatedCabinets = [...filteredCabinets, fields];
 
     setLoading(true);
     try {
       const result = await updateCabinetsOrder({
         _id: order?._id,
-        cabinets: allFields,
+        cabinets: updatedCabinets,
       });
-
       if (result?.ok !== false) {
-        message.success(result?.message || "Mueble actualizado correctamente");
+        message.success(result?.message || "Mueble guardado correctamente");
         setOpenModal(false);
         await refreshOrder();
       }
@@ -62,17 +64,13 @@ const Muebles = () => {
   };
 
   const handleArchived = async (row) => {
-    const cabinetFields = order.cabinets.filter(
-      (cabinet) => cabinet.id !== row.id
-    );
-
+    const updatedCabinets = order.cabinets.filter((c) => c.id !== row.id);
     setLoading(true);
     try {
       const result = await updateCabinetsOrder({
         _id: order?._id,
-        cabinets: cabinetFields,
+        cabinets: updatedCabinets,
       });
-
       if (result?.ok !== false) {
         message.success(result?.message || "Mueble eliminado correctamente");
         await refreshOrder();
@@ -84,17 +82,11 @@ const Muebles = () => {
 
   return (
     <section>
-      <Header
-        name={"Muebles"}
-        funcion={() => {
-          setSelected({ mode: "new" });
-          setOpenModal(true);
-        }}
-      />
+      <Header name={"Muebles"} funcion={openNew} />
 
-      {order && order.cabinets && (
+      {order?.cabinets && (
         <Table
-          className="border border-t-0 border-border"
+          style={{ border: "1px solid var(--color-border)", borderTop: "none" }}
           loading={loading}
           dataSource={order.cabinets}
           pagination={false}
@@ -107,146 +99,41 @@ const Muebles = () => {
             align="center"
             key="action"
             width={150}
-            render={(_, rows) => (
+            render={(_, row) => (
               <>
-                <Typography.Link
-                  onClick={() => {
-                    setSelected({ ...rows, mode: "edit" });
-                    setOpenModal(true);
-                  }}
-                >
-                  Editar
-                </Typography.Link>
-                &nbsp;&nbsp; | &nbsp;&nbsp;
+                <Typography.Link onClick={() => openEdit(row)}>Editar</Typography.Link>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
                 <Popconfirm
                   okType="default"
                   okText="Si"
                   cancelText="No"
                   title="¿Estás seguro de eliminar este mueble?"
-                  onConfirm={() => handleArchived(rows)}
+                  onConfirm={() => handleArchived(row)}
                 >
                   <Typography.Link>Eliminar</Typography.Link>
                 </Popconfirm>
               </>
             )}
           />
-          <Table.Column
-            title="Referencia"
-            dataIndex="reference"
-            key="reference"
-            width={120}
-            render={(_, rows) => rows.reference}
-          />
-          <Table.Column
-            title="Nombre"
-            dataIndex="name"
-            key="name"
-            width={400}
-            render={(_, rows) => rows.name}
-          />
+          <Table.Column title="Referencia" dataIndex="reference" key="reference" width={120} />
+          <Table.Column title="Nombre" dataIndex="name" key="name" width={400} />
           <Table.Column
             title="Precio"
             align="right"
             dataIndex="price"
             key="price"
-            render={(_, rows) => <>{rows.total || 0}&nbsp;€</>}
+            render={(_, row) => <>{row.total || 0}&nbsp;€</>}
           />
         </Table>
       )}
 
-      <Form
-        layout="vertical"
+      <MuebleModal
+        open={openModal}
+        onClose={handleClose}
+        onSave={handleSave}
         form={form}
-        initialValues={{
-          name: selected.name,
-          reference: selected.reference,
-          priceCabinet: selected.priceCabinet,
-          priceVariants: selected.priceVariants,
-          priceDrawers: selected.priceDrawers,
-          total: selected.total,
-          id: selected.id,
-        }}
-        onFinish={handleFinished}
-        style={{ maxWidth: 600 }}
-      >
-        <Modal
-          title="Editar Mueble"
-          open={openModal}
-          onOk={() => {}}
-          destroyOnClose
-          onCancel={() => setOpenModal(false)}
-          footer={false}
-        >
-          <br />
-          <Row gutter={[16, 16]}>
-            <Col span={8}>ID</Col>
-            <Col span={16}>
-              <Form.Item name="id">
-                <Input disabled={selected.mode !== "new"} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={8}>Nombre</Col>
-            <Col span={16}>
-              <Form.Item name="name">
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={8}>Referencía</Col>
-            <Col span={16}>
-              <Form.Item name="reference">
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={8}>Precio del Mueble</Col>
-            <Col span={16}>
-              <Form.Item name="priceCabinet">
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={8}>Precio de la variante</Col>
-            <Col span={16}>
-              <Form.Item name="priceVariants">
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={8}>Precio de los Cajones</Col>
-            <Col span={16}>
-              <Form.Item name="priceDrawers">
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={8}>Precio total</Col>
-            <Col span={16}>
-              <Form.Item name="total">
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={16}></Col>
-            <Col span={8}>
-              <Button
-                style={{ background: "#000", color: "#fff", width: "100%" }}
-                onClick={handleFinished}
-              >
-                Guardar
-              </Button>
-            </Col>
-          </Row>
-        </Modal>
-      </Form>
+        isNew={isNew}
+      />
     </section>
   );
 };

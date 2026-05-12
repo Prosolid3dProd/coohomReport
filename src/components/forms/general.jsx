@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Button,
   Input,
@@ -9,10 +9,10 @@ import {
   message,
   Divider,
   Checkbox,
-  Modal,
 } from "antd";
 import { updateOrder } from "../../handlers/order";
 import { useOrder } from "../../context";
+import { useUser } from "../../context/UserContext";
 import {
   existePrecio,
   getPrecio,
@@ -20,16 +20,14 @@ import {
   getTotales,
   setTotales,
   existeTotales,
-} from "../../data/localStorage";
+  setIvaIncluido,
+} from "../../shared/lib/storage";
 
-const General = ({ data }) => {
+const General = ({ data, ivaIncluido = false, onIvaIncluidoChange }) => {
   const { refreshOrder } = useOrder();
+  const { user } = useUser();
   const [form] = Form.useForm();
-  const role = data?.profile?.role || "";
-  const isClient = role === "client";
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCoefficientEditable, setIsCoefficientEditable] = useState(!isClient);
-  const [password, setPassword] = useState("");
+  const role = user?.role || "";
 
   const [precios, setPrecios] = useState({
     C: existePrecio(getPrecio("C")),
@@ -43,7 +41,7 @@ const General = ({ data }) => {
     Electrodomesticos: existeTotales(getTotales("Electrodomesticos")),
   });
 
-  const initialValues = {
+  const initialValues = useMemo(() => ({
     ...data,
     observation: data?.observation?.includes("null")
       ? ""
@@ -68,7 +66,7 @@ const General = ({ data }) => {
     ivaCabinets: data?.ivaCabinets || "",
     ivaElectrodomesticos: data?.ivaElectrodomesticos || "",
     ivaEquipamientos: data?.ivaEquipamientos || "",
-  };
+  }), [data]);
 
   const handlePrecioChange = (key) => {
     setPrecios((prev) => {
@@ -86,24 +84,10 @@ const General = ({ data }) => {
     });
   };
 
-  const unlockCoefficient = () => {
-    if (isClient && !isCoefficientEditable) setIsModalOpen(true);
-  };
-
-  const handleModalOk = () => {
-    if (password === "1234") {
-      setIsCoefficientEditable(true);
-      message.success("Coeficiente desbloqueado");
-    } else {
-      message.error("Contraseña incorrecta");
-    }
-    setIsModalOpen(false);
-    setPassword("");
-  };
-
-  const handleModalCancel = () => {
-    setIsModalOpen(false);
-    setPassword("");
+  const handleIvaIncluidoChange = () => {
+    const newValue = !ivaIncluido;
+    setIvaIncluido(newValue);
+    if (onIvaIncluidoChange) onIvaIncluidoChange(newValue);
   };
 
   const onFinish = async (values) => {
@@ -118,15 +102,15 @@ const General = ({ data }) => {
       const result = await updateOrder(updatedOrder);
 
       if (result && result.order && result.order._id) {
-        await refreshOrder();
         message.success("Se ha actualizado correctamente");
+        refreshOrder();
       } else {
         throw new Error("La respuesta de updateOrder no contiene un order válido");
       }
     } catch (error) {
       console.error("Error en onFinish:", error);
       message.error("Error al guardar los cambios: " + error.message);
-      form.setFieldsValue(initialValues); // Restauramos los valores originales
+      form.resetFields();
     }
   };
 
@@ -135,7 +119,7 @@ const General = ({ data }) => {
   }
 
   return (
-    <Card className="rounded-none bg-gray border border-border">
+    <Card style={{ borderRadius: 0, background: "var(--color-bg-layout)", border: "1px solid var(--color-border)" }}>
       <div style={{ maxHeight: "70vh", overflowY: "auto", padding: "0 16px" }}>
         <Form
           form={form}
@@ -219,13 +203,8 @@ const General = ({ data }) => {
                   customInput={
                     <Input
                       value={data.coefficient}
-                      readOnly={!isCoefficientEditable}
-                      onClick={unlockCoefficient}
-                      style={
-                        !isCoefficientEditable
-                          ? { opacity: 0.7, cursor: "pointer" }
-                          : {}
-                      }
+                      readOnly
+                      style={{ opacity: 0.7 }}
                     />
                   }
                 />
@@ -348,6 +327,10 @@ const General = ({ data }) => {
                   },
                 ]}
               />
+              <DividerSection title="IVA en Precios" />
+              <Checkbox checked={ivaIncluido} onChange={handleIvaIncluidoChange}>
+                IVA incluido en precio de artículos
+              </Checkbox>
               <Button
                 type="primary"
                 htmlType="submit"
@@ -365,18 +348,6 @@ const General = ({ data }) => {
         </Form>
       </div>
 
-      <Modal
-        title="Introduce la contraseña"
-        open={isModalOpen}
-        onOk={handleModalOk}
-        onCancel={handleModalCancel}
-        okText="Guardar"
-      >
-        <Input.Password
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </Modal>
     </Card>
   );
 };
@@ -385,7 +356,7 @@ const General = ({ data }) => {
 const DividerSection = ({ title }) => (
   <Col span={24}>
     <Divider orientation="left">
-      <p className="uppercase">
+      <p style={{ textTransform: "uppercase" }}>
         <b>{title}</b>
       </p>
     </Divider>
@@ -415,7 +386,7 @@ const FormField = ({
 const CheckboxGroup = ({ title, options }) => (
   <Row>
     <DividerSection title={title} />
-    <div className="flex flex-col">
+    <div style={{ display: "flex", flexDirection: "column" }}>
       {options.map(({ label, key, checked, onChange }) => (
         <Checkbox key={key} checked={checked} onChange={() => onChange(key)}>
           Mostrar {label}

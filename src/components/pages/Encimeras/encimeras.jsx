@@ -147,7 +147,7 @@ const Encimeras = () => {
     },
   ];
   return (
-    <main className="flex flex-col px-4">
+    <main style={{ display: "flex", flexDirection: "column", padding: "0 16px" }}>
       <Header
         name={"Biblioteca"}
         input={true}
@@ -158,7 +158,7 @@ const Encimeras = () => {
         setData={setData}
       />
       <Table
-        className="border border-t-0 border-border mx-3 relative"
+        style={{ border: "1px solid var(--color-border)", borderTop: "none", margin: "0 12px", position: "relative" }}
         loading={editado}
         dataSource={data}
         rowKey={"_id"}

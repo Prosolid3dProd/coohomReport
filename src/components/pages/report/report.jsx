@@ -1,75 +1,52 @@
-import { useEffect, useState, useMemo } from "react";
-import { useReportTotals } from "../../../hooks/useReportTotals";
+import { useEffect, useState } from "react";
+import { useReportData } from "../../../shared/hooks/useReportData";
 import { NavLink } from "react-router-dom";
 import { General, Product, Profile } from "./../../index";
-import { Tabs, Card, Button, Space } from "antd";
+import { Tabs, Card, Button, Space, Spin } from "antd";
 import { PDFViewer } from "@react-pdf/renderer";
-import Confirmacion_Pedido from "./confirmacion_pedido";
-import { Presupuesto_Cliente } from "./index";
+import Confirmacion_Pedido from "../../../widgets/pdf-reports/ConfirmacionPedido";
+import Confirmacion_Pedido_Venta from "../../../widgets/pdf-reports/ConfirmacionPedidoVenta";
+import Presupuesto_Cliente from "../../../widgets/pdf-reports/PresupuestoCliente";
 import LogoERP from "../../../assets/logoERP.png";
-import Confirmacion_Pedido_Venta from "./confirmacion_pedido_venta";
-import { getProfile } from "../../../handlers/order";
 import {
   existePrecio,
   existeTotales,
+  existeIvaIncluido,
   getPrecio,
   getTotales,
-} from "../../../data/localStorage";
+  getIvaIncluido,
+} from "../../../shared/lib/storage";
 import { useOrder } from "../../../context";
 import "./report.css";
 
 const Report = () => {
-  const { order, refreshOrder } = useOrder();
+  const { order } = useOrder();
   const [main, setMain] = useState(null);
   const [visible, setBtnVisible] = useState(false);
   const [tabActivo, setTabActivo] = useState(0);
-  const [profile, setProfile] = useState(null);
+  const [ivaIncluido, setIvaIncluido] = useState(() => existeIvaIncluido(getIvaIncluido()));
 
-  useEffect(() => {
-    getProfile().then(setProfile);
-  }, []);
-
-  useEffect(() => {
-    refreshOrder();
-  }, [tabActivo]);
-
-  const updatedData = useMemo(() => {
-    if (!order || !order.cabinets) return order;
-
-    const newData = JSON.parse(JSON.stringify(order));
-    let coeficiente;
-
-    if (tabActivo === 0 || tabActivo === 1) {
-      coeficiente = order.userId?.coefficient || 1;
-    } else if (tabActivo === 2 || tabActivo === 3) {
-      coeficiente = order.coefficient || 1;
-    }
-
-    newData.cabinets = newData.cabinets.map((item) => ({
-      ...item,
-      total: String(item.customcode) === "3333" ? item.total : item.total * coeficiente,
-    }));
-
-    return { ...newData, profile };
-  }, [order, tabActivo, profile]);
-
-  const totales = useReportTotals(updatedData);
+  const { reportData, loading } = useReportData(order?._id, tabActivo, ivaIncluido);
+  const pdfData = reportData?.processedOrder;
+  const { importeTotal, descuentoAplicado, totalConDescuento, ivaCalculado, totalFinal } =
+    reportData?.totals || {};
 
   useEffect(() => {
     if (main) {
-      const handleScroll = () => {
-        if (main.scrollTop > 100) {
-          setBtnVisible(true);
-        } else {
-          setBtnVisible(false);
-        }
-      };
+      const handleScroll = () => setBtnVisible(main.scrollTop > 100);
       main.addEventListener("scroll", handleScroll);
       return () => main.removeEventListener("scroll", handleScroll);
     }
   }, [main]);
 
-  const { totalConDescuento, totalFinal, importeTotal, ivaCalculado } = totales.resultadoFinal || {};
+  const pdfViewer = (children) =>
+    loading ? (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+        <Spin size="large" />
+      </div>
+    ) : pdfData ? (
+      children
+    ) : null;
 
   const tabs = [
     {
@@ -77,18 +54,21 @@ const Report = () => {
       label: "Confirmación de Pedido",
       component: (
         <div className="alturaPreview-presu">
-          <PDFViewer className="h-full w-full">
-            <Confirmacion_Pedido
-              price={existePrecio(getPrecio("P"))}
-              data={updatedData}
-              totalconDescuento={totalConDescuento}
-              ivaCalculado={ivaCalculado}
-              resultadoFinal={totalFinal}
-              importeTotal={importeTotal}
-              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
-              title="Confirmación de Pedido"
-            />
-          </PDFViewer>
+          {pdfViewer(
+            <PDFViewer style={{ width: "100%", height: "100%" }}>
+              <Confirmacion_Pedido
+                price={existePrecio(getPrecio("P"))}
+                data={pdfData}
+                totalconDescuento={totalConDescuento}
+                ivaCalculado={ivaCalculado}
+                resultadoFinal={totalFinal}
+                importeTotal={importeTotal}
+                descuentoAplicado={descuentoAplicado}
+                title="Confirmación de Pedido"
+                ivaIncluido={ivaIncluido}
+              />
+            </PDFViewer>
+          )}
         </div>
       ),
     },
@@ -97,18 +77,21 @@ const Report = () => {
       label: "Presupuesto",
       component: (
         <div className="alturaPreview-presu">
-          <PDFViewer className="h-full w-full">
-            <Confirmacion_Pedido
-              price={existePrecio(getPrecio("P"))}
-              data={updatedData}
-              title="Presupuesto"
-              totalconDescuento={totalConDescuento}
-              ivaCalculado={ivaCalculado}
-              resultadoFinal={totalFinal}
-              importeTotal={importeTotal}
-              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
-            />
-          </PDFViewer>
+          {pdfViewer(
+            <PDFViewer style={{ width: "100%", height: "100%" }}>
+              <Confirmacion_Pedido
+                price={existePrecio(getPrecio("P"))}
+                data={pdfData}
+                title="Presupuesto"
+                totalconDescuento={totalConDescuento}
+                ivaCalculado={ivaCalculado}
+                resultadoFinal={totalFinal}
+                importeTotal={importeTotal}
+                descuentoAplicado={descuentoAplicado}
+                ivaIncluido={ivaIncluido}
+              />
+            </PDFViewer>
+          )}
         </div>
       ),
     },
@@ -117,18 +100,21 @@ const Report = () => {
       label: "Presupuesto Venta Detallado",
       component: (
         <div className="alturaPreview-presu">
-          <PDFViewer className="h-full w-full">
-            <Confirmacion_Pedido_Venta
-              data={updatedData}
-              price={existePrecio(getPrecio("P"))}
-              title="Presupuesto Venta"
-              totalconDescuento={totalConDescuento}
-              ivaCalculado={ivaCalculado}
-              resultadoFinal={totalFinal}
-              importeTotal={importeTotal}
-              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
-            />
-          </PDFViewer>
+          {pdfViewer(
+            <PDFViewer style={{ width: "100%", height: "100%" }}>
+              <Confirmacion_Pedido_Venta
+                data={pdfData}
+                price={existePrecio(getPrecio("P"))}
+                title="Presupuesto Venta"
+                totalconDescuento={totalConDescuento}
+                ivaCalculado={ivaCalculado}
+                resultadoFinal={totalFinal}
+                importeTotal={importeTotal}
+                descuentoAplicado={descuentoAplicado}
+                ivaIncluido={ivaIncluido}
+              />
+            </PDFViewer>
+          )}
         </div>
       ),
     },
@@ -137,20 +123,23 @@ const Report = () => {
       label: "Presupuesto Venta Simplificado",
       component: (
         <div className="alturaPreview-presu">
-          <PDFViewer className="h-full w-full">
-            <Presupuesto_Cliente
-              totalEncimeras={existeTotales(getTotales("Encimeras"))}
-              totalEquipamiento={existeTotales(getTotales("Equipamiento"))}
-              totalElectrodomesticos={existeTotales(getTotales("Electrodomesticos"))}
-              price={existePrecio(getPrecio("C"))}
-              totalconDescuento={totalConDescuento}
-              ivaCalculado={ivaCalculado}
-              resultadoFinal={totalFinal}
-              importeTotal={importeTotal}
-              descuentoAplicado={totales.resultadoFinal?.descuentoAplicado}
-              data={updatedData}
-            />
-          </PDFViewer>
+          {pdfViewer(
+            <PDFViewer style={{ width: "100%", height: "100%" }}>
+              <Presupuesto_Cliente
+                totalEncimeras={existeTotales(getTotales("Encimeras"))}
+                totalEquipamiento={existeTotales(getTotales("Equipamiento"))}
+                totalElectrodomesticos={existeTotales(getTotales("Electrodomesticos"))}
+                price={existePrecio(getPrecio("C"))}
+                totalconDescuento={totalConDescuento}
+                ivaCalculado={ivaCalculado}
+                resultadoFinal={totalFinal}
+                importeTotal={importeTotal}
+                descuentoAplicado={descuentoAplicado}
+                data={pdfData}
+                ivaIncluido={ivaIncluido}
+              />
+            </PDFViewer>
+          )}
         </div>
       ),
     },
@@ -159,7 +148,11 @@ const Report = () => {
       label: "Información General",
       component: (
         <div className="alturaPreview">
-          <General data={updatedData} />
+          <General
+            data={order}
+            ivaIncluido={ivaIncluido}
+            onIvaIncluidoChange={setIvaIncluido}
+          />
         </div>
       ),
     },
@@ -177,7 +170,7 @@ const Report = () => {
       label: "Mi Perfil",
       component: (
         <div className="alturaPreview">
-          <Profile data={updatedData} />
+          <Profile data={order} />
         </div>
       ),
     },
@@ -186,17 +179,14 @@ const Report = () => {
   return (
     order &&
     order._id && (
-      <main className="flex flex-col" id="main">
-        <Card className="rounded-none m-0 pt-0 border-0">
-          <header
-            className="border border-border bg-gray py-4"
-            style={{ padding: 20 }}
-          >
-            <h1 className="text-sv p-2 inline">
+      <main style={{ display: "flex", flexDirection: "column" }} id="main">
+        <Card style={{ borderRadius: 0, margin: 0, border: "none" }} styles={{ body: { paddingTop: 0 } }}>
+          <header style={{ border: "1px solid var(--color-border)", background: "var(--color-bg-layout)", padding: 20 }}>
+            <h1 style={{ fontSize: "var(--font-sv)", padding: 8, display: "inline" }}>
               Ordén
               <NavLink
                 to="/Dashboard/Presupuestos"
-                className="italic font-bold hover:underline hover:text-blue"
+                style={{ fontStyle: "italic", fontWeight: "bold" }}
               >
                 #{order?.orderCode || "Sin especificar"}
               </NavLink>
@@ -206,9 +196,7 @@ const Report = () => {
               type="default"
               onClick={() => {
                 const contenidoJSON = JSON.stringify(order, null, 2);
-                const blob = new Blob([contenidoJSON], {
-                  type: "application/json",
-                });
+                const blob = new Blob([contenidoJSON], { type: "application/json" });
                 const url = URL.createObjectURL(blob);
                 const enlace = document.createElement("a");
                 enlace.href = url;

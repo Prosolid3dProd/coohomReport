@@ -1,165 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { FileAddOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import * as filestack from "filestack-js";
 import "../../../index.css";
 import "./admin.css";
 import {
   Button,
   Form,
-  Input as Input_ant,
-  Select,
   message,
   Popconfirm,
   Modal,
   Table,
   Space,
-  Row,
-  Col,
 } from "antd";
 import { Header } from "../../content";
-import { QuestionCircleOutlined } from "@ant-design/icons";
-import {
-  createUser,
-  getUsers,
-  deleteUser,
-  updateUser,
-} from "../../../handlers/user";
-
-const { Option } = Select;
-const { success, info, error } = message;
-
-const MENSAJES = {
-  SUCCESS: () => success("Se ha actualizado Correctamente"),
-  INFO: (nombreTienda) => info(`Nueva Tienda: ${nombreTienda}`),
-  ERROR: (problema) => error(`Error: ${problema}`),
-  DELETE: (nombreTienda) => info(`Se ha eliminado la Tienda: ${nombreTienda}`),
-};
-
-const ShopsForm = ({ setListaTiendas, open, setOpen }) => {
-  const [logoUrl, setLogoUrl] = useState("");
-  const [form] = Form.useForm();
-
-  const handleUpload = () => {
-    const client = filestack.init(import.meta.env.VITE_FILESTACK_KEY);
-    const options = {
-      onUploadDone: async (file) => {
-        const uploadedUrl = file.filesUploaded[0].url;
-        setLogoUrl(uploadedUrl);
-      },
-      onFileUploadFailed: (error) => {
-        console.error("Error en la carga del archivo:", error);
-      },
-    };
-    const picker = client.picker(options);
-    picker.open();
-  };
-
-  const onFinish = async (values) => {
-    try {
-      const finalValues = { ...values, logo: logoUrl || "" };
-      const nuevaTienda = await createUser(finalValues);
-      if (nuevaTienda.response?.data.message === "Usuario ya existe") {
-        return MENSAJES.ERROR("Usuario existente");
-      }
-      if (!nuevaTienda) {
-        return MENSAJES.ERROR("Conexión Base de Datos");
-      }
-      const tiendasTemporal = await getUsers();
-      setListaTiendas(tiendasTemporal);
-      MENSAJES.INFO(nuevaTienda[0].name);
-      setOpen(false);
-      form.resetFields();
-      setLogoUrl("");
-    } catch (error) {
-      console.error("Error en onFinish:", error);
-    }
-  };
-
-  const handleCancel = () => {
-    setOpen(false);
-    form.resetFields();
-    setLogoUrl("");
-  };
-
-  useEffect(() => {
-    if (open) {
-      form.resetFields();
-      setLogoUrl("");
-    }
-  }, [open, form]);
-
-  return (
-    <Modal
-      title="Crear Nuevo Usuario"
-      open={open}
-      onCancel={handleCancel}
-      footer={null}
-      width={800}
-    >
-      <Form
-        form={form}
-        name="create_user"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        onFinish={onFinish}
-        autoComplete="off"
-      >
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item name="name" label="Propietario" rules={[{ required: true }]}>
-              <Input_ant autoComplete="off" />
-            </Form.Item>
-            <Form.Item name="email" label="E-mail" rules={[{ required: true, type: "email" }]}>
-              <Input_ant autoComplete="off" />
-            </Form.Item>
-            <Form.Item name="nif" label="NIF">
-              <Input_ant autoComplete="off" />
-            </Form.Item>
-            <Form.Item name="info1" label="Info1">
-              <Input_ant autoComplete="off" />
-            </Form.Item>
-            <Form.Item name="coefficient" label="Coeficiente" rules={[{ required: true }]}>
-              <Input_ant autoComplete="off" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name="logo" label="Logo">
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <Button type="default" onClick={handleUpload}>
-                  <FileAddOutlined /> Logo
-                </Button>
-                {logoUrl && (
-                  <img
-                    src={logoUrl}
-                    alt="Logo"
-                    style={{ width: 100, height: 100, objectFit: "contain" }}
-                  />
-                )}
-              </div>
-            </Form.Item>
-            <Form.Item name="password" label="Contraseña" rules={[{ required: true }]}>
-              <Input_ant.Password autoComplete="new-password" />
-            </Form.Item>
-            <Form.Item name="role" label="Rol" rules={[{ required: true }]}>
-              <Select>
-                <Option value="admin">Administrador</Option>
-                <Option value="client">Cliente</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="coefficientVenta" label="Coef. Venta">
-              <Input_ant autoComplete="off" />
-            </Form.Item>
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit">
-                Crear Usuario
-              </Button>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-    </Modal>
-  );
-};
+import { getUsers, deleteUser, updateUser } from "../../../handlers/user";
+import CreateUserModal from "./CreateUserModal";
+import UserFormFields from "./UserFormFields";
 
 const Admin = () => {
   const [listaTiendas, setListaTiendas] = useState([]);
@@ -191,26 +46,23 @@ const Admin = () => {
     const updateTableDimensions = () => {
       const windowHeight = window.innerHeight;
       const windowWidth = window.innerWidth;
-      
-      const headerHeight = 65;
-      const buttonHeight = 42;
-      const paddingAndGaps = 32;
-      const paginationHeight = 55;
-      const availableHeight = windowHeight - headerHeight - buttonHeight - paddingAndGaps - paginationHeight;
-      const rowHeight = 122;
-      const calculatedPageSize = Math.max(1, Math.floor(availableHeight / rowHeight));
-      setPageSize(calculatedPageSize);
-
+      const availableHeight =
+        windowHeight - 65 - 42 - 32 - 55;
+      setPageSize(Math.max(1, Math.floor(availableHeight / 122)));
       const totalColumnWidth = 150 + 200 + 120 + 100 + 100 + 100 + 100 + 200;
-      const minScrollX = 800;
-      const calculatedScrollX = Math.max(minScrollX, Math.min(totalColumnWidth, windowWidth - 32));
-      setTableScrollX(calculatedScrollX);
+      setTableScrollX(Math.max(800, Math.min(totalColumnWidth, windowWidth - 32)));
     };
-
     updateTableDimensions();
     window.addEventListener("resize", updateTableDimensions);
     return () => window.removeEventListener("resize", updateTableDimensions);
   }, []);
+
+  const handleUpload = () => {
+    const client = filestack.init(import.meta.env.VITE_FILESTACK_KEY);
+    client.picker({
+      onUploadDone: (file) => setLogoUrl(file.filesUploaded[0].url),
+    }).open();
+  };
 
   const showEditModal = (user) => {
     setSelectedUser(user);
@@ -225,7 +77,7 @@ const Admin = () => {
       info3: user.info3,
       coefficientVenta: user.coefficientVenta,
       role: user.role,
-      password: "", // No cargamos la contraseña actual por seguridad
+      password: "",
     });
     setEditModalOpen(true);
   };
@@ -233,20 +85,11 @@ const Admin = () => {
   const handleEditOk = async () => {
     try {
       const values = await form.validateFields();
-      const updatedUserData = {
-        ...selectedUser,
-        ...values,
-        logo: logoUrl,
-      };
-      // Solo incluir password si se ingresó un valor
-      if (!values.password) {
-        delete updatedUserData.password; // Evitar enviar contraseña vacía
-      }
+      const updatedUserData = { ...selectedUser, ...values, logo: logoUrl };
+      if (!values.password) delete updatedUserData.password;
       const updatedUser = await updateUser(updatedUserData);
-      
       if (updatedUser) {
-        const tiendasTemporal = await getUsers(); // Recargar desde el servidor
-        setListaTiendas(tiendasTemporal);
+        setListaTiendas(await getUsers());
         setEditModalOpen(false);
         setSelectedUser(null);
         setLogoUrl("");
@@ -271,9 +114,9 @@ const Admin = () => {
   const onDelete = async (item) => {
     try {
       await deleteUser(item);
-      setListaTiendas(prev => prev.filter(user => user._id !== item._id));
+      setListaTiendas((prev) => prev.filter((user) => user._id !== item._id));
       message.success("Usuario eliminado correctamente");
-    } catch (error) {
+    } catch {
       message.error("Error al eliminar usuario");
     }
   };
@@ -290,9 +133,14 @@ const Admin = () => {
       dataIndex: "logo",
       key: "logo",
       width: 100,
-      render: (text) => text && (
-        <img src={text} alt="logo" style={{ width: 50, height: 50, objectFit: "contain" }} />
-      ),
+      render: (text) =>
+        text && (
+          <img
+            src={text}
+            alt="logo"
+            style={{ width: 50, height: 50, objectFit: "contain" }}
+          />
+        ),
     },
     {
       title: "Acción",
@@ -315,35 +163,24 @@ const Admin = () => {
     },
   ];
 
-  const handleUpload = () => {
-    const client = filestack.init(import.meta.env.VITE_FILESTACK_KEY);
-    const options = {
-      onUploadDone: async (file) => {
-        setLogoUrl(file.filesUploaded[0].url);
-      },
-    };
-    const picker = client.picker(options);
-    picker.open();
-  };
-
   return (
-    <main className="px-4 py-4 flex flex-col gap-4 h-screen">
+    <main style={{ padding: 16, display: "flex", flexDirection: "column", gap: 16, height: "100vh" }}>
       <Header actions={false} name={"Tiendas"} />
-      <Button 
-        type="primary" 
+      <Button
+        type="primary"
         onClick={() => setCreateModalOpen(true)}
         style={{ width: "200px" }}
       >
         Crear Nuevo Usuario
       </Button>
-      
+
       <Table
         columns={columns}
         dataSource={listaTiendas}
         loading={load}
         rowKey="_id"
         pagination={{
-          pageSize: pageSize,
+          pageSize,
           defaultPageSize: pageSize,
           showSizeChanger: true,
           pageSizeOptions: Array.from(
@@ -351,18 +188,19 @@ const Admin = () => {
             (_, i) => (i + 1) * Math.max(1, Math.floor(pageSize / 2))
           ).map(String),
           total: listaTiendas.length,
-          showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} usuarios`,
-          position: ['bottomRight'],
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} de ${total} usuarios`,
+          position: ["bottomRight"],
         }}
         scroll={{ x: tableScrollX }}
       />
 
-      <ShopsForm 
-        setListaTiendas={setListaTiendas}
+      <CreateUserModal
         open={createModalOpen}
         setOpen={setCreateModalOpen}
+        onCreated={setListaTiendas}
       />
-      
+
       <Modal
         title="Editar Usuario"
         open={editModalOpen}
@@ -371,53 +209,11 @@ const Admin = () => {
         width={800}
       >
         <Form form={form} layout="vertical">
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="name" label="Propietario" rules={[{ required: true }]}>
-                <Input_ant />
-              </Form.Item>
-              <Form.Item name="email" label="E-mail" rules={[{ required: true, type: "email" }]}>
-                <Input_ant />
-              </Form.Item>
-              <Form.Item name="nif" label="NIF">
-                <Input_ant />
-              </Form.Item>
-              <Form.Item name="info1" label="Info1">
-                <Input_ant />
-              </Form.Item>
-              <Form.Item name="coefficient" label="Coeficiente" rules={[{ required: true }]}>
-                <Input_ant />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="logo" label="Logo">
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <Button type="default" onClick={handleUpload}>
-                    <FileAddOutlined /> Logo
-                  </Button>
-                  {logoUrl && (
-                    <img
-                      src={logoUrl}
-                      alt="Logo"
-                      style={{ width: 100, height: 100, objectFit: "contain" }}
-                    />
-                  )}
-                </div>
-              </Form.Item>
-              <Form.Item name="password" label="Contraseña">
-                <Input_ant.Password autoComplete="new-password" placeholder="Nueva contraseña (opcional)" />
-              </Form.Item>
-              <Form.Item name="coefficientVenta" label="Coef. Venta">
-                <Input_ant />
-              </Form.Item>
-              <Form.Item name="role" label="Rol" rules={[{ required: true }]}>
-                <Select>
-                  <Option value="admin">Administrador</Option>
-                  <Option value="client">Cliente</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
+          <UserFormFields
+            logoUrl={logoUrl}
+            onUploadLogo={handleUpload}
+            isEdit
+          />
         </Form>
       </Modal>
     </main>

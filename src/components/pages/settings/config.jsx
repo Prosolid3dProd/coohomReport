@@ -4,27 +4,22 @@ import { Tabs } from 'antd'
 
 import ojoAbierto from '../../../assets/ojoAbierto.svg';
 import ojoCerrado from '../../../assets/ojoCerrado.svg';
-import { Info, Exit } from '../../icons';
+import { Info, Exit } from '../../../shared/ui/icons';
 
-import { BtnAction } from '../../utils';
-import { getValue, setValue } from '../../../data/session';
-import { ButtonForm, LabelForm } from '../../utils/btnAction';
+import { ButtonAction as BtnAction, ButtonForm, LabelForm } from '../../../shared/ui/Button';
+import { getValue, setValue } from '../../../shared/lib/storage';
 
 const Title = ({ name }) => (
-    <header className=" flex items-center gap-2 pl-4 border-b border-border">
-        <h2 className=" text-sv font-bold">{name}</h2>
-        <Info className="text-[20px]" />
+    <header style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 16, borderBottom: '1px solid var(--color-border)' }}>
+        <h2 style={{ fontSize: 'var(--font-sv)', fontWeight: 'bold' }}>{name}</h2>
+        <Info style={{ fontSize: 20 }} />
     </header>
 );
 
 const NavConfig = () => {
     const tabs = [
-        {
-            'Perfil': <Perfil />
-        },
-        {
-            'Detalles': <Detalles />
-        }
+        { 'Perfil': <Perfil /> },
+        { 'Detalles': <Detalles /> },
     ]
 
     return (
@@ -38,7 +33,7 @@ const NavConfig = () => {
                     return {
                         label: `${key}`,
                         key: String(i + 1),
-                        children: <>{item}</>
+                        children: <>{item}</>,
                     }
                 })
             }
@@ -93,51 +88,49 @@ const Perfil = () => {
         <SectionBody tabName={'Detalles'}
             content={
                 <>
-                    <article className='h-[400px] py-4 flex flex-col items-center gap-4 w-full'>
-                        <div className='w-full lg:w-[500px] flex flex-col items-center justify-center gap-4 flex-1 mr-l '>
-                            <img ref={imgRef} className='w-full h-[250px] bg-gray object-cover' src={img} />
+                    <article style={{ height: 400, padding: '16px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, width: '100%' }}>
+                        <div style={{ width: '100%', maxWidth: 500, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, flex: 1 }}>
+                            <img ref={imgRef} style={{ width: '100%', height: 250, background: 'var(--color-bg-layout)', objectFit: 'cover' }} src={img} />
                         </div>
-                        <header className='flex flex-row h-[85px] items-center justify-between w-full p-8'>
-                            <h2 className='font-semibold '>Banner</h2>
-                            <div className='flex flex-row h-[50px] gap-4'>
-                                {
-                                    botonSave && (
-                                        <>
-                                            <BtnAction text={'Cancel'} color='#FF4733' action={cancel} />
-                                            <BtnAction text={'Save'} color='#1a7af8' action={onClick} />
-                                        </>
-                                    )
-                                }
-                                <LabelForm text={
+                        <header style={{ display: 'flex', flexDirection: 'row', height: 85, alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: 32 }}>
+                            <h2 style={{ fontWeight: 600 }}>Banner</h2>
+                            <div style={{ display: 'flex', flexDirection: 'row', height: 50, gap: 16 }}>
+                                {botonSave && (
                                     <>
-                                        <input
-                                            placeholder="Introduce a file"
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            disabled={disabled}
-                                            onChange={(e) => {
-                                                const files = e.target.files
-                                                const fileUpload = files[0]
-                                                const fileRead = new FileReader()
-
-                                                if (files && files.length) {
-                                                    fileRead.onload = () => {
-                                                        const fileContent = fileRead.result;
-                                                        if (imgRef.current) imgRef.current.src = fileContent
-                                                    };
-                                                    fileRead.readAsDataURL(fileUpload);
-                                                    setDisabled(true)
-                                                    setColor('#CFCFCF')
-                                                    setBotonSave(true)
-                                                }
-                                            }}
-                                        />
-                                        <p>Change</p>
+                                        <BtnAction text={'Cancel'} color='#FF4733' action={cancel} />
+                                        <BtnAction text={'Save'} color='#1a7af8' action={onClick} />
                                     </>
-                                }
+                                )}
+                                <LabelForm
+                                    text={
+                                        <>
+                                            <input
+                                                placeholder="Introduce a file"
+                                                type="file"
+                                                accept="image/*"
+                                                style={{ display: 'none' }}
+                                                disabled={disabled}
+                                                onChange={(e) => {
+                                                    const files = e.target.files
+                                                    const fileUpload = files[0]
+                                                    const fileRead = new FileReader()
+
+                                                    if (files && files.length) {
+                                                        fileRead.onload = () => {
+                                                            const fileContent = fileRead.result;
+                                                            if (imgRef.current) imgRef.current.src = fileContent
+                                                        };
+                                                        fileRead.readAsDataURL(fileUpload);
+                                                        setDisabled(true)
+                                                        setColor('#CFCFCF')
+                                                        setBotonSave(true)
+                                                    }
+                                                }}
+                                            />
+                                            <p>Change</p>
+                                        </>
+                                    }
                                     color={color}
-                                    altura={'[50px]'}
                                 />
                             </div>
                         </header>
@@ -161,13 +154,21 @@ const Perfil = () => {
                             </>
                         }
                     />
-                    <Section text={<NavLink to={'/Login'} className={'text-blue'}><span className='flex flex-row justify-start gap-2 items-center self-start '>Exit<Exit className='bg-blue-600/25 rounded-full h-[30px] w-[30px] p-1'/></span></NavLink>} />
+                    <Section
+                        text={
+                            <NavLink to={'/Login'} style={{ color: 'var(--color-primary)' }}>
+                                <span style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', gap: 8, alignItems: 'center' }}>
+                                    Exit
+                                    <Exit style={{ background: 'rgba(37,99,235,0.25)', borderRadius: '50%', height: 30, width: 30, padding: 4 }} />
+                                </span>
+                            </NavLink>
+                        }
+                    />
                 </>
             }
         />
     )
 };
-
 
 const EditableArticle = ({ text, extraBtn = false, action, input = true }) => {
     const inputRef = useRef(null)
@@ -197,77 +198,66 @@ const EditableArticle = ({ text, extraBtn = false, action, input = true }) => {
     }
 
     return (
-        <article className='grid grid-cols-12 lg:grid-cols-[100px_1fr] gap-4 lg:gap-0 p-4 h-[85px]'>
-            <header className='col-span-2 lg:col-span-1 flex justify-start items-start'>
-                <h2 className='pt-1'>{text}</h2>
+        <article style={{ display: 'grid', gridTemplateColumns: '100px 1fr', padding: 16, height: 85 }}>
+            <header style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+                <h2 style={{ paddingTop: 4 }}>{text}</h2>
             </header>
-            <article className="flex w-full col-start-3 lg:col-start-2 col-span-11 lg:flex lg:justify-between">
-                <div className='bg-gray flex w-[400px] rounded-md outline outline-border outline-1 transition-all duration-150 lg:w-[400px] h-[32px]'>
-                    {
-                        input
-                        && (
-                            <>
-                                <input ref={inputRef} type={showPassword ? 'password' : 'text'}
-                                    className={`self-start bg-transparent w-full h-full focus:outline-none text-start pl-4`}
-                                    placeholder={text}
-                                    defaultValue={value || text}
-                                    disabled
-                                />
-                                {
-                                    extraBtn && (
-                                        <button type="button" className='pr-4' onClick={() => setShowPassword(psw => psw = !psw)}>
-                                            {showPassword ? <img src={ojoCerrado} alt="ojoCerrado" /> : <img src={ojoAbierto} alt="ojoAbierto" />}
-                                        </button>
-                                    )
-                                }
-                            </>
-                        )
-                    }
+            <article style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                <div style={{ background: 'var(--color-bg-layout)', display: 'flex', width: 400, borderRadius: 6, outline: '1px solid var(--color-border)', transition: 'all 0.15s', height: 32 }}>
+                    {input && (
+                        <>
+                            <input
+                                ref={inputRef}
+                                type={showPassword ? 'password' : 'text'}
+                                style={{ background: 'transparent', width: '100%', height: '100%', border: 'none', outline: 'none', paddingLeft: 16 }}
+                                placeholder={text}
+                                defaultValue={value || text}
+                                disabled
+                            />
+                            {extraBtn && (
+                                <button type="button" style={{ paddingRight: 16 }} onClick={() => setShowPassword(psw => !psw)}>
+                                    {showPassword ? <img src={ojoCerrado} alt="ojoCerrado" /> : <img src={ojoAbierto} alt="ojoAbierto" />}
+                                </button>
+                            )}
+                        </>
+                    )}
                 </div>
-                <ButtonForm text={textoBtn} color={`${textoBtn === 'Editar' ? '#1a7af8' : '#FFF'}`} background={`${textoBtn === 'Editar' ? 'white' : '#1a7af8'}`} altura='[65px]' action={editInput} />
+                <ButtonForm
+                    text={textoBtn}
+                    color={textoBtn === 'Editar' ? '#1a7af8' : '#FFF'}
+                    background={textoBtn === 'Editar' ? 'white' : '#1a7af8'}
+                    action={editInput}
+                />
             </article>
         </article>
     )
 }
 
-const Section = ({ text, articles }) => {
-    return (
-        <div className='mb-8'>
-            <header className='bg-gray p-4 text-sv font-semibold'>
-                {text}
-            </header>
-            <section className='px-4 divide-y-[1px] divide-border'>
-                {
-                    articles
-                }
-            </section>
-        </div>
-    )
-}
-
-const SectionBody = ({ tabName, content }) => {
-    return (
-        <section id={tabName} className='p-4 divide-y-[1px] divide-border'>
-            {content}
+const Section = ({ text, articles }) => (
+    <div style={{ marginBottom: 32 }}>
+        <header style={{ background: 'var(--color-bg-layout)', padding: 16, fontSize: 'var(--font-sv)', fontWeight: 600 }}>
+            {text}
+        </header>
+        <section style={{ padding: '0 16px' }}>
+            {articles}
         </section>
-    )
-}
+    </div>
+)
 
-const Detalles = () => {
-    return (
-        <SectionBody tabName={'Detalles'}
-            content={
-                <>
-                    <EditableArticle text={'Coeficiente'} />
-                </>
-            }
-        />
-    )
-}
+const SectionBody = ({ tabName, content }) => (
+    <section id={tabName} style={{ padding: 16 }}>
+        {content}
+    </section>
+)
+
+const Detalles = () => (
+    <SectionBody tabName={'Detalles'}
+        content={<EditableArticle text={'Coeficiente'} />}
+    />
+)
 
 const Config = () => (
-    <div className='grid grid-rows-[75px_56px_1fr] overflow-y-scroll
-    '>
+    <div style={{ display: 'grid', gridTemplateRows: '75px 56px 1fr', overflowY: 'scroll' }}>
         <Title name={'Settings'} />
         <NavConfig />
         <Outlet />

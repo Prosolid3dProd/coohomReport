@@ -1,4 +1,4 @@
-import { Config, Encimera, Tiendas, List } from "../../icons";
+import { Config, Encimera, Tiendas, List } from "../../../shared/ui/icons";
 
 export const lista = [
   {

@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { getOrderById, fixOrder } from "../handlers/order";
+import { getOrderById } from "../entities/order/api";
 import { useUser } from "./UserContext";
 
 const OrderContext = createContext(null);
@@ -10,11 +10,11 @@ export const OrderProvider = ({ children }) => {
   const [orderId, setOrderId] = useState(() => localStorage.getItem("orderId"));
   const [isLoading, setIsLoading] = useState(false);
 
-  const _fetch = useCallback(async (id, role) => {
+  const _fetch = useCallback(async (id) => {
     setIsLoading(true);
     try {
       const raw = await getOrderById({ _id: id });
-      setOrder(fixOrder(raw, 0, role ?? "client"));
+      setOrder(raw);
     } finally {
       setIsLoading(false);
     }
@@ -23,14 +23,14 @@ export const OrderProvider = ({ children }) => {
   const setActiveOrder = useCallback(async (id) => {
     localStorage.setItem("orderId", id);
     setOrderId(id);
-    await _fetch(id, user?.role);
-  }, [_fetch, user?.role]);
+    await _fetch(id);
+  }, [_fetch]);
 
   const refreshOrder = useCallback(async () => {
     const id = orderId ?? order?._id;
     if (!id) return;
-    await _fetch(id, user?.role);
-  }, [orderId, order?._id, _fetch, user?.role]);
+    await _fetch(id);
+  }, [orderId, order?._id, _fetch]);
 
   const clearOrder = useCallback(() => {
     localStorage.removeItem("orderId");
@@ -39,7 +39,7 @@ export const OrderProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (orderId && user) _fetch(orderId, user?.role);
+    if (orderId && user) _fetch(orderId);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

@@ -1,36 +1,50 @@
-import { lista as items } from "./menuData";
-import { listaCliente as itemsCliente } from "./menuData";
-import { NavLink } from "react-router-dom";
+import { Menu as AntMenu } from "antd";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../../../context";
+import { lista, listaCliente } from "./menuData";
+import { ArrowsLeft, ArrowsRight } from "../../../shared/ui/icons";
 
-const Item = ({ name, Icon, textShown }) => (
-  <NavLink
-    to={`${name}`}
-    className="w-full flex flex-row justify-center items-center border-b border-transparent focus:text-blue pb-2 pt-2 hover:bg-gray-200 transition duration-400 ease-out hover:ease-in lg:justify-start pl-3 max-[1023px]:pl-0 text-gray-400"
-  >
-    <Icon className="w-8 h-8 flex self-center cursor-pointer" />
-    {textShown && (
-      <p className="cursor-pointer ml-3 max-[1024px]:hidden">{name}</p>
-    )}
-  </NavLink>
-);
-
-const Lista = ({ change, textShown }) => {
+const Lista = ({ collapsed, onToggle }) => {
   const { user } = useUser();
-  const roleItems = user?.role === "admin" ? items : user?.role === "client" ? itemsCliente : [];
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const roleItems =
+    user?.role === "admin" ? lista : user?.role === "client" ? listaCliente : [];
+
+  const items = roleItems.map(({ name, icon: Icon }) => ({
+    key: `/Dashboard/${name}`,
+    icon: <Icon style={{ fontSize: 20 }} />,
+    label: name,
+  }));
+
+  const selectedKey = items.find((item) =>
+    location.pathname.startsWith(item.key)
+  )?.key;
 
   return (
-    <ul className="flex items-center h-full w-full flex-col pt-4 list-disc relative">
-      {roleItems.map(({ name, icon }, index) => (
-        <li key={index} className="w-full">
-          <Item
-            name={name}
-            Icon={icon}
-            textShown={change ? false : textShown}
-          />
-        </li>
-      ))}
-    </ul>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", paddingTop: 8 }}>
+      <div
+        onClick={onToggle}
+        style={{
+          display: "flex",
+          justifyContent: collapsed ? "center" : "flex-end",
+          padding: "4px 12px 8px",
+          cursor: "pointer",
+          color: "#9ca3af",
+        }}
+      >
+        {collapsed ? <ArrowsRight /> : <ArrowsLeft />}
+      </div>
+      <AntMenu
+        mode="inline"
+        selectedKeys={selectedKey ? [selectedKey] : []}
+        inlineCollapsed={collapsed}
+        items={items}
+        onClick={({ key }) => navigate(key)}
+        style={{ background: "transparent", border: "none", flex: 1 }}
+      />
+    </div>
   );
 };
 

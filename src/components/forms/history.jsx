@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { getDiferenciaDias } from "../../data/dateUtils";
+import { useEffect, useState, useCallback } from "react";
+import { getDiferenciaDias } from "../../shared/lib/date";
 import { useOrder } from "../../context";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import "./../../index.css";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -14,23 +13,59 @@ import {
   message,
   Table,
 } from "antd";
-import {
-  getOrders,
-  archivedOrder,
-} from "../../handlers/order";
-import { Header } from "../content"; 
+import { getOrders, archivedOrder } from "../../handlers/order";
+import { Header } from "../content";
 
+const calculatePageSize = () => {
+  const available = window.innerHeight - 250;
+  const size = Math.floor(available / 80);
+  return isNaN(size) || size < 5 ? 5 : size;
+};
 
 const History = () => {
   const [data, setData] = useState([]);
   const [load, setLoad] = useState(true);
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: calculatePageSize(),
     total: 0,
   });
   const navigate = useNavigate();
   const { setActiveOrder } = useOrder();
+
+  const fetchData = useCallback(async (page = 1, pageSize = pagination.pageSize) => {
+    setLoad(true);
+    try {
+      const result = await getOrders({ page, limit: pageSize });
+      if (result?.data) {
+        setData(result.data);
+        setPagination((prev) => ({
+          ...prev,
+          current: result.page,
+          pageSize,
+          total: result.total,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoad(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const newPageSize = calculatePageSize();
+    fetchData(1, newPageSize);
+
+    const handleResize = () => {
+      const ps = calculatePageSize();
+      setPagination((prev) => ({ ...prev, pageSize: ps }));
+      fetchData(1, ps);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [fetchData]);
 
   const onDelete = async (item) => {
     setLoad(true);
@@ -42,7 +77,7 @@ const History = () => {
       } else {
         message.error(`Error al eliminar el pedido ${item.orderCode}`);
       }
-    } catch (e) {
+    } catch {
       message.error(`Error al eliminar el pedido ${item.orderCode}`);
     } finally {
       setLoad(false);
@@ -58,94 +93,35 @@ const History = () => {
     }
   };
 
- // función que calcula pageSize dinámico
-// calcula el número de filas visibles según la pantalla
-const calculatePageSize = () => {
-  const windowHeight = window.innerHeight;
-
-  // margen reservado para header, paddings, etc.
-  const reservedSpace = 250; 
-
-  // alto estimado de cada fila de la tabla (ajústalo a tu diseño)
-  const rowHeight = 80; 
-
-  let newPageSize = Math.floor((windowHeight - reservedSpace) / rowHeight);
-
-  // asegurar que nunca se queda demasiado pequeño
-  if (isNaN(newPageSize) || newPageSize < 5) {
-    newPageSize = 5;
-  }
-
-  return newPageSize;
-};
-
-
-const fetchData = async (page = 1, pageSize = pagination.pageSize) => {
-  try {
+  const getFilterComplements = async (params) => {
     setLoad(true);
-    const result = await getOrders({ page, limit: pageSize });
-    if (result?.data) {
-      setData(result.data);
-      setPagination({
-        current: result.page,
-        pageSize: pageSize, // usamos el dinámico
-        total: result.total,
+    try {
+      const search =
+        params?.text && typeof params.text === "string"
+          ? params.text.trim()
+          : "";
+      const result = await getOrders({
+        page: 1,
+        limit: pagination.pageSize,
+        search,
       });
+      if (result?.data) {
+        setData(result.data);
+        setPagination((prev) => ({
+          ...prev,
+          current: result.page,
+          total: result.total,
+        }));
+      } else {
+        setData([]);
+        message.warning("No se encontraron resultados");
+      }
+    } catch (error) {
+      console.error("Error filtrando las órdenes:", error);
+    } finally {
+      setLoad(false);
     }
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-  } finally {
-    setLoad(false);
-  }
-};
-
-useEffect(() => {
-  const handleResize = () => {
-    const newPageSize = calculatePageSize();
-    setPagination({pagesize:newPageSize});
-
-    // opcional: recargar datos con el nuevo pageSize
-    fetchData(1, newPageSize);
   };
-
-  handleResize(); // inicial
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
-
-
- const getFilterComplements = async (params) => {
-  try {
-    setLoad(true);
-    const searchTerm =
-      params && params.text && typeof params.text === "string"
-        ? params.text.trim()
-        : "";
-
-    // 👇 le pasamos el término de búsqueda al backend
-    const result = await getOrders({
-      page: 1,
-      limit: pagination.pageSize,
-      search: searchTerm,
-    });
-
-    if (result?.data) {
-      setData(result.data);
-      setPagination({
-        current: result.page,
-        pageSize: pagination.pageSize,
-        total: result.total,
-      });
-    } else {
-      setData([]);
-      message.warning("No se encontraron resultados");
-    }
-  } catch (error) {
-    console.error("Error filtrando las órdenes:", error);
-  } finally {
-    setLoad(false);
-  }
-};
 
   const columns = [
     {
@@ -158,7 +134,7 @@ useEffect(() => {
           <Button type="link" style={{ marginTop: 10 }}>
             <Typography.Link onClick={() => onNavigate(record)}>
               <Tag color="blue">
-                <span className="hover:underline text-smd lg:text-md">
+                <span style={{ fontSize: 16 }}>
                   {text || "Sin especificar"}
                 </span>
               </Tag>
@@ -220,7 +196,7 @@ useEffect(() => {
       key: "actions",
       fixed: "right",
       width: 110,
-      render: (text, record) => (
+      render: (_, record) => (
         <Space>
           <Popconfirm
             title="¿Estás seguro de que deseas eliminar este reporte?"
@@ -229,9 +205,7 @@ useEffect(() => {
             okText="Si"
             cancelText="No"
           >
-            <Typography.Link>
-              <Button danger>Eliminar</Button>
-            </Typography.Link>
+            <Button danger>Eliminar</Button>
           </Popconfirm>
         </Space>
       ),
@@ -239,10 +213,9 @@ useEffect(() => {
   ];
 
   return (
-    <div className="flex flex-col ">
-      <div className="px-4">
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "0 16px" }}>
         <Header
-          actions={true}
           name={"Listado"}
           setLoading={setLoad}
           setData={setData}
@@ -252,8 +225,8 @@ useEffect(() => {
           addFile={(e) => e}
         />
       </div>
-      <article className="border-none rounded-none relative overflow-x-hidden">
-        <Card className="border-none">
+      <article style={{ borderRadius: 0, position: "relative", overflowX: "hidden" }}>
+        <Card style={{ border: "none" }}>
           <Table
             style={{
               borderBottom: "1px solid #e8e8e8",
@@ -266,9 +239,7 @@ useEffect(() => {
             rowKey="_id"
             pagination={{
               ...pagination,
-              onChange: (page, pageSize) => {
-                fetchData(page, pageSize);
-              },
+              onChange: (page, pageSize) => fetchData(page, pageSize),
             }}
           />
         </Card>

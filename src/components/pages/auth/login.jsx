@@ -42,65 +42,68 @@ const Login = () => {
   return (
     <div
       id="pantalla"
-      className="col-span-2 row-span-2 flex items-center justify-center"
+      style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}
     >
       <div
         id="panel"
-        className="bg-white rounded-xl w-[610px] h-[439px] grid grid-cols-[200px_1fr]"
+        style={{
+          background: "white",
+          borderRadius: 12,
+          width: 610,
+          height: 439,
+          display: "grid",
+          gridTemplateColumns: "200px 1fr",
+        }}
       >
-        <h1 className="h-full flex justify-center self-center bg-bckLogin rounded-l-xl font-medium text-[70px] items-center">
+        <div
+          style={{
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "var(--color-primary)",
+            borderRadius: "12px 0 0 12px",
+            fontWeight: 500,
+            fontSize: 70,
+            color: "white",
+          }}
+        >
           C
-        </h1>
-        <div id="info" className="flex flex-col items-center justify-around">
-          <h1 className="font-semibold font-login text-[24px]">
-            Iniciar sesión
-          </h1>
+        </div>
+        <div
+          id="info"
+          style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-around" }}
+        >
+          <h1 style={{ fontWeight: 600, fontSize: 24 }}>Iniciar sesión</h1>
           <Form
             name="normal_login"
-            className="login-form"
-            initialValues={{
-              remember: true,
-            }}
+            initialValues={{ remember: true }}
             onFinish={onFinish}
             onFinishFailed={onFailed}
+            validateMessages={validateMessages}
           >
             <Form.Item
-              className="mb-12"
               name="email"
-              rules={[
-                {
-                  required: true,
-                  message: "El email no es válido",
-                },
-              ]}
+              rules={[{ required: true, message: "El email no es válido" }]}
             >
               <Input
-                className="h-10 w-80"
-                prefix={<UserOutlined className="site-form-item-icon" />}
+                style={{ height: 40, width: 320 }}
+                prefix={<UserOutlined />}
                 placeholder="Email"
               />
             </Form.Item>
 
             <Form.Item
               name="password"
-              validateMessages={validateMessages}
               rules={[
-                {
-                  message: "Al menos 1 Mayúscula y un signo especial",
-                },
-                {
-                  message: "Debe tener al menos 8 carácteres!",
-                },
-                {
-                  required: true,
-                  message: "Introduce la contraseña!",
-                },
+                { message: "Al menos 1 Mayúscula y un signo especial" },
+                { message: "Debe tener al menos 8 carácteres!" },
+                { required: true, message: "Introduce la contraseña!" },
               ]}
             >
               <Input.Password
-                className="h-10 w-80"
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                type="password"
+                style={{ height: 40, width: 320 }}
+                prefix={<LockOutlined />}
                 placeholder="Contraseña"
                 iconRender={(visible) =>
                   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -112,17 +115,8 @@ const Login = () => {
                 <Checkbox>Recuerdame</Checkbox>
               </Form.Item>
             </Form.Item>
-            <Form.Item className="flex justify-center">
-              <Button
-                style={{
-                  backgroundColor: "#1a7af8",
-                  width: "160px",
-                  height: "40px",
-                }}
-                type="primary"
-                htmlType="submit"
-                className="login-form-button"
-              >
+            <Form.Item style={{ textAlign: "center" }}>
+              <Button style={{ width: 160, height: 40 }} type="primary" htmlType="submit">
                 Acceder
               </Button>
             </Form.Item>

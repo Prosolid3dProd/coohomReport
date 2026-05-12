@@ -1,31 +1,29 @@
 import { useState, useEffect } from "react";
-import BotonPlegar from "./botonPlegar";
+import { Layout } from "antd";
 import Lista from "./lista";
 
 const Menu = () => {
-  const root = document.getElementById("root");
-  const [change, setChange] = useState(() => {
-    return localStorage.getItem("MenuDesp") === "true";
-  });
-  const [mostrarTexto, setMostrarTexto] = useState(true);
+  const [collapsed, setCollapsed] = useState(
+    () => localStorage.getItem("MenuDesp") === "true"
+  );
 
   useEffect(() => {
-    localStorage.setItem("MenuDesp", change);
-  }, [change]);
-
-  const onClick = () => {
-    root.classList.toggle("rootLayout");
-    setChange((prevChange) => !prevChange);
-    setMostrarTexto((prevMostrarTexto) => !prevMostrarTexto);
-  };
+    localStorage.setItem("MenuDesp", collapsed);
+  }, [collapsed]);
 
   return (
-    <aside className="col-span-1 row-start-2 row-span-2 bg-gray flex flex-col gap-4">
-      <ul className="flex items-center h-full w-full flex-col pt-4 list-disc relative">
-        <BotonPlegar fn={onClick} change={change} />
-        <Lista change={change} textShown={mostrarTexto} />
-      </ul>
-    </aside>
+    <Layout.Sider
+      collapsed={collapsed}
+      collapsedWidth={56}
+      width={200}
+      trigger={null}
+      style={{
+        background: "var(--color-bg-layout)",
+        borderRight: "1px solid var(--color-border)",
+      }}
+    >
+      <Lista collapsed={collapsed} onToggle={() => setCollapsed((v) => !v)} />
+    </Layout.Sider>
   );
 };
 
