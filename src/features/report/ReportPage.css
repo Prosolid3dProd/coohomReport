@@ -1,0 +1,13 @@
+.alturaPreview {
+  height: calc(100vh - 280px);
+  overflow-y: auto;
+}
+
+.alturaPreview-presu {
+  height: calc(100vh - 280px);
+}
+
+#main {
+  background: var(--color-bg-layout);
+  min-height: 100vh;
+}

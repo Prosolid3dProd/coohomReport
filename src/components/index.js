@@ -9,7 +9,7 @@ import {
   Error,
 } from "./pages";
 import { Admin } from "./pages";
-import { History, Product, General, Profile } from "./forms/index";
+import { History } from "./forms/index";
 
 export {
   Config,
@@ -22,8 +22,5 @@ export {
   RedirectLogin,
   Error,
   History,
-  Profile,
-  Product,
-  General,
   Admin,
 };

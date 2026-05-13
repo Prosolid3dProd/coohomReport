@@ -15,7 +15,7 @@ import { AdminGuard } from "./components/pages/auth/guard";
 import { UserProvider, OrderProvider } from "./context";
 import './index.css'
 
-const Report = lazy(() => import("./components/pages/report/report"));
+const Report = lazy(() => import("./features/report").then(m => ({ default: m.ReportPage })));
 const Admin = lazy(() => import("./components/pages/admin/admin").then(m => ({ default: m.Admin })));
 
 const Loading = () => <div style={{ padding: 32, textAlign: "center" }}>Cargando...</div>;
