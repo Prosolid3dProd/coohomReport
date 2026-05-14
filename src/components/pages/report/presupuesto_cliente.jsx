@@ -150,9 +150,6 @@ const Presupuesto_Cliente = ({
               </View>
             </>
           )}
-          <View>
-            <Text>I.V.A. ({ivaPorcentaje}%)</Text>
-          </View>
           <View style={{ marginTop: 2 }}>
             <Text>
               <Text>PRECIO TOTAL</Text>
@@ -167,9 +164,6 @@ const Presupuesto_Cliente = ({
               </View>
             </View>
           )}
-          <View style={{ textAlign: "right", marginTop: 1 }}>
-            <Text>{calcularIva(sumaImportes, descuento, ivaPorcentaje)}</Text>
-          </View>
           <View
             style={{
               borderTop: "1 solid #000000",
@@ -1049,7 +1043,7 @@ const Presupuesto_Cliente = ({
                         ? [{ value: `${item.discount}%`, width: "30" }]
                         : []),
                       {
-                        value: parseFloat(item.total).toFixed(2),
+                        value: (parseFloat(item.total) * (1 + (parseFloat(data.ivaEncimeras) || 21) / 100)).toFixed(2),
                         width: "100",
                         textAlign: "right",
                       },
@@ -1147,7 +1141,7 @@ const Presupuesto_Cliente = ({
                         ? [{ value: `${item.discount}%`, width: "30" }]
                         : []),
                       {
-                        value: parseFloat(item.total).toFixed(2),
+                        value: (parseFloat(item.total) * (1 + (parseFloat(data.ivaEquipamientos) || 21) / 100)).toFixed(2),
                         width: "100",
                         textAlign: "right",
                       },
@@ -1246,7 +1240,7 @@ const Presupuesto_Cliente = ({
                         ? [{ value: `${item.discount}%`, width: "30" }]
                         : []),
                       {
-                        value: parseFloat(item.total).toFixed(2),
+                        value: (parseFloat(item.total) * (1 + (parseFloat(data.ivaElectrodomesticos) || 21) / 100)).toFixed(2),
                         width: "100",
                         textAlign: "right",
                       },

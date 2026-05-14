@@ -35,6 +35,11 @@ const setPrecio = (key, value) => {
     return value;
   };
 
+const setTotales = (key, value) => {
+    localStorage.setItem(`Mostrar_Totales_${key}`, JSON.stringify(value));
+    return value;
+  };
+
 /**
  *
  *
@@ -54,6 +59,7 @@ export {
     getPrecio,
     setPrecio,
     getTotales,
+    setTotales,
     existePrecio,
     existeTotales,
     getLocalToken,

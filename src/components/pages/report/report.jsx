@@ -36,6 +36,15 @@ const Report = () => {
   const [visible, setBtnVisible] = useState(false);
   const [tabActivo, setTabActivo] = useState(0);
   const [profile, setProfile] = useState(null);
+  const [totalesState, setTotalesState] = useState({
+    Encimeras: existeTotales(getTotales("Encimeras")),
+    Equipamiento: existeTotales(getTotales("Equipamiento")),
+    Electrodomesticos: existeTotales(getTotales("Electrodomesticos")),
+  });
+
+  const handleTotalesChangeReport = (key, value) => {
+    setTotalesState((prev) => ({ ...prev, [key]: value }));
+  };
 
   const updatedData = useMemo(() => {
     if (!data || !data.cabinets) return data;
@@ -193,9 +202,9 @@ const Report = () => {
         <div className="alturaPreview-presu">
           <PDFViewer className="h-full w-full">
             <Presupuesto_Cliente
-              totalEncimeras={existeTotales(getTotales("Encimeras"))}
-              totalEquipamiento={existeTotales(getTotales("Equipamiento"))}
-              totalElectrodomesticos={existeTotales(getTotales("Electrodomesticos"))}
+              totalEncimeras={totalesState.Encimeras}
+              totalEquipamiento={totalesState.Equipamiento}
+              totalElectrodomesticos={totalesState.Electrodomesticos}
               price={existePrecio(getPrecio("C"))}
               totalconDescuento={totalConDescuento}
               ivaCalculado={ivaCalculado}
@@ -213,7 +222,7 @@ const Report = () => {
       label: "Información General",
       component: (
         <div className="alturaPreview">
-          <General getData={setData} data={updatedData} />
+          <General getData={setData} data={updatedData} onTotalesChange={handleTotalesChangeReport} />
         </div>
       ),
     },

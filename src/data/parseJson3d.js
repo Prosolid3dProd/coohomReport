@@ -660,8 +660,6 @@ export const parseJson3D = async (json) => {
     let validarDoor = false;
     let drawer;
     let total = 0;
-    let modelDrawer = null;
-    let modeloDrawer = null;
     const doors = [];
     let isCajonExist = false;
     let referenceType = {
@@ -1332,7 +1330,7 @@ export const parseJson3D = async (json) => {
               modelName: String(nameFinal).replace("-", ""),
               doors: getDoors(item.subModels),
               opening,
-              modelDrawer: modeloDrawer,
+              //modelDrawer: modeloDrawer,
               zocalo: zocalo,
               priceDoor: parseInt(getTotalDoors(item?.subModels)),
               total: totalPrice,
@@ -1399,11 +1397,6 @@ export const parseJson3D = async (json) => {
       };
       cabinets.push(zocNuevo);
     });
-
-    if (modelDrawer) {
-      drawerTemp = modelDrawer[0].modelDrawer;
-      drawerTexture = modelDrawer[0].textureDrawer;
-    }
 
     const conteo = cabinets.reduce((contador, item) => {
       const id = item.obsBrandGoodId;

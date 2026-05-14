@@ -17,10 +17,11 @@ import {
   getPrecio,
   setPrecio,
   getTotales,
+  setTotales as setTotalesStorage,
   existeTotales,
 } from "../../data/localStorage";
 
-const General = ({ getData, data }) => {
+const General = ({ getData, data, onTotalesChange }) => {
   const [form] = Form.useForm();
   const role = data?.profile?.role || "";
   const isClient = role === "client";
@@ -78,7 +79,8 @@ const General = ({ getData, data }) => {
   const handleTotalesChange = (key) => {
     setTotales((prev) => {
       const newValue = !prev[key];
-      setTotales(key, newValue);
+      setTotalesStorage(key, newValue);
+      onTotalesChange?.(key, newValue);
       return { ...prev, [key]: newValue };
     });
   };
