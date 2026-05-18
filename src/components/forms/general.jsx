@@ -62,10 +62,10 @@ const General = ({ getData, data, onTotalesChange }) => {
     modelDoor: data?.modelDoor || "",
     materialDoor: data?.materialDoor || "",
     materialCabinet: data?.materialCabinet || "",
-    ivaEncimeras: data?.ivaEncimeras || "",
-    ivaCabinets: data?.ivaCabinets || "",
-    ivaElectrodomesticos: data?.ivaElectrodomesticos || "",
-    ivaEquipamientos: data?.ivaEquipamientos || "",
+    ivaEncimeras: data?.ivaEncimeras ?? "",
+    ivaCabinets: data?.ivaCabinets ?? "",
+    ivaElectrodomesticos: data?.ivaElectrodomesticos ?? "",
+    ivaEquipamientos: data?.ivaEquipamientos ?? "",
   };
 
   const handlePrecioChange = (key) => {

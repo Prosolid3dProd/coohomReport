@@ -11,6 +11,7 @@ import {
 } from "@react-pdf/renderer";
 import { CONFIG } from "../../../data/constants";
 import LogoSola from "../../../assets/sola.png";
+import { getIva } from "./operaciones";
 
 Font.register({
   family: "Helvetica-Bold",
@@ -114,7 +115,7 @@ const Presupuesto_Cliente = ({
   };
 
   const calcularIvaCabinets = (imp, descuento, ivaCabinets) => {
-    const ivaAplicable = ivaCabinets || 21;
+    const ivaAplicable = getIva(ivaCabinets);
     const importeConDescuento = calcularImporteDescuento(imp, descuento);
     return parseFloat((importeConDescuento * ivaAplicable) / 100).toFixed(2);
   };
@@ -128,7 +129,7 @@ const Presupuesto_Cliente = ({
 
   const Total2 = ({ descuento, importe, seccion, iva }) => {
     const sumaImportes = parseFloat(calcularTotal(importe, seccion));
-    const ivaPorcentaje = parseFloat(iva || 21);
+    const ivaPorcentaje = getIva(iva);
     return (
       <View
         style={{
@@ -1016,7 +1017,7 @@ const Presupuesto_Cliente = ({
                       )
                         ? [{ label: "Desc(%)", width: "30" }]
                         : []),
-                      { label: "Total", width: "100", textAlign: "right" },
+                      { label: `TOTAL (iva incluido ${getIva(data.ivaEncimeras)}%)`, width: "160", textAlign: "right" },
                     ].map(({ label, width, textAlign }) => (
                       <View key={label} style={{ width, textAlign }}>
                         <Text>{label}</Text>
@@ -1043,8 +1044,8 @@ const Presupuesto_Cliente = ({
                         ? [{ value: `${item.discount}%`, width: "30" }]
                         : []),
                       {
-                        value: (parseFloat(item.total) * (1 + (parseFloat(data.ivaEncimeras) || 21) / 100)).toFixed(2),
-                        width: "100",
+                        value: (parseFloat(item.total) * (1 + getIva(data.ivaEncimeras) / 100)).toFixed(2),
+                        width: "160",
                         textAlign: "right",
                       },
                     ].map(({ value, width, textAlign }, idx) => (
@@ -1115,7 +1116,7 @@ const Presupuesto_Cliente = ({
                       )
                         ? [{ label: "Desc(%)", width: "30" }]
                         : []),
-                      { label: "Total", width: "100", textAlign: "right" },
+                      { label: `TOTAL (iva incluido ${getIva(data.ivaEquipamientos)}%)`, width: "160", textAlign: "right" },
                     ].map(({ label, width, textAlign }) => (
                       <View key={label} style={{ width, textAlign }}>
                         <Text>{label}</Text>
@@ -1141,8 +1142,8 @@ const Presupuesto_Cliente = ({
                         ? [{ value: `${item.discount}%`, width: "30" }]
                         : []),
                       {
-                        value: (parseFloat(item.total) * (1 + (parseFloat(data.ivaEquipamientos) || 21) / 100)).toFixed(2),
-                        width: "100",
+                        value: (parseFloat(item.total) * (1 + getIva(data.ivaEquipamientos) / 100)).toFixed(2),
+                        width: "160",
                         textAlign: "right",
                       },
                     ].map(({ value, width, textAlign }, idx) => (
@@ -1213,7 +1214,7 @@ const Presupuesto_Cliente = ({
                       )
                         ? [{ label: "Desc(%)", width: "30" }]
                         : []),
-                      { label: "Total", width: "100", textAlign: "right" },
+                      { label: `TOTAL (iva incluido ${getIva(data.ivaElectrodomesticos)}%)`, width: "160", textAlign: "right" },
                     ].map(({ label, width, textAlign }) => (
                       <View key={label} style={{ width, textAlign }}>
                         <Text>{label}</Text>
@@ -1240,8 +1241,8 @@ const Presupuesto_Cliente = ({
                         ? [{ value: `${item.discount}%`, width: "30" }]
                         : []),
                       {
-                        value: (parseFloat(item.total) * (1 + (parseFloat(data.ivaElectrodomesticos) || 21) / 100)).toFixed(2),
-                        width: "100",
+                        value: (parseFloat(item.total) * (1 + getIva(data.ivaElectrodomesticos) / 100)).toFixed(2),
+                        width: "160",
                         textAlign: "right",
                       },
                     ].map(({ value, width, textAlign }, idx) => (

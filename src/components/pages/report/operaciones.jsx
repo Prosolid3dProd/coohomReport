@@ -3,6 +3,11 @@ const formatNumber = (value, coefficient = 1) => {
   return parseFloat(value) * parseFloat(coefficient);
 };
 
+const getIva = (value, fallback = 21) => {
+  const n = parseFloat(value);
+  return Number.isFinite(n) ? n : fallback;
+};
+
 const calcularSumaTotal = (cabinets, coeficiente) => {
   return cabinets.reduce((sum, item) => sum + (item.total * coeficiente), 0);
 };
@@ -44,6 +49,7 @@ const calcularTotalConDescuentoEIVA = (
 
 export {
   formatNumber,
+  getIva,
   calcularSumaTotal,
   calcularTotalZocalo,
   calcularTotalDescuentos,

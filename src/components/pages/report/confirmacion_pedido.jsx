@@ -1868,7 +1868,7 @@ const Confirmacion_Pedido = ({
                 )}
                 <View style={{ marginTop: 1 }}>
                   <Text>
-                    I.V.A. ({data.ivaCabinets == "0" ? "21" : data.ivaCabinets}%
+                    I.V.A. ({data.ivaCabinets}%
                     en muebles)
                   </Text>
                 </View>
