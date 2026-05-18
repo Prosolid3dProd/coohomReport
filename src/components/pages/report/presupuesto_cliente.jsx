@@ -1017,7 +1017,7 @@ const Presupuesto_Cliente = ({
                       )
                         ? [{ label: "Desc(%)", width: "30" }]
                         : []),
-                      { label: `TOTAL (iva incluido ${getIva(data.ivaEncimeras)}%)`, width: "160", textAlign: "right" },
+                      { label: `TOTAL (IVA INCLUIDO ${getIva(data.ivaEncimeras)}%)`, width: "160", textAlign: "right" },
                     ].map(({ label, width, textAlign }) => (
                       <View key={label} style={{ width, textAlign }}>
                         <Text>{label}</Text>
