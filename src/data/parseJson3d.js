@@ -773,6 +773,11 @@ export const parseJson3D = async (json) => {
           ),
         };
 
+        // Resta 7% al precio del casco si la Referencia termina en ".BC"
+        if (String(referenceType.ref).trim().toUpperCase().endsWith(".BC")) {
+          items.priceCabinet = items.priceCabinet * 0.93;
+        }
+
         if (
           String(item.modelProductNumber).toLocaleUpperCase() === "COSTADOS"
         ) {
